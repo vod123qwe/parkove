@@ -1760,6 +1760,18 @@
 
 /* ---- walking the same route again ---- */
 
+/*
+ * The replay has its own three colours: the walked line, the edge of anything
+ * that belongs to it, and the dark it all sits on. Pins, the marker and the
+ * dial handle read as one family because they share these.
+ */
+:root {
+  --trail-line: #7ce93f;
+  --trail-edge: #7ce93f;
+  --trail-icon: #8bef5c;
+  --trail-fill: #24451f;
+}
+
 .memplay {
   position: fixed;
   inset: 0;
@@ -1829,9 +1841,11 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--sp-4);
   padding: var(--sp-16) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-3));
   color: #ffffff;
+  text-align: center;
   background: linear-gradient(
     to top,
     rgb(4 9 5 / 0.97) 0%,
@@ -1845,7 +1859,7 @@
 .memplay__memory {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--sp-2);
   animation: memory-rise 420ms var(--ease-screen);
 }
@@ -1886,7 +1900,7 @@
  */
 .memplay__said {
   margin: var(--sp-1) 0 var(--sp-3);
-  max-width: 20ch;
+  max-width: 22ch;
   font-family: var(--font-display);
   font-weight: 800;
   font-style: italic;
@@ -1903,7 +1917,7 @@
 .memplay__teaser {
   margin: 0 0 var(--sp-2);
   color: rgb(255 255 255 / 0.78);
-  max-width: 34ch;
+  max-width: 32ch;
 }
 
 .memplay__stamp {
@@ -1915,11 +1929,12 @@
   color: rgb(255 255 255 / 0.72);
 }
 
+/* the number and its label sit on one line, centred, like a dashboard */
 .memplay__clock {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  align-self: flex-end;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--sp-3);
   color: #ffffff;
 }
 
@@ -1965,18 +1980,16 @@
 .memplay__arcwrap {
   position: absolute;
   inset: 0;
-  mask-image: radial-gradient(
-    115% 165% at 50% 118%,
-    #000 42%,
-    rgb(0 0 0 / 0.35) 72%,
-    transparent 100%
-  );
-  -webkit-mask-image: radial-gradient(
-    115% 165% at 50% 118%,
-    #000 42%,
-    rgb(0 0 0 / 0.35) 72%,
-    transparent 100%
-  );
+  /* two fades at once: out to the sides, and in towards the centre of the
+     circle, so each tick is brightest at its outer tip */
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%),
+    radial-gradient(circle at 50% 205%, transparent 52%, rgb(0 0 0 / 0.55) 62%, #000 78%);
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%),
+    radial-gradient(circle at 50% 205%, transparent 52%, rgb(0 0 0 / 0.55) 62%, #000 78%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
 }
 
 .memplay__arc,

@@ -150,6 +150,10 @@ export function MemoryPlayer({
 
     map.on('load', async () => {
       const colors = pinColors()
+      const trail = {
+        line: colors.trailEdge,
+        fill: colors.trailFill,
+      }
       for (const [id, img] of await buildPinImages(colors)) {
         if (!map.hasImage(id)) map.addImage(id, img)
       }
@@ -193,7 +197,7 @@ export function MemoryPlayer({
         type: 'line',
         source: 'mem-done',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': '#7ce93f', 'line-width': 6 },
+        paint: { 'line-color': trail.line, 'line-width': 6 },
       })
 
       map.addSource('mem-stops', {
@@ -244,9 +248,9 @@ export function MemoryPlayer({
         source: 'mem-me',
         paint: {
           'circle-radius': 9,
-          'circle-color': '#7ce93f',
+          'circle-color': trail.line,
           'circle-stroke-width': 3,
-          'circle-stroke-color': '#0f1a0d',
+          'circle-stroke-color': trail.fill,
         },
       })
 
@@ -466,17 +470,16 @@ export function MemoryPlayer({
       )}
 
         <div className="memplay__clock">
-        <span className="t-caption memplay__clocklabel">czas wyprawy</span>
-        <span className="memplay__time">{fmtClock(elapsed)}</span>
-        <span className="memplay__clocklabel -small">
-          {easing
-            ? 'zwalniam przy punkcie'
-            : rate === 0
-              ? 'przesuń suwak'
-              : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
-        </span>
+          <span className="memplay__time">{fmtClock(elapsed).replace(':', ' : ')}</span>
+          <span className="memplay__clocklabel">czas wyprawy</span>
+          <span className="memplay__clocklabel -small">
+            {easing
+              ? 'zwalniam'
+              : rate === 0
+                ? 'przesuń suwak'
+                : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
+          </span>
         </div>
-
 
         <div
           className="memplay__dial"
@@ -523,8 +526,8 @@ export function MemoryPlayer({
                 width="68"
                 height="38"
                 rx="19"
-                fill="#2c5527"
-                stroke="#5fe336"
+                fill="var(--trail-fill)"
+                stroke="var(--trail-edge)"
                 strokeWidth="3"
               />
               {[-3.5, 3.5].map((dx) =>

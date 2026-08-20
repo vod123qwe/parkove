@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.30.1'
+export const VERSION = '0.30.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.30.2',
+    date: '2026-08-20',
+    title: 'Centred, and one family of greens',
+    changes: [
+      ['changed', 'Everything under a replay is centred now, and the walk clock reads as one line: the number, then its label'],
+      ['changed', 'The dial ticks fade twice over: out to both ends, and inwards towards the centre of the circle, so each tick is brightest at its outer tip'],
+      ['changed', 'Pins, the marker and the dial handle share three colours with the walked line, so they read as one family instead of three'],
+    ],
+  },
   {
     version: '0.30.1',
     date: '2026-08-20',

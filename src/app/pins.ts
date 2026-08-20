@@ -67,7 +67,7 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   const [fill, stroke, icon] =
     // the replay is its own world: dark discs with a lime edge, over imagery
     variant === 'replay'
-      ? [colors.deep, colors.lime, colors.lime]
+      ? [colors.trailFill, colors.trailEdge, colors.trailIcon]
       : (themed[variant] ?? [
           variant === 'done' ? colors.gold : colors.surface,
           variant === 'active' ? colors.accentStrong : colors.accent,
@@ -173,6 +173,9 @@ export function pinColors() {
     onGold: v('--content-on-gold'),
     lime: v('--bg-lime'),
     deep: v('--bg-primary'),
+    trailFill: v('--trail-fill'),
+    trailEdge: v('--trail-edge'),
+    trailIcon: v('--trail-icon'),
     onPrimary: v('--content-on-primary'),
     paper: v('--bg-surface'),
     ink: v('--content-primary'),
