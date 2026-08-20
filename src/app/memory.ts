@@ -117,3 +117,13 @@ export function msAtMetres(t: Timeline, metres: number) {
   }
   return t.totalMs
 }
+
+/**
+ * A sticky note holds only so much. Rather than growing the paper, the hand
+ * gets smaller as the note gets longer, the way it does on real paper.
+ */
+export function noteType(text: string, base = 27, floor = 14) {
+  const len = Math.max(text.length, 46)
+  const size = Math.round(Math.max(floor, Math.min(base, base * Math.sqrt(46 / len))))
+  return { fontSize: `${size}px`, lineHeight: `${Math.round(size * 1.22)}px` }
+}

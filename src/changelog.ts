@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.32.0'
+export const VERSION = '0.32.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.32.1',
+    date: '2026-08-20',
+    title: 'Yellow paper, smaller hand',
+    changes: [
+      ['changed', 'A sticky note is canary yellow now, and a long note writes itself smaller instead of growing the paper'],
+      ['changed', 'The walk clock reads at the size of its own label, in white: a readout rather than a headline'],
+    ],
+  },
   {
     version: '0.32.0',
     date: '2026-08-20',

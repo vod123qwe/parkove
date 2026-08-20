@@ -1529,9 +1529,10 @@
   padding: var(--sp-4);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: var(--bg-surface-sunken);
-  color: var(--content-primary);
+  background: var(--paper-note);
+  color: var(--ink-note);
   font-family: var(--font-hand);
+  font-weight: 700;
   font-size: 26px;
   line-height: 32px;
   text-align: left;
@@ -1770,6 +1771,9 @@
   --trail-edge: #7ce93f;
   --trail-icon: #8bef5c;
   --trail-fill: #24451f;
+  /* a sticky note is canary yellow: near the gold of a stamp but its own thing */
+  --paper-note: #fdf19b;
+  --ink-note: #33301c;
 }
 
 .memplay {
@@ -1902,8 +1906,8 @@
   padding: var(--sp-5) var(--sp-5) var(--sp-6);
   border-radius: 24px;
   corner-shape: var(--corner-smooth);
-  background: #fdfbf0;
-  color: #1b1b1b;
+  background: var(--paper-note);
+  color: var(--ink-note);
   font-family: var(--font-hand);
   font-weight: 700;
   font-size: 27px;
@@ -1971,8 +1975,8 @@
 .memplay__clocklabel {
   font-family: var(--font-mono);
   font-weight: 500;
-  font-size: 10px;
-  line-height: 14px;
+  font-size: 11px;
+  line-height: 16px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgb(255 255 255 / 0.62);
@@ -1981,8 +1985,10 @@
 .memplay__time {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 17px;
-  line-height: 22px;
+  /* the same size as its label, just white: a readout, not a headline */
+  font-size: 11px;
+  line-height: 16px;
+  color: #ffffff;
   font-variant-numeric: tabular-nums;
 }
 
@@ -2231,7 +2237,7 @@
 }
 
 .memview__note .memview__kind {
-  color: var(--content-tertiary);
+  color: rgb(51 48 28 / 0.6);
 }
 
 .memview__notetext,
@@ -2241,9 +2247,10 @@
   background: none;
   text-align: left;
   font-family: var(--font-hand);
+  font-weight: 700;
   font-size: 30px;
   line-height: 36px;
-  color: var(--content-primary);
+  color: var(--ink-note);
   cursor: text;
   resize: none;
 }

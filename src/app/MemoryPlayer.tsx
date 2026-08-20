@@ -4,7 +4,7 @@ import { ChevronLeft, Pause } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
 import { CINEMATIC } from './data/mapstyles'
-import { buildTimeline, metresAt, msAtMetres, pointAt, walkedSoFar } from './memory'
+import { buildTimeline, metresAt, msAtMetres, noteType, pointAt, walkedSoFar } from './memory'
 import type { Timeline } from './memory'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import type { Journey } from './state'
@@ -527,7 +527,12 @@ export function MemoryPlayer({
             ) : (
               <>
                 <span className="memplay__kind">Notatka</span>
-                <p className="memplay__postit">{memory.mark.caption || 'Pusta notatka'}</p>
+                <p
+                  className="memplay__postit"
+                  style={noteType(memory.mark.caption || 'Pusta notatka')}
+                >
+                  {memory.mark.caption || 'Pusta notatka'}
+                </p>
               </>
             )
           ) : (

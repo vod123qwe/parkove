@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Mic, Move, StickyNote, Trash2, X } from 'lucide-react'
 import { deleteMark, updateMark } from './photos'
+import { noteType } from './memory'
 import type { WalkMark } from './photos'
 
 const fmtWhen = (at: number) =>
@@ -114,6 +115,7 @@ export function MemoryViewer({
                 ) : (
                   <button
                     className="memview__notetext"
+                    style={noteType(m.caption || 'Napisz notatkę', 30, 16)}
                     onClick={() => {
                       setDraft(m.caption)
                       setEditing(m.id)
