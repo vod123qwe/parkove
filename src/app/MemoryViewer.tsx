@@ -27,8 +27,9 @@ export function MemoryViewer({
   marks: Array<WalkMark & { url?: string }>
   startId: string
   onClose: () => void
-  /** hands the map over so the pin can be dropped somewhere else */
-  onMove: (markId: string) => void
+  /** hands the map over so the pin can be dropped somewhere else; without it
+   * the viewer is read only, which is what a replay wants */
+  onMove?: (markId: string) => void
 }) {
   const rail = useRef<HTMLDivElement>(null)
   const startIndex = Math.max(
@@ -161,9 +162,11 @@ export function MemoryViewer({
       <div className="memview__foot">
         <span className="t-caption memview__when">{fmtWhen(current.at)}</span>
         <div className="memview__actions">
-          <button className="memview__action" onClick={() => onMove(current.id)}>
-            <Move size={17} /> Przesuń pin
-          </button>
+          {onMove && (
+            <button className="memview__action" onClick={() => onMove(current.id)}>
+              <Move size={17} /> Przesuń pin
+            </button>
+          )}
           <button
             className="memview__action"
             onClick={() => {

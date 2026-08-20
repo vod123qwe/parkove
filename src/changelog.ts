@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.33.1'
+export const VERSION = '0.34.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.34.0',
+    date: '2026-08-20',
+    title: 'Open a memory, and no more white strip',
+    changes: [
+      ['added', 'A memory in a replay can be tapped: photos, recordings and notes open full screen and can be swiped through, and a point opens its whole story. The walk stops while you read'],
+      ['fixed', 'The white band at the bottom of the installed app is gone. The map now runs past the bottom edge, under the home indicator, instead of stopping at it and letting the white page show through'],
+    ],
+  },
   {
     version: '0.33.1',
     date: '2026-08-20',

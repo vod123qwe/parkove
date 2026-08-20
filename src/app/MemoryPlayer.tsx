@@ -3,6 +3,8 @@ import { Map as MapGL } from 'maplibre-gl'
 import { ChevronLeft, Layers, Pause } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
+import { MemoryViewer } from './MemoryViewer'
+import { PoiModal } from './PoiSheet'
 import { REPLAY_LOOKS, replayStyle } from './data/mapstyles'
 import type { ReplayLook } from './data/mapstyles'
 import { buildTimeline, metresAt, msAtMetres, noteType, pointAt, walkedSoFar } from './memory'
@@ -92,6 +94,9 @@ export function MemoryPlayer({
   const [memory, setMemory] = useState<Memory | null>(null)
   const [look, setLook] = useState<ReplayLook>('day')
   const [looksOpen, setLooksOpen] = useState(false)
+  /** whatever the memory was opened into: the full screen version of it */
+  const [openMark, setOpenMark] = useState<string | null>(null)
+  const [openPoi, setOpenPoi] = useState<QuestPoi | null>(null)
 
   const timeline = (lineRef.current ??= buildTimeline(journey, points))
   const track = journey.track
@@ -557,38 +562,47 @@ export function MemoryPlayer({
       )}
 
       <div className="memplay__bottom">
-      {memory && (
-        <div className="memplay__memory">
-          {memory.kind === 'mark' ? (
-            memory.mark.kind === 'photo' && memory.mark.url ? (
-              <>
-                <img className="memplay__snap" src={memory.mark.url} alt={memory.mark.caption} />
-                {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
-              </>
-            ) : memory.mark.kind === 'audio' && memory.mark.url ? (
-              <>
-                <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
-                {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
-              </>
-            ) : (
-              <>
+        {memory && (
+          <button
+            className="memplay__memory"
+            onClick={() => {
+              // stop where we are: reading is not walking
+              targetRef.current = 0
+              rateRef.current = 0
+              posRef.current = 0
+              setPos(0)
+              if (memory.kind === 'mark') setOpenMark(memory.id)
+              else setOpenPoi(memory.poi)
+            }}
+          >
+            {memory.kind === 'mark' ? (
+              memory.mark.kind === 'photo' && memory.mark.url ? (
+                <>
+                  <img className="memplay__snap" src={memory.mark.url} alt={memory.mark.caption} />
+                  {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
+                </>
+              ) : memory.mark.kind === 'audio' && memory.mark.url ? (
+                <>
+                  <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
+                  {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
+                </>
+              ) : (
                 <p
                   className="memplay__postit"
                   style={noteType(memory.mark.caption || 'Pusta notatka')}
                 >
                   {memory.mark.caption || 'Pusta notatka'}
                 </p>
+              )
+            ) : (
+              <>
+                <p className="t-body-strong memplay__poiname">{memory.poi.name}</p>
+                <p className="t-body-sm memplay__teaser">{memory.poi.teaser}</p>
+                <span className="memplay__more">czytaj więcej</span>
               </>
-            )
-          ) : (
-            <>
-              <p className="t-body-strong memplay__poiname">{memory.poi.name}</p>
-              <p className="t-body-sm memplay__teaser">{memory.poi.teaser}</p>
-            </>
-          )}
-
-        </div>
-      )}
+            )}
+          </button>
+        )}
 
         <div className="memplay__clock">
           <span className="memplay__time">{fmtClock(elapsed).replace(':', ' : ')}</span>
@@ -665,6 +679,21 @@ export function MemoryPlayer({
         <button className="memplay__pause" aria-label="Zatrzymaj przewijanie" onClick={centre}>
           <Pause size={20} />
         </button>
+
+        {openMark && (
+          <MemoryViewer
+            marks={marks}
+            startId={openMark}
+            onClose={() => setOpenMark(null)}
+          />
+        )}
+
+        <PoiModal
+          poi={openPoi}
+          parkId={journey.parkId}
+          collected
+          onClose={() => setOpenPoi(null)}
+        />
       </div>
     </div>
   )

@@ -1,15 +1,26 @@
 .app-shell {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   /* dvh, not lvh: lvh is taller than what is actually visible, which pushed
      the whole app into a scroll and cut the content at the bottom */
   height: 100dvh;
-  overflow: hidden;
+  /* no clipping here on purpose: the map is allowed to spill past the bottom */
+  overflow-x: hidden;
 }
 
+/*
+ * The map runs past the bottom edge by the height of the home indicator strip.
+ * On an installed app that strip belongs to the document, and the document is
+ * white now, so anything the canvas does not cover reads as a white band.
+ */
 .app-map {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
 }
 
 /* HUD: city progress top left, profile top right */
@@ -1676,7 +1687,10 @@
 /* the map takes the whole screen; the sheet rides over it */
 .jscreen .journeymap {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
   height: auto;
   min-height: 0;
   margin: 0;
@@ -1793,7 +1807,10 @@
 
 .memplay__map {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
 }
 
 /* changing how the ground looks: top right, opposite the way out */
@@ -1924,7 +1941,29 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sp-2);
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   animation: memory-rise 420ms var(--ease-screen);
+}
+
+.memplay__memory:active {
+  transform: scale(0.99);
+}
+
+/* a quiet hint that there is more behind a point */
+.memplay__more {
+  font-family: var(--font-text);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--trail-icon);
 }
 
 @keyframes memory-rise {
