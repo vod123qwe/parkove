@@ -1463,16 +1463,17 @@
   border: 1px solid var(--border-focus);
 }
 
-/* a note is somebody's handwriting on a scrap of paper, so it looks like one */
+/* a note is somebody's handwriting on a scrap of paper, so it looks like one.
+   Paper, not gold: gold belongs to the collection now */
 .marksheet__note,
 .marksheet__notefield {
   width: 100%;
   min-height: 96px;
   padding: var(--sp-4);
-  border: 0;
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: var(--bg-gold);
-  color: var(--content-on-gold);
+  background: var(--bg-surface-sunken);
+  color: var(--content-primary);
   font-family: var(--font-hand);
   font-size: 26px;
   line-height: 32px;
@@ -2044,7 +2045,7 @@
   width: 100%;
 }
 
-/* a note keeps its paper: handwriting on gold, big enough to read at arm length */
+/* a note keeps its paper: handwriting on a sheet, big enough to read at arm length */
 .memview__note {
   display: flex;
   flex-direction: column;
@@ -2054,12 +2055,12 @@
   max-width: 420px;
   padding: var(--sp-6);
   border-radius: var(--radius-xl);
-  background: var(--bg-gold);
+  background: var(--bg-surface-raised);
   box-shadow: var(--elevation-3);
 }
 
 .memview__note .memview__kind {
-  color: rgb(64 45 0 / 0.65);
+  color: var(--content-tertiary);
 }
 
 .memview__notetext,
@@ -2071,7 +2072,7 @@
   font-family: var(--font-hand);
   font-size: 30px;
   line-height: 36px;
-  color: var(--content-on-gold);
+  color: var(--content-primary);
   cursor: text;
   resize: none;
 }

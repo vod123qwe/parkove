@@ -15,10 +15,12 @@ import { fileURLToPath } from 'node:url'
 const HUE = 140 // forest green
 
 const palettes = {
-  P: TonalPalette.fromHueAndChroma(HUE, 26), // primary, calm forest green
-  N: TonalPalette.fromHueAndChroma(HUE, 5), // neutral, whisper of green
-  NV: TonalPalette.fromHueAndChroma(HUE, 11), // neutral variant, borders and muted content
-  G: TonalPalette.fromHueAndChroma(84, 46), // gold, badges and 100% only
+  P: TonalPalette.fromHueAndChroma(HUE, 30), // primary, deep forest: fills are near black
+  // true greys: on white paper a tinted neutral reads as dirt, not as calm
+  N: TonalPalette.fromHueAndChroma(HUE, 0),
+  NV: TonalPalette.fromHueAndChroma(HUE, 3), // neutral variant, borders and muted content
+  L: TonalPalette.fromHueAndChroma(124, 68), // lime, the one loud voice, only on dark
+  G: TonalPalette.fromHueAndChroma(84, 46), // gold, the collection and nothing else
   E: TonalPalette.fromHueAndChroma(25, 70), // error
   B: TonalPalette.fromHueAndChroma(250, 34), // calm blue, practical info (parking)
   F: TonalPalette.fromHueAndChroma(52, 52), // warm amber, food and drink
@@ -29,13 +31,14 @@ const t = (palette, tone) => ({ palette, tone })
 
 // Semantic roles: [light, dark]. Tone pairs follow M3 contrast logic (AA).
 const roles = {
-  // background
-  'bg-page': [t('N', 98), t('N', 6)],
+  // background: white paper, neutral grey fills
+  'bg-page': [t('N', 100), t('N', 6)],
   'bg-surface': [t('N', 100), t('N', 12)],
   'bg-surface-raised': [t('N', 100), t('N', 17)],
-  'bg-surface-sunken': [t('N', 95), t('N', 4)],
-  'bg-primary': [t('P', 40), t('P', 80)],
-  'bg-primary-subtle': [t('P', 95), t('P', 25)],
+  'bg-surface-sunken': [t('N', 96), t('N', 4)],
+  'bg-primary': [t('P', 20), t('P', 80)],
+  'bg-primary-subtle': [t('N', 96), t('P', 25)],
+  'bg-lime': [t('L', 88), t('L', 80)],
   'bg-gold': [t('G', 85), t('G', 30)],
   'bg-error-subtle': [t('E', 95), t('E', 20)],
 
@@ -44,22 +47,24 @@ const roles = {
   'content-secondary': [t('NV', 30), t('NV', 80)],
   'content-tertiary': [t('NV', 50), t('NV', 60)],
   'content-disabled': [t('N', 62), t('N', 40)],
-  'content-accent': [t('P', 40), t('P', 80)],
-  'content-on-primary': [t('P', 100), t('P', 20)],
+  'content-accent': [t('P', 25), t('P', 80)],
+  // lime on the deep green: the pairing the whole palette is built around
+  'content-on-primary': [t('L', 90), t('P', 20)],
+  'content-on-lime': [t('P', 15), t('P', 15)],
   'content-on-gold': [t('G', 20), t('G', 90)],
   'content-error': [t('E', 40), t('E', 80)],
 
   // border
   'border-subtle': [t('NV', 90), t('NV', 25)],
   'border-default': [t('NV', 80), t('NV', 30)],
-  'border-focus': [t('P', 40), t('P', 80)],
+  'border-focus': [t('P', 30), t('P', 80)],
 
   // map, the fog of war
-  'map-visited-fill': [t('P', 90), t('P', 25)],
-  'map-visited-stroke': [t('P', 40), t('P', 70)],
-  'map-unvisited-fill': [t('N', 90), t('N', 20)],
-  'map-unvisited-stroke': [t('N', 70), t('N', 35)],
-  'map-track': [t('P', 40), t('P', 80)],
+  'map-visited-fill': [t('P', 92), t('P', 25)],
+  'map-visited-stroke': [t('P', 30), t('P', 70)],
+  'map-unvisited-fill': [t('N', 92), t('N', 20)],
+  'map-unvisited-stroke': [t('N', 75), t('N', 35)],
+  'map-track': [t('P', 25), t('P', 80)],
 
   // practical info, set apart from the green of nature
   'bg-info-subtle': [t('B', 96), t('B', 22)],

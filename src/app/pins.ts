@@ -58,9 +58,10 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
     parking: [colors.infoSubtle, colors.infoBorder, colors.info],
     food: [colors.foodSubtle, colors.foodBorder, colors.food],
     playground: [colors.playSubtle, colors.playBorder, colors.play],
-    // things you left yourself: a filled pin, so they read apart from the game
-    audio: [colors.accent, colors.accent, colors.surface],
-    note: [colors.gold, colors.gold, colors.onGold],
+    // things you left yourself, told apart from the game and from the collection:
+    // gold now belongs to the collection alone
+    audio: [colors.accentStrong, colors.accentStrong, colors.lime],
+    note: [colors.paper, colors.accentStrong, colors.ink],
   }
   const [fill, stroke, icon] = themed[variant] ?? [
     variant === 'done' ? colors.gold : colors.surface,
@@ -165,6 +166,10 @@ export function pinColors() {
     accentStrong: v('--content-accent'),
     gold: v('--bg-gold'),
     onGold: v('--content-on-gold'),
+    lime: v('--bg-lime'),
+    onPrimary: v('--content-on-primary'),
+    paper: v('--bg-surface'),
+    ink: v('--content-primary'),
     infoSubtle: v('--bg-info-subtle'),
     info: v('--content-info'),
     infoBorder: v('--border-info'),

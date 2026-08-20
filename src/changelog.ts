@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.26.0'
+export const VERSION = '0.27.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.27.0',
+    date: '2026-08-20',
+    title: 'White paper, deep green, one lime',
+    changes: [
+      ['changed', 'The palette moved to white paper with truly neutral greys: a tinted grey reads as dirt next to white, so the tint is gone'],
+      ['changed', 'Green went deep, almost black, and lime arrived as the one loud voice: it writes on the dark green fills, never on white'],
+      ['changed', 'Gold now belongs to the collection alone, so notes are written on paper and voice pins wear the deep green with a lime microphone'],
+    ],
+  },
   {
     version: '0.26.0',
     date: '2026-08-20',
