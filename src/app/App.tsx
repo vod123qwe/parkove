@@ -25,6 +25,7 @@ import type { Pt } from './geo'
 import { beginWalk } from './walk'
 import { EndWalkSheet } from './EndWalkSheet'
 import { JourneyScreen } from './JourneyScreen'
+import { StampScreen } from './StampScreen'
 import { WalkSummary } from './WalkSummary'
 import { stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
@@ -74,6 +75,8 @@ export function App() {
   const [myFix, setMyFix] = useState<{ coords: Pt; accuracy: number; at: number } | null>(null)
   /** a past walk opened for review: its route takes over the map */
   const [journeyId, setJourneyId] = useState<string | null>(null)
+  /** one sticker opened up close */
+  const [stampParkId, setStampParkId] = useState<string | null>(null)
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   const [profileOpen, setProfileOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
@@ -339,6 +342,7 @@ export function App() {
   )
 
   const journeys = useGameState().journeys
+  const stampPark = stampParkId ? (FEATURES.find((f) => f.id === stampParkId) ?? null) : null
   const summaryJourney = summaryId ? (journeys.find((j) => j.id === summaryId) ?? null) : null
   const summaryPark = summaryJourney
     ? FEATURES.find((f) => f.id === summaryJourney.parkId)
@@ -562,6 +566,18 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
+      {stampPark && (
+        <StampScreen
+          park={stampPark}
+          onClose={() => setStampParkId(null)}
+          onGoToPark={(id) => {
+            setStampParkId(null)
+            setProfileOpen(false)
+            selectParkFromMap(id)
+          }}
+        />
+      )}
+
       {journey && journeyPark && (
         <JourneyScreen
           journey={journey}
@@ -706,6 +722,7 @@ export function App() {
         onOpenStamps={() => setStampsOpen(true)}
         onOpenAppearance={() => setAppearanceOpen(true)}
         onOpenMapStyle={() => setMapStyleOpen(true)}
+        onOpenStamp={setStampParkId}
         onOpenJourney={(id) => {
           clearSelection()
           setJourneyId(id)

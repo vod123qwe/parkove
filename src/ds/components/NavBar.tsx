@@ -13,6 +13,8 @@ export type NavBarProps = {
   trailing?: ReactNode
   /** true once the content under the bar has scrolled: translucent blur backdrop */
   scrolled?: boolean
+  /** floats over a map: no background, no title, a white button that always reads */
+  transparent?: boolean
   className?: string
 }
 
@@ -23,10 +25,18 @@ export function NavBar({
   onAction,
   trailing,
   scrolled,
+  transparent,
   className,
 }: NavBarProps) {
   return (
-    <header className={cx('pk-navbar', scrolled && '-scrolled', className)}>
+    <header
+      className={cx(
+        'pk-navbar',
+        scrolled && !transparent && '-scrolled',
+        transparent ? '-transparent' : null,
+        className,
+      )}
+    >
       <IconButton
         aria-label={variant === 'close' ? 'Zamknij' : 'Wstecz'}
         variant="tonal"
@@ -35,7 +45,7 @@ export function NavBar({
       >
         {variant === 'close' ? <X size={20} /> : <ChevronLeft size={20} />}
       </IconButton>
-      {title != null && <h2 className="pk-navbar__title">{title}</h2>}
+      {title != null && !transparent && <h2 className="pk-navbar__title">{title}</h2>}
       {trailing != null && <span className="pk-navbar__trailing">{trailing}</span>}
     </header>
   )

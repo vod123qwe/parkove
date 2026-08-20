@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { ChevronRight, Component, Footprints, Map as MapIcon, Palette, Pencil, Sparkles, Trees } from 'lucide-react'
-import { Button, Carousel, List, ListItem, Modal, Polaroid, ProgressRing, Stamp, Stat } from '../ds'
+import { Award, ChevronRight, Component, Footprints, Map as MapIcon, Palette, Pencil, Route, Sparkles, Trees } from 'lucide-react'
+import { Button, Carousel, List, ListItem, Modal, Polaroid, Stamp, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
 import { usePhotos } from './photos'
 import { getName, greeting, initials, setName as saveName } from './profile'
@@ -28,6 +28,7 @@ export function ProfileModal({
   onOpenMapStyle,
   onGoToPark,
   onOpenJourney,
+  onOpenStamp,
 }: {
   open: boolean
   onClose: () => void
@@ -40,6 +41,8 @@ export function ProfileModal({
   onGoToPark: (parkId: string) => void
   /** open one past walk: its route lands on the map, details in a sheet */
   onOpenJourney: (journeyId: string) => void
+  /** one sticker up close, on its own page */
+  onOpenStamp: (parkId: string) => void
 }) {
   const { parks: progress, journeys } = useGameState()
   const photos = usePhotos().filter((m) => m.kind === 'photo' && m.url)
@@ -101,21 +104,30 @@ export function ProfileModal({
           </button>
         )}
 
-        <div className="prof-ring">
-          <ProgressRing value={percent} size="lg" />
-          <div className="prof-ring__text">
-            <p className="t-body-strong">{percent}% Krakowa odkryte</p>
-            <p className="t-body-sm park-muted">
-              {visitedCount} z {parks.length} miejsc · {km.toFixed(1).replace('.', ',')} km w parkach
-            </p>
+        {/* the city as a board: one square per place, filled once you have been */}
+        <div className="prof-cover">
+          <div className="prof-cover__head">
+            <span className="prof-cover__pct">{percent}%</span>
+            <div className="prof-cover__text">
+              <p className="t-body-strong">Krakowa odkryte</p>
+              <p className="t-body-sm park-muted">
+                {visitedCount} z {parks.length} miejsc · {km.toFixed(1).replace('.', ',')} km w
+                parkach
+              </p>
+            </div>
+          </div>
+          <div className="prof-cover__grid" aria-hidden="true">
+            {parks.map((p) => (
+              <span key={p.id} className={progress[p.id] ? 'is-on' : undefined} />
+            ))}
           </div>
         </div>
 
-        <div className="prof-stats">
-          <Stat value={String(visitedCount)} label="pieczątki" />
-          <Stat value={String(journeys.length)} label="wyprawy" />
-          <Stat value={km.toFixed(1).replace('.', ',')} label="kilometry" />
-        </div>
+        <StatGrid cols={3} className="prof-stats">
+          <Stat icon={<Award />} value={String(visitedCount)} label="pieczątki" />
+          <Stat icon={<Footprints />} value={String(journeys.length)} label="wyprawy" />
+          <Stat icon={<Route />} value={km.toFixed(1).replace('.', ',')} label="kilometry" />
+        </StatGrid>
       </header>
 
       <section className="prof-section">
@@ -136,6 +148,7 @@ export function ProfileModal({
                 size="md"
                 showName
                 fallback={<Trees />}
+                onClick={() => onOpenStamp(p.id)}
               />
             ))}
           </Carousel>

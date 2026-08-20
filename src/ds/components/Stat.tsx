@@ -22,12 +22,17 @@ export function Stat({ value, label, icon, className }: StatProps) {
   )
 }
 
-export type StatGridProps = { children: ReactNode; className?: string }
+export type StatGridProps = {
+  children: ReactNode
+  /** two by default: three when the numbers are short, like a profile header */
+  cols?: 2 | 3
+  className?: string
+}
 
 /**
  * Two columns of stat cards. A single row of four numbers reads as a cramped
  * table; in pairs each number gets room and its own icon to hold on to.
  */
-export function StatGrid({ children, className }: StatGridProps) {
-  return <div className={cx('pk-statgrid', className)}>{children}</div>
+export function StatGrid({ children, cols = 2, className }: StatGridProps) {
+  return <div className={cx('pk-statgrid', `-c${cols}`, className)}>{children}</div>
 }

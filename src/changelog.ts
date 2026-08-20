@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.21.0'
+export const VERSION = '0.22.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.22.0',
+    date: '2026-08-20',
+    title: 'A profile with room to breathe',
+    changes: [
+      ['changed', 'The profile header drops the ring for the city as a board: one square per place, filled in as you walk, with the percentage in full size next to it'],
+      ['changed', 'Stamps, walks and kilometres are three cards with icons, and every section on the page has twice the room it had'],
+      ['added', 'Tapping a stamp opens its own page: where it comes from, when you first stood there, points, visits and the photos you took in that park'],
+      ['changed', 'The walk screen header is transparent with no label, and its back button is white so it reads over any map'],
+      ['added', 'DS: StatGrid does three columns, Stamp can be tapped, NavBar has a transparent variant'],
+    ],
+  },
   {
     version: '0.21.0',
     date: '2026-08-20',

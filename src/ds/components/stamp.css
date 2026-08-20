@@ -73,3 +73,17 @@
 .pk-stamp.-locked .pk-stamp__name {
   color: var(--content-tertiary);
 }
+
+/* a stamp that leads somewhere: no chrome, just a press */
+.pk-stamp.-tappable {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.pk-stamp.-tappable:active {
+  transform: scale(0.97);
+}

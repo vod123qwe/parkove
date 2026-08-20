@@ -57,3 +57,17 @@
   display: flex;
   align-items: center;
 }
+
+/* floating over a map: nothing but a button that reads on any background */
+.pk-navbar.-transparent {
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 0;
+}
+
+.pk-navbar.-transparent .pk-navbar__action {
+  background: #ffffff;
+  color: var(--content-primary);
+  box-shadow: var(--elevation-2);
+}

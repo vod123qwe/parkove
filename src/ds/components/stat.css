@@ -65,6 +65,22 @@
 
 .pk-statgrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: var(--sp-3);
+}
+
+.pk-statgrid.-c2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.pk-statgrid.-c3 {
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+}
+
+/* three across on a phone is tight: stack the icon above the number */
+.pk-statgrid.-c3 .pk-stat.-card {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
 }

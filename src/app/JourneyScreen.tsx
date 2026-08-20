@@ -113,7 +113,7 @@ export function JourneyScreen({
         }}
       />
 
-      <NavBar title="Wyprawa" variant="back" onAction={onClose} className="jscreen__nav" />
+      <NavBar transparent variant="back" onAction={onClose} className="jscreen__nav" />
 
       {movingId && (
         <div className="jscreen__placing t-body-sm">Dotknij mapy, żeby przenieść ten pin</div>
