@@ -8,6 +8,8 @@
   --bg-primary: #1b3711; /* P20 */
   --bg-primary-subtle: #f3f3f3; /* N96 */
   --bg-lime: #c3ec47; /* L88 */
+  --bg-mint: #ecfac0; /* LS96 */
+  --border-mint: #d0dda5; /* LS86 */
   --bg-gold: #ffcd68; /* G85 */
   --bg-error-subtle: #ffedea; /* E95 */
   --content-primary: #1b1b1b; /* N10 */
@@ -47,6 +49,8 @@
   --bg-primary: #aed09c; /* P80 */
   --bg-primary-subtle: #26421b; /* P25 */
   --bg-lime: #aed531; /* L80 */
+  --bg-mint: #203b15; /* P22 */
+  --border-mint: #36532a; /* P32 */
   --bg-gold: #5c4200; /* G30 */
   --bg-error-subtle: #690005; /* E20 */
   --content-primary: #f1f1f1; /* N95 */
@@ -87,6 +91,8 @@
     --bg-primary: #aed09c; /* P80 */
     --bg-primary-subtle: #26421b; /* P25 */
     --bg-lime: #aed531; /* L80 */
+    --bg-mint: #203b15; /* P22 */
+    --border-mint: #36532a; /* P32 */
     --bg-gold: #5c4200; /* G30 */
     --bg-error-subtle: #690005; /* E20 */
     --content-primary: #f1f1f1; /* N95 */

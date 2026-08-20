@@ -160,12 +160,7 @@ export function MemoryPlayer({
     // the bottom third carries the memory, so the walker rides above centre
     map.setPadding({ top: 0, left: 0, right: 0, bottom: Math.round(window.innerHeight * 0.34) })
 
-    // styledata fires several times per style, and this is async: without a
-    // synchronous latch every one of them starts adding the same sources
-    let painting = false
-    const paint = async () => {
-      if (painting || map.getSource('mem-track')) return
-      painting = true
+    const paintOnce = async () => {
       const colors = pinColors()
       const trail = {
         line: colors.trailEdge,
@@ -283,8 +278,26 @@ export function MemoryPlayer({
       })
 
       readyRef.current = true
-      painting = false
       draw(elapsedRef.current)
+    }
+
+    /*
+     * styledata fires several times per style and painting is async, so it
+     * needs a latch. The latch has to be released even when the style is
+     * swapped mid-paint and an add throws: without the finally, one failed
+     * paint locked the map out of ever drawing the route again.
+     */
+    let painting = false
+    const paint = async () => {
+      if (painting || map.getSource('mem-track')) return
+      painting = true
+      try {
+        await paintOnce()
+      } catch {
+        // the style changed under us; the next styledata will call again
+      } finally {
+        painting = false
+      }
     }
     ;(map as unknown as { __paint: () => void }).__paint = paint
 
@@ -619,11 +632,31 @@ export function MemoryPlayer({
           {/* ticks and the arc live under a shadow that eats their ends */}
           <div className="memplay__arcwrap">
             <svg className="memplay__arc" viewBox="0 0 300 110" aria-hidden="true">
+              {/*
+                * The fade lives here rather than in a CSS mask: a gradient in
+                * user space around the same centre the ticks radiate from
+                * dissolves every tick along its own length, at exactly the
+                * right radius, whatever size the dial ends up.
+                */}
+              <defs>
+                <radialGradient
+                  id="pk-tick-fade"
+                  gradientUnits="userSpaceOnUse"
+                  cx={DIAL_CX}
+                  cy={DIAL_CY}
+                  r={DIAL_R + 35}
+                >
+                  <stop offset="0.84" stopColor="#ffffff" stopOpacity="0" />
+                  <stop offset="0.9" stopColor="#ffffff" stopOpacity="0.18" />
+                  <stop offset="0.95" stopColor="#ffffff" stopOpacity="0.55" />
+                  <stop offset="1" stopColor="#ffffff" stopOpacity="0.95" />
+                </radialGradient>
+              </defs>
               <path
                 d="M 11.3 101.6 A 176 176 0 0 1 288.7 101.6"
                 fill="none"
-                stroke="rgba(255,255,255,0.18)"
-                strokeWidth="1.6"
+                stroke="rgba(255,255,255,0.1)"
+                strokeWidth="1.4"
                 strokeLinecap="round"
               />
               {Array.from({ length: 61 }, (_, i) => {
@@ -636,7 +669,7 @@ export function MemoryPlayer({
                     y1={DIAL_CY - Math.cos(a) * (DIAL_R + 1)}
                     x2={DIAL_CX + Math.sin(a) * (DIAL_R + 35)}
                     y2={DIAL_CY - Math.cos(a) * (DIAL_R + 35)}
-                    stroke="rgba(255,255,255,0.72)"
+                    stroke="url(#pk-tick-fade)"
                     strokeWidth="1.1"
                     strokeLinecap="round"
                   />

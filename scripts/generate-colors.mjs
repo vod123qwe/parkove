@@ -20,6 +20,7 @@ const palettes = {
   N: TonalPalette.fromHueAndChroma(HUE, 0),
   NV: TonalPalette.fromHueAndChroma(HUE, 3), // neutral variant, borders and muted content
   L: TonalPalette.fromHueAndChroma(124, 68), // lime, the one loud voice, only on dark
+  LS: TonalPalette.fromHueAndChroma(124, 26), // the same lime, whispered: tinted surfaces
   G: TonalPalette.fromHueAndChroma(84, 46), // gold, the collection and nothing else
   E: TonalPalette.fromHueAndChroma(25, 70), // error
   B: TonalPalette.fromHueAndChroma(250, 34), // calm blue, practical info (parking)
@@ -39,6 +40,10 @@ const roles = {
   'bg-primary': [t('P', 20), t('P', 80)],
   'bg-primary-subtle': [t('N', 96), t('P', 25)],
   'bg-lime': [t('L', 88), t('L', 80)],
+  // a surface that belongs to the app rather than to the paper: questions,
+  // stats, anything that should read as "ours" without shouting
+  'bg-mint': [t('LS', 96), t('P', 22)],
+  'border-mint': [t('LS', 86), t('P', 32)],
   'bg-gold': [t('G', 85), t('G', 30)],
   'bg-error-subtle': [t('E', 95), t('E', 20)],
 

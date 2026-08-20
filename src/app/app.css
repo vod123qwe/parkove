@@ -3,9 +3,7 @@
   top: 0;
   left: 0;
   right: 0;
-  /* dvh, not lvh: lvh is taller than what is actually visible, which pushed
-     the whole app into a scroll and cut the content at the bottom */
-  height: 100dvh;
+  height: var(--screen-h);
   /* no clipping here on purpose: the map is allowed to spill past the bottom */
   overflow-x: hidden;
 }
@@ -692,12 +690,14 @@
   color: var(--content-tertiary);
 }
 
-/* dilemma: the question a place asks */
+/* dilemma: the question a place asks. Tinted, not grey: a question from the
+   app should feel like it came from the app */
 .dilemma {
   margin: var(--sp-6) 0;
   padding: var(--sp-5);
-  background: var(--bg-surface-sunken);
+  background: var(--bg-mint);
   border-radius: var(--radius-lg);
+  corner-shape: var(--corner-smooth);
 }
 
 .dilemma__kicker {
@@ -1664,7 +1664,10 @@
 
 .jscreen {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--screen-h);
   z-index: 80;
   background: var(--bg-page);
   /* a walk from the journal is one level deeper, so it arrives from the side */
@@ -1786,7 +1789,10 @@
 
 .memplay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--screen-h);
   z-index: 120;
   background: #0f1a0d;
   /* a screening is presented over everything, so it rises from the bottom */
@@ -2102,30 +2108,16 @@
 .memplay__arcwrap {
   position: absolute;
   inset: 0;
-  /* two fades at once: out to the sides, and in towards the centre of the
-     circle, so each tick is brightest at its outer tip */
-  mask-image:
-    linear-gradient(to right, transparent 0%, #000 26%, #000 74%, transparent 100%),
-    radial-gradient(
-      circle at 50% 205%,
-      transparent 44%,
-      rgb(0 0 0 / 0.18) 56%,
-      rgb(0 0 0 / 0.55) 68%,
-      rgb(0 0 0 / 0.85) 78%,
-      #000 88%
-    );
-  -webkit-mask-image:
-    linear-gradient(to right, transparent 0%, #000 26%, #000 74%, transparent 100%),
-    radial-gradient(
-      circle at 50% 205%,
-      transparent 44%,
-      rgb(0 0 0 / 0.18) 56%,
-      rgb(0 0 0 / 0.55) 68%,
-      rgb(0 0 0 / 0.85) 78%,
-      #000 88%
-    );
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
+  /* only the side fade lives here now: the fade along each tick is drawn
+     inside the SVG, where the radii are exact */
+  mask-image: linear-gradient(to right, transparent 0%, #000 24%, #000 76%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 24%,
+    #000 76%,
+    transparent 100%
+  );
 }
 
 .memplay__arc,
@@ -2223,7 +2215,10 @@
 
 .memview {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--screen-h);
   z-index: 130;
   display: flex;
   flex-direction: column;

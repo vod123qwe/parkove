@@ -162,7 +162,13 @@ export function JourneyScreen({
               size="lg"
               icon={<Play size={18} />}
               className="journey__replay"
-              onClick={() => setReplay(true)}
+              onClick={() => {
+                // nothing of this screen may stay open under the replay, or
+                // closing a memory there lands you two screens back
+                setMarkId(null)
+                setPoi(null)
+                setReplay(true)
+              }}
             >
               Przejdź tę trasę jeszcze raz
             </Button>
@@ -301,7 +307,7 @@ export function JourneyScreen({
         </div>
       </BottomSheet>
 
-      {markId && !movingId && marks.length > 0 && (
+      {markId && !movingId && !replay && marks.length > 0 && (
         <MemoryViewer
           marks={marks}
           startId={markId}
@@ -323,7 +329,7 @@ export function JourneyScreen({
       )}
 
       <PoiModal
-        poi={poi}
+        poi={replay ? null : poi}
         parkId={journey.parkId}
         collected={poi ? collected.has(poi.id) : false}
         onClose={() => setPoi(null)}

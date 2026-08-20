@@ -44,9 +44,22 @@
    */
   --corner-smooth: squircle;
 
+  /*
+   * The height of the physical screen. lvh is the largest viewport, which on
+   * an installed app includes the strip behind the home indicator; dvh stops
+   * above it and leaves a band of bare page showing.
+   */
+  --screen-h: 100vh;
+
   /* control sizes */
   --control-sm: 36px;
   --control-md: 44px;
   --control-lg: 52px;
   --touch-min: 44px;
+}
+
+@supports (height: 100lvh) {
+  :root {
+    --screen-h: 100lvh;
+  }
 }

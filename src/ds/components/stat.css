@@ -32,7 +32,7 @@
   gap: var(--sp-3);
   padding: var(--sp-4);
   border-radius: var(--radius-lg);
-  background: var(--bg-surface-sunken);
+  background: var(--bg-mint);
 }
 
 .pk-stat__icon {

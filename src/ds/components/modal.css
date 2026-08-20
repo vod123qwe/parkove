@@ -7,8 +7,10 @@
 
 .pk-modal__panel {
   position: absolute;
-  inset: 0;
-  height: 100dvh;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--screen-h);
   display: flex;
   flex-direction: column;
   background: var(--bg-page);

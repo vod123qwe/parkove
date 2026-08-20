@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.37.0'
+export const VERSION = '0.38.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.38.0',
+    date: '2026-08-20',
+    title: 'Ticks that dissolve, and a screen that ends where the screen ends',
+    changes: [
+      ['changed', 'Tinted inserts are back: the question a place asks and the stat cards sit on a whisper of lime instead of grey'],
+      ['fixed', 'The dial ticks now really dissolve towards the arc. The fade is drawn inside the dial itself, around the same centre the ticks radiate from, instead of a mask that guessed its radius from the corner of the box'],
+      ['fixed', 'Every full screen layer is now as tall as the physical screen, not as tall as the viewport the browser admits to, which is what kept leaving a white band above the home indicator'],
+      ['fixed', 'Grafit 3D lost the route, the marker and the pins: one failed repaint used to lock the map out of ever drawing them again'],
+      ['fixed', 'Closing a memory opened from a replay no longer drops you two screens back'],
+    ],
+  },
   {
     version: '0.37.0',
     date: '2026-08-20',
