@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.30.2'
+export const VERSION = '0.31.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.31.0',
+    date: '2026-08-20',
+    title: 'Pause, and the handle springs home',
+    changes: [
+      ['added', 'A pause button under the arc. It brings the handle back to the middle with a spring rather than a jump, overshooting the centre by a hair before it settles'],
+      ['changed', 'The hour a memory was left and the speed multiplier are gone from the replay: the walk clock is enough'],
+    ],
+  },
   {
     version: '0.30.2',
     date: '2026-08-20',

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Pause } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
 import { CINEMATIC } from './data/mapstyles'
@@ -44,10 +44,6 @@ const DIAL_CX = 150
 const DIAL_CY = 210
 const DIAL_R = 176
 
-/** the wall clock of a memory, for the small line under it */
-const clockOf = (at: number) =>
-  at ? new Date(at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '—'
-
 /** a walk is usually minutes, so read it as mm:ss until it passes an hour */
 const fmtClock = (ms: number) => {
   const s = Math.floor(ms / 1000)
@@ -90,11 +86,7 @@ export function MemoryPlayer({
   const bearingRef = useRef<number | null>(null)
   const seenRef = useRef<Set<string>>(new Set())
   const dwellUntil = useRef(0)
-  const easingRef = useRef(false)
-  const shownRate = useRef(0)
-  const [easing, setEasing] = useState(false)
 
-  const [rate, setRate] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
 
@@ -327,11 +319,6 @@ export function MemoryPlayer({
         const k = 1 - Math.exp(-dt / RATE_TAU)
         rateRef.current += (target - rateRef.current) * k
         if (Math.abs(target - rateRef.current) < 0.04) rateRef.current = target
-        shownRate.current += 1
-        if (shownRate.current > 4) {
-          shownRate.current = 0
-          setRate(rateRef.current)
-        }
       }
 
       let r = rateRef.current
@@ -350,12 +337,6 @@ export function MemoryPlayer({
           const t = Math.max(0, nearest / SLOW_M)
           r *= SLOW_FLOOR + (1 - SLOW_FLOOR) * t * t
         }
-      }
-      // only call it slowing when it is actually noticeable
-      const slowed = rateRef.current > 0 && r < rateRef.current * 0.8
-      if (slowed !== easingRef.current) {
-        easingRef.current = slowed
-        setEasing(slowed)
       }
       if (r !== 0) {
         const next = Math.max(0, Math.min(timeline.totalMs, elapsedRef.current + dt * r))
@@ -376,7 +357,6 @@ export function MemoryPlayer({
           setPos(0)
           targetRef.current = 0
           rateRef.current = 0
-          setRate(0)
         }
       }
       raf = requestAnimationFrame(step)
@@ -400,6 +380,7 @@ export function MemoryPlayer({
   }
 
   const onDialDown = (e: React.PointerEvent) => {
+    cancelAnimationFrame(tween.current)
     try {
       // capture keeps the drag alive outside the arc; losing it is survivable
       e.currentTarget.setPointerCapture(e.pointerId)
@@ -418,7 +399,27 @@ export function MemoryPlayer({
     dragFrom.current = null
   }
 
-  const fmtRate = (r: number) => (Math.abs(r) >= 10 ? Math.round(Math.abs(r)) : Math.abs(r).toFixed(1))
+  /**
+   * Pausing lets the handle spring back rather than teleport: it overshoots
+   * the middle by a hair and settles, which is what makes it feel sprung.
+   */
+  const tween = useRef(0)
+  const centre = () => {
+    cancelAnimationFrame(tween.current)
+    const from = posRef.current
+    if (from === 0) return
+    const t0 = performance.now()
+    const DUR = 360
+    const step = (now: number) => {
+      const p = Math.min(1, (now - t0) / DUR)
+      const eased = 1 - Math.pow(1 - p, 3)
+      const overshoot = Math.sin(p * Math.PI) * 0.05 * -Math.sign(from)
+      applyPos(from * (1 - eased) + overshoot)
+      if (p < 1) tween.current = requestAnimationFrame(step)
+      else applyPos(0)
+    }
+    tween.current = requestAnimationFrame(step)
+  }
 
   return (
     <div className="memplay">
@@ -465,20 +466,12 @@ export function MemoryPlayer({
             </>
           )}
 
-          <span className="memplay__stamp">godzina: {clockOf(memory.at)}</span>
         </div>
       )}
 
         <div className="memplay__clock">
           <span className="memplay__time">{fmtClock(elapsed).replace(':', ' : ')}</span>
           <span className="memplay__clocklabel">czas wyprawy</span>
-          <span className="memplay__clocklabel -small">
-            {easing
-              ? 'zwalniam'
-              : rate === 0
-                ? 'przesuń suwak'
-                : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
-          </span>
         </div>
 
         <div
@@ -546,12 +539,11 @@ export function MemoryPlayer({
             </g>
           </svg>
 
-          <button
-            className="memplay__dialreset"
-            aria-label="Zatrzymaj przewijanie"
-            onClick={() => applyPos(0)}
-          />
         </div>
+
+        <button className="memplay__pause" aria-label="Zatrzymaj przewijanie" onClick={centre}>
+          <Pause size={20} />
+        </button>
       </div>
     </div>
   )

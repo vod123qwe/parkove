@@ -1948,11 +1948,6 @@
   color: rgb(255 255 255 / 0.62);
 }
 
-.memplay__clocklabel.-small {
-  font-size: 9px;
-  letter-spacing: 0.12em;
-}
-
 .memplay__time {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -2005,17 +2000,24 @@
   filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.55));
 }
 
-/* a tap in the middle of the arc stops the walk */
-.memplay__dialreset {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 80px;
-  height: 46px;
-  transform: translateX(-50%);
+/* pause sits under the arc: it brings the handle back to the middle */
+.memplay__pause {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: calc(-1 * var(--sp-6)) auto 0;
   border: 0;
-  background: transparent;
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  background: rgb(255 255 255 / 0.12);
+  color: #ffffff;
   cursor: pointer;
+  transition: background var(--motion-fast) var(--ease-out);
+}
+
+.memplay__pause:active {
+  background: rgb(255 255 255 / 0.2);
 }
 
 /* ---- a voice note drawn as its own waveform ---- */
