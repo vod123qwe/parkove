@@ -58,6 +58,7 @@ export function ParkSheet({
   onOpenPoi,
   onOpenParking,
   onOpenAmenity,
+  onPhotoSaved,
 }: {
   park: ParkFeature | null
   onClose: () => void
@@ -65,6 +66,8 @@ export function ParkSheet({
   onOpenPoi: (poi: QuestPoi) => void
   onOpenParking: () => void
   onOpenAmenity: (kind: 'food' | 'playground') => void
+  /** a fresh picture opens its own sheet, where the caption gets written */
+  onPhotoSaved: (photoId: string) => void
 }) {
   const { parks, expedition } = useGameState()
   const [status, setStatus] = useState<Status>({ s: 'idle' })
@@ -318,7 +321,7 @@ export function ParkSheet({
           </Button>
           <PhotoButton
             parkId={park.id}
-            defaultCaption={park.properties.name}
+            onSaved={onPhotoSaved}
             className="park-secondbtn"
             variant="ghost"
           />

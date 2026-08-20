@@ -12,11 +12,14 @@ export function RevealSheet({
   poi,
   onClose,
   onReadMore,
+  onPhotoSaved,
 }: {
   parkId: string
   poi: QuestPoi | null
   onClose: () => void
   onReadMore: (poi: QuestPoi) => void
+  /** a fresh picture opens its own sheet, where the caption gets written */
+  onPhotoSaved: (photoId: string) => void
 }) {
   const { parks } = useGameState()
   if (!poi) return null
@@ -58,7 +61,7 @@ export function RevealSheet({
       <PhotoButton
         parkId={parkId}
         poiId={poi.id}
-        defaultCaption={poi.name}
+        onSaved={onPhotoSaved}
         label="Zrób zdjęcie tego miejsca"
         variant="tonal"
         className="park-devbtn"

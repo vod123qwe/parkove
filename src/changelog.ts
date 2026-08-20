@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.16.0'
+export const VERSION = '0.17.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.17.0',
+    date: '2026-08-20',
+    title: 'Walks you can come back to',
+    changes: [
+      ['added', 'Every past walk opens from the profile: its route lands on the map and a sheet holds the details, so you can look at where you actually went'],
+      ['added', 'Past walks are editable. Rename them, write a note at home, add photos from the camera roll later, move or delete their pins, or drop the whole walk from the journal'],
+      ['changed', 'The profile lists all your walks now, not just the last three, and shows the name you gave them'],
+      ['fixed', 'Taking a photo no longer opens a system prompt for the caption. That dialog could freeze the installed app; the caption is written in the photo sheet instead'],
+      ['fixed', 'A name or note typed into a sheet survives closing it by dragging, which never fired the save before'],
+    ],
+  },
   {
     version: '0.16.0',
     date: '2026-08-20',

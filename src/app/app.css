@@ -1106,3 +1106,96 @@
   gap: var(--sp-2);
   margin-top: var(--sp-2);
 }
+
+/* ---- one walk from the journal ---- */
+
+.journey {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.journey__name {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--content-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.journey__name svg {
+  color: var(--content-tertiary);
+}
+
+.journey__nameinput {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border-focus);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-sunken);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--content-primary);
+}
+
+.journey__when {
+  margin: calc(-1 * var(--sp-2)) 0 0;
+  color: var(--content-tertiary);
+}
+
+.journey__stats {
+  display: flex;
+  gap: var(--sp-6);
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.journey__section {
+  margin: var(--sp-4) 0 0;
+}
+
+.journey__note {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-sunken);
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--content-primary);
+  resize: vertical;
+}
+
+/* full-bleed row of pictures, scrolling past the sheet padding */
+.journey__photos {
+  display: flex;
+  gap: var(--sp-4);
+  overflow-x: auto;
+  padding: var(--sp-2) var(--sp-6);
+  margin-inline: calc(-1 * var(--sp-6));
+  scrollbar-width: none;
+}
+
+.journey__photos::-webkit-scrollbar {
+  display: none;
+}
+
+.journey__danger {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.journey__danger .pk-btn {
+  color: var(--content-error);
+}

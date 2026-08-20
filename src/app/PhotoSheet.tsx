@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Move, Pencil, Trash2 } from 'lucide-react'
 import { BottomSheet, Button } from '../ds'
 import { deletePhoto, updatePhoto } from './photos'
@@ -29,6 +29,17 @@ export function PhotoSheet({
 }) {
   const [caption, setCaption] = useState(photo.caption)
   const [editing, setEditing] = useState(!photo.caption)
+
+  // same reason as in the walk sheet: a dragged-away sheet fires no blur
+  const latest = useRef(caption)
+  latest.current = caption
+  useEffect(
+    () => () => {
+      if (latest.current !== photo.caption) void updatePhoto(photo.id, { caption: latest.current.trim() })
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [photo.id],
+  )
 
   return (
     <BottomSheet open modal={false} onClose={onClose} title="Zdjęcie z wyprawy">

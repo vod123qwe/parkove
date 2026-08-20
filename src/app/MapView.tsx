@@ -11,6 +11,8 @@ const KRAKOW: [number, number] = [19.9445, 50.0555]
 
 export type MapFocus = {
   center: [number, number]
+  /** fit this box instead of centring, used for a whole recorded route */
+  bounds?: [[number, number], [number, number]]
   /** zoom derived from park size; ignored when zoom is set */
   areaHa?: number
   /** explicit zoom, wins over areaHa */
@@ -649,6 +651,19 @@ export function MapView({
   useEffect(() => {
     const map = mapRef.current
     if (!map || !focus) return
+    if (focus.bounds) {
+      map.fitBounds(focus.bounds, {
+        duration: 1200,
+        maxZoom: 17,
+        padding: {
+          top: 120,
+          left: 48,
+          right: 48,
+          bottom: (focus.bottomPadding ?? 0) + 48,
+        },
+      })
+      return
+    }
     map.flyTo({
       center: focus.center,
       zoom: focus.zoom ?? zoomForArea(focus.areaHa ?? 20),

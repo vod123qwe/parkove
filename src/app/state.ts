@@ -32,6 +32,8 @@ export type Journey = {
   id: string
   parkId: string
   name?: string
+  /** written afterwards, at home: what this walk was like */
+  note?: string
   startedAt: number
   endedAt: number
   distanceM: number
@@ -210,6 +212,18 @@ export function recordFix(fix: Fix) {
 }
 
 /** used by the dev simulation, which has no GPS to speak of */
+/** a walk stays editable: its name and note can be written long after */
+export function updateJourney(id: string, patch: Partial<Pick<Journey, 'name' | 'note'>>) {
+  commit({
+    ...state,
+    journeys: state.journeys.map((j) => (j.id === id ? { ...j, ...patch } : j)),
+  })
+}
+
+export function deleteJourney(id: string) {
+  commit({ ...state, journeys: state.journeys.filter((j) => j.id !== id) })
+}
+
 export function appendTrackPoint(pt: Pt) {
   recordFix({ coords: pt, accuracy: 5, course: null })
 }

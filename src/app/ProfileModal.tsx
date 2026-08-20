@@ -27,6 +27,7 @@ export function ProfileModal({
   onOpenAppearance,
   onOpenMapStyle,
   onGoToPark,
+  onOpenJourney,
 }: {
   open: boolean
   onClose: () => void
@@ -37,6 +38,8 @@ export function ProfileModal({
   onOpenAppearance: () => void
   onOpenMapStyle: () => void
   onGoToPark: (parkId: string) => void
+  /** open one past walk: its route lands on the map, details in a sheet */
+  onOpenJourney: (journeyId: string) => void
 }) {
   const { parks: progress, journeys } = useGameState()
   const photos = usePhotos()
@@ -166,20 +169,19 @@ export function ProfileModal({
 
       {journeys.length > 0 && (
         <section className="prof-section">
-          <h3 className="t-title prof-sectitle">Ostatnie wyprawy</h3>
+          <h3 className="t-title prof-sectitle">Moje wyprawy</h3>
           <List className="prof-list">
             {[...journeys]
               .sort((a, b) => b.startedAt - a.startedAt)
-              .slice(0, 3)
               .map((j) => (
                 <ListItem
                   key={j.id}
                   icon={<Footprints />}
                   leadTone="accent"
-                  title={parkName(j.parkId)}
+                  title={j.name ?? parkName(j.parkId)}
                   meta={`${fmtDate(j.startedAt)} · ${(j.distanceM / 1000).toFixed(1).replace('.', ',')} km · ${fmtDuration(j.endedAt - j.startedAt)}${j.points.length ? ` · ${j.points.length} pkt` : ''}`}
                   onClick={() => {
-                    onGoToPark(j.parkId)
+                    onOpenJourney(j.id)
                     onClose()
                   }}
                   trailing={<ChevronRight size={18} className="park-parking__chevron" />}

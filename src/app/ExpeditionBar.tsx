@@ -42,7 +42,6 @@ export function ExpeditionBar({
           parkId={expedition.parkId}
           journeyId={expedition.id}
           coords={expedition.where?.coords ?? expedition.track[expedition.track.length - 1]}
-          askCaption={false}
           onSaved={onPhoto}
           label="Zdjęcie"
           full={false}

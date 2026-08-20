@@ -24,6 +24,7 @@ import { distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { beginWalk } from './walk'
 import { EndWalkSheet } from './EndWalkSheet'
+import { JourneySheet } from './JourneySheet'
 import { stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
 import { isDarkNow, onDarkChange } from './theme'
@@ -67,6 +68,8 @@ export function App() {
   const [endingWalk, setEndingWalk] = useState(false)
   /** last known position outside a walk: decides whether the start CTA shows */
   const [myFix, setMyFix] = useState<{ coords: Pt; at: number } | null>(null)
+  /** a past walk opened for review: its route takes over the map */
+  const [journeyId, setJourneyId] = useState<string | null>(null)
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   const [profileOpen, setProfileOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
@@ -326,16 +329,46 @@ export function App() {
     [peekIndex, peekPages, flyToSlide],
   )
 
+  const journeys = useGameState().journeys
+  const journey = journeyId ? (journeys.find((j) => j.id === journeyId) ?? null) : null
+  const journeyPark = journey ? FEATURES.find((f) => f.id === journey.parkId) : null
+
+  // reviewing a past walk reuses the walk machinery: same track layer, same
+  // photo pins, only the data comes from the journal instead of the GPS
+  useEffect(() => {
+    if (!journey || journey.track.length === 0) return
+    let west = journey.track[0][0]
+    let east = west
+    let south = journey.track[0][1]
+    let north = south
+    for (const [lng, lat] of journey.track) {
+      west = Math.min(west, lng)
+      east = Math.max(east, lng)
+      south = Math.min(south, lat)
+      north = Math.max(north, lat)
+    }
+    setFocus({
+      center: [(west + east) / 2, (south + north) / 2],
+      bounds: [
+        [west, south],
+        [east, north],
+      ],
+      bottomPadding: Math.round(window.innerHeight * 0.42),
+      ts: Date.now(),
+    })
+  }, [journey])
+
   // photo pins belong to a walk: on the everyday map they would be clutter
   const walkPhotos = usePhotos()
+  const shownWalkId = expedition?.id ?? journeyId
   const photoPins = useMemo(
     () =>
-      expedition
+      shownWalkId
         ? walkPhotos
-            .filter((ph) => ph.journeyId === expedition.id && ph.coords)
+            .filter((ph) => ph.journeyId === shownWalkId && ph.coords)
             .map((ph) => ({ id: ph.id, coords: ph.coords as [number, number], blob: ph.blob }))
         : [],
-    [walkPhotos, expedition],
+    [walkPhotos, shownWalkId],
   )
   const openPhoto = photoId ? (walkPhotos.find((ph) => ph.id === photoId) ?? null) : null
 
@@ -355,7 +388,7 @@ export function App() {
         onClearSelection={clearSelection}
         focus={focus}
         quest={questOverlay}
-        track={expedition?.track ?? null}
+        track={expedition?.track ?? journey?.track ?? null}
         me={expedition?.where ?? null}
         followMe={onWalk && followMe}
         onUserPan={() => setFollowMe(false)}
@@ -500,6 +533,7 @@ export function App() {
       <ParkSheet
         park={expanded ? selected : null}
         onClose={() => setExpanded(false)}
+        onPhotoSaved={setPhotoId}
         onReveal={onReveal}
         onOpenPoi={(poi) => selected && setPoiCard({ parkId: selected.id, poi })}
         onOpenParking={() => setParkingOpen(true)}
@@ -513,6 +547,15 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
+      {journey && journeyPark && !openPhoto && (
+        <JourneySheet
+          journey={journey}
+          parkName={journeyPark.properties.name}
+          onClose={() => setJourneyId(null)}
+          onOpenPhoto={setPhotoId}
+        />
+      )}
+
       {endingWalk && (
         <EndWalkSheet
           onClose={() => setEndingWalk(false)}
@@ -599,6 +642,7 @@ export function App() {
           parkId={reveal.parkId}
           poi={reveal.poi}
           onClose={() => setReveal(null)}
+          onPhotoSaved={setPhotoId}
           onReadMore={(poi) => {
             const parkId = reveal.parkId
             setReveal(null)
@@ -621,6 +665,10 @@ export function App() {
         onOpenStamps={() => setStampsOpen(true)}
         onOpenAppearance={() => setAppearanceOpen(true)}
         onOpenMapStyle={() => setMapStyleOpen(true)}
+        onOpenJourney={(id) => {
+          clearSelection()
+          setJourneyId(id)
+        }}
         onGoToPark={(id) => {
           setProfileOpen(false)
           selectParkFromMap(id)
