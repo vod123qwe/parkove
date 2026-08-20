@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import { ChevronLeft, Mic, Pause, StickyNote } from 'lucide-react'
+import { ChevronLeft, Pause, X } from 'lucide-react'
+import type { CSSProperties } from 'react'
+import { WavePlayer } from './WavePlayer'
 import { CINEMATIC } from './data/mapstyles'
 import { buildTimeline, metresAt, pointAt, walkedSoFar } from './memory'
 import type { Timeline } from './memory'
@@ -24,6 +26,10 @@ const TURN_TAU = 420
 const MAX_RATE = 90
 /** travel of the handle, in pixels, from the middle to either end */
 const DIAL_THROW = 96
+
+/** the wall clock of a memory, for the small line under it */
+const clockOf = (at: number) =>
+  at ? new Date(at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '—'
 
 /** a walk is usually minutes, so read it as mm:ss until it passes an hour */
 const fmtClock = (ms: number) => {
@@ -349,6 +355,14 @@ export function MemoryPlayer({
     <div className="memplay">
       <div ref={holder} className="memplay__map" />
 
+      {/* progressive blur: four bands, each blurrier and masked lower down */}
+      <div className="memplay__veil" aria-hidden="true">
+        <span style={{ '--b': '2px', '--from': '0%', '--to': '32%' } as CSSProperties} />
+        <span style={{ '--b': '6px', '--from': '18%', '--to': '58%' } as CSSProperties} />
+        <span style={{ '--b': '14px', '--from': '38%', '--to': '78%' } as CSSProperties} />
+        <span style={{ '--b': '26px', '--from': '58%', '--to': '100%' } as CSSProperties} />
+      </div>
+
       <div className="memplay__top">
         <button className="memplay__back" aria-label="Wyjdź ze wspomnień" onClick={onClose}>
           <ChevronLeft size={20} />
@@ -368,42 +382,43 @@ export function MemoryPlayer({
       </div>
 
       {memory && (
-        <div className="memplay__card">
+        <div className="memplay__memory">
           <button
-            className="memplay__cardclose"
+            className="memplay__memclose"
             aria-label="Schowaj wspomnienie"
             onClick={() => setMemory(null)}
           >
-            ×
+            <X size={18} />
           </button>
+
           {memory.kind === 'mark' ? (
             memory.mark.kind === 'photo' && memory.mark.url ? (
               <>
-                <img className="memplay__photo" src={memory.mark.url} alt={memory.mark.caption} />
-                {memory.mark.caption && <p className="t-body memplay__cap">{memory.mark.caption}</p>}
+                <span className="memplay__kind">Zdjęcie</span>
+                <img className="memplay__snap" src={memory.mark.url} alt={memory.mark.caption} />
+                {memory.mark.caption && <p className="memplay__hand">{memory.mark.caption}</p>}
               </>
             ) : memory.mark.kind === 'audio' && memory.mark.url ? (
               <>
-                <span className="memplay__kind">
-                  <Mic size={16} /> Notatka głosowa
-                </span>
-                <audio src={memory.mark.url} controls autoPlay className="memplay__audio" />
+                <span className="memplay__kind">Notatka głosowa</span>
+                <WavePlayer src={memory.mark.url} blob={memory.mark.blob} />
+                {memory.mark.caption && <p className="memplay__hand">{memory.mark.caption}</p>}
               </>
             ) : (
               <>
-                <span className="memplay__kind">
-                  <StickyNote size={16} /> Notatka
-                </span>
-                <p className="memplay__note">{memory.mark.caption || 'Pusta notatka'}</p>
+                <span className="memplay__kind">Notatka</span>
+                <p className="memplay__hand">{memory.mark.caption || 'Pusta notatka'}</p>
               </>
             )
           ) : (
             <>
               <span className="memplay__kind">Punkt wyprawy</span>
               <p className="t-body-strong memplay__poiname">{memory.poi.name}</p>
-              <p className="t-body-sm memplay__cap">{memory.poi.teaser}</p>
+              <p className="t-body-sm memplay__teaser">{memory.poi.teaser}</p>
             </>
           )}
+
+          <span className="memplay__stamp">godzina: {clockOf(memory.at)}</span>
         </div>
       )}
 

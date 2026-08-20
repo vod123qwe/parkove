@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Mic, Trash2 } from 'lucide-react'
 import { BottomSheet, Button } from '../ds'
 import { addMark } from './photos'
+import { WavePlayer } from './WavePlayer'
 
 /** below this a press was a tap, not a recording */
 const MIN_MS = 600
@@ -36,6 +37,10 @@ export function VoiceRecorder({
   const rec = useRef<MediaRecorder | null>(null)
   const chunks = useRef<Blob[]>([])
   const startedAt = useRef(0)
+  /** live levels while recording, so the bars are your voice and not a loop */
+  const [levels, setLevels] = useState<number[]>([])
+  const audioCtx = useRef<AudioContext | null>(null)
+  const raf = useRef(0)
 
   useEffect(() => {
     if (!recording) return
@@ -45,6 +50,8 @@ export function VoiceRecorder({
 
   useEffect(
     () => () => {
+      cancelAnimationFrame(raf.current)
+      void audioCtx.current?.close()
       rec.current?.stream.getTracks().forEach((t) => t.stop())
     },
     [],
@@ -57,11 +64,33 @@ export function VoiceRecorder({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mime = pickMime()
       const recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined)
+
+      // read the microphone in parallel, only to draw it
+      const ctx = new AudioContext()
+      audioCtx.current = ctx
+      const analyser = ctx.createAnalyser()
+      analyser.fftSize = 512
+      ctx.createMediaStreamSource(stream).connect(analyser)
+      const buf = new Uint8Array(analyser.frequencyBinCount)
+      const tick = () => {
+        analyser.getByteTimeDomainData(buf)
+        let peak = 0
+        for (let i = 0; i < buf.length; i += 4) {
+          const v = Math.abs(buf[i] - 128) / 128
+          if (v > peak) peak = v
+        }
+        setLevels((prev) => [...prev.slice(-43), Math.max(0.08, Math.min(1, peak * 2.2))])
+        raf.current = requestAnimationFrame(tick)
+      }
+      raf.current = requestAnimationFrame(tick)
       chunks.current = []
       recorder.ondataavailable = (e) => {
         if (e.data.size) chunks.current.push(e.data)
       }
       recorder.onstop = () => {
+        cancelAnimationFrame(raf.current)
+        void audioCtx.current?.close()
+        audioCtx.current = null
         stream.getTracks().forEach((t) => t.stop())
         const ms = Date.now() - startedAt.current
         const blob = new Blob(chunks.current, { type: mime || 'audio/webm' })
@@ -105,7 +134,7 @@ export function VoiceRecorder({
             <p className="t-body voice__lead">
               {Math.round(review.ms / 1000)} sekund. Przesłuchaj i zdecyduj, czy zostaje na mapie.
             </p>
-            <audio className="marksheet__audio" src={review.url} controls autoPlay />
+            <WavePlayer src={review.url} blob={review.blob} />
             <div className="voice__actions">
               <Button
                 full
@@ -133,11 +162,28 @@ export function VoiceRecorder({
           </>
         ) : (
           <>
-            <p className="t-body voice__lead">
-              {recording
-                ? `Nagrywam… ${seconds} s. Puść, kiedy skończysz.`
-                : 'Przytrzymaj przycisk i mów. Nagranie zostanie tam, gdzie teraz stoisz.'}
+            <span className="voice__kicker">nagraj wspomnienie</span>
+            <p className="t-headline voice__ask">
+              {recording ? 'Słucham…' : 'Co Ci teraz chodzi po głowie?'}
             </p>
+
+            <div className="voice__wave" aria-hidden="true">
+              {Array.from({ length: 44 }, (_, i) => {
+                const v = levels[levels.length - 44 + i]
+                return (
+                  <span
+                    key={i}
+                    className={v != null ? 'is-live' : undefined}
+                    style={{ height: `${Math.round((v ?? 0.06) * 100)}%` }}
+                  />
+                )
+              })}
+            </div>
+
+            <span className="voice__clock">
+              {String(Math.floor(seconds / 60)).padStart(2, '0')} : {String(seconds % 60).padStart(2, '0')}
+            </span>
+
             <button
               className={`voice__mic${recording ? ' -recording' : ''}`}
               aria-label="Przytrzymaj, żeby nagrać"
@@ -149,8 +195,11 @@ export function VoiceRecorder({
               onPointerCancel={stop}
               onPointerLeave={stop}
             >
-              <Mic size={34} />
+              <Mic size={30} />
             </button>
+            <span className="t-caption voice__hold">
+              {recording ? 'puść, żeby zakończyć' : 'przytrzymaj, żeby nagrać'}
+            </span>
             {hint && <p className="t-caption voice__hint">{hint}</p>}
           </>
         )}

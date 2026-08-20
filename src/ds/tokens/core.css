@@ -20,6 +20,8 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-pill: 999px;
+  /* buttons and small controls: a squircle, not a pill */
+  --radius-btn: 16px;
 
   /* elevation, drop shadow only */
   --elevation-1: 0 1px 2px rgba(16, 24, 18, 0.05), 0 2px 8px rgba(16, 24, 18, 0.06);
@@ -35,6 +37,12 @@
   /* screens: leaves quickly, lands slowly, never bounces (the iOS sheet curve) */
   --ease-screen: cubic-bezier(0.32, 0.72, 0, 1);
   --motion-screen: 360ms;
+
+  /*
+   * iOS-style corner smoothing. Browsers that know corner-shape draw a real
+   * squircle; the rest keep the plain radius, which is a fair fallback.
+   */
+  --corner-smooth: squircle;
 
   /* control sizes */
   --control-sm: 36px;

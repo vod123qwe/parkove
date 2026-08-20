@@ -71,3 +71,11 @@
   color: var(--content-primary);
   box-shadow: var(--elevation-2);
 }
+
+/* the navigation button is a smoothed square, 48 px, like the mock */
+.pk-navbar__action {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+}

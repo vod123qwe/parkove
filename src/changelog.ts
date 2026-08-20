@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.27.0'
+export const VERSION = '0.28.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.28.0',
+    date: '2026-08-20',
+    title: 'Squircles, and memories without a frame',
+    changes: [
+      ['changed', 'Buttons and controls left the pill behind: they are 16 px rounded squares with iOS style corner smoothing, and so are the cards on the profile and in the walks'],
+      ['changed', 'A memory during a replay has no card any more. It arrives on a soft darkness at the bottom of the screen: a small label, a photo dropped like a polaroid, or your own words in your own hand'],
+      ['changed', 'The header of a replay floats on a progressive blur, four bands deep, with a gentle gradient under it'],
+      ['added', 'Voice notes are drawn as their own waveform, read from the recording itself, filling in with lime as it plays. While recording, the bars move with your voice next to a big clock'],
+    ],
+  },
   {
     version: '0.27.0',
     date: '2026-08-20',

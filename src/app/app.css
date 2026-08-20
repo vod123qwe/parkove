@@ -30,10 +30,11 @@
 }
 
 .app-profilebtn {
-  width: var(--control-md);
-  height: var(--control-md);
+  corner-shape: var(--corner-smooth);
+  width: 48px;
+  height: 48px;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
   background: var(--bg-surface-raised);
   color: var(--content-secondary);
   box-shadow: var(--elevation-1);
@@ -58,7 +59,8 @@
   align-items: center;
   gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-2);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-xl);
+  corner-shape: var(--corner-smooth);
 }
 
 .app-hud__text {
@@ -943,7 +945,8 @@
   height: var(--control-md);
   padding-inline: var(--sp-4);
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
   background: var(--bg-surface-sunken);
   color: var(--content-secondary);
   font-family: var(--font-text);
@@ -1029,7 +1032,8 @@
   width: var(--control-md);
   height: var(--control-md);
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
   background: var(--bg-surface-raised);
   color: var(--content-accent);
   box-shadow: var(--elevation-2);
@@ -1274,7 +1278,8 @@
   width: var(--control-md);
   height: var(--control-md);
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
   background: var(--bg-primary);
   color: var(--content-on-primary);
   cursor: pointer;
@@ -1355,8 +1360,60 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
   padding-bottom: var(--sp-4);
+}
+
+.voice__kicker {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--content-accent);
+}
+
+.voice__ask {
+  margin: 0;
+  text-align: center;
+  max-width: 20ch;
+}
+
+/* your voice, drawn as it arrives */
+.voice__wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  height: 92px;
+  padding: 0 var(--sp-2);
+}
+
+.voice__wave span {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 2px;
+  background: var(--border-default);
+  transition: height 90ms linear;
+}
+
+.voice__wave span.is-live {
+  background: var(--bg-primary);
+}
+
+.voice__clock {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 44px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.voice__hold {
+  color: var(--content-tertiary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .voice__lead {
@@ -1739,10 +1796,11 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: var(--control-md);
-  height: var(--control-md);
+  width: 48px;
+  height: 48px;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
   background: #ffffff;
   color: var(--content-primary);
   box-shadow: var(--elevation-2);
@@ -1857,71 +1915,169 @@
   white-space: nowrap;
 }
 
-/* ---- a memory arriving ---- */
+/* ---- a memory arriving: no frame, just the screen going dark under it ---- */
 
-.memplay__card {
+.memplay__memory {
   position: absolute;
-  left: var(--sp-4);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 2;
-  width: min(62%, 260px);
-  padding: var(--sp-4);
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface-raised);
-  box-shadow: var(--elevation-3);
-  animation: pk-toast-in 260ms var(--ease-out);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-16) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  color: #ffffff;
+  /* the frame is the darkness itself, so the map keeps showing through */
+  background: linear-gradient(
+    to top,
+    rgb(6 12 7 / 0.94) 0%,
+    rgb(6 12 7 / 0.82) 38%,
+    rgb(6 12 7 / 0.45) 68%,
+    transparent 100%
+  );
+  animation: memory-rise 420ms var(--ease-screen);
 }
 
-.memplay__cardclose {
+@keyframes memory-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+.memplay__memclose {
   position: absolute;
-  top: 6px;
-  right: 10px;
+  top: var(--sp-8);
+  right: var(--sp-5);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
   border: 0;
-  background: none;
-  font-size: 20px;
-  line-height: 1;
-  color: var(--content-tertiary);
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: rgb(255 255 255 / 0.16);
+  color: #ffffff;
   cursor: pointer;
 }
 
-.memplay__photo {
-  width: 100%;
-  border-radius: var(--radius-md);
-  display: block;
-}
-
 .memplay__kind {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
   font-family: var(--font-text);
   font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--content-tertiary);
+  color: rgb(255 255 255 / 0.62);
 }
 
-.memplay__cap,
-.memplay__poiname {
-  margin: var(--sp-2) 0 0;
+/* the photo lands like a polaroid dropped on the table */
+.memplay__snap {
+  width: 62%;
+  max-width: 240px;
+  max-height: 34vh;
+  object-fit: cover;
+  padding: 8px 8px 22px;
+  background: #fdfdf8;
+  border-radius: 4px;
+  transform: rotate(-2.2deg);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.45);
 }
 
-.memplay__audio {
-  width: 100%;
-  margin-top: var(--sp-3);
-}
-
-.memplay__note {
-  margin: var(--sp-2) 0 0;
+/* somebody's own words, in their own hand */
+.memplay__hand {
+  margin: 0;
+  max-width: 22ch;
   font-family: var(--font-hand);
-  font-size: 24px;
-  line-height: 28px;
-  color: var(--content-primary);
+  font-size: 30px;
+  line-height: 34px;
+  color: #ffffff;
 }
 
-.journey__replay {
-  margin-top: var(--sp-2);
+.memplay__poiname {
+  margin: 0;
+}
+
+.memplay__teaser {
+  margin: 0;
+  color: rgb(255 255 255 / 0.78);
+  max-width: 34ch;
+}
+
+.memplay__stamp {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.5);
+}
+
+/* ---- the header sits on a progressive blur, not on a bar ---- */
+
+.memplay__veil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top, 0px) + 116px);
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgb(6 12 7 / 0.55), transparent);
+}
+
+.memplay__veil span {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--b));
+  -webkit-backdrop-filter: blur(var(--b));
+  mask-image: linear-gradient(to bottom, #000 var(--from), transparent var(--to));
+  -webkit-mask-image: linear-gradient(to bottom, #000 var(--from), transparent var(--to));
+}
+
+/* ---- a voice note drawn as its own waveform ---- */
+
+.wave {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: min(100%, 320px);
+}
+
+.wave__play {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-lime);
+  color: var(--content-on-lime);
+  cursor: pointer;
+}
+
+.wave__bars {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 44px;
+  cursor: pointer;
+}
+
+.wave__bars span {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.32);
+  transition: background var(--motion-fast) linear;
+}
+
+.wave__bars span.is-done {
+  background: var(--bg-lime);
 }
 
 /* ---- memories as slides, over a blurred version of where you were ---- */
@@ -1968,10 +2124,11 @@
 .memview__close {
   display: grid;
   place-items: center;
-  width: var(--control-md);
-  height: var(--control-md);
+  width: 48px;
+  height: 48px;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
   background: #ffffff;
   color: var(--content-primary);
   box-shadow: var(--elevation-2);
@@ -2126,7 +2283,8 @@
   height: var(--control-md);
   padding-inline: var(--sp-5);
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
   background: rgb(255 255 255 / 0.14);
   color: #ffffff;
   font-family: var(--font-text);

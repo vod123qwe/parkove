@@ -72,3 +72,22 @@ button {
     animation-duration: 1ms;
   }
 }
+
+/*
+ * Everything that used to be a pill now carries a smoothed corner instead.
+ * Kept as one rule so the shape stays consistent and can be pulled back in
+ * one place if it turns out to be the wrong call.
+ */
+.pk-btn,
+.pk-iconbtn,
+.pk-stat.-card,
+.pk-toast,
+.pk-actionbar,
+.pk-polaroid,
+.pk-listitem,
+.pk-card,
+.pk-peek,
+.pk-sheet__panel,
+.pk-modal__panel {
+  corner-shape: var(--corner-smooth);
+}

@@ -5,7 +5,7 @@
   justify-content: center;
   gap: var(--sp-2);
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-btn);
   font-family: var(--font-text);
   font-weight: 700;
   font-size: 14px;
