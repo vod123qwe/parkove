@@ -104,3 +104,35 @@ export async function buildPinImages(colors: Record<string, string>) {
   }
   return out
 }
+
+/**
+ * A walk photo drawn as a round pin: the picture itself, cropped to a circle
+ * with a light ring, so a route reads as "here is where I stopped".
+ */
+export async function buildPhotoImage(blob: Blob, ring: string) {
+  const bmp = await createImageBitmap(blob)
+  const size = 88
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')!
+  const r = size / 2
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(r, r, r - 6, 0, Math.PI * 2)
+  ctx.closePath()
+  ctx.clip()
+  // cover: fill the circle without squashing the photo
+  const scale = Math.max(size / bmp.width, size / bmp.height)
+  const w = bmp.width * scale
+  const h = bmp.height * scale
+  ctx.drawImage(bmp, (size - w) / 2, (size - h) / 2, w, h)
+  ctx.restore()
+  ctx.lineWidth = 6
+  ctx.strokeStyle = ring
+  ctx.beginPath()
+  ctx.arc(r, r, r - 3, 0, Math.PI * 2)
+  ctx.stroke()
+  bmp.close?.()
+  return ctx.getImageData(0, 0, size, size)
+}

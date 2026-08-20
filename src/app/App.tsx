@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { CircleUserRound, Crosshair, Footprints, List as ListIcon, Sparkles } from 'lucide-react'
+import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
@@ -16,10 +16,16 @@ import { AppearanceModal, MapStyleModal } from './SettingsModals'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
 import { ExpeditionStatus } from './ExpeditionStatus'
+import { PhotoSheet } from './PhotoSheet'
+import { updatePhoto, usePhotos } from './photos'
 import { RevealSheet } from './RevealSheet'
 import { KIND_META } from './kinds'
-import { formatDistance } from './geo'
-import { useGameState } from './state'
+import { distanceToParkM, formatDistance } from './geo'
+import type { Pt } from './geo'
+import { beginWalk } from './walk'
+import { EndWalkSheet } from './EndWalkSheet'
+import { stopExpedition, useGameState } from './state'
+import { isParkComplete } from './progress'
 import { isDarkNow, onDarkChange } from './theme'
 import { getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import type { MapStyleId } from './data/mapstyles'
@@ -53,6 +59,14 @@ export function App() {
   const [arrival, setArrival] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   /** the camera follows the walker until the map is touched */
   const [followMe, setFollowMe] = useState(true)
+  /** photo pin being looked at, and the one being dragged to a new place */
+  const [photoId, setPhotoId] = useState<string | null>(null)
+  const [movingPhotoId, setMovingPhotoId] = useState<string | null>(null)
+  const [photoAdded, setPhotoAdded] = useState<string | null>(null)
+  /** confirmation before a walk becomes a journal entry */
+  const [endingWalk, setEndingWalk] = useState(false)
+  /** last known position outside a walk: decides whether the start CTA shows */
+  const [myFix, setMyFix] = useState<{ coords: Pt; at: number } | null>(null)
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   const [profileOpen, setProfileOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
@@ -74,29 +88,31 @@ export function App() {
 
   const visitedIds = useMemo(() => new Set(Object.keys(progress)), [progress])
 
+  /** parks with every point collected: these are the ones with a stamp */
+  const completedIds = useMemo(
+    () => new Set(FEATURES.filter((f) => isParkComplete(f.id, progress)).map((f) => f.id)),
+    [progress],
+  )
+
   const stampPins = useMemo(
     () =>
-      FEATURES.filter((f) => visitedIds.has(f.id)).map((f) => ({
+      FEATURES.filter((f) => completedIds.has(f.id)).map((f) => ({
         parkId: f.id,
         coords: f.properties.center,
       })),
-    [visitedIds],
+    [completedIds],
   )
 
-  // celebrate the moment a park joins the collection
-  const knownVisited = useRef<Set<string> | null>(null)
+  // A stamp is the end of a story, so it waits for the walk to be over: during
+  // one, completions queue up here instead of interrupting with confetti.
+  const knownComplete = useRef<Set<string> | null>(null)
+  const pendingStamps = useRef<string[]>([])
   useEffect(() => {
-    const prev = knownVisited.current
-    knownVisited.current = visitedIds
+    const prev = knownComplete.current
+    knownComplete.current = completedIds
     if (!prev) return
-    for (const id of visitedIds) {
-      if (!prev.has(id)) {
-        const f = FEATURES.find((x) => x.id === id)
-        if (f) setCelebrate({ id, name: f.properties.name })
-        break
-      }
-    }
-  }, [visitedIds])
+    for (const id of completedIds) if (!prev.has(id)) pendingStamps.current.push(id)
+  }, [completedIds])
 
   const earnedPoints = FEATURES.reduce((s, f) => {
     const p = progress[f.id]
@@ -110,6 +126,35 @@ export function App() {
   const expeditionPark = expedition ? FEATURES.find((f) => f.id === expedition.parkId) : null
   const onWalk = !!expedition
   const peekOpen = !!selected && !expanded && !onWalk
+
+  // ...and lands once the walk is closed, one park at a time
+  useEffect(() => {
+    if (onWalk || celebrate || !pendingStamps.current.length) return
+    const id = pendingStamps.current.shift()!
+    const f = FEATURES.find((x) => x.id === id)
+    if (f) setCelebrate({ id, name: f.properties.name })
+  }, [onWalk, celebrate, completedIds])
+
+  // the start CTA only makes sense when the park is within reach, so the peek
+  // asks the phone where we are: once per minute, reusing the cached reading
+  useEffect(() => {
+    if (!peekOpen || !navigator.geolocation) return
+    if (myFix && Date.now() - myFix.at < 60_000) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setMyFix({ coords: [pos.coords.longitude, pos.coords.latitude], at: Date.now() }),
+      () => {
+        // no permission or no signal: then there is simply no CTA
+      },
+      { maximumAge: 60_000, timeout: 8000 },
+    )
+    // myFix in the deps would re-ask right after every answer
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peekOpen, selectedId])
+
+  /** walking distance where starting a walk is a real option */
+  const NEAR_PARK_M = 300
+  const nearSelected =
+    !!selected && !!myFix && distanceToParkM(myFix.coords, selected.geometry) <= NEAR_PARK_M
 
   // swipeable peek pages: park -> quest points -> parking
   const peekPages = useMemo<PeekPage[]>(() => {
@@ -281,6 +326,19 @@ export function App() {
     [peekIndex, peekPages, flyToSlide],
   )
 
+  // photo pins belong to a walk: on the everyday map they would be clutter
+  const walkPhotos = usePhotos()
+  const photoPins = useMemo(
+    () =>
+      expedition
+        ? walkPhotos
+            .filter((ph) => ph.journeyId === expedition.id && ph.coords)
+            .map((ph) => ({ id: ph.id, coords: ph.coords as [number, number], blob: ph.blob }))
+        : [],
+    [walkPhotos, expedition],
+  )
+  const openPhoto = photoId ? (walkPhotos.find((ph) => ph.id === photoId) ?? null) : null
+
   const sortedParks = useMemo(
     () => [...FEATURES].sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'pl')),
     [],
@@ -307,6 +365,13 @@ export function App() {
         amenityPins={amenityPins}
         onSelectAmenity={setAmenityKind}
         hideStampFor={overlayParkId}
+        photoPins={photoPins}
+        onSelectPhoto={setPhotoId}
+        placingPhoto={!!movingPhotoId}
+        onPlacePhoto={(coords) => {
+          if (movingPhotoId) void updatePhoto(movingPhotoId, { coords })
+          setMovingPhotoId(null)
+        }}
       />
       <ExpeditionController onNear={onNear} onArrive={onArrive} />
 
@@ -340,7 +405,7 @@ export function App() {
               <Crosshair size={20} />
             </button>
           )}
-          <ExpeditionBar onStopped={() => setFollowMe(true)} />
+          <ExpeditionBar onRequestStop={() => setEndingWalk(true)} onPhoto={setPhotoAdded} />
         </>
       ) : (
         !selected && (
@@ -363,16 +428,31 @@ export function App() {
           if (selected) flyToPark(selected, Math.round(window.innerHeight * 0.42))
         }}
         action={
-          <Button
-            full
-            variant="tonal"
-            onClick={() => {
-              setExpanded(true)
-              if (selected) flyToPark(selected, Math.round(window.innerHeight * 0.42))
-            }}
-          >
-            Zobacz szczegóły miejsca
-          </Button>
+          <div className="app-peekactions">
+            <Button
+              full
+              variant="tonal"
+              onClick={() => {
+                setExpanded(true)
+                if (selected) flyToPark(selected, Math.round(window.innerHeight * 0.42))
+              }}
+            >
+              {nearSelected ? 'Szczegóły' : 'Zobacz szczegóły miejsca'}
+            </Button>
+            {nearSelected && (
+              <Button
+                full
+                icon={<Compass size={18} />}
+                onClick={() => {
+                  if (!selected) return
+                  beginWalk(selected.id, selected.properties.name)
+                  clearSelection()
+                }}
+              >
+                Zacznij wyprawę
+              </Button>
+            )}
+          </div>
         }
       >
         {selected && page?.t === 'poi' ? (
@@ -433,6 +513,57 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
+      {endingWalk && (
+        <EndWalkSheet
+          onClose={() => setEndingWalk(false)}
+          onConfirm={() => {
+            stopExpedition()
+            setEndingWalk(false)
+            setFollowMe(true)
+          }}
+        />
+      )}
+
+      {openPhoto && !movingPhotoId && (
+        <PhotoSheet
+          photo={openPhoto}
+          onClose={() => setPhotoId(null)}
+          onMove={() => {
+            setMovingPhotoId(openPhoto.id)
+            setPhotoId(null)
+          }}
+        />
+      )}
+
+      {movingPhotoId && (
+        <Toast
+          open
+          onClose={() => setMovingPhotoId(null)}
+          icon={<Camera size={18} />}
+          title="Dotknij mapy"
+          text="Tam postawię ten pin ze zdjęciem"
+          offset={76}
+        />
+      )}
+
+      {photoAdded && !openPhoto && (
+        <Toast
+          open
+          onClose={() => setPhotoAdded(null)}
+          tone="reward"
+          icon={<Camera size={18} />}
+          title="Zdjęcie zapisane"
+          text="Pin stanął w miejscu, gdzie stoisz"
+          actionLabel="Opisz"
+          onAction={() => {
+            setPhotoId(photoAdded)
+            setPhotoAdded(null)
+          }}
+          autoMs={9000}
+          offset={76}
+        />
+      )}
+
       {onWalk && nearNotice && !arrival && (
         <Toast
           open

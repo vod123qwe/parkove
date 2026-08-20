@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.15.0'
+export const VERSION = '0.16.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,19 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.16.0',
+    date: '2026-08-20',
+    title: 'Photos on the route, and a proper goodbye',
+    changes: [
+      ['fixed', 'The stamp no longer lands the moment a walk starts. It is now the reward for a finished park: every point collected, handed over once you close the walk'],
+      ['fixed', 'Photos and stamps were being asked for from the root of the domain, so on the phone nothing loaded. Every file now goes through the base path of the build'],
+      ['added', 'Ending a walk asks first, and shows what you are about to save. Points the GPS missed can be ticked by hand there, before the walk becomes a journal entry'],
+      ['added', 'A photo taken on a walk becomes a pin where you stood, as a round thumbnail. Tap it to caption it, move it or delete it. Those pins stay inside the walk, off the everyday map'],
+      ['added', 'A start button on the peek card, but only when you are actually near the park (300 m). Too far, no button'],
+      ['changed', 'Taking a photo while walking no longer stops to ask for a caption: it saves, and offers to describe it afterwards'],
+    ],
+  },
   {
     version: '0.15.0',
     date: '2026-08-20',

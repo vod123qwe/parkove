@@ -4,7 +4,7 @@ import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import parksData from './data/parks.json'
 import { circlePolygon, trackSegments } from './geo'
-import { buildPinImages, pinImageId } from './pins'
+import { buildPhotoImage, buildPinImages, pinImageId } from './pins'
 import { asset } from './assets'
 
 const KRAKOW: [number, number] = [19.9445, 50.0555]
@@ -33,6 +33,9 @@ export type QuestOverlay = {
 
 /** collected parks, drawn as stamp pins once the map is zoomed in */
 export type StampPin = { parkId: string; coords: [number, number] }
+
+/** a picture taken on a walk, pinned where the phone stood */
+export type PhotoPin = { id: string; coords: [number, number]; blob: Blob }
 
 /** practical spots around a park: coffee and playgrounds */
 export type AmenityPin = {
@@ -71,6 +74,12 @@ type Props = {
   onSelectAmenity: (kind: 'food' | 'playground') => void
   /** stamp of this park steps aside so its quest pins stay readable */
   hideStampFor: string | null
+  /** photos of the current walk, drawn as round thumbnails */
+  photoPins: PhotoPin[]
+  onSelectPhoto: (id: string) => void
+  /** while moving a photo, the next tap on the map is its new home */
+  placingPhoto: boolean
+  onPlacePhoto: (coords: [number, number]) => void
 }
 
 function readMapColors() {
@@ -181,6 +190,15 @@ const meHaloFC = (me: Props['me']) => ({
       : [],
 })
 
+const photoFC = (pins: PhotoPin[]) => ({
+  type: 'FeatureCollection' as const,
+  features: pins.map((p) => ({
+    type: 'Feature' as const,
+    properties: { photoId: p.id, icon: `photo-${p.id}` },
+    geometry: { type: 'Point' as const, coordinates: p.coords },
+  })),
+})
+
 const zoomForArea = (ha: number) => (ha > 150 ? 12.4 : ha > 40 ? 13.2 : ha > 8 ? 14 : 14.8)
 
 export function MapView({
@@ -202,6 +220,10 @@ export function MapView({
   amenityPins,
   onSelectAmenity,
   hideStampFor,
+  photoPins,
+  onSelectPhoto,
+  placingPhoto,
+  onPlacePhoto,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MapGL | null>(null)
@@ -214,9 +236,11 @@ export function MapView({
   const parkingRef = useRef(parking)
   const stampPinsRef = useRef(stampPins)
   const amenityPinsRef = useRef(amenityPins)
+  const photoPinsRef = useRef(photoPins)
+  const placingRef = useRef(placingPhoto)
   // the map handler is registered once, so callbacks must be read fresh
-  const cbRef = useRef({ onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan })
-  cbRef.current = { onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan }
+  const cbRef = useRef({ onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan, onSelectPhoto, onPlacePhoto })
+  cbRef.current = { onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan, onSelectPhoto, onPlacePhoto }
   const initialStyle = useRef(mapStyle)
   const currentStyleKey = useRef(mapStyle.key)
   visitedRef.current = visited
@@ -227,6 +251,8 @@ export function MapView({
   parkingRef.current = parking
   stampPinsRef.current = stampPins
   amenityPinsRef.current = amenityPins
+  photoPinsRef.current = photoPins
+  placingRef.current = placingPhoto
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -290,6 +316,21 @@ export function MapView({
       }
     }
     ;(map as unknown as { __addStampImages: (p: StampPin[]) => void }).__addStampImages = addStampImages
+
+    const addPhotoImages = async (pins: PhotoPin[]) => {
+      const ring = readMapColors().meRing
+      for (const pin of pins) {
+        const id = `photo-${pin.id}`
+        if (map.hasImage(id)) continue
+        try {
+          map.addImage(id, await buildPhotoImage(pin.blob, ring))
+        } catch {
+          // an unreadable picture simply gets no pin
+        }
+      }
+    }
+    ;(map as unknown as { __addPhotoImages: (p: PhotoPin[]) => Promise<void> }).__addPhotoImages =
+      addPhotoImages
 
     const syncVisited = () => {
       for (const f of parksData.features) {
@@ -419,6 +460,24 @@ export function MapView({
         },
       })
       // stamps for collected parks: only worth showing when zoomed in
+      await addPhotoImages(photoPinsRef.current)
+      map.addSource('walk-photos', { type: 'geojson', data: photoFC(photoPinsRef.current) as never })
+      map.addLayer({
+        id: 'walk-photo-hit',
+        type: 'circle',
+        source: 'walk-photos',
+        paint: { 'circle-radius': 24, 'circle-color': 'transparent' },
+      })
+      map.addLayer({
+        id: 'walk-photo-pins',
+        type: 'symbol',
+        source: 'walk-photos',
+        layout: {
+          'icon-image': ['get', 'icon'] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 13, 0.3, 16, 0.46, 18, 0.55] as never,
+          'icon-allow-overlap': true,
+        },
+      })
       map.addSource('stamp-pins', { type: 'geojson', data: stampFC(stampPinsRef.current) as never })
       map.addLayer({
         id: 'stamp-pin-hit',
@@ -492,6 +551,16 @@ export function MapView({
         map.getLayer(layer) ? map.queryRenderedFeatures(e.point, { layers: [layer] })[0] : undefined
 
       const cb = cbRef.current
+      // moving a photo takes over the whole map: the next tap is its new place
+      if (placingRef.current) {
+        cb.onPlacePhoto([e.lngLat.lng, e.lngLat.lat])
+        return
+      }
+      const photo = hit('walk-photo-hit')
+      if (photo?.properties?.photoId) {
+        cb.onSelectPhoto(String(photo.properties.photoId))
+        return
+      }
       const poi = hit('quest-poi-hit')
       if (poi?.properties?.poiId) {
         cb.onSelectPoi(String(poi.properties.poiId))
@@ -522,7 +591,7 @@ export function MapView({
       }
       cb.onClearSelection()
     })
-    for (const layer of ['parks-fill', 'quest-poi-hit', 'parking-hit', 'amenity-hit', 'stamp-pin-hit']) {
+    for (const layer of ['parks-fill', 'quest-poi-hit', 'parking-hit', 'amenity-hit', 'stamp-pin-hit', 'walk-photo-hit']) {
       map.on('mouseenter', layer, () => {
         map.getCanvas().style.cursor = 'pointer'
       })
@@ -636,6 +705,17 @@ export function MapView({
       amenityFC(amenityPins),
     )
   }, [amenityPins])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !loadedRef.current) return
+    const withImages = map as unknown as { __addPhotoImages?: (p: PhotoPin[]) => Promise<void> }
+    void withImages.__addPhotoImages?.(photoPins).then(() => {
+      ;(map.getSource('walk-photos') as { setData: (d: unknown) => void } | undefined)?.setData(
+        photoFC(photoPins),
+      )
+    })
+  }, [photoPins])
 
   useEffect(() => {
     const map = mapRef.current

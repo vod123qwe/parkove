@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Square } from 'lucide-react'
 import { Card } from '../ds'
-import { stopExpedition, useGameState } from './state'
+import { useGameState } from './state'
 import { PhotoButton } from './PhotoButton'
 
 function fmtTime(ms: number) {
@@ -16,7 +16,14 @@ function fmtTime(ms: number) {
  * status card, so this one only carries what the thumb needs: a camera, the
  * effort so far, and the way out.
  */
-export function ExpeditionBar({ onStopped }: { onStopped?: () => void }) {
+export function ExpeditionBar({
+  onRequestStop,
+  onPhoto,
+}: {
+  /** ending is irreversible, so the bar only asks for it */
+  onRequestStop: () => void
+  onPhoto?: (photoId: string) => void
+}) {
   const { expedition } = useGameState()
   const [, tick] = useState(0)
 
@@ -35,6 +42,8 @@ export function ExpeditionBar({ onStopped }: { onStopped?: () => void }) {
           parkId={expedition.parkId}
           journeyId={expedition.id}
           coords={expedition.where?.coords ?? expedition.track[expedition.track.length - 1]}
+          askCaption={false}
+          onSaved={onPhoto}
           label="Zdjęcie"
           full={false}
           variant="tonal"
@@ -46,10 +55,7 @@ export function ExpeditionBar({ onStopped }: { onStopped?: () => void }) {
         <button
           className="app-expbar__stop"
           aria-label="Zakończ wyprawę"
-          onClick={() => {
-            stopExpedition()
-            onStopped?.()
-          }}
+          onClick={onRequestStop}
         >
           <Square size={16} />
           Koniec

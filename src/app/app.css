@@ -1013,3 +1013,96 @@
   cursor: pointer;
   animation: pk-toast-in 220ms var(--ease-out);
 }
+
+/* ---- one walk photo ---- */
+
+.photosheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.photosheet__img {
+  width: 100%;
+  max-height: 46vh;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-sunken);
+}
+
+.photosheet__when {
+  color: var(--content-tertiary);
+  margin: 0;
+}
+
+.photosheet__caption,
+.photosheet__input {
+  width: 100%;
+  min-height: var(--control-md);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-sunken);
+  font-family: var(--font-text);
+  font-size: 15px;
+  color: var(--content-primary);
+}
+
+.photosheet__caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--content-secondary);
+}
+
+.photosheet__input {
+  border: 1px solid var(--border-focus);
+}
+
+.photosheet__actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+/* ---- two actions on the peek card ---- */
+
+.app-peekactions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+/* ---- closing a walk ---- */
+
+.endwalk {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.endwalk__lead {
+  margin: 0;
+  color: var(--content-secondary);
+}
+
+.endwalk__stats {
+  display: flex;
+  gap: var(--sp-6);
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.endwalk__title {
+  margin: var(--sp-2) 0 calc(-1 * var(--sp-2));
+}
+
+.endwalk__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}

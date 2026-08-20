@@ -13,6 +13,8 @@ export function PhotoButton({
   journeyId,
   coords,
   defaultCaption,
+  askCaption = true,
+  onSaved,
   label = 'Dodaj zdjęcie',
   full = true,
   variant = 'tonal',
@@ -25,6 +27,9 @@ export function PhotoButton({
   /** where the phone was standing: the photo becomes a pin there */
   coords?: [number, number]
   defaultCaption?: string
+  /** false while walking: typing on the move is friction, the caption can wait */
+  askCaption?: boolean
+  onSaved?: (id: string) => void
   label?: string
   full?: boolean
   variant?: 'primary' | 'tonal' | 'ghost'
@@ -38,9 +43,19 @@ export function PhotoButton({
     e.target.value = ''
     if (!file) return
     setBusy(true)
-    const note = window.prompt('Podpis pod zdjęciem (możesz zostawić puste)', defaultCaption ?? '')
-    await addPhoto({ parkId, blob: file, caption: (note ?? '').trim(), poiId, journeyId, coords })
+    const note = askCaption
+      ? window.prompt('Podpis pod zdjęciem (możesz zostawić puste)', defaultCaption ?? '')
+      : ''
+    const saved = await addPhoto({
+      parkId,
+      blob: file,
+      caption: (note ?? '').trim(),
+      poiId,
+      journeyId,
+      coords,
+    })
     setBusy(false)
+    onSaved?.(saved.id)
   }
 
   return (
