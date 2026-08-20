@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import { ChevronLeft, Pause } from 'lucide-react'
+import { ChevronLeft, Layers, Pause } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
-import { CINEMATIC } from './data/mapstyles'
+import { REPLAY_LOOKS, replayStyle } from './data/mapstyles'
+import type { ReplayLook } from './data/mapstyles'
 import { buildTimeline, metresAt, msAtMetres, noteType, pointAt, walkedSoFar } from './memory'
 import type { Timeline } from './memory'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
@@ -89,6 +90,8 @@ export function MemoryPlayer({
 
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
+  const [look, setLook] = useState<ReplayLook>('day')
+  const [looksOpen, setLooksOpen] = useState(false)
 
   const timeline = (lineRef.current ??= buildTimeline(journey, points))
   const track = journey.track
@@ -128,7 +131,7 @@ export function MemoryPlayer({
     if (!holder.current || track.length === 0) return
     const map = new MapGL({
       container: holder.current,
-      style: CINEMATIC,
+      style: replayStyle('day'),
       center: track[0],
       zoom: 16.6,
       pitch: 58,
@@ -152,7 +155,12 @@ export function MemoryPlayer({
     // the bottom third carries the memory, so the walker rides above centre
     map.setPadding({ top: 0, left: 0, right: 0, bottom: Math.round(window.innerHeight * 0.34) })
 
-    map.on('load', async () => {
+    // styledata fires several times per style, and this is async: without a
+    // synchronous latch every one of them starts adding the same sources
+    let painting = false
+    const paint = async () => {
+      if (painting || map.getSource('mem-track')) return
+      painting = true
       const colors = pinColors()
       const trail = {
         line: colors.trailEdge,
@@ -172,6 +180,10 @@ export function MemoryPlayer({
         }
       }
 
+      map.addSource('mem-track', {
+        type: 'geojson',
+        data: { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: track[0] } } as never,
+      })
       map.addSource('mem-ahead', {
         type: 'geojson',
         data: {
@@ -266,7 +278,15 @@ export function MemoryPlayer({
       })
 
       readyRef.current = true
-      draw(0)
+      painting = false
+      draw(elapsedRef.current)
+    }
+    ;(map as unknown as { __paint: () => void }).__paint = paint
+
+    map.on('load', () => void paint())
+    // setStyle wipes our layers, and 'style.load' is unreliable in v5
+    map.on('styledata', () => {
+      if (map.isStyleLoaded() && !map.getSource('mem-track')) void paint()
     })
 
     // tapping a pin walks you there: the marker travels, then stops and speaks
@@ -508,25 +528,50 @@ export function MemoryPlayer({
         <ChevronLeft size={20} />
       </button>
 
+      <button
+        className="memplay__look"
+        aria-label="Zmień wygląd mapy"
+        onClick={() => setLooksOpen((v) => !v)}
+      >
+        <Layers size={19} />
+      </button>
+
+      {looksOpen && (
+        <div className="memplay__looks">
+          {REPLAY_LOOKS.map((l) => (
+            <button
+              key={l.id}
+              className={`memplay__lookopt${l.id === look ? ' -on' : ''}`}
+              onClick={() => {
+                setLooksOpen(false)
+                if (l.id === look) return
+                setLook(l.id)
+                readyRef.current = false
+                mapRef.current?.setStyle(replayStyle(l.id))
+              }}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="memplay__bottom">
       {memory && (
         <div className="memplay__memory">
           {memory.kind === 'mark' ? (
             memory.mark.kind === 'photo' && memory.mark.url ? (
               <>
-                <span className="memplay__kind">Zdjęcie</span>
                 <img className="memplay__snap" src={memory.mark.url} alt={memory.mark.caption} />
                 {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
               </>
             ) : memory.mark.kind === 'audio' && memory.mark.url ? (
               <>
-                <span className="memplay__kind">Notatka głosowa</span>
                 <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
                 {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
               </>
             ) : (
               <>
-                <span className="memplay__kind">Notatka</span>
                 <p
                   className="memplay__postit"
                   style={noteType(memory.mark.caption || 'Pusta notatka')}
@@ -537,7 +582,6 @@ export function MemoryPlayer({
             )
           ) : (
             <>
-              <span className="memplay__kind">Punkt wyprawy</span>
               <p className="t-body-strong memplay__poiname">{memory.poi.name}</p>
               <p className="t-body-sm memplay__teaser">{memory.poi.teaser}</p>
             </>

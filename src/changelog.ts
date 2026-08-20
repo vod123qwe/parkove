@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.32.1'
+export const VERSION = '0.33.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.33.0',
+    date: '2026-08-20',
+    title: 'Three ways to see a walk',
+    changes: [
+      ['added', 'A button top right of a replay changes how the ground looks: Satelita as it is, Noc where the imagery is graded cooler and darker like film, and Grafit 3D which drops the photos and paints the city from our own palette with the buildings still standing up'],
+      ['changed', 'The memory no longer announces itself with a heading: a photo is a photo, a note is a note'],
+      ['fixed', 'Map credits moved under the darkness at the bottom, out of the picture'],
+      ['fixed', 'Switching the look used to lose the route, the marker and the pins: several repaints raced each other, and now only one runs'],
+    ],
+  },
   {
     version: '0.32.1',
     date: '2026-08-20',

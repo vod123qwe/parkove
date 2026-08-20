@@ -107,3 +107,118 @@ export const CINEMATIC: StyleSpecification = {
     },
   ],
 }
+
+/**
+ * Looks for the replay screen. Three answers to the same question, and the
+ * trade-off is the interesting part:
+ *
+ * - imagery cannot be repainted feature by feature, but it CAN be graded like
+ *   film: MapLibre lets a raster layer be desaturated, darkened and hue
+ *   shifted, which is how the night look is made;
+ * - the vector look drops imagery entirely and paints the city from the same
+ *   tiles we already load, so every colour is ours and the trail really pops;
+ * - both extrude buildings, because in a flat city the buildings are the relief.
+ */
+export type ReplayLook = 'day' | 'night' | 'graphite'
+
+export const REPLAY_LOOKS: Array<{ id: ReplayLook; label: string }> = [
+  { id: 'day', label: 'Satelita' },
+  { id: 'night', label: 'Noc' },
+  { id: 'graphite', label: 'Grafit 3D' },
+]
+
+const sat = (extra: Record<string, unknown>) => ({
+  id: 'sat',
+  type: 'raster' as const,
+  source: 'sat',
+  paint: extra as never,
+})
+
+const buildings = (color: string, opacity: number) => ({
+  id: 'buildings-3d',
+  type: 'fill-extrusion' as const,
+  source: 'ofm',
+  'source-layer': 'building',
+  minzoom: 14,
+  paint: {
+    'fill-extrusion-color': color,
+    'fill-extrusion-opacity': opacity,
+    'fill-extrusion-height': ['coalesce', ['get', 'render_height'], ['get', 'height'], 9],
+    'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+  } as never,
+})
+
+const SOURCES = {
+  sat: {
+    type: 'raster' as const,
+    tiles: [
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    ],
+    tileSize: 256,
+    maxzoom: 19,
+    attribution: 'Esri, Maxar, Earthstar Geographics',
+  },
+  ofm: {
+    type: 'vector' as const,
+    url: 'https://tiles.openfreemap.org/planet',
+    attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
+  },
+}
+
+export function replayStyle(look: ReplayLook): StyleSpecification {
+  const base = {
+    version: 8 as const,
+    glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+    sources: SOURCES,
+  }
+  if (look === 'day') {
+    return { ...base, layers: [sat({}), buildings('#dfe4d8', 0.55)] }
+  }
+  if (look === 'night') {
+    return {
+      ...base,
+      layers: [
+        // graded like film: cooler, darker, most of the colour taken out
+        sat({
+          'raster-saturation': -0.55,
+          'raster-contrast': 0.12,
+          'raster-brightness-max': 0.52,
+          'raster-hue-rotate': 200,
+        }),
+        buildings('#1d2a3a', 0.7),
+      ],
+    }
+  }
+  // no imagery at all: the city painted from our own palette
+  return {
+    ...base,
+    layers: [
+      { id: 'bg', type: 'background', paint: { 'background-color': '#0e1310' } },
+      {
+        id: 'water',
+        type: 'fill',
+        source: 'ofm',
+        'source-layer': 'water',
+        paint: { 'fill-color': '#16232b' },
+      },
+      {
+        id: 'green',
+        type: 'fill',
+        source: 'ofm',
+        'source-layer': 'landcover',
+        paint: { 'fill-color': '#16251a', 'fill-opacity': 0.9 },
+      },
+      {
+        id: 'roads',
+        type: 'line',
+        source: 'ofm',
+        'source-layer': 'transportation',
+        paint: {
+          'line-color': '#2b332c',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.4, 17, 2.4] as never,
+        },
+      },
+      buildings('#24312a', 0.95),
+    ],
+  }
+}

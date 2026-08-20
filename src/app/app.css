@@ -1796,6 +1796,63 @@
   inset: 0;
 }
 
+/* changing how the ground looks: top right, opposite the way out */
+.memplay__look {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3));
+  right: var(--sp-4);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.memplay__looks {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3) + 56px);
+  right: var(--sp-4);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-2);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-smooth);
+  background: rgb(10 16 11 / 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: pk-toast-in 200ms var(--ease-out);
+}
+
+.memplay__lookopt {
+  padding: var(--sp-3) var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  corner-shape: var(--corner-smooth);
+  background: transparent;
+  color: rgb(255 255 255 / 0.8);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.memplay__lookopt.-on {
+  background: var(--trail-fill);
+  color: var(--trail-icon);
+}
+
 /* the only thing at the top is the way out */
 .memplay__back {
   position: absolute;
@@ -2314,15 +2371,17 @@
   cursor: pointer;
 }
 
-/* credits go to the top right, away from both the button and the memory */
+/*
+ * Credits sit at the very bottom, under the darkness: they stay in the page
+ * (imagery and OSM data ask to be credited) but they are out of the picture.
+ */
 .memplay .maplibregl-ctrl-bottom-left,
 .memplay .maplibregl-ctrl-bottom-right {
-  bottom: auto;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-2));
-  right: var(--sp-2);
+  bottom: 0;
   left: auto;
-  z-index: 3;
-  opacity: 0.38;
+  right: 2px;
+  z-index: 0;
+  opacity: 0.35;
   font-size: 9px;
 }
 
