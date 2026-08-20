@@ -9,7 +9,16 @@ const BARS = 44
  * recording itself, so the bars are that sentence and not decoration, and they
  * fill in as it plays. Tapping anywhere on the wave jumps there.
  */
-export function WavePlayer({ src, blob }: { src: string; blob?: Blob }) {
+export function WavePlayer({
+  src,
+  blob,
+  autoPlay,
+}: {
+  src: string
+  blob?: Blob
+  /** a memory you walked up to plays itself; one you tapped waits for you */
+  autoPlay?: boolean
+}) {
   const audio = useRef<HTMLAudioElement | null>(null)
   const [peaks, setPeaks] = useState<number[] | null>(null)
   const [playing, setPlaying] = useState(false)
@@ -55,6 +64,7 @@ export function WavePlayer({ src, blob }: { src: string; blob?: Blob }) {
       <audio
         ref={audio}
         src={src}
+        autoPlay={autoPlay}
         preload="metadata"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}

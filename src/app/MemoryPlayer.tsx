@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import { ChevronLeft, Pause, X } from 'lucide-react'
+import { ChevronLeft, Pause } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
 import { CINEMATIC } from './data/mapstyles'
@@ -14,6 +14,15 @@ import { bearingDeg, distanceM } from './geo'
 
 /** how far ahead of the marker a memory counts as "we are passing it" */
 const REACH_M = 22
+/**
+ * Approaching a memory the walk eases off, but only close to it: with points
+ * every eighty metres a wide window turned the whole replay into a crawl.
+ */
+const SLOW_M = 30
+/** and it never drops below a third of the speed you asked for */
+const SLOW_FLOOR = 0.35
+/** and it stands still this long when the memory lands */
+const DWELL_MS = 1100
 /** the camera aims at a point this far up the route, so it turns before you do */
 const LOOKAHEAD_M = 28
 /** how long the camera takes to settle on a new heading, in ms */
@@ -72,6 +81,9 @@ export function MemoryPlayer({
   const elapsedRef = useRef(0)
   const bearingRef = useRef<number | null>(null)
   const seenRef = useRef<Set<string>>(new Set())
+  const dwellUntil = useRef(0)
+  const easingRef = useRef(false)
+  const [easing, setEasing] = useState(false)
 
   const [rate, setRate] = useState(0)
   const [elapsed, setElapsed] = useState(0)
@@ -124,6 +136,8 @@ export function MemoryPlayer({
       interactive: false,
     })
     mapRef.current = map
+    // the bottom third carries the memory, so the walker rides above centre
+    map.setPadding({ top: 0, left: 0, right: 0, bottom: Math.round(window.innerHeight * 0.34) })
 
     map.on('load', async () => {
       const colors = pinColors()
@@ -282,6 +296,8 @@ export function MemoryPlayer({
       seenRef.current.add(hit.id)
       setMemory(hit.body)
       navigator.vibrate?.(25)
+      // a beat of stillness, so arriving somewhere actually feels like arriving
+      dwellUntil.current = performance.now() + DWELL_MS
     }
   }
 
@@ -291,7 +307,29 @@ export function MemoryPlayer({
     const step = (now: number) => {
       const dt = now - last
       last = now
-      const r = rateRef.current
+      let r = rateRef.current
+      // standing at a memory: the walk holds itself still for a moment
+      if (now < dwellUntil.current) r = 0
+      if (r > 0) {
+        // approaching something you left: slow down, the way you would
+        const metresNow = metresAt(timeline, elapsedRef.current)
+        let nearest = Infinity
+        for (const stop of stops.current) {
+          if (seenRef.current.has(stop.id)) continue
+          const gap = stop.metres - metresNow
+          if (gap >= 0 && gap < nearest) nearest = gap
+        }
+        if (nearest < SLOW_M) {
+          const t = Math.max(0, nearest / SLOW_M)
+          r *= SLOW_FLOOR + (1 - SLOW_FLOOR) * t * t
+        }
+      }
+      // only call it slowing when it is actually noticeable
+      const slowed = rateRef.current > 0 && r < rateRef.current * 0.8
+      if (slowed !== easingRef.current) {
+        easingRef.current = slowed
+        setEasing(slowed)
+      }
       if (r !== 0) {
         const next = Math.max(0, Math.min(timeline.totalMs, elapsedRef.current + dt * r))
         if (next !== elapsedRef.current) {
@@ -363,6 +401,13 @@ export function MemoryPlayer({
         <span style={{ '--b': '26px', '--from': '58%', '--to': '100%' } as CSSProperties} />
       </div>
 
+      <div className="memplay__floor" aria-hidden="true">
+        <span style={{ '--b': '2px', '--from': '0%', '--to': '34%' } as CSSProperties} />
+        <span style={{ '--b': '7px', '--from': '20%', '--to': '60%' } as CSSProperties} />
+        <span style={{ '--b': '16px', '--from': '42%', '--to': '82%' } as CSSProperties} />
+        <span style={{ '--b': '28px', '--from': '62%', '--to': '100%' } as CSSProperties} />
+      </div>
+
       <div className="memplay__top">
         <button className="memplay__back" aria-label="Wyjdź ze wspomnień" onClick={onClose}>
           <ChevronLeft size={20} />
@@ -377,20 +422,18 @@ export function MemoryPlayer({
         <span className="t-caption memplay__clocklabel">czas wyprawy</span>
         <span className="memplay__time">{fmtClock(elapsed)}</span>
         <span className="t-caption memplay__clocklabel">
-          {done ? 'koniec trasy' : rate === 0 ? 'przesuń suwak' : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
+          {done
+            ? 'koniec trasy'
+            : easing
+              ? 'zwalniam przy punkcie'
+              : rate === 0
+                ? 'przesuń suwak'
+                : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
         </span>
       </div>
 
       {memory && (
         <div className="memplay__memory">
-          <button
-            className="memplay__memclose"
-            aria-label="Schowaj wspomnienie"
-            onClick={() => setMemory(null)}
-          >
-            <X size={18} />
-          </button>
-
           {memory.kind === 'mark' ? (
             memory.mark.kind === 'photo' && memory.mark.url ? (
               <>
@@ -401,13 +444,13 @@ export function MemoryPlayer({
             ) : memory.mark.kind === 'audio' && memory.mark.url ? (
               <>
                 <span className="memplay__kind">Notatka głosowa</span>
-                <WavePlayer src={memory.mark.url} blob={memory.mark.blob} />
+                <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
                 {memory.mark.caption && <p className="memplay__hand">{memory.mark.caption}</p>}
               </>
             ) : (
               <>
                 <span className="memplay__kind">Notatka</span>
-                <p className="memplay__hand">{memory.mark.caption || 'Pusta notatka'}</p>
+                <p className="memplay__postit">{memory.mark.caption || 'Pusta notatka'}</p>
               </>
             )
           ) : (

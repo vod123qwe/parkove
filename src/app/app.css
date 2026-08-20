@@ -1823,7 +1823,7 @@
   position: absolute;
   /* same right edge as the dial, and a clear gap above it */
   right: var(--sp-4);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6) + 216px + var(--sp-8));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6) + 216px + var(--sp-10));
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -1927,14 +1927,15 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--sp-3);
-  padding: var(--sp-16) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  padding: var(--sp-20) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-8));
   color: #ffffff;
   /* the frame is the darkness itself, so the map keeps showing through */
   background: linear-gradient(
     to top,
-    rgb(6 12 7 / 0.94) 0%,
-    rgb(6 12 7 / 0.82) 38%,
-    rgb(6 12 7 / 0.45) 68%,
+    rgb(4 9 5 / 0.97) 0%,
+    rgb(4 9 5 / 0.94) 42%,
+    rgb(4 9 5 / 0.72) 72%,
+    rgb(4 9 5 / 0.28) 90%,
     transparent 100%
   );
   animation: memory-rise 420ms var(--ease-screen);
@@ -1985,6 +1986,22 @@
   box-shadow: 0 14px 34px rgb(0 0 0 / 0.45);
 }
 
+/* a sticky note: rounded, a touch crooked, words in your own hand */
+.memplay__postit {
+  margin: 0;
+  max-width: 20ch;
+  padding: var(--sp-5) var(--sp-5) var(--sp-6);
+  border-radius: 22px;
+  corner-shape: var(--corner-smooth);
+  background: #fdfcf4;
+  color: var(--content-primary);
+  font-family: var(--font-hand);
+  font-size: 28px;
+  line-height: 32px;
+  transform: rotate(-1.6deg);
+  box-shadow: 0 16px 36px rgb(0 0 0 / 0.42);
+}
+
 /* somebody's own words, in their own hand */
 .memplay__hand {
   margin: 0;
@@ -2012,6 +2029,26 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgb(255 255 255 / 0.5);
+}
+
+/* the same blur under the memory, so the map dissolves instead of being covered */
+.memplay__floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.memplay__floor span {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--b));
+  -webkit-backdrop-filter: blur(var(--b));
+  mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+  -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
 }
 
 /* ---- the header sits on a progressive blur, not on a bar ---- */
@@ -2291,4 +2328,12 @@
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
+}
+
+/* the map credits belong above the darkness, not inside the memory */
+.memplay .maplibregl-ctrl-bottom-left,
+.memplay .maplibregl-ctrl-bottom-right {
+  bottom: 46%;
+  opacity: 0.55;
+  font-size: 10px;
 }

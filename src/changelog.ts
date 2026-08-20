@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.28.0'
+export const VERSION = '0.29.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.29.0',
+    date: '2026-08-20',
+    title: 'Arriving somewhere feels like arriving',
+    changes: [
+      ['added', 'A replay now slows down as it comes up to something you left behind, and stands still for a beat when it lands. A voice note starts playing by itself: you walked up to it, so it speaks'],
+      ['changed', 'Memories have no close button any more. There is always one on screen, and it changes when you reach the next'],
+      ['changed', 'The darkness under a memory goes deeper and higher, with the same progressive blur as the header, so the map dissolves into it instead of being covered'],
+      ['changed', 'The camera rides higher on the screen, above the darkness, and a written note is a rounded sticky note lying a little crooked'],
+    ],
+  },
   {
     version: '0.28.0',
     date: '2026-08-20',
