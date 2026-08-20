@@ -17,7 +17,7 @@ export function PhotoButton({
   onSaved,
   label = 'Dodaj zdjęcie',
   full = true,
-  variant = 'tonal',
+  variant = 'primary',
   className,
 }: {
   parkId: string

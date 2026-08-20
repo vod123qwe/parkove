@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Mic, Plus, Square, StickyNote, X } from 'lucide-react'
-import { Card } from '../ds'
+import { Button, Card } from '../ds'
 import { useGameState } from './state'
 import { PhotoButton } from './PhotoButton'
 import { VoiceRecorder } from './VoiceRecorder'
@@ -62,25 +62,26 @@ export function ExpeditionBar({
             journeyId={expedition.id}
             coords={here}
             label="Dodaj zdjęcie"
-            variant="tonal"
+            full={false}
             className="app-addmenu__item"
             onSaved={(id) => {
               setOpen(false)
               onPhoto?.(id)
             }}
           />
-          <button
-            className="app-addmenu__item app-addmenu__btn"
+          <Button
+            className="app-addmenu__item"
+            icon={<Mic size={18} />}
             onClick={() => {
               setOpen(false)
               setRecording(true)
             }}
           >
-            <Mic size={18} />
             Dodaj nagranie
-          </button>
-          <button
-            className="app-addmenu__item app-addmenu__btn"
+          </Button>
+          <Button
+            className="app-addmenu__item"
+            icon={<StickyNote size={18} />}
             onClick={async () => {
               setOpen(false)
               const saved = await addMark({
@@ -93,9 +94,8 @@ export function ExpeditionBar({
               onMark?.(saved.id)
             }}
           >
-            <StickyNote size={18} />
             Dodaj notatkę
-          </button>
+          </Button>
         </div>
       )}
 
