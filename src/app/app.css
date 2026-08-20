@@ -982,9 +982,9 @@
   }
 }
 
-/* ---- back to my position ---- */
+/* ---- where am I: quiet, always within thumb reach ---- */
 
-.app-recenter {
+.app-locate {
   position: absolute;
   right: var(--sp-4);
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4));
@@ -999,7 +999,7 @@
   color: var(--content-accent);
   box-shadow: var(--elevation-2);
   cursor: pointer;
-  animation: pk-toast-in 220ms var(--ease-out);
+  opacity: 0.92;
 }
 
 /* ---- one walk photo ---- */
@@ -1383,4 +1383,17 @@
   flex-direction: column;
   gap: var(--sp-2);
   margin-top: var(--sp-6);
+}
+
+/* ---- the map of a walk already walked ---- */
+
+.journeymap {
+  height: 38vh;
+  min-height: 220px;
+  margin: 0 calc(-1 * var(--sp-6)) var(--sp-2);
+  background: var(--bg-surface-sunken);
+}
+
+.journeymap .maplibregl-ctrl-attrib {
+  font-size: 10px;
 }

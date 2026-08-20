@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.18.2'
+export const VERSION = '0.19.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.19.0',
+    date: '2026-08-20',
+    title: 'Walk history on its own screen',
+    changes: [
+      ['changed', 'A walk from the journal now opens as its own screen with its own map of the route, instead of a sheet over the live map. Looking back no longer tangles with where you are now'],
+      ['added', 'A location button on the map, quiet in the corner: it shows where you are outside a walk too, and during one it puts the camera back on you'],
+      ['added', 'Photos, recordings and notes are tappable straight on the route map of a past walk'],
+    ],
+  },
   {
     version: '0.18.2',
     date: '2026-08-20',

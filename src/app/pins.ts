@@ -154,3 +154,25 @@ export async function buildPhotoImage(blob: Blob, ring: string) {
   bmp.close?.()
   return ctx.getImageData(0, 0, size, size)
 }
+
+/** pin colours read from the live tokens, so both maps draw the same artwork */
+export function pinColors() {
+  const cs = getComputedStyle(document.documentElement)
+  const v = (n: string) => cs.getPropertyValue(n).trim()
+  return {
+    surface: v('--bg-surface'),
+    accent: v('--map-visited-stroke'),
+    accentStrong: v('--content-accent'),
+    gold: v('--bg-gold'),
+    onGold: v('--content-on-gold'),
+    infoSubtle: v('--bg-info-subtle'),
+    info: v('--content-info'),
+    infoBorder: v('--border-info'),
+    foodSubtle: v('--bg-food-subtle'),
+    food: v('--content-food'),
+    foodBorder: v('--border-food'),
+    playSubtle: v('--bg-play-subtle'),
+    play: v('--content-play'),
+    playBorder: v('--border-play'),
+  }
+}

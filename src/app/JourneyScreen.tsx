@@ -11,12 +11,13 @@ import {
   StickyNote,
   Trash2,
 } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, Polaroid, Stat, StatGrid } from '../ds'
+import { Button, List, ListItem, Modal, Polaroid, Stat, StatGrid } from '../ds'
 import { deleteJourney, updateJourney, useGameState } from './state'
 import type { Journey } from './state'
 import { questForPark } from './data/quests'
 import { useMarks } from './photos'
 import { PhotoButton } from './PhotoButton'
+import { JourneyMap } from './JourneyMap'
 
 const fmtDate = (at: number) =>
   new Date(at).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -32,11 +33,14 @@ function fmtTime(ms: number) {
 }
 
 /**
- * A walk after the fact, with its route drawn on the map behind this sheet.
+ * One walk from the journal, on a screen of its own: its route on its own map,
+ * then everything it produced. A separate screen on purpose, so looking back
+ * at old walks never gets tangled with the live map.
+ *
  * Everything here is editable, because a walk gets its meaning at home: the
  * name, a note, and pictures added later from the camera roll.
  */
-export function JourneySheet({
+export function JourneyScreen({
   journey,
   parkName,
   onClose,
@@ -79,8 +83,16 @@ export function JourneySheet({
   const points = quest?.pois ?? []
 
   return (
-    <BottomSheet open modal={false} onClose={onClose} title="Wyprawa">
+    <Modal open onClose={onClose} title="Wyprawa" action="back">
       <div className="journey">
+        <JourneyMap
+          track={journey.track}
+          points={points}
+          collected={walked}
+          marks={marks}
+          onSelectMark={onOpenPhoto}
+        />
+
         {editingName ? (
           <input
             className="journey__nameinput"
@@ -237,6 +249,6 @@ export function JourneySheet({
           )}
         </div>
       </div>
-    </BottomSheet>
+    </Modal>
   )
 }

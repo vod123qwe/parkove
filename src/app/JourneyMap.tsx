@@ -1,0 +1,187 @@
+import { useEffect, useRef } from 'react'
+import { Map as MapGL } from 'maplibre-gl'
+import type { MapLayerMouseEvent } from 'maplibre-gl'
+import { trackSegments } from './geo'
+import type { Pt } from './geo'
+import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
+import { resolveMapStyle, getMapStyle } from './data/mapstyles'
+import { isDarkNow } from './theme'
+import type { WalkMark } from './photos'
+import type { QuestPoi } from './data/quests'
+
+/**
+ * The map of a walk that already happened: the path, the points it collected
+ * and the things left along it. Its own instance on purpose, because the walk
+ * history is a screen of its own and must not disturb the live map.
+ */
+export function JourneyMap({
+  track,
+  points,
+  collected,
+  marks,
+  onSelectMark,
+}: {
+  track: Pt[]
+  points: QuestPoi[]
+  collected: Set<string>
+  marks: Array<WalkMark & { url?: string }>
+  onSelectMark: (id: string) => void
+}) {
+  const holder = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<MapGL | null>(null)
+  const cb = useRef(onSelectMark)
+  cb.current = onSelectMark
+  const data = useRef({ track, points, collected, marks })
+  data.current = { track, points, collected, marks }
+
+  useEffect(() => {
+    if (!holder.current) return
+    const map = new MapGL({
+      container: holder.current,
+      style: resolveMapStyle(getMapStyle(), isDarkNow()).spec,
+      center: track[0] ?? [19.9445, 50.0555],
+      zoom: 14,
+      attributionControl: { compact: true },
+      // a small map inside a screen: panning yes, twisting no
+      pitchWithRotate: false,
+      dragRotate: false,
+    })
+    mapRef.current = map
+
+    const draw = async () => {
+      const { track: line, points: pois, collected: got, marks: things } = data.current
+      const colors = pinColors()
+      for (const [id, img] of await buildPinImages(colors)) {
+        if (!map.hasImage(id)) map.addImage(id, img)
+      }
+      for (const m of things) {
+        if (m.kind !== 'photo' || !m.blob) continue
+        const id = `photo-${m.id}`
+        if (map.hasImage(id)) continue
+        try {
+          map.addImage(id, await buildPhotoImage(m.blob, colors.surface))
+        } catch {
+          // an unreadable picture just gets no pin
+        }
+      }
+
+      map.addSource('j-track', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: trackSegments(line)
+            .filter((seg) => seg.length >= 2)
+            .map((seg) => ({
+              type: 'Feature',
+              properties: {},
+              geometry: { type: 'LineString', coordinates: seg },
+            })),
+        } as never,
+      })
+      map.addLayer({
+        id: 'j-track-line',
+        type: 'line',
+        source: 'j-track',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': colors.accentStrong, 'line-width': 4, 'line-opacity': 0.9 },
+      })
+
+      map.addSource('j-pois', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: pois.map((p) => ({
+            type: 'Feature',
+            properties: { icon: pinImageId(p.category, got.has(p.id) ? 'done' : 'open') },
+            geometry: { type: 'Point', coordinates: p.coords },
+          })),
+        } as never,
+      })
+      map.addLayer({
+        id: 'j-poi-pins',
+        type: 'symbol',
+        source: 'j-pois',
+        layout: {
+          'icon-image': ['get', 'icon'] as never,
+          'icon-size': 0.34,
+          'icon-allow-overlap': true,
+        },
+      })
+
+      map.addSource('j-marks', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: things
+            .filter((m) => m.coords)
+            .map((m) => ({
+              type: 'Feature',
+              properties: {
+                markId: m.id,
+                icon: m.kind === 'photo' ? `photo-${m.id}` : pinImageId(m.kind, m.kind),
+              },
+              geometry: { type: 'Point', coordinates: m.coords as Pt },
+            })),
+        } as never,
+      })
+      map.addLayer({
+        id: 'j-mark-hit',
+        type: 'circle',
+        source: 'j-marks',
+        paint: { 'circle-radius': 22, 'circle-color': 'transparent' },
+      })
+      map.addLayer({
+        id: 'j-mark-pins',
+        type: 'symbol',
+        source: 'j-marks',
+        layout: {
+          'icon-image': ['get', 'icon'] as never,
+          'icon-size': 0.42,
+          'icon-allow-overlap': true,
+        },
+      })
+
+      // frame the whole walk, with room for the pins at its edges
+      if (line.length > 1) {
+        let west = line[0][0]
+        let east = west
+        let south = line[0][1]
+        let north = south
+        for (const [lng, lat] of line) {
+          west = Math.min(west, lng)
+          east = Math.max(east, lng)
+          south = Math.min(south, lat)
+          north = Math.max(north, lat)
+        }
+        map.fitBounds(
+          [
+            [west, south],
+            [east, north],
+          ],
+          { padding: 48, maxZoom: 17, duration: 0 },
+        )
+      } else if (line.length === 1) {
+        map.jumpTo({ center: line[0], zoom: 16.5 })
+      }
+    }
+
+    map.on('load', () => void draw())
+    map.on('click', (e: MapLayerMouseEvent) => {
+      if (!map.getLayer('j-mark-hit')) return
+      const hit = map.queryRenderedFeatures(e.point, { layers: ['j-mark-hit'] })[0]
+      if (hit?.properties?.markId) cb.current(String(hit.properties.markId))
+    })
+    // the screen animates in, so the canvas learns its size a beat later
+    const t = window.setTimeout(() => map.resize(), 260)
+
+    return () => {
+      window.clearTimeout(t)
+      map.remove()
+      mapRef.current = null
+    }
+    // built once per screen: the walk it shows never changes underneath
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return <div ref={holder} className="journeymap" />
+}

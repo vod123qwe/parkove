@@ -4,7 +4,7 @@ import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import parksData from './data/parks.json'
 import { circlePolygon, trackSegments } from './geo'
-import { buildPhotoImage, buildPinImages, pinImageId } from './pins'
+import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import { asset } from './assets'
 
 const KRAKOW: [number, number] = [19.9445, 50.0555]
@@ -288,24 +288,7 @@ export function MapView({
 
     // pin artwork must exist before the symbol layers reference it
     const addPinImages = async () => {
-      const cs = getComputedStyle(document.documentElement)
-      const v = (n: string) => cs.getPropertyValue(n).trim()
-      const images = await buildPinImages({
-        surface: v('--bg-surface'),
-        accent: v('--map-visited-stroke'),
-        accentStrong: v('--content-accent'),
-        gold: v('--bg-gold'),
-        onGold: v('--content-on-gold'),
-        infoSubtle: v('--bg-info-subtle'),
-        info: v('--content-info'),
-        infoBorder: v('--border-info'),
-        foodSubtle: v('--bg-food-subtle'),
-        food: v('--content-food'),
-        foodBorder: v('--border-food'),
-        playSubtle: v('--bg-play-subtle'),
-        play: v('--content-play'),
-        playBorder: v('--border-play'),
-      })
+      const images = await buildPinImages(pinColors())
       for (const [id, bmp] of images) {
         if (map.hasImage(id)) map.removeImage(id)
         map.addImage(id, bmp)

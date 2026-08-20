@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, Mic, RefreshCw, Sparkles } from 'lucide-react'
+import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, LocateFixed, Mic, RefreshCw, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
@@ -24,7 +24,7 @@ import { distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { beginWalk } from './walk'
 import { EndWalkSheet } from './EndWalkSheet'
-import { JourneySheet } from './JourneySheet'
+import { JourneyScreen } from './JourneyScreen'
 import { WalkSummary } from './WalkSummary'
 import { stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
@@ -73,7 +73,7 @@ export function App() {
   /** the walk that just ended, waiting to show its summary */
   const [summaryId, setSummaryId] = useState<string | null>(null)
   /** last known position outside a walk: decides whether the start CTA shows */
-  const [myFix, setMyFix] = useState<{ coords: Pt; at: number } | null>(null)
+  const [myFix, setMyFix] = useState<{ coords: Pt; accuracy: number; at: number } | null>(null)
   /** a past walk opened for review: its route takes over the map */
   const [journeyId, setJourneyId] = useState<string | null>(null)
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
@@ -150,7 +150,12 @@ export function App() {
     if (!peekOpen || !navigator.geolocation) return
     if (myFix && Date.now() - myFix.at < 60_000) return
     navigator.geolocation.getCurrentPosition(
-      (pos) => setMyFix({ coords: [pos.coords.longitude, pos.coords.latitude], at: Date.now() }),
+      (pos) =>
+        setMyFix({
+          coords: [pos.coords.longitude, pos.coords.latitude],
+          accuracy: pos.coords.accuracy ?? 30,
+          at: Date.now(),
+        }),
       () => {
         // no permission or no signal: then there is simply no CTA
       },
@@ -343,36 +348,11 @@ export function App() {
   const journey = journeyId ? (journeys.find((j) => j.id === journeyId) ?? null) : null
   const journeyPark = journey ? FEATURES.find((f) => f.id === journey.parkId) : null
 
-  // reviewing a past walk reuses the walk machinery: same track layer, same
-  // photo pins, only the data comes from the journal instead of the GPS
-  useEffect(() => {
-    if (!journey || journey.track.length === 0) return
-    let west = journey.track[0][0]
-    let east = west
-    let south = journey.track[0][1]
-    let north = south
-    for (const [lng, lat] of journey.track) {
-      west = Math.min(west, lng)
-      east = Math.max(east, lng)
-      south = Math.min(south, lat)
-      north = Math.max(north, lat)
-    }
-    setFocus({
-      center: [(west + east) / 2, (south + north) / 2],
-      bounds: [
-        [west, south],
-        [east, north],
-      ],
-      bottomPadding: Math.round(window.innerHeight * 0.42),
-      ts: Date.now(),
-    })
-  }, [journey])
-
   // photo pins belong to a walk: on the everyday map they would be clutter
   const updateReady = useUpdateAvailable()
   const [updateHidden, setUpdateHidden] = useState(false)
   const walkMarks = useMarks()
-  const shownWalkId = expedition?.id ?? journeyId
+  const shownWalkId = expedition?.id ?? null
   const photoPins = useMemo(
     () =>
       shownWalkId
@@ -405,8 +385,11 @@ export function App() {
         onClearSelection={clearSelection}
         focus={focus}
         quest={questOverlay}
-        track={expedition?.track ?? journey?.track ?? null}
-        me={expedition?.where ?? null}
+        track={expedition?.track ?? null}
+        me={
+          expedition?.where ??
+          (myFix ? { coords: myFix.coords, accuracy: myFix.accuracy, course: null } : null)
+        }
         followMe={onWalk && followMe}
         onUserPan={() => setFollowMe(false)}
         mapStyle={mapStyleSpec}
@@ -446,15 +429,6 @@ export function App() {
 
       {onWalk && expeditionPark ? (
         <>
-          {!followMe && (
-            <button
-              className="app-recenter"
-              aria-label="Wróć do mojej pozycji"
-              onClick={() => setFollowMe(true)}
-            >
-              <Crosshair size={20} />
-            </button>
-          )}
           <ExpeditionBar
             onRequestStop={() => setEndingWalk(true)}
             onPhoto={setPhotoAdded}
@@ -471,6 +445,28 @@ export function App() {
           </div>
         )
       )}
+
+      <button
+        className="app-locate"
+        aria-label="Pokaż, gdzie jestem"
+        onClick={() => {
+          if (onWalk) setFollowMe(true)
+          if (!navigator.geolocation) return
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const coords: Pt = [pos.coords.longitude, pos.coords.latitude]
+              setMyFix({ coords, accuracy: pos.coords.accuracy ?? 30, at: Date.now() })
+              setFocus({ center: coords, zoom: 16.4, ts: Date.now() })
+            },
+            () => {
+              // no permission, no position: nothing to centre on
+            },
+            { enableHighAccuracy: true, maximumAge: 15_000, timeout: 8000 },
+          )
+        }}
+      >
+        {onWalk && !followMe ? <Crosshair size={19} /> : <LocateFixed size={19} />}
+      </button>
 
       <PeekCard
         open={peekOpen}
@@ -569,8 +565,8 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
-      {journey && journeyPark && !openPhoto && (
-        <JourneySheet
+      {journey && journeyPark && (
+        <JourneyScreen
           journey={journey}
           parkName={journeyPark.properties.name}
           onClose={() => setJourneyId(null)}
