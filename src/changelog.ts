@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.18.1'
+export const VERSION = '0.18.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.18.2',
+    date: '2026-08-20',
+    title: 'Map right up to the top',
+    changes: [
+      ['fixed', 'The band under the clock and battery is gone: iOS was painting that strip with the theme colour, and a gradient of ours sat on top of it. The map now runs to the very edge of the screen'],
+    ],
+  },
   {
     version: '0.18.1',
     date: '2026-08-20',
