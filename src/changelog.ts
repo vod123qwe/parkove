@@ -19,7 +19,7 @@ export const CHANGELOG: Release[] = [
     title: 'A walk you can see',
     changes: [
       ['added', 'Your position on the map: a dot with a circle showing how sure the GPS is, and the camera rides along until you touch the map (then a button brings it back)'],
-      ['added', 'The top card turns into the live walk: a ring of this walk's points, its name, a pulse, and which way the next point is with the distance'],
+      ['added', 'The top card turns into the live walk: a ring of the points on this walk, its name, a pulse, and which way the next point is with the distance'],
       ['added', 'Two-stage detection: a soft buzz around 50 m to make you look around, and the point counts once you are really there (15 m, or as close as the GPS can promise)'],
       ['added', 'Arriving now shows a notice with "Czytaj" instead of taking over the screen: the point is already counted, the story can wait for a bench'],
       ['added', 'A tick on collected pins, so a walked route reads at a glance'],
