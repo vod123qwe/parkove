@@ -2,8 +2,10 @@ import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { ErrorBoundary } from './ErrorBoundary'
 import { initTheme } from './theme'
+import { trackScreenHeight } from './screen'
 
 initTheme()
+trackScreenHeight()
 
 // only in a build: in dev the worker would serve stale modules
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {

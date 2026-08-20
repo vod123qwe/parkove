@@ -14,6 +14,7 @@ import type { Journey } from './state'
 import type { WalkMark } from './photos'
 import type { QuestPoi } from './data/quests'
 import { bearingDeg, distanceM } from './geo'
+import { useDarkChrome } from './screen'
 
 /** how far ahead of the marker a memory counts as "we are passing it" */
 const REACH_M = 22
@@ -93,6 +94,7 @@ export function MemoryPlayer({
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
   const [look, setLook] = useState<ReplayLook>('day')
+  useDarkChrome()
   const [looksOpen, setLooksOpen] = useState(false)
   /** whatever the memory was opened into: the full screen version of it */
   const [openMark, setOpenMark] = useState<string | null>(null)
@@ -288,9 +290,12 @@ export function MemoryPlayer({
      * paint locked the map out of ever drawing the route again.
      */
     let painting = false
+    /** a broken style must not be retried forever; reset on every new style */
+    let tries = 0
     const paint = async () => {
-      if (painting || map.getSource('mem-track')) return
+      if (painting || tries > 6 || map.getSource('mem-track')) return
       painting = true
+      tries++
       try {
         await paintOnce()
       } catch {
@@ -304,7 +309,17 @@ export function MemoryPlayer({
     map.on('load', () => void paint())
     // setStyle wipes our layers, and 'style.load' is unreliable in v5
     map.on('styledata', () => {
+      tries = 0
       if (map.isStyleLoaded() && !map.getSource('mem-track')) void paint()
+    })
+    /*
+     * A heavy look (raised ground, a whole vector city) is still settling when
+     * styledata arrives, so that call finds the style unready and there is no
+     * second one. 'idle' means everything has landed: if the walk is not on the
+     * map by then, it never will be, so paint it.
+     */
+    map.on('idle', () => {
+      if (!map.getSource('mem-track')) void paint()
     })
 
     // tapping a pin walks you there: the marker travels, then stops and speaks
@@ -565,7 +580,15 @@ export function MemoryPlayer({
                 if (l.id === look) return
                 setLook(l.id)
                 readyRef.current = false
-                mapRef.current?.setStyle(replayStyle(l.id))
+                const map = mapRef.current
+                if (!map) return
+                // the raised ground survives a style swap unless it is dropped
+                try {
+                  map.setTerrain(null)
+                } catch {
+                  // no terrain to drop
+                }
+                map.setStyle(replayStyle(l.id))
               }}
             >
               {l.label}

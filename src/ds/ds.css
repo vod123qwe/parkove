@@ -24,6 +24,31 @@ body {
   background: var(--bg-page);
 }
 
+/* nailed to the window, so there is nothing left for the document to scroll
+   and nothing to draw a scrollbar for */
+body {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+}
+
+/* a dark screen is in front: the strip behind the home indicator has to be
+   dark too, whatever the browser thinks the window height is */
+html[data-pk-dark],
+html[data-pk-dark] body {
+  background: #0b1207;
+}
+
+/* the app scrolls inside its own panels; the bars are noise on top of that */
+:where(.app-shell, .jscreen, .stampscreen, .memview, .memplay, .pk-modal, .pk-sheet) :where(*) {
+  scrollbar-width: none;
+}
+
+:where(.app-shell, .jscreen, .stampscreen, .memview, .memplay, .pk-modal, .pk-sheet)
+  :where(*)::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   background: var(--bg-page);
   color: var(--content-primary);

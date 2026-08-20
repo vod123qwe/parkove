@@ -10,7 +10,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: var(--screen-h);
+  bottom: 0;
+  min-height: var(--screen-h);
   display: flex;
   flex-direction: column;
   background: var(--bg-page);

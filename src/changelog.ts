@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.38.0'
+export const VERSION = '0.39.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,21 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.39.0',
+    date: '2026-08-20',
+    title: 'Four more ways to look at a walk',
+    changes: [
+      ['added', 'Rzezba terenu: the ground is really raised now, from free elevation tiles, and lit from the side. Piltza is flat so it barely shows there; on Kopiec Krakusa, Zakrzowek or the river valley it does'],
+      ['added', 'Czarno-biala and Sepia: the imagery graded like film, so nothing on screen is green except your walk'],
+      ['added', 'Mieta 3D: the whole city painted in the colours of the app, buildings included'],
+      ['changed', 'Photos that pop up during a replay are a quarter smaller, so they sit on the map instead of covering it'],
+      ['changed', 'The tinted inserts went back to grey'],
+      ['fixed', 'A heavy look could arrive without the route, the marker and the pins: the map is now checked once more the moment it settles'],
+      ['fixed', 'The white band above the home indicator, again: the screen is measured rather than asked for, every layer is pinned to both edges, and the document behind a dark screen is dark too'],
+      ['fixed', 'No more scrollbar sliding in over the app while a panel scrolls'],
+    ],
+  },
   {
     version: '0.38.0',
     date: '2026-08-20',

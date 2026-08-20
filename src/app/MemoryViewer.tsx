@@ -4,6 +4,7 @@ import { deleteMark, updateMark } from './photos'
 import { noteType } from './memory'
 import { WavePlayer } from './WavePlayer'
 import type { WalkMark } from './photos'
+import { useDarkChrome } from './screen'
 
 const fmtWhen = (at: number) =>
   new Date(at).toLocaleString('pl-PL', {
@@ -32,6 +33,7 @@ export function MemoryViewer({
    * the viewer is read only, which is what a replay wants */
   onMove?: (markId: string) => void
 }) {
+  useDarkChrome()
   const rail = useRef<HTMLDivElement>(null)
   const startIndex = Math.max(
     0,

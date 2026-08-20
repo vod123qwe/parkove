@@ -119,12 +119,16 @@ export const CINEMATIC: StyleSpecification = {
  *   tiles we already load, so every colour is ours and the trail really pops;
  * - both extrude buildings, because in a flat city the buildings are the relief.
  */
-export type ReplayLook = 'day' | 'night' | 'graphite'
+export type ReplayLook = 'day' | 'night' | 'mono' | 'sepia' | 'relief' | 'graphite' | 'mint'
 
 export const REPLAY_LOOKS: Array<{ id: ReplayLook; label: string }> = [
   { id: 'day', label: 'Satelita' },
   { id: 'night', label: 'Noc' },
+  { id: 'mono', label: 'Czarno-biała' },
+  { id: 'sepia', label: 'Sepia' },
+  { id: 'relief', label: 'Rzeźba terenu' },
   { id: 'graphite', label: 'Grafit 3D' },
+  { id: 'mint', label: 'Mięta 3D' },
 ]
 
 const sat = (extra: Record<string, unknown>) => ({
@@ -163,6 +167,15 @@ const SOURCES = {
     url: 'https://tiles.openfreemap.org/planet',
     attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
   },
+  // free global elevation, no key, and it does send CORS headers
+  dem: {
+    type: 'raster-dem' as const,
+    tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+    encoding: 'terrarium' as const,
+    tileSize: 256,
+    maxzoom: 15,
+    attribution: 'Elevation: Mapzen, AWS Open Data',
+  },
 }
 
 export function replayStyle(look: ReplayLook): StyleSpecification {
@@ -186,6 +199,87 @@ export function replayStyle(look: ReplayLook): StyleSpecification {
           'raster-hue-rotate': 200,
         }),
         buildings('#1d2a3a', 0.7),
+      ],
+    }
+  }
+  if (look === 'mono') {
+    return {
+      ...base,
+      layers: [
+        // all the colour taken out: nothing on screen is green except the walk
+        sat({ 'raster-saturation': -1, 'raster-contrast': 0.28, 'raster-brightness-min': 0.04 }),
+        buildings('#f2f2f2', 0.5),
+      ],
+    }
+  }
+  if (look === 'sepia') {
+    return {
+      ...base,
+      layers: [
+        // an old postcard: warm, soft, a little faded
+        sat({
+          'raster-saturation': -0.4,
+          'raster-hue-rotate': -28,
+          'raster-contrast': 0.08,
+          'raster-brightness-max': 0.93,
+        }),
+        buildings('#e8dcc4', 0.6),
+      ],
+    }
+  }
+  if (look === 'relief') {
+    return {
+      ...base,
+      // real elevation, pushed a little: Kraków is flat, so the mounds and the
+      // river valley only read once the height is exaggerated
+      terrain: { source: 'dem', exaggeration: 2.2 },
+      layers: [
+        sat({ 'raster-saturation': -0.1 }),
+        {
+          id: 'shade',
+          type: 'hillshade' as const,
+          source: 'dem',
+          paint: {
+            'hillshade-exaggeration': 0.55,
+            'hillshade-shadow-color': '#0b1a10',
+            'hillshade-highlight-color': '#eaf6df',
+          } as never,
+        },
+        buildings('#dfe4d8', 0.5),
+      ],
+    }
+  }
+  if (look === 'mint') {
+    return {
+      ...base,
+      layers: [
+        { id: 'bg', type: 'background', paint: { 'background-color': '#0b1a10' } },
+        {
+          id: 'water',
+          type: 'fill',
+          source: 'ofm',
+          'source-layer': 'water',
+          paint: { 'fill-color': '#123027' },
+        },
+        {
+          id: 'green',
+          type: 'fill',
+          source: 'ofm',
+          'source-layer': 'landcover',
+          paint: { 'fill-color': '#16311c', 'fill-opacity': 0.95 },
+        },
+        {
+          id: 'roads',
+          type: 'line',
+          source: 'ofm',
+          'source-layer': 'transportation',
+          paint: {
+            'line-color': '#2a4a32',
+            'line-width': ['interpolate', ['linear'], ['zoom'], 12, 0.4, 17, 2.4] as never,
+          },
+        },
+        // the city in the colour of the app, so the trail belongs to it
+        buildings('#3c6b45', 0.95),
       ],
     }
   }
