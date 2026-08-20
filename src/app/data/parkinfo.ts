@@ -18,17 +18,13 @@ export type ParkInfo = {
 }
 
 export const PARK_INFO: Record<string, ParkInfo> = {
-  'test-ruczaj': {
+  'test-piltza': {
     description: [
-      "Poligon testowy: nie jest to prawdziwy park, a obszar do sprawdzania wyprawy z domu. Obejmuje trzy punkty w promieniu 150 metrów od ul. Piltza 43 na Ruczaju.",
-      "Trasa ma około pół kilometra i przechodzi obok paczkomatu Allegro i sklepu Stokrotka. Wystarczy, żeby sprawdzić wykrywanie punktów, wibrację, ślad GPS, licznik kilometrów i wpis w dzienniku wypraw.",
-      "Po testach można ten obszar usunąć jednym poleceniem: to jedyne miejsce w kolekcji oznaczone jako testowe.",
+      'Trasa testowa wzdłuż ulicy Piltza, od numeru 43 do 34: pół kilometra w jedną stronę i sześć punktów, na których sprawdzasz, czy aplikacja robi to, co ma robić w terenie.',
+      'Nie jest to park, ale trasa ma własną opowieść. Zaczyna się przy bloku o nazwie Bruksela, prowadzi obok przedszkoli i żłobków najmłodszej dzielnicy Krakowa, skręca do pomnika pacjentów szpitala w Kobierzynie zamordowanych w 1942 roku i kończy przy numerze 34, pod nazwiskiem lekarza, który ten szpital wywalczył.',
+      'Po testach usuniesz ją jedną komendą: npm run test-park:remove.',
     ],
-    amenities: {
-      playground: { has: false, note: "Obszar testowy, nie prawdziwy park." },
-      food: { has: true, note: "Stokrotka Express i Żabka przy ul. Piltza, na trasie wyprawy." },
-      verified: true,
-    },
+    amenities: { playground: { has: true, note: 'Kilka placów zabaw między blokami, największy przy numerze 34.' }, food: { has: true, note: 'Kwiaty i Kawa oraz Dary Posejdona po drodze, Żabka i Groszek przy starcie.' }, verified: false },
   },
   blonia: {
     photos: [

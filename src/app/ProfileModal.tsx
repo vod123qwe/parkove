@@ -42,7 +42,7 @@ export function ProfileModal({
   onOpenJourney: (journeyId: string) => void
 }) {
   const { parks: progress, journeys } = useGameState()
-  const photos = usePhotos()
+  const photos = usePhotos().filter((m) => m.kind === 'photo' && m.url)
   const [name, setNameState] = useState(getName)
   const [editing, setEditing] = useState(false)
 
@@ -153,8 +153,8 @@ export function ProfileModal({
             {photos.map((ph, i) => (
               <Polaroid
                 key={ph.id}
-                src={ph.url}
-                caption={ph.caption || parkName(ph.parkId)}
+                src={ph.url!}
+                caption={ph.caption || undefined}
                 meta={`${parkName(ph.parkId)} · ${fmtDate(ph.at)}`}
                 tilt={i % 2 ? 1.5 : -1.5}
               />

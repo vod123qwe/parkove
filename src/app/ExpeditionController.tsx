@@ -18,6 +18,8 @@ const NEAR_M = 50
 const ARRIVE_M = 15
 /** ...and never further than this, however bad the signal claims to be */
 const ARRIVE_MAX_M = 35
+/** on foot this is already a run: a faster jump is the GPS lying, not a step */
+const MAX_WALK_SPEED = 6
 
 export function ExpeditionController({
   onNear,
@@ -35,22 +37,45 @@ export function ExpeditionController({
   const cbRef = useRef({ onNear, onArrive })
   cbRef.current = { onNear, onArrive }
 
+  // a phone in a street of blocks reports positions that hop a few metres
+  // sideways while you walk straight; this keeps the drawn line calm
+  const smoothRef = useRef<{ pt: Pt; at: number } | null>(null)
+
   useEffect(() => {
     if (!parkId) return
     warnedRef.current = new Set()
+    smoothRef.current = null
     const quest = questForPark(parkId)
 
     let watchId: number | null = null
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (pos) => {
-          const pt: Pt = [pos.coords.longitude, pos.coords.latitude]
+          const raw: Pt = [pos.coords.longitude, pos.coords.latitude]
           const accuracy = pos.coords.accuracy ?? 999
           // the phone reports heading only sometimes, so fall back on the walk
           const course =
             pos.coords.heading != null && !Number.isNaN(pos.coords.heading)
               ? pos.coords.heading
               : null
+
+          const now = Date.now()
+          const prev = smoothRef.current
+          let pt = raw
+          if (prev) {
+            const dt = (now - prev.at) / 1000
+            const moved = distanceM(prev.pt, raw)
+            // a jump too fast to walk is noise; the next reading is a second away
+            if (dt > 0 && dt < 20 && moved / dt > MAX_WALK_SPEED) return
+            // a sharp reading leads, a vague one only nudges
+            const alpha = Math.min(0.7, Math.max(0.25, 10 / Math.max(accuracy, 5)))
+            pt = [
+              prev.pt[0] + (raw[0] - prev.pt[0]) * alpha,
+              prev.pt[1] + (raw[1] - prev.pt[1]) * alpha,
+            ]
+          }
+          smoothRef.current = { pt, at: now }
+
           recordFix({ coords: pt, accuracy, course })
           if (!quest) return
 

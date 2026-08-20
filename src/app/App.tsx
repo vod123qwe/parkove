@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, RefreshCw, Sparkles } from 'lucide-react'
+import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, Mic, RefreshCw, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
@@ -16,8 +16,8 @@ import { AppearanceModal, MapStyleModal } from './SettingsModals'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
 import { ExpeditionStatus } from './ExpeditionStatus'
-import { PhotoSheet } from './PhotoSheet'
-import { updatePhoto, usePhotos } from './photos'
+import { MarkSheet } from './MarkSheet'
+import { updateMark, useMarks } from './photos'
 import { RevealSheet } from './RevealSheet'
 import { KIND_META } from './kinds'
 import { distanceToParkM, formatDistance } from './geo'
@@ -25,6 +25,7 @@ import type { Pt } from './geo'
 import { beginWalk } from './walk'
 import { EndWalkSheet } from './EndWalkSheet'
 import { JourneySheet } from './JourneySheet'
+import { WalkSummary } from './WalkSummary'
 import { stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
@@ -65,8 +66,12 @@ export function App() {
   const [photoId, setPhotoId] = useState<string | null>(null)
   const [movingPhotoId, setMovingPhotoId] = useState<string | null>(null)
   const [photoAdded, setPhotoAdded] = useState<string | null>(null)
+  /** one-liner from the field: no mic access, press held too briefly */
+  const [hint, setHint] = useState<string | null>(null)
   /** confirmation before a walk becomes a journal entry */
   const [endingWalk, setEndingWalk] = useState(false)
+  /** the walk that just ended, waiting to show its summary */
+  const [summaryId, setSummaryId] = useState<string | null>(null)
   /** last known position outside a walk: decides whether the start CTA shows */
   const [myFix, setMyFix] = useState<{ coords: Pt; at: number } | null>(null)
   /** a past walk opened for review: its route takes over the map */
@@ -331,6 +336,10 @@ export function App() {
   )
 
   const journeys = useGameState().journeys
+  const summaryJourney = summaryId ? (journeys.find((j) => j.id === summaryId) ?? null) : null
+  const summaryPark = summaryJourney
+    ? FEATURES.find((f) => f.id === summaryJourney.parkId)
+    : null
   const journey = journeyId ? (journeys.find((j) => j.id === journeyId) ?? null) : null
   const journeyPark = journey ? FEATURES.find((f) => f.id === journey.parkId) : null
 
@@ -362,18 +371,23 @@ export function App() {
   // photo pins belong to a walk: on the everyday map they would be clutter
   const updateReady = useUpdateAvailable()
   const [updateHidden, setUpdateHidden] = useState(false)
-  const walkPhotos = usePhotos()
+  const walkMarks = useMarks()
   const shownWalkId = expedition?.id ?? journeyId
   const photoPins = useMemo(
     () =>
       shownWalkId
-        ? walkPhotos
-            .filter((ph) => ph.journeyId === shownWalkId && ph.coords)
-            .map((ph) => ({ id: ph.id, coords: ph.coords as [number, number], blob: ph.blob }))
+        ? walkMarks
+            .filter((m) => m.journeyId === shownWalkId && m.coords)
+            .map((m) => ({
+              id: m.id,
+              kind: m.kind,
+              coords: m.coords as [number, number],
+              blob: m.blob,
+            }))
         : [],
-    [walkPhotos, shownWalkId],
+    [walkMarks, shownWalkId],
   )
-  const openPhoto = photoId ? (walkPhotos.find((ph) => ph.id === photoId) ?? null) : null
+  const openPhoto = photoId ? (walkMarks.find((m) => m.id === photoId) ?? null) : null
 
   const sortedParks = useMemo(
     () => [...FEATURES].sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'pl')),
@@ -405,7 +419,7 @@ export function App() {
         onSelectPhoto={setPhotoId}
         placingPhoto={!!movingPhotoId}
         onPlacePhoto={(coords) => {
-          if (movingPhotoId) void updatePhoto(movingPhotoId, { coords })
+          if (movingPhotoId) void updateMark(movingPhotoId, { coords })
           setMovingPhotoId(null)
         }}
       />
@@ -441,7 +455,12 @@ export function App() {
               <Crosshair size={20} />
             </button>
           )}
-          <ExpeditionBar onRequestStop={() => setEndingWalk(true)} onPhoto={setPhotoAdded} />
+          <ExpeditionBar
+            onRequestStop={() => setEndingWalk(true)}
+            onPhoto={setPhotoAdded}
+            onMark={setPhotoId}
+            onHint={setHint}
+          />
         </>
       ) : (
         !selected && (
@@ -563,16 +582,31 @@ export function App() {
         <EndWalkSheet
           onClose={() => setEndingWalk(false)}
           onConfirm={() => {
+            const finished = expedition?.id ?? null
             stopExpedition()
             setEndingWalk(false)
             setFollowMe(true)
+            // the stamp goes first, the summary waits its turn below
+            setSummaryId(finished)
           }}
         />
       )}
 
+      {summaryId && !celebrate && summaryJourney && summaryPark && (
+        <WalkSummary
+          journey={summaryJourney}
+          parkName={summaryPark.properties.name}
+          onOpenJourney={() => {
+            setSummaryId(null)
+            setJourneyId(summaryJourney.id)
+          }}
+          onClose={() => setSummaryId(null)}
+        />
+      )}
+
       {openPhoto && !movingPhotoId && (
-        <PhotoSheet
-          photo={openPhoto}
+        <MarkSheet
+          mark={openPhoto}
           onClose={() => setPhotoId(null)}
           onMove={() => {
             setMovingPhotoId(openPhoto.id)
@@ -588,6 +622,17 @@ export function App() {
           icon={<Camera size={18} />}
           title="Dotknij mapy"
           text="Tam postawię ten pin ze zdjęciem"
+          offset={76}
+        />
+      )}
+
+      {hint && (
+        <Toast
+          open
+          onClose={() => setHint(null)}
+          icon={<Mic size={18} />}
+          title={hint}
+          autoMs={4000}
           offset={76}
         />
       )}

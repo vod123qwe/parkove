@@ -2,6 +2,8 @@
    Roles are named by task. Emphasis is a variant (-strong), not a separate role. */
 
 :root {
+  /* a traveller's hand, for notes left on the map */
+  --font-hand: 'Caveat', 'Bricolage Grotesque', cursive;
   --font-display: 'Bricolage Grotesque', 'Manrope', system-ui, sans-serif;
   --font-text: 'Manrope', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;

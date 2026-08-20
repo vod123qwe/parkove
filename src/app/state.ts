@@ -24,6 +24,8 @@ export type Expedition = {
   distanceM: number
   /** poi ids collected during this walk */
   collected: string[]
+  /** when each point was reached, so the journal can say at what hour */
+  times: Record<string, number>
   /** latest position, null until the first fix arrives */
   where: Fix | null
 }
@@ -40,6 +42,8 @@ export type Journey = {
   /** simplified GPS track */
   track: Pt[]
   points: string[]
+  /** poi id -> timestamp, for walks recorded since this became a thing */
+  times?: Record<string, number>
 }
 
 type GameState = {
@@ -129,7 +133,9 @@ export function collectPoint(parkId: string, poiId: string) {
   parks = { ...parks, [parkId]: { ...park, points: [...park.points, poiId], lastAt: new Date().toISOString() } }
   const exp = state.expedition
   const expedition =
-    exp && exp.parkId === parkId ? { ...exp, collected: [...exp.collected, poiId] } : exp
+    exp && exp.parkId === parkId
+      ? { ...exp, collected: [...exp.collected, poiId], times: { ...exp.times, [poiId]: Date.now() } }
+      : exp
   commit({ ...state, parks, expedition })
 }
 
@@ -152,6 +158,7 @@ export function startExpedition(parkId: string, name: string) {
         track: [],
         distanceM: 0,
         collected: [],
+        times: {},
         where: null,
       },
     },
@@ -176,6 +183,7 @@ export function stopExpedition() {
           distanceM: Math.round(exp.distanceM),
           track: simplifyTrack(exp.track),
           points: exp.collected,
+          times: exp.times,
         },
       ]
     : state.journeys
@@ -183,7 +191,7 @@ export function stopExpedition() {
 }
 
 /** a reading this vague would drag the drawn line through buildings */
-const USABLE_ACCURACY_M = 30
+const USABLE_ACCURACY_M = 25
 
 /**
  * Every GPS reading lands here: it always updates where we are (even a vague
@@ -195,8 +203,8 @@ export function recordFix(fix: Fix) {
   if (!exp) return
   const last = exp.track[exp.track.length - 1]
   const moved = last ? distanceM(last, fix.coords) : Infinity
-  // ignore jitter below 3 m so the distance does not inflate while standing still
-  const extend = fix.accuracy <= USABLE_ACCURACY_M && moved >= 3
+  // ignore jitter below 5 m so the distance does not inflate while standing still
+  const extend = fix.accuracy <= USABLE_ACCURACY_M && moved >= 5
   commit(
     {
       ...state,

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Square } from 'lucide-react'
+import { StickyNote, Square } from 'lucide-react'
 import { Card } from '../ds'
 import { useGameState } from './state'
 import { PhotoButton } from './PhotoButton'
+import { VoiceButton } from './VoiceButton'
+import { addMark } from './photos'
 
 function fmtTime(ms: number) {
   const s = Math.floor(ms / 1000)
@@ -19,10 +21,16 @@ function fmtTime(ms: number) {
 export function ExpeditionBar({
   onRequestStop,
   onPhoto,
+  onMark,
+  onHint,
 }: {
   /** ending is irreversible, so the bar only asks for it */
   onRequestStop: () => void
-  onPhoto?: (photoId: string) => void
+  /** a picture only gets a notice: writing can wait */
+  onPhoto?: (markId: string) => void
+  /** a note or a recording opens right away, because it needs words */
+  onMark?: (markId: string) => void
+  onHint?: (message: string) => void
 }) {
   const { expedition } = useGameState()
   const [, tick] = useState(0)
@@ -34,6 +42,7 @@ export function ExpeditionBar({
 
   if (!expedition) return null
   const km = (expedition.distanceM / 1000).toFixed(1).replace('.', ',')
+  const here = expedition.where?.coords ?? expedition.track[expedition.track.length - 1]
 
   return (
     <div className="app-expbar">
@@ -41,13 +50,36 @@ export function ExpeditionBar({
         <PhotoButton
           parkId={expedition.parkId}
           journeyId={expedition.id}
-          coords={expedition.where?.coords ?? expedition.track[expedition.track.length - 1]}
+          coords={here}
           onSaved={onPhoto}
-          label="Zdjęcie"
+          label=""
           full={false}
           variant="tonal"
-          className="app-expbar__photo"
+          className="app-expbar__icon"
         />
+        <VoiceButton
+          parkId={expedition.parkId}
+          journeyId={expedition.id}
+          coords={here}
+          onSaved={onMark}
+          onHint={onHint}
+        />
+        <button
+          className="app-voicebtn"
+          aria-label="Zostaw notatkę w tym miejscu"
+          onClick={async () => {
+            const saved = await addMark({
+              kind: 'note',
+              parkId: expedition.parkId,
+              journeyId: expedition.id,
+              coords: here,
+              caption: '',
+            })
+            onMark?.(saved.id)
+          }}
+        >
+          <StickyNote size={20} />
+        </button>
         <span className="t-caption app-expbar__meta">
           {fmtTime(Date.now() - expedition.startedAt)} · {km} km
         </span>

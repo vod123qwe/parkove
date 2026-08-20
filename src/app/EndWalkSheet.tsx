@@ -3,7 +3,7 @@ import { BottomSheet, Button, List, ListItem, Stat } from '../ds'
 import { collectPoint, useGameState } from './state'
 import { questForPark } from './data/quests'
 import { distanceM, formatDistance } from './geo'
-import { usePhotos } from './photos'
+import { useMarks } from './photos'
 
 function fmtTime(ms: number) {
   const s = Math.floor(ms / 1000)
@@ -19,7 +19,7 @@ function fmtTime(ms: number) {
  */
 export function EndWalkSheet({ onClose, onConfirm }: { onClose: () => void; onConfirm: () => void }) {
   const { expedition, parks } = useGameState()
-  const photos = usePhotos()
+  const marks = useMarks()
   if (!expedition) return null
 
   const quest = questForPark(expedition.parkId)
@@ -28,7 +28,9 @@ export function EndWalkSheet({ onClose, onConfirm }: { onClose: () => void; onCo
   const total = quest?.pois.length ?? 0
   const done = total - missed.length
   const here = expedition.where?.coords ?? expedition.track[expedition.track.length - 1]
-  const shots = photos.filter((ph) => ph.journeyId === expedition.id).length
+  const mine = marks.filter((m) => m.journeyId === expedition.id)
+  const shots = mine.filter((m) => m.kind === 'photo').length
+  const notes = mine.length - shots
 
   return (
     <BottomSheet
@@ -53,6 +55,7 @@ export function EndWalkSheet({ onClose, onConfirm }: { onClose: () => void; onCo
           />
           {total > 0 && <Stat value={`${done}/${total}`} label="punkty" />}
           {shots > 0 && <Stat value={String(shots)} label="zdjęcia" />}
+          {notes > 0 && <Stat value={String(notes)} label="notatki" />}
         </div>
 
         {missed.length > 0 && (

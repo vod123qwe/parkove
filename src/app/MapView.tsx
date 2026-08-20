@@ -36,8 +36,14 @@ export type QuestOverlay = {
 /** collected parks, drawn as stamp pins once the map is zoomed in */
 export type StampPin = { parkId: string; coords: [number, number] }
 
-/** a picture taken on a walk, pinned where the phone stood */
-export type PhotoPin = { id: string; coords: [number, number]; blob: Blob }
+/** something you left on a walk: a picture, a voice note or a written one */
+export type MarkPin = {
+  id: string
+  kind: 'photo' | 'audio' | 'note'
+  coords: [number, number]
+  /** the picture, for the thumbnail pin; absent for notes */
+  blob?: Blob
+}
 
 /** practical spots around a park: coffee and playgrounds */
 export type AmenityPin = {
@@ -76,10 +82,10 @@ type Props = {
   onSelectAmenity: (kind: 'food' | 'playground') => void
   /** stamp of this park steps aside so its quest pins stay readable */
   hideStampFor: string | null
-  /** photos of the current walk, drawn as round thumbnails */
-  photoPins: PhotoPin[]
+  /** what the current walk left behind, drawn as thumbnails and small pins */
+  photoPins: MarkPin[]
   onSelectPhoto: (id: string) => void
-  /** while moving a photo, the next tap on the map is its new home */
+  /** while moving a pin, the next tap on the map is its new home */
   placingPhoto: boolean
   onPlacePhoto: (coords: [number, number]) => void
 }
@@ -192,11 +198,15 @@ const meHaloFC = (me: Props['me']) => ({
       : [],
 })
 
-const photoFC = (pins: PhotoPin[]) => ({
+const photoFC = (pins: MarkPin[]) => ({
   type: 'FeatureCollection' as const,
   features: pins.map((p) => ({
     type: 'Feature' as const,
-    properties: { photoId: p.id, icon: `photo-${p.id}` },
+    properties: {
+      photoId: p.id,
+      // a photo is its own thumbnail; a note or a recording gets a drawn pin
+      icon: p.kind === 'photo' ? `photo-${p.id}` : pinImageId(p.kind, p.kind),
+    },
     geometry: { type: 'Point' as const, coordinates: p.coords },
   })),
 })
@@ -319,9 +329,10 @@ export function MapView({
     }
     ;(map as unknown as { __addStampImages: (p: StampPin[]) => void }).__addStampImages = addStampImages
 
-    const addPhotoImages = async (pins: PhotoPin[]) => {
+    const addPhotoImages = async (pins: MarkPin[]) => {
       const ring = readMapColors().meRing
       for (const pin of pins) {
+        if (pin.kind !== 'photo' || !pin.blob) continue
         const id = `photo-${pin.id}`
         if (map.hasImage(id)) continue
         try {
@@ -331,7 +342,7 @@ export function MapView({
         }
       }
     }
-    ;(map as unknown as { __addPhotoImages: (p: PhotoPin[]) => Promise<void> }).__addPhotoImages =
+    ;(map as unknown as { __addPhotoImages: (p: MarkPin[]) => Promise<void> }).__addPhotoImages =
       addPhotoImages
 
     const syncVisited = () => {
@@ -476,7 +487,7 @@ export function MapView({
         source: 'walk-photos',
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 13, 0.3, 16, 0.46, 18, 0.55] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 13, 0.28, 16, 0.42, 18, 0.5] as never,
           'icon-allow-overlap': true,
         },
       })
@@ -724,7 +735,7 @@ export function MapView({
   useEffect(() => {
     const map = mapRef.current
     if (!map || !loadedRef.current) return
-    const withImages = map as unknown as { __addPhotoImages?: (p: PhotoPin[]) => Promise<void> }
+    const withImages = map as unknown as { __addPhotoImages?: (p: MarkPin[]) => Promise<void> }
     void withImages.__addPhotoImages?.(photoPins).then(() => {
       ;(map.getSource('walk-photos') as { setData: (d: unknown) => void } | undefined)?.setData(
         photoFC(photoPins),

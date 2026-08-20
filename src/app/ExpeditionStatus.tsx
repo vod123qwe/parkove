@@ -50,7 +50,7 @@ export function ExpeditionStatus() {
           ) : !here ? (
             'szukam sygnału GPS'
           ) : total > 0 ? (
-            'komplet punktów'
+            'komplet punktów, kończysz kiedy chcesz'
           ) : (
             'nagrywam spacer'
           )}

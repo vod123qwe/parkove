@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.17.1'
+export const VERSION = '0.18.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,22 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.18.0',
+    date: '2026-08-20',
+    title: 'Voice, notes and a proper ending',
+    changes: [
+      ['added', 'Voice notes: hold the microphone, let go, listen back, then decide whether it stays. Saved ones become pins on the route'],
+      ['added', 'Written notes pinned to a place, in a travelling hand, for things like the sunset that happened right here'],
+      ['added', 'Ending a walk is now a small ceremony: the stamp first, then a summary of what the walk added up to, then it lands in the history'],
+      ['added', 'The summary shows the badge even when it was not earned: pale, locked, and with the exact points still missing'],
+      ['added', 'The journal remembers the hour each point was reached, and lists the notes and recordings from that walk'],
+      ['added', 'A new test route along Piltza, from 43 to 34: six points, half a kilometre, from a block named Brussels to the doctor the street is named after, with the Kobierzyn memorial in between'],
+      ['changed', 'The drawn track is calmer: readings that imply running are dropped and the rest is smoothed, weighted by how sure the GPS is'],
+      ['changed', 'A full set of points no longer reads like the end of the walk. It says so, and leaves the decision to you'],
+      ['changed', 'Polaroids are rounder, and a photo without a caption simply has none'],
+    ],
+  },
   {
     version: '0.17.1',
     date: '2026-08-20',

@@ -5,7 +5,10 @@
 import type { PoiCategory } from './data/quests'
 
 /** 24x24 viewBox path data, taken from the Lucide icons used across the UI */
-const ICONS: Record<PoiCategory | 'parking' | 'stamp' | 'food' | 'playground', string[]> = {
+const ICONS: Record<
+  PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note',
+  string[]
+> = {
   // eye
   view: ['M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0', 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0'],
   // landmark
@@ -28,11 +31,23 @@ const ICONS: Record<PoiCategory | 'parking' | 'stamp' | 'food' | 'playground', s
   food: ['M10 2v2', 'M14 2v2', 'M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1', 'M6 2v2'],
   // blocks, reads as a playground
   playground: ['M10 22V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1z', 'M20 14h-6a1 1 0 0 0-1 1v7h8v-7a1 1 0 0 0-1-1', 'M14 6V3a1 1 0 0 0-1-1h-2'],
+  // mic, a voice note left on the way
+  audio: ['M12 19v3', 'M19 10v2a7 7 0 0 1-14 0v-2', 'M8 5a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z'],
+  // sticky-note, a thought pinned to a place
+  note: ['M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z', 'M15 3v6h6'],
   // award, generic
   stamp: ['m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526', 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z'],
 }
 
-export type PinVariant = 'open' | 'done' | 'active' | 'parking' | 'food' | 'playground'
+export type PinVariant =
+  | 'open'
+  | 'done'
+  | 'active'
+  | 'parking'
+  | 'food'
+  | 'playground'
+  | 'audio'
+  | 'note'
 
 const SIZE = 96 // rendered at 2x of the on-map size
 
@@ -43,6 +58,9 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
     parking: [colors.infoSubtle, colors.infoBorder, colors.info],
     food: [colors.foodSubtle, colors.foodBorder, colors.food],
     playground: [colors.playSubtle, colors.playBorder, colors.play],
+    // things you left yourself: a filled pin, so they read apart from the game
+    audio: [colors.accent, colors.accent, colors.surface],
+    note: [colors.gold, colors.gold, colors.onGold],
   }
   const [fill, stroke, icon] = themed[variant] ?? [
     variant === 'done' ? colors.gold : colors.surface,
@@ -90,10 +108,10 @@ async function rasterise(svg: string) {
 export async function buildPinImages(colors: Record<string, string>) {
   const out: Array<[string, ImageData]> = []
   for (const [category, paths] of Object.entries(ICONS)) {
-    const variants: PinVariant[] =
-      category === 'parking' || category === 'food' || category === 'playground'
-        ? [category as PinVariant]
-        : ['open', 'done', 'active']
+    const own = ['parking', 'food', 'playground', 'audio', 'note']
+    const variants: PinVariant[] = own.includes(category)
+      ? [category as PinVariant]
+      : ['open', 'done', 'active']
     for (const variant of variants) {
       try {
         out.push([pinImageId(category, variant), await rasterise(pinSvg(paths, variant, colors))])

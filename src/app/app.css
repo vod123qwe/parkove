@@ -901,8 +901,12 @@
 }
 
 /* the camera keeps its own label off: the icon is the whole button */
-.app-expbar__photo {
+.app-expbar__icon {
   flex: none;
+  width: var(--control-md);
+  min-width: var(--control-md);
+  padding: 0;
+  justify-content: center;
 }
 
 .app-expbar__meta {
@@ -1198,4 +1202,213 @@
 
 .journey__danger .pk-btn {
   color: var(--content-error);
+}
+
+/* ---- voice and note buttons in the walk bar ---- */
+
+.app-voicebtn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-primary-subtle);
+  color: var(--content-accent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+/* holding it down should feel like holding a button down */
+.app-voicebtn.-recording {
+  background: var(--content-error);
+  color: var(--content-on-primary);
+  transform: scale(1.08);
+  animation: rec-pulse 1.1s var(--ease-in-out) infinite;
+}
+
+@keyframes rec-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(175 46 39 / 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgb(175 46 39 / 0);
+  }
+}
+
+/* ---- one mark: photo, recording or note ---- */
+
+.marksheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.marksheet__img {
+  width: 100%;
+  max-height: 46vh;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-sunken);
+}
+
+.marksheet__audio {
+  width: 100%;
+}
+
+.marksheet__when {
+  color: var(--content-tertiary);
+  margin: 0;
+}
+
+.marksheet__caption,
+.marksheet__input {
+  width: 100%;
+  min-height: var(--control-md);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-sunken);
+  font-family: var(--font-text);
+  font-size: 15px;
+  color: var(--content-primary);
+}
+
+.marksheet__caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--content-secondary);
+}
+
+.marksheet__input {
+  border: 1px solid var(--border-focus);
+}
+
+/* a note is somebody's handwriting on a scrap of paper, so it looks like one */
+.marksheet__note,
+.marksheet__notefield {
+  width: 100%;
+  min-height: 96px;
+  padding: var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-gold);
+  color: var(--content-on-gold);
+  font-family: var(--font-hand);
+  font-size: 26px;
+  line-height: 32px;
+  text-align: left;
+  box-shadow: var(--elevation-1);
+}
+
+.marksheet__note {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  cursor: pointer;
+}
+
+.marksheet__notefield {
+  resize: vertical;
+}
+
+.marksheet__actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+/* ---- listening back before it stays ---- */
+
+.voicereview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.voicereview__lead {
+  margin: 0;
+  color: var(--content-secondary);
+}
+
+.voicereview__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ---- what the walk added up to ---- */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.summary__name {
+  margin: 0;
+}
+
+.summary__where {
+  margin: 0;
+  color: var(--content-tertiary);
+}
+
+.summary__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-6);
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.summary__badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-top: var(--sp-2);
+  padding: var(--sp-4);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-sunken);
+}
+
+.summary__badge.-earned {
+  background: var(--bg-primary-subtle);
+}
+
+.summary__badgetext {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.summary__hint {
+  margin: 0;
+  color: var(--content-secondary);
+}
+
+.summary__lock {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  color: var(--content-tertiary);
+}
+
+.summary__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
 }

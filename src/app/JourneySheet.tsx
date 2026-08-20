@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, MapPin, Pencil, Trash2 } from 'lucide-react'
+import { Check, ChevronRight, MapPin, Mic, Pencil, StickyNote, Trash2 } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, Polaroid, Stat } from '../ds'
 import { deleteJourney, updateJourney, useGameState } from './state'
 import type { Journey } from './state'
@@ -34,7 +34,9 @@ export function JourneySheet({
   onOpenPhoto: (photoId: string) => void
 }) {
   const { parks } = useGameState()
-  const photos = usePhotos().filter((ph) => ph.journeyId === journey.id)
+  const marks = usePhotos().filter((m) => m.journeyId === journey.id)
+  const photos = marks.filter((m) => m.kind === 'photo' && m.url)
+  const notes = marks.filter((m) => m.kind !== 'photo')
   const [name, setName] = useState(journey.name ?? parkName)
   const [editingName, setEditingName] = useState(false)
   const [note, setNote] = useState(journey.note ?? '')
@@ -95,7 +97,30 @@ export function JourneySheet({
             value={`${(journey.distanceM / 1000).toFixed(1).replace('.', ',')} km`}
             label="dystans"
           />
-          {points.length > 0 && (
+          {notes.length > 0 && (
+          <>
+            <h3 className="t-title journey__section">Notatki</h3>
+            <List>
+              {notes.map((m) => (
+                <ListItem
+                  key={m.id}
+                  icon={m.kind === 'audio' ? <Mic /> : <StickyNote />}
+                  leadTone="gold"
+                  title={m.caption || (m.kind === 'audio' ? 'Nagranie bez podpisu' : 'Pusta notatka')}
+                  meta={new Date(m.at).toLocaleTimeString('pl-PL', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                  className="-stacked"
+                  onClick={() => onOpenPhoto(m.id)}
+                  trailing={<ChevronRight size={18} className="park-parking__chevron" />}
+                />
+              ))}
+            </List>
+          </>
+        )}
+
+        {points.length > 0 && (
             <Stat value={`${journey.points.length}/${points.length}`} label="punkty" />
           )}
           {photos.length > 0 && <Stat value={String(photos.length)} label="zdjęcia" />}
@@ -119,8 +144,8 @@ export function JourneySheet({
             {photos.map((ph) => (
               <Polaroid
                 key={ph.id}
-                src={ph.url}
-                caption={ph.caption || 'Bez podpisu'}
+                src={ph.url!}
+                caption={ph.caption || undefined}
                 onClick={() => onOpenPhoto(ph.id)}
               />
             ))}
@@ -150,7 +175,9 @@ export function JourneySheet({
                     title={poi.name}
                     meta={
                       onThisWalk
-                        ? 'zaliczony na tej wyprawie'
+                        ? journey.times?.[poi.id]
+                          ? `zaliczony o ${new Date(journey.times[poi.id]).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}`
+                          : 'zaliczony na tej wyprawie'
                         : ever
                           ? 'zaliczony innym razem'
                           : 'jeszcze nieodkryty'

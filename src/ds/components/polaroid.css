@@ -5,7 +5,7 @@
   padding: var(--sp-2) var(--sp-2) var(--sp-3);
   border: none;
   background: #fdfdf8;
-  border-radius: 3px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--elevation-2);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -17,6 +17,7 @@
   aspect-ratio: 1;
   background: #e7e7de;
   overflow: hidden;
+  border-radius: var(--radius-md);
 }
 
 .pk-polaroid__frame img {
@@ -31,7 +32,7 @@
   flex-direction: column;
   gap: 1px;
   padding: var(--sp-2) 2px 0;
-  min-height: 34px;
+  min-height: 18px;
 }
 
 /* handwriting-ish: the caption is the person's own note */
