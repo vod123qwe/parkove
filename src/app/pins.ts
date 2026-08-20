@@ -67,7 +67,7 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   const [fill, stroke, icon] =
     // the replay is its own world: dark discs with a lime edge, over imagery
     variant === 'replay'
-      ? [colors.trailFill, colors.trailEdge, colors.trailIcon]
+      ? [colors.trailFill, colors.paper, colors.trailIcon]
       : (themed[variant] ?? [
           variant === 'done' ? colors.gold : colors.surface,
           variant === 'active' ? colors.accentStrong : colors.accent,
@@ -75,7 +75,8 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
         ])
   const ring = variant === 'active' ? 5 : variant === 'replay' ? 4.5 : 3.5
   const r = SIZE / 2 - ring
-  const iconScale = 2.1
+  // a smaller mark inside the same disc: it reads calmer on imagery
+  const iconScale = variant === 'replay' ? 1.72 : 2.1
   const iconOffset = (SIZE - 24 * iconScale) / 2
   // a collected point wears a tick: gold alone did not read as "done"
   const tick =

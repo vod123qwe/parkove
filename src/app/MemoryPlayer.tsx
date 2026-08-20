@@ -4,7 +4,7 @@ import { ChevronLeft, Pause } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
 import { CINEMATIC } from './data/mapstyles'
-import { buildTimeline, metresAt, pointAt, walkedSoFar } from './memory'
+import { buildTimeline, metresAt, msAtMetres, pointAt, walkedSoFar } from './memory'
 import type { Timeline } from './memory'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import type { Journey } from './state'
@@ -134,9 +134,21 @@ export function MemoryPlayer({
       pitch: 58,
       bearing: 0,
       attributionControl: { compact: true },
-      interactive: false,
+      // no panning or zooming by hand: the dial and the pins drive this map,
+      // but taps still have to arrive, so the handlers are switched off one by one
+      dragPan: false,
+      dragRotate: false,
+      scrollZoom: false,
+      touchZoomRotate: false,
+      doubleClickZoom: false,
+      keyboard: false,
+      boxZoom: false,
     })
     mapRef.current = map
+    if (import.meta.env.DEV) {
+      // a debug handle, the same as the main map has
+      ;(window as unknown as { __pkReplay?: MapGL }).__pkReplay = map
+    }
     // the bottom third carries the memory, so the walker rides above centre
     map.setPadding({ top: 0, left: 0, right: 0, bottom: Math.round(window.innerHeight * 0.34) })
 
@@ -199,6 +211,7 @@ export function MemoryPlayer({
           features: stops.current.map((s) => ({
             type: 'Feature',
             properties: {
+              markId: s.id,
               icon:
                 s.body.kind === 'mark'
                   ? s.body.mark.kind === 'photo'
@@ -213,6 +226,12 @@ export function MemoryPlayer({
             },
           })),
         } as never,
+      })
+      map.addLayer({
+        id: 'mem-stop-hit',
+        type: 'circle',
+        source: 'mem-stops',
+        paint: { 'circle-radius': 26, 'circle-color': 'transparent' },
       })
       map.addLayer({
         id: 'mem-stop-pins',
@@ -248,6 +267,16 @@ export function MemoryPlayer({
 
       readyRef.current = true
       draw(0)
+    })
+
+    // tapping a pin walks you there: the marker travels, then stops and speaks
+    map.on('click', (e) => {
+      if (!map.getLayer('mem-stop-hit')) return
+      const hit = map.queryRenderedFeatures(e.point, { layers: ['mem-stop-hit'] })[0]
+      const id = hit?.properties?.markId
+      if (!id) return
+      const stop = stops.current.find((x) => x.id === String(id))
+      if (stop) travelTo(stop)
     })
 
     return () => {
@@ -306,6 +335,29 @@ export function MemoryPlayer({
     }
   }
 
+  /** an animated walk to a chosen memory, ignoring the throttle while it runs */
+  const trip = useRef<{ from: number; to: number; t0: number; dur: number; stop: string } | null>(
+    null,
+  )
+  const travelTo = (stop: { id: string; metres: number; body: Memory }) => {
+    const to = msAtMetres(timeline, stop.metres)
+    const from = elapsedRef.current
+    const gap = Math.abs(to - from)
+    targetRef.current = 0
+    rateRef.current = 0
+    posRef.current = 0
+    setPos(0)
+    trip.current = {
+      from,
+      to,
+      t0: performance.now(),
+      // near things are a step, far things a proper walk, but never a slog
+      dur: Math.max(600, Math.min(1600, 600 + gap / 60)),
+      stop: stop.id,
+    }
+    setMemory(stop.body)
+  }
+
   useEffect(() => {
     let raf = 0
     let last = performance.now()
@@ -319,6 +371,25 @@ export function MemoryPlayer({
         const k = 1 - Math.exp(-dt / RATE_TAU)
         rateRef.current += (target - rateRef.current) * k
         if (Math.abs(target - rateRef.current) < 0.04) rateRef.current = target
+      }
+
+      // travelling to a pin the walker was sent to: nothing else moves it
+      const going = trip.current
+      if (going) {
+        const p = Math.min(1, (now - going.t0) / going.dur)
+        // ease in and out: it sets off, covers ground, and lands softly
+        const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2
+        const next = going.from + (going.to - going.from) * e
+        elapsedRef.current = next
+        setElapsed(next)
+        draw(next, dt)
+        if (p >= 1) {
+          seenRef.current.add(going.stop)
+          dwellUntil.current = now + DWELL_MS
+          trip.current = null
+        }
+        raf = requestAnimationFrame(step)
+        return
       }
 
       let r = rateRef.current
@@ -381,6 +452,7 @@ export function MemoryPlayer({
 
   const onDialDown = (e: React.PointerEvent) => {
     cancelAnimationFrame(tween.current)
+    trip.current = null
     try {
       // capture keeps the drag alive outside the arc; losing it is survivable
       e.currentTarget.setPointerCapture(e.pointerId)
@@ -426,10 +498,10 @@ export function MemoryPlayer({
       <div ref={holder} className="memplay__map" />
 
       <div className="memplay__floor" aria-hidden="true">
-        <span style={{ '--b': '2px', '--from': '0%', '--to': '34%' } as CSSProperties} />
-        <span style={{ '--b': '7px', '--from': '20%', '--to': '60%' } as CSSProperties} />
-        <span style={{ '--b': '16px', '--from': '42%', '--to': '82%' } as CSSProperties} />
-        <span style={{ '--b': '28px', '--from': '62%', '--to': '100%' } as CSSProperties} />
+        <span style={{ '--b': '1px', '--from': '0%', '--to': '38%' } as CSSProperties} />
+        <span style={{ '--b': '3px', '--from': '24%', '--to': '66%' } as CSSProperties} />
+        <span style={{ '--b': '7px', '--from': '48%', '--to': '88%' } as CSSProperties} />
+        <span style={{ '--b': '12px', '--from': '70%', '--to': '100%' } as CSSProperties} />
       </div>
 
       <button className="memplay__back" aria-label="Wyjdź ze wspomnień" onClick={onClose}>
@@ -455,7 +527,7 @@ export function MemoryPlayer({
             ) : (
               <>
                 <span className="memplay__kind">Notatka</span>
-                <p className="memplay__said">{memory.mark.caption || 'Pusta notatka'}</p>
+                <p className="memplay__postit">{memory.mark.caption || 'Pusta notatka'}</p>
               </>
             )
           ) : (

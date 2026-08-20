@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.31.1'
+export const VERSION = '0.32.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.32.0',
+    date: '2026-08-20',
+    title: 'Tap a pin, walk there',
+    changes: [
+      ['added', 'Pins in a replay are tappable: the walker sets off, covers the ground and lands softly at that place, then the memory speaks. The dial lets go while it travels, and touching the dial cancels the trip'],
+      ['changed', 'A note is a sticky note again: rounded paper in a marker hand, dropped slightly crooked, arriving like something being put down'],
+      ['changed', 'Pins in a replay wear a white edge with a slightly smaller mark inside, and the blur under the memory is lighter'],
+    ],
+  },
   {
     version: '0.31.1',
     date: '2026-08-20',

@@ -103,3 +103,17 @@ export function walkedSoFar(track: Pt[], dist: number[], metres: number): Pt[] {
   out.push(head)
   return out
 }
+
+/** the other way round: at what point in the walk were we this far along */
+export function msAtMetres(t: Timeline, metres: number) {
+  const m = Math.max(0, Math.min(t.totalM, metres))
+  for (let i = 1; i < t.anchors.length; i++) {
+    const [t1, d1] = t.anchors[i]
+    const [t0, d0] = t.anchors[i - 1]
+    if (m <= d1) {
+      const span = d1 - d0 || 1
+      return t0 + ((m - d0) / span) * (t1 - t0)
+    }
+  }
+  return t.totalMs
+}

@@ -1895,10 +1895,38 @@
   box-shadow: 0 14px 34px rgb(0 0 0 / 0.45);
 }
 
+/* a sticky note, in marker on paper, dropped a little crooked */
+.memplay__postit {
+  margin: var(--sp-2) 0 var(--sp-1);
+  max-width: 17ch;
+  padding: var(--sp-5) var(--sp-5) var(--sp-6);
+  border-radius: 24px;
+  corner-shape: var(--corner-smooth);
+  background: #fdfbf0;
+  color: #1b1b1b;
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 27px;
+  line-height: 33px;
+  text-align: left;
+  /* a long word without spaces must not run off the paper */
+  overflow-wrap: anywhere;
+  box-shadow: 0 18px 38px rgb(0 0 0 / 0.45);
+  transform: rotate(-1.8deg);
+  animation: postit-drop 460ms var(--ease-screen);
+}
+
+/* it arrives like a note being put down: a touch too big, then settled */
+@keyframes postit-drop {
+  from {
+    opacity: 0;
+    transform: rotate(3.5deg) scale(0.92) translateY(14px);
+  }
+}
+
 /*
- * Somebody's own words, quoted. Bold italic in the display face rather than
- * handwriting: over imagery the heavier letter holds its shape, and the slant
- * is what makes it read as a quote.
+ * A caption under a photo or a recording, quoted. Bold italic in the display
+ * face: over imagery the heavier letter holds its shape.
  */
 .memplay__said {
   margin: var(--sp-1) 0 var(--sp-3);
