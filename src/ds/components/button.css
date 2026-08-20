@@ -1,0 +1,88 @@
+.pk-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: none;
+}
+
+/* state layer: one mechanism for hover and press on every variant */
+.pk-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+
+.pk-btn:hover::after {
+  opacity: 0.08;
+}
+
+.pk-btn:active::after {
+  opacity: 0.14;
+}
+
+.pk-btn.-md {
+  height: var(--control-md);
+  padding: 0 var(--sp-5);
+}
+
+.pk-btn.-lg {
+  height: var(--control-lg);
+  padding: 0 var(--sp-6);
+  font-size: 16px;
+}
+
+.pk-btn.-full {
+  width: 100%;
+}
+
+.pk-btn.-primary {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+.pk-btn.-tonal {
+  background: var(--bg-primary-subtle);
+  color: var(--content-accent);
+}
+
+.pk-btn.-ghost {
+  background: transparent;
+  color: var(--content-accent);
+}
+
+.pk-btn:disabled {
+  background: var(--bg-surface-sunken);
+  color: var(--content-disabled);
+  cursor: default;
+}
+
+.pk-btn:disabled::after {
+  display: none;
+}
+
+.pk-btn__icon {
+  display: inline-flex;
+  margin-left: calc(-1 * var(--sp-1));
+}
+
+.pk-iconbtn {
+  width: var(--control-md);
+  height: var(--control-md);
+  padding: 0;
+}

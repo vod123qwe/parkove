@@ -1,0 +1,70 @@
+.pk-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: 96px;
+}
+
+.pk-badge__disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  transition:
+    background var(--motion-base) var(--ease-out),
+    color var(--motion-base) var(--ease-out);
+}
+
+.pk-badge.-md .pk-badge__disc {
+  width: 64px;
+  height: 64px;
+}
+
+.pk-badge.-lg .pk-badge__disc {
+  width: 80px;
+  height: 80px;
+}
+
+.pk-badge.-md .pk-badge__disc svg {
+  width: 28px;
+  height: 28px;
+}
+
+.pk-badge.-lg .pk-badge__disc svg {
+  width: 36px;
+  height: 36px;
+}
+
+.pk-badge.-locked .pk-badge__disc {
+  background: var(--bg-surface-sunken);
+  color: var(--content-tertiary);
+  border: 1.5px dashed var(--border-default);
+}
+
+.pk-badge.-visited .pk-badge__disc {
+  background: var(--bg-primary-subtle);
+  color: var(--content-accent);
+  border: 1.5px solid transparent;
+}
+
+.pk-badge.-completed .pk-badge__disc {
+  background: var(--bg-gold);
+  color: var(--content-on-gold);
+  border: 1.5px solid transparent;
+  box-shadow: var(--elevation-1);
+}
+
+.pk-badge__label {
+  font-family: var(--font-text);
+  font-weight: 550;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+  color: var(--content-secondary);
+  text-align: center;
+}
+
+.pk-badge.-locked .pk-badge__label {
+  color: var(--content-tertiary);
+}

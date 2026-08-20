@@ -1,0 +1,170 @@
+.pk-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.pk-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-scrim);
+  animation: pk-sheet-fade var(--motion-base) var(--ease-out);
+  transition: opacity var(--motion-base) var(--ease-out);
+}
+
+.pk-sheet.-closing .pk-sheet__scrim {
+  opacity: 0;
+}
+
+.pk-sheet.-closing {
+  pointer-events: none;
+}
+
+/* non-modal: the sheet floats over a live page, only the panel takes input */
+.pk-sheet.-nonmodal {
+  pointer-events: none;
+}
+
+.pk-sheet.-nonmodal .pk-sheet__panel {
+  pointer-events: auto;
+}
+
+.pk-sheet__panel {
+  position: relative;
+  width: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface-raised);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--elevation-3);
+  overflow: hidden;
+  /* backdrop root: the header blur must never sample the page BEHIND the panel */
+  isolation: isolate;
+  animation: pk-sheet-up var(--motion-slow) var(--ease-out);
+  transition: transform var(--motion-slow) var(--ease-out);
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+/* header floats over the content: scrolled content fades out underneath it
+   through a background gradient plus a blur that tapers off (progressive) */
+.pk-sheet__head {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  padding: 0 var(--sp-6) var(--sp-3);
+  cursor: grab;
+}
+
+/* the fade zone lives INSIDE the header's last 28px, so untouched content
+   below starts fully crisp and only fades once it scrolls underneath */
+.pk-sheet__head::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  mask-image: linear-gradient(to bottom, black calc(100% - 30px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 30px), transparent 100%);
+}
+
+.pk-sheet__head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--bg-surface-raised) calc(100% - 28px),
+    transparent 100%
+  );
+}
+
+.pk-sheet__grab {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-3) 0 var(--sp-2);
+}
+
+.pk-sheet__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--border-default);
+}
+
+.pk-sheet__title {
+  margin: var(--sp-2) 0 var(--sp-5);
+}
+
+.pk-sheet__content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 var(--sp-6);
+  overscroll-behavior: contain;
+  margin-top: -28px;
+}
+
+/* hero mode: media runs to the panel edges, only the body keeps the margin */
+.pk-sheet__head.-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding-bottom: 0;
+}
+
+.pk-sheet__head.-overlay::before,
+.pk-sheet__head.-overlay::after {
+  display: none;
+}
+
+.pk-sheet__head.-overlay .pk-sheet__handle {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.pk-sheet__content.-hero {
+  margin-top: 0;
+  padding: 0;
+}
+
+.pk-sheet__content.-hero .pk-sheet__inner {
+  padding: var(--sp-6) var(--sp-6) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+}
+
+/* inner scroll wakes up only at the full detent */
+.pk-sheet__panel.-full .pk-sheet__content {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+/* fade hint when collapsed content is clipped */
+.pk-sheet__panel:not(.-full) .pk-sheet__content {
+  mask-image: linear-gradient(to bottom, black calc(100% - 28px), transparent);
+}
+
+.pk-sheet__inner {
+  padding-top: 28px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+}
+
+@keyframes pk-sheet-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pk-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}

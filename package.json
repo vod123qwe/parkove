@@ -1,0 +1,36 @@
+{
+  "name": "parkove",
+  "private": true,
+  "version": "0.14.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:phone": "vite --mode phone",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "tsc --noEmit",
+    "tokens": "node scripts/generate-colors.mjs",
+    "stamps": "node scripts/slice-stamps.mjs",
+    "stamps:files": "node scripts/import-stamps.mjs",
+    "photos:optimize": "node scripts/optimize-photos.mjs",
+    "test-park:remove": "node scripts/remove-test-park.mjs",
+    "icons": "node scripts/make-icons.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "^1.33.0",
+    "maplibre-gl": "^5.24.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@material/material-color-utilities": "^0.4.0",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "sharp": "^0.35.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1"
+  }
+}

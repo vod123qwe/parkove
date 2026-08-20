@@ -1,0 +1,96 @@
+.pk-listitem {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: var(--sp-3) var(--sp-3);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  text-align: left;
+  font-family: var(--font-text);
+  color: var(--content-primary);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.pk-listitem {
+  cursor: pointer;
+}
+
+button.pk-listitem:hover {
+  background: var(--bg-surface-sunken);
+}
+
+.pk-listitem__lead {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pk-listitem__lead svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pk-listitem__lead.-neutral {
+  background: var(--bg-surface-sunken);
+  color: var(--content-tertiary);
+}
+
+.pk-listitem__lead.-accent {
+  background: var(--bg-primary-subtle);
+  color: var(--content-accent);
+}
+
+.pk-listitem__lead.-gold {
+  background: var(--bg-gold);
+  color: var(--content-on-gold);
+}
+
+.pk-listitem__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.pk-listitem__title {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pk-listitem__meta {
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 17px;
+  letter-spacing: 0.02em;
+  color: var(--content-tertiary);
+}
+
+/* rows that carry a sentence rather than a label need room to breathe */
+.pk-listitem.-stacked {
+  align-items: flex-start;
+  padding-top: var(--sp-4);
+  padding-bottom: var(--sp-4);
+}
+
+.pk-listitem.-stacked .pk-listitem__title {
+  white-space: normal;
+  font-size: 15px;
+}
+
+.pk-listitem__trailing {
+  flex: none;
+  display: flex;
+  align-items: center;
+}

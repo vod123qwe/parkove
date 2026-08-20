@@ -1,0 +1,35 @@
+.pk-collapsible__body {
+  overflow: hidden;
+  transition: max-height 340ms var(--ease-out), mask-position 340ms var(--ease-out);
+}
+
+/* paragraphs must flow as one block while folded, or only the first shows */
+.pk-collapsible__body.-clamped > * {
+  display: inline;
+}
+
+.pk-collapsible__body.-clamped > * + *::before {
+  content: ' ';
+}
+
+/* the last folded line fades out instead of being cut mid-letter */
+.pk-collapsible__body.-clamped {
+  mask-image: linear-gradient(to bottom, black calc(100% - 22px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 22px), transparent 100%);
+}
+
+.pk-collapsible__toggle {
+  margin-top: var(--sp-2);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--content-accent);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}

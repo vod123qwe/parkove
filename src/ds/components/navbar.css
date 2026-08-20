@@ -1,0 +1,59 @@
+.pk-navbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--control-lg);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--sp-3)) var(--sp-4) var(--sp-3);
+  background: var(--bg-page);
+  transition: background var(--motion-base) var(--ease-out);
+}
+
+/* content scrolled underneath: translucent bar with a progressive blur tail */
+.pk-navbar.-scrolled {
+  background: color-mix(in srgb, var(--bg-page) 72%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.pk-navbar.-scrolled::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 20px;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+.pk-navbar__action {
+  flex: none;
+  z-index: 1;
+}
+
+.pk-navbar__title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: calc(100% - 128px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 24px;
+  text-align: center;
+}
+
+.pk-navbar__trailing {
+  flex: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}

@@ -1,0 +1,63 @@
+.pk-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200; /* above every sheet and hud: the modal owns the whole screen */
+  isolation: isolate;
+}
+
+.pk-modal__panel {
+  position: absolute;
+  inset: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+  isolation: isolate;
+  animation: pk-modal-in 300ms var(--ease-out);
+}
+
+/* the bar floats over the scrolling content so the blur has something behind it */
+.pk-modal__nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.pk-modal.-closing {
+  pointer-events: none;
+}
+
+.pk-modal.-closing .pk-modal__panel {
+  animation: pk-modal-out 220ms var(--ease-out) forwards;
+}
+
+.pk-modal__content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sp-6);
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--control-lg) + var(--sp-6) + var(--sp-2));
+}
+
+.pk-modal__inner {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-8));
+}
+
+@keyframes pk-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+}
+
+@keyframes pk-modal-out {
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+}

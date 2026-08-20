@@ -1,0 +1,97 @@
+// Map pin artwork: the same Lucide icons the UI uses, drawn into a round badge
+// and handed to MapLibre as images. Icons are inlined as path data so no React
+// renderer is needed at map time.
+
+import type { PoiCategory } from './data/quests'
+
+/** 24x24 viewBox path data, taken from the Lucide icons used across the UI */
+const ICONS: Record<PoiCategory | 'parking' | 'stamp' | 'food' | 'playground', string[]> = {
+  // eye
+  view: ['M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0', 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0'],
+  // landmark
+  monument: ['M10 18v-7', 'M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z', 'M14 18v-7', 'M18 18v-7', 'M3 22h18', 'M6 18v-7'],
+  // waves
+  water: ['M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1', 'M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1', 'M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1'],
+  // leaf
+  nature: ['M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z', 'M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12'],
+  // mountain
+  cave: ['m8 3 4 8 5-5 5 15H2L8 3z'],
+  // scroll-text
+  history: ['M15 12h-5', 'M15 8h-5', 'M19 17V5a2 2 0 0 0-2-2H4', 'M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3'],
+  // flower-2
+  meadow: ['M12 5a3 3 0 1 1 3 3M12 5a3 3 0 1 0-3 3M12 19a3 3 0 1 0 3-3M12 19a3 3 0 1 1-3-3', 'M9 8a3 3 0 1 0 3 3M15 8a3 3 0 1 1-3 3M9 16a3 3 0 1 1 3-3M15 16a3 3 0 1 0-3-3', 'M12 22v-6'],
+  // move-up-right, reads as a climbing route
+  climb: ['M13 5H19V11', 'M19 5 5 19'],
+  // circle-parking
+  parking: ['M9 17V7h4a3 3 0 0 1 0 6H9'],
+  // coffee
+  food: ['M10 2v2', 'M14 2v2', 'M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1', 'M6 2v2'],
+  // blocks, reads as a playground
+  playground: ['M10 22V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1z', 'M20 14h-6a1 1 0 0 0-1 1v7h8v-7a1 1 0 0 0-1-1', 'M14 6V3a1 1 0 0 0-1-1h-2'],
+  // award, generic
+  stamp: ['m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526', 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z'],
+}
+
+export type PinVariant = 'open' | 'done' | 'active' | 'parking' | 'food' | 'playground'
+
+const SIZE = 96 // rendered at 2x of the on-map size
+
+/** an SVG pin: round badge with the category icon, styled from DS colours */
+function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, string>) {
+  // practical categories get their own hue so they read apart from nature green
+  const themed: Record<string, [string, string, string]> = {
+    parking: [colors.infoSubtle, colors.infoBorder, colors.info],
+    food: [colors.foodSubtle, colors.foodBorder, colors.food],
+    playground: [colors.playSubtle, colors.playBorder, colors.play],
+  }
+  const [fill, stroke, icon] = themed[variant] ?? [
+    variant === 'done' ? colors.gold : colors.surface,
+    variant === 'active' ? colors.accentStrong : colors.accent,
+    variant === 'done' ? colors.onGold : colors.accent,
+  ]
+  const ring = variant === 'active' ? 5 : 3.5
+  const r = SIZE / 2 - ring
+  const iconScale = 2.1
+  const iconOffset = (SIZE - 24 * iconScale) / 2
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
+  <circle cx="${SIZE / 2}" cy="${SIZE / 2}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${ring * 1.6}"/>
+  <g transform="translate(${iconOffset} ${iconOffset}) scale(${iconScale})" fill="none" stroke="${icon}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    ${paths.map((d) => `<path d="${d}"/>`).join('')}
+  </g>
+</svg>`
+}
+
+export const pinImageId = (category: string, variant: PinVariant) => `pin-${category}-${variant}`
+
+/** SVG has to go through an <img> first: createImageBitmap cannot decode it */
+async function rasterise(svg: string) {
+  const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
+  const img = new Image(SIZE, SIZE)
+  img.src = url
+  await img.decode()
+  const canvas = document.createElement('canvas')
+  canvas.width = SIZE
+  canvas.height = SIZE
+  const ctx = canvas.getContext('2d')!
+  ctx.drawImage(img, 0, 0, SIZE, SIZE)
+  return ctx.getImageData(0, 0, SIZE, SIZE)
+}
+
+/** rasterise every pin the map needs; returns [imageId, ImageData] pairs */
+export async function buildPinImages(colors: Record<string, string>) {
+  const out: Array<[string, ImageData]> = []
+  for (const [category, paths] of Object.entries(ICONS)) {
+    const variants: PinVariant[] =
+      category === 'parking' || category === 'food' || category === 'playground'
+        ? [category as PinVariant]
+        : ['open', 'done', 'active']
+    for (const variant of variants) {
+      try {
+        out.push([pinImageId(category, variant), await rasterise(pinSvg(paths, variant, colors))])
+      } catch {
+        // a pin that fails to draw simply stays absent from the map
+      }
+    }
+  }
+  return out
+}

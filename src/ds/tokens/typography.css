@@ -1,0 +1,69 @@
+/* Parkove type roles. Display face: Bricolage Grotesque. Text face: Manrope.
+   Roles are named by task. Emphasis is a variant (-strong), not a separate role. */
+
+:root {
+  --font-display: 'Bricolage Grotesque', 'Manrope', system-ui, sans-serif;
+  --font-text: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 36px;
+  line-height: 42px;
+  letter-spacing: -0.01em;
+}
+
+.t-headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 32px;
+  letter-spacing: -0.005em;
+}
+
+.t-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 24px;
+}
+
+.t-body {
+  font-family: var(--font-text);
+  font-weight: 450;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.t-body.-strong,
+.t-body-strong {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.t-body-sm {
+  font-family: var(--font-text);
+  font-weight: 450;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.t-label {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.01em;
+}
+
+.t-caption {
+  font-family: var(--font-text);
+  font-weight: 550;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+}

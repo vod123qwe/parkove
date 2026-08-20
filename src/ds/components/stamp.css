@@ -1,0 +1,75 @@
+.pk-stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pk-stamp__art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pk-stamp__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.pk-stamp.-sm {
+  width: 44px;
+}
+
+.pk-stamp.-md {
+  width: 76px;
+}
+
+.pk-stamp.-lg {
+  width: 112px;
+}
+
+.pk-stamp.-xl {
+  width: min(64vw, 260px);
+}
+
+/* not collected yet: a pale ghost of the artwork */
+.pk-stamp.-locked .pk-stamp__art {
+  filter: grayscale(1) opacity(0.32);
+}
+
+.pk-stamp__placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-sunken);
+  border: 1.5px dashed var(--border-default);
+  color: var(--content-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pk-stamp__placeholder svg {
+  width: 44%;
+  height: 44%;
+  stroke-width: 1.5;
+}
+
+.pk-stamp__name {
+  font-family: var(--font-text);
+  font-weight: 550;
+  font-size: 11px;
+  line-height: 15px;
+  letter-spacing: 0.01em;
+  text-align: center;
+  color: var(--content-secondary);
+}
+
+.pk-stamp.-locked .pk-stamp__name {
+  color: var(--content-tertiary);
+}

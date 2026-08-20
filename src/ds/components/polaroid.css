@@ -1,0 +1,58 @@
+.pk-polaroid {
+  display: flex;
+  flex-direction: column;
+  width: 148px;
+  padding: var(--sp-2) var(--sp-2) var(--sp-3);
+  border: none;
+  background: #fdfdf8;
+  border-radius: 3px;
+  box-shadow: var(--elevation-2);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--motion-base) var(--ease-out);
+}
+
+.pk-polaroid__frame {
+  display: block;
+  aspect-ratio: 1;
+  background: #e7e7de;
+  overflow: hidden;
+}
+
+.pk-polaroid__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pk-polaroid__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--sp-2) 2px 0;
+  min-height: 34px;
+}
+
+/* handwriting-ish: the caption is the person's own note */
+.pk-polaroid__caption {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 15px;
+  color: #2a2f26;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pk-polaroid__meta {
+  font-family: var(--font-text);
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  color: #7b8073;
+  text-align: left;
+}

@@ -1,0 +1,46 @@
+.pk-segmented {
+  position: relative;
+  display: flex;
+  padding: var(--sp-1);
+  gap: var(--sp-1);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-sunken);
+}
+
+/* one raised pill glides under the active segment */
+.pk-segmented__thumb {
+  position: absolute;
+  top: var(--sp-1);
+  bottom: var(--sp-1);
+  left: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-1);
+  transition:
+    transform 280ms var(--ease-out),
+    width 280ms var(--ease-out);
+}
+
+.pk-segmented__btn {
+  position: relative;
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--content-secondary);
+  font-family: var(--font-text);
+  font-weight: 550;
+  font-size: 13px;
+  line-height: 20px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color var(--motion-base) var(--ease-out),
+    font-weight var(--motion-base) var(--ease-out);
+}
+
+.pk-segmented__btn.-active {
+  color: var(--content-primary);
+  font-weight: 700;
+}

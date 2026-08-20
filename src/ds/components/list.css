@@ -1,0 +1,24 @@
+.pk-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* hairline between rows, drawn as a pseudo element so the inset can shift */
+.pk-list.-divided > * + * {
+  position: relative;
+}
+
+.pk-list.-divided > * + *::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--sp-3);
+  right: var(--sp-3);
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* start the line past the 40px leading disc plus its gap */
+.pk-list.-divided.-inset > * + *::before {
+  left: calc(var(--sp-3) + 40px + var(--sp-4));
+}

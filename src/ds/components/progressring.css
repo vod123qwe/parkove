@@ -1,0 +1,42 @@
+.pk-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pk-ring svg {
+  transform: rotate(-90deg);
+  display: block;
+}
+
+.pk-ring__track {
+  fill: none;
+  stroke: var(--border-subtle);
+}
+
+.pk-ring__value {
+  fill: none;
+  stroke: var(--content-accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--motion-slow) var(--ease-out);
+}
+
+.pk-ring.-complete .pk-ring__value {
+  stroke: var(--bg-gold);
+}
+
+.pk-ring__label {
+  position: absolute;
+  font-family: var(--font-text);
+  font-weight: 700;
+  color: var(--content-primary);
+}
+
+.pk-ring.-md .pk-ring__label {
+  font-size: 12px;
+}
+
+.pk-ring.-lg .pk-ring__label {
+  font-size: 19px;
+}

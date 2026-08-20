@@ -1,0 +1,268 @@
+// Parkove version history. Newest first.
+// Every update session: add an entry here and bump VERSION (+ package.json).
+
+export const VERSION = '0.14.0'
+
+export type ChangeType = 'added' | 'changed' | 'fixed'
+
+export type Release = {
+  version: string
+  date: string
+  title: string
+  changes: Array<[ChangeType, string]>
+}
+
+export const CHANGELOG: Release[] = [
+  {
+    version: '0.14.0',
+    date: '2026-08-20',
+    title: 'Installable and offline',
+    changes: [
+      ['added', 'The app is now a real PWA: add it to the home screen and it opens like an app, full screen, with its own icon'],
+      ['added', 'A service worker keeps the app, the photos and the map tiles you have already seen, so a park with no signal (or a dead dev server) no longer breaks it'],
+      ['added', 'Deploy to GitHub Pages on every push, so the phone always has a stable HTTPS address instead of a laptop on the local network'],
+    ],
+  },
+  {
+    version: '0.13.1',
+    date: '2026-08-20',
+    title: 'Test ground on Ruczaj',
+    changes: [
+      ['added', 'A test area around Piltza 43 with three points: the doorway, the Allegro locker 90 m away and Stokrotka 150 m away, so an expedition can be tried from home'],
+      ['added', 'One command removes the test area when the field test is done: npm run test-park:remove'],
+    ],
+  },
+  {
+    version: '0.13.0',
+    date: '2026-08-20',
+    title: 'Light by default, 37 parks with a game',
+    changes: [
+      ['changed', 'The app opens in light mode by default; auto and dark stay one tap away in settings'],
+      ['added', 'Eleven more quests: Stacja Wisla with an installation by Miroslaw Balka, Grzegorzecki and Reduta with Fortress Krakow remains, Witkowice with a hidden cavern, Szymborskiej, Zaczarowanej Dorozki, Laki Nowohuckie, Duchacki, Przylasek Rusiecki, Aleksandry and Zielony Jar'],
+      ['added', 'The collection reaches 115 points across 37 parks, with 103 questions'],
+      ['fixed', 'Estimated point positions were pulled inside park boundaries; real objects just outside got a matching reach'],
+      ['added', 'If the app ever crashes it now shows a way out instead of freezing on the last frame: one tap reloads and the progress stays'],
+    ],
+  },
+  {
+    version: '0.12.0',
+    date: '2026-08-20',
+    title: 'Field games in 26 parks',
+    changes: [
+      ['added', 'Eleven more quests: Kopiec Kosciuszki, Jerzmanowskich, Bagry, Wyspianskiego, Solvay, Mlynowka, Panienskie Skaly, Jalu Kurka, Wisniowy Sad, Planty Bienczyckie and Park Szwedzki'],
+      ['added', 'Planty grew to ten points, including Collegium Novum and the arrest of the professors, Zuzanna Ginczanka and the theatre built on a demolished monastery'],
+      ['added', 'The collection now holds 104 points in 26 field games, with 81 questions to argue about'],
+      ['fixed', 'Points that stand just outside a park (churches, palaces) got a reach that matches where they really are'],
+    ],
+  },
+  {
+    version: '0.11.0',
+    date: '2026-08-20',
+    title: 'Ten more field games',
+    changes: [
+      ['added', 'Ten new quests: Planty, Las Wolski, Park Krakowski, Strzelecki, the Botanic Garden, Lotnikow, Bednarskiego, Blonia, Kopiec Wandy and Decjusza'],
+      ['added', '32 new points, each with a public story, a reveal unlocked on site and a question to argue about on the bench'],
+      ['added', 'The city now holds 82 collectible points across 15 field games, up from 55 and five'],
+      ['fixed', 'Three points sat outside their park boundary and were moved inside, so they can be collected on a walk'],
+      ['changed', 'Photos shrunk for phones: the app build dropped from 83 MB to 29 MB with no visible loss'],
+      ['fixed', 'The Banach monument photo was a 348 px thumbnail, replaced with a sharp one'],
+    ],
+  },
+  {
+    version: '0.10.0',
+    date: '2026-08-20',
+    title: 'Every park has a story',
+    changes: [
+      ['added', 'All 48 places now have a written page: what it is, why go, and what makes it different from the park next door'],
+      ['added', 'Food and playgrounds for 40 parks straight from OpenStreetMap, curated to the six closest named places and four playgrounds'],
+      ['added', 'Photos for the park pages, pulled from Wikimedia Commons with credits'],
+      ['fixed', 'Pin positions verified against park boundaries: two quest points sat outside their park and were moved in'],
+    ],
+  },
+  {
+    version: '0.9.0',
+    date: '2026-08-20',
+    title: 'Profile with your own trail',
+    changes: [
+      ['added', 'Profile is a full screen now: a greeting with your name, the city ring, stamps, photos, recent walks and one nudge where to go today'],
+      ['added', 'Walk photos: take one during a walk, add a note, and it lands in the profile as a polaroid with park and date'],
+      ['added', 'Polaroid component and photo storage that keeps pictures on the device (IndexedDB)'],
+      ['added', 'Your name lives in the profile: tap the greeting to change it, the initials become your avatar'],
+      ['changed', 'Settings moved off the profile into two pages of their own: app appearance and map look'],
+      ['added', '"Where to today": one unvisited park suggested each day, quest parks first'],
+    ],
+  },
+  {
+    version: '0.8.0',
+    date: '2026-08-20',
+    title: 'Stamps and icon pins',
+    changes: [
+      ['added', 'Park stamps: a sticker per park, pale until you collect it, with a full-screen celebration the moment it lands'],
+      ['added', 'Collection screen in the profile: every stamp in one grid with a counter'],
+      ['added', 'Stamp on the park hero, like a mark in a passport'],
+      ['added', 'Stamp pins appear on the map for collected parks once you zoom in, and tapping one opens that park'],
+      ['added', 'Quest pins carry category icons in the app icon style: view, monument, water, nature, cave, history, meadow, climb'],
+      ['added', 'Slicing script: drop a sticker sheet in assets-in/ and npm run stamps cuts one transparent PNG per park'],
+      ['fixed', 'Pins were unclickable: the map click handler held stale callbacks and the park polygon under the pin always won'],
+      ['changed', 'More air between park page sections, especially around the point carousel and the amenity rows'],
+      ['added', 'First ten stamps are in: the sticker sheet was sliced into transparent PNGs and they already show on the map'],
+      ['added', 'Practical pins have their own colours: parking in blue, food in amber, playgrounds in magenta, all generated from the HCT seed'],
+      ['added', 'Food and playground spots from OpenStreetMap; tapping a pin or the amenity row opens the list with walking directions'],
+      ['changed', 'Stamp celebration darkens and blurs the background much harder, so only the sticker matters'],
+    ],
+  },
+  {
+    version: '0.7.1',
+    date: '2026-08-19',
+    title: 'Park page redesign',
+    changes: [
+      ['changed', 'Park page follows the new draft: a full-bleed hero photo with the name written on it, swipeable photos with dots, then progress and a folded description'],
+      ['added', 'MediaHero component: header image carousel with title overlay, dots and per-photo credit'],
+      ['added', 'Collapsible component: long copy folded to a few lines with a "Więcej" toggle'],
+      ['added', 'Sheets support a hero slot: media runs to the panel edges and the handle floats over it'],
+      ['changed', 'Unfolding a description glides open instead of snapping, and the last folded line fades out'],
+      ['changed', 'Photo credit left the header image; attribution now sits quietly at the bottom of the park page'],
+      ['changed', 'Amenities are proper rows now: icon, small heading and a sentence, separated by hairline dividers instead of pills'],
+      ['added', 'List component: wraps rows with hairline dividers inset past the icon; the parks list and parking list use it too'],
+      ['added', 'Public transport row under parking: the nearest stop and its lines, tapping it opens Google Maps transit directions from wherever you are'],
+    ],
+  },
+  {
+    version: '0.7.0',
+    date: '2026-08-19',
+    title: 'Questions, park pages, Skałki and Skawina',
+    changes: [
+      ['added', 'Every point can now ask a question: after the reveal you pick a side and the app argues the other one'],
+      ['added', 'Dilemmas written for 11 points, from digging up a 1200-year-old mound to a bear who never chose the war'],
+      ['added', 'Park page: hero photo, gallery, "why go there" description and the two amenities that decide a family Saturday (playground, food)'],
+      ['added', 'New quest: Skałki Twardowskiego with the sorcerer legend, the cave and the climbing walls'],
+      ['added', 'New park with a quest: Park Miejski in Skawina (the collection now reaches beyond Kraków)'],
+      ['added', 'Photos for twelve points, all CC from Wikimedia Commons with credits'],
+      ['changed', 'Zakrzówek keeps four points; the Skałki now live in their own quest'],
+    ],
+  },
+  {
+    version: '0.6.1',
+    date: '2026-08-19',
+    title: 'Feel and polish',
+    changes: [
+      ['added', 'Peek card has a "Zobacz szczegóły miejsca" button under the dots'],
+      ['changed', 'More room to breathe in the peek card and in sheet headers'],
+      ['changed', 'Top bars keep their size and turn translucent with a progressive blur once content scrolls under them'],
+      ['changed', 'Segmented control: the raised pill now glides between options instead of fading in place'],
+      ['changed', 'Changelog reads more clearly: version and date in one row, wider line spacing, aligned type tags'],
+      ['fixed', 'Sheet header blur no longer bleeds the page behind the panel (layer isolation)'],
+      ['fixed', 'Pinch zoom disabled in the app and the catalog, so the catalog behaves like part of the app'],
+    ],
+  },
+  {
+    version: '0.6.0',
+    date: '2026-08-19',
+    title: 'Live map interaction',
+    changes: [
+      ['added', 'Peek card: tapping a park on the map opens a compact floating card; pins stay clickable, drag up expands to the full sheet'],
+      ['added', 'Tapping a quest pin swaps the peek to that point: photo, teaser and a tap-through to the full story'],
+      ['added', 'Parking pin (P) on the map for the suggested spot; tapping opens a full-screen list of suggestions with navigation'],
+      ['added', 'NavBar component: X or back always on the left, centered title; used by modals and the mobile catalog'],
+      ['added', 'Back-to-app nav bar in the catalog on mobile'],
+      ['changed', 'The park sheet is non-modal now: no dimming, the map stays live; tapping empty map closes the peek'],
+      ['changed', 'Modal header uses NavBar: action on the left, title centered'],
+      ['changed', 'Carousel cards fade out at the screen edge instead of a hard crop'],
+      ['fixed', 'Carousel cards align to the top edge; a shorter caption no longer floats its photo upward'],
+      ['fixed', 'Tapping a park area on the map did nothing: string feature ids need promoteId in MapLibre; visited park colors relied on it too'],
+      ['added', 'Peek swipe pages: park, quest points and parking in one card; content slides with the finger, dots show the position'],
+      ['added', 'The active page highlights its pin on the map and the camera flies to it'],
+      ['added', 'Profile links to the design system catalog'],
+    ],
+  },
+  {
+    version: '0.5.1',
+    date: '2026-08-19',
+    title: 'Sheet polish, default and satellite map',
+    changes: [
+      ['changed', 'Sheet headers no longer cut content with a solid edge: scrolled content slides underneath and fades out in a gradient with a progressive blur'],
+      ['added', 'Map style "Domyślny": follows the app theme (Minimal in light, Ciemna in dark) and is the new default'],
+      ['added', 'Map style "Satelita": Esri World Imagery with lighter park fills so the greenery shows through'],
+      ['changed', 'Park sheet breathes: more space between sections, the point carousel sits within the margins'],
+      ['fixed', 'Park meta line was caught in the header fade zone right after opening'],
+      ['changed', 'Point modal hardened to truly full screen, above every sheet'],
+    ],
+  },
+  {
+    version: '0.5.0',
+    date: '2026-08-19',
+    title: 'Profile, map styles and polish',
+    changes: [
+      ['added', 'Profile (top right): app theme switch (auto, light, dark) shared with the catalog'],
+      ['added', 'Four map styles switchable in the profile with a live preview: Minimal, Klasyczna, Żywa, Ciemna'],
+      ['added', 'Point details open as a full-screen modal with a gentle enter, photos and the whole story'],
+      ['added', 'Quest points in the park sheet are a snap carousel of cards instead of a plain list'],
+      ['added', 'Suggested parking per pilot park: a concrete spot and fee hint (OSM-checked)'],
+      ['added', 'DS components: Modal, Carousel, Segmented (the catalog theme switch now uses it too)'],
+      ['fixed', 'Sheets animate out on close (drag, scrim, Escape) instead of vanishing in one frame'],
+    ],
+  },
+  {
+    version: '0.4.0',
+    date: '2026-08-19',
+    title: 'Point cards and the iOS sheet',
+    changes: [
+      ['added', 'Point card: tap any quest point (list, map, or Read more) for photos and the full story, anytime'],
+      ['added', 'Rich public descriptions for all 12 pilot points; the hidden on-site reveal stays as the punchline'],
+      ['added', 'CC photos from Wikimedia Commons for five points, stored locally with attribution'],
+      ['added', 'Walk journal: every expedition saves its track, distance, time and collected points'],
+      ['added', 'Compass on the expedition bar: distance and direction to the nearest remaining point'],
+      ['changed', 'BottomSheet rebuilt iOS-style: two detents (auto and full), drag anywhere, inner scroll only at full'],
+      ['changed', 'Selecting a park flies the map to it with the sheet in mind, so the park is not covered'],
+      ['changed', 'Quest dots show on the map when browsing a quest park, not only during a walk'],
+    ],
+  },
+  {
+    version: '0.3.0',
+    date: '2026-08-19',
+    title: 'Quests and expeditions',
+    changes: [
+      ['added', 'Pilot quests in three parks: Kopiec Krakusa, Zakrzówek and Park Jordana (4 points each, real OSM coordinates)'],
+      ['added', 'Two-tier point content: a public teaser for planning, a hidden story revealed only on site'],
+      ['added', 'Expedition mode: screen stays awake, GPS records the track (km, time) and detects points in radius'],
+      ['added', 'Reveal sheet with the story, progress and a hint to the nearest remaining point'],
+      ['added', 'Expedition bar with live time, distance and points; quest dots and the walked track drawn on the map'],
+      ['changed', 'City progress now counts points: a quest park scores per point, a plain park scores its entry (55 points total)'],
+    ],
+  },
+  {
+    version: '0.2.1',
+    date: '2026-08-19',
+    title: 'Map fix and phone testing',
+    changes: [
+      ['fixed', 'Map never finished loading (blank page): MapLibre 6.4.1 regression, pinned to stable 5.x'],
+      ['added', 'Phone testing mode: npm run dev:phone serves the app over HTTPS on the local network, so GPS works on the phone'],
+    ],
+  },
+  {
+    version: '0.2.0',
+    date: '2026-08-19',
+    title: 'Map foundations',
+    changes: [
+      ['added', 'Live map of Kraków (MapLibre) with the fog of war: visited parks in green, the rest greyed out'],
+      ['added', 'Park data from OpenStreetMap: curated set of parks, mounds, woods and lakesides with real boundaries'],
+      ['added', 'Park sheet with check-in: GPS verifies you are inside the park boundary'],
+      ['added', 'City progress: percent of Kraków discovered, stored locally on the device'],
+      ['added', 'Version history: click the version number in the catalog sidebar to open this changelog'],
+      ['added', 'ListItem component for the parks list (leading disc, title, meta, trailing slot)'],
+      ['changed', 'Map colors are driven by the same DS tokens in light and dark'],
+    ],
+  },
+  {
+    version: '0.1.0',
+    date: '2026-08-19',
+    title: 'Foundation',
+    changes: [
+      ['added', 'Color tokens generated from one HCT seed (forest green), light and dark from day one'],
+      ['added', 'Core tokens: 4px spacing rhythm, radius, elevation, motion, control sizes'],
+      ['added', 'Type roles: Bricolage Grotesque for display, Manrope for text'],
+      ['added', 'Components: Button, IconButton, Chip, ParkBadge, ProgressRing, Card, ParkCard, BottomSheet, Stat'],
+      ['added', 'This catalog: tokens, components and live examples with a theme switch'],
+    ],
+  },
+]

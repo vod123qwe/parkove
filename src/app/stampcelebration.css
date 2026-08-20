@@ -1,0 +1,89 @@
+.celebrate {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* the stamp is the only thing that matters here: kill the background hard */
+.celebrate__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 14, 10, 0.82);
+  backdrop-filter: blur(14px) saturate(0.75);
+  -webkit-backdrop-filter: blur(14px) saturate(0.75);
+  animation: celebrate-fade var(--motion-slow) var(--ease-out);
+}
+
+.celebrate__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-8) var(--sp-6);
+  text-align: center;
+}
+
+.celebrate__kicker {
+  margin: 0;
+  color: #fff;
+  opacity: 0.8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  animation: celebrate-rise 420ms var(--ease-out) both;
+}
+
+/* the stamp lands: overshoot, slight rotation, then settle */
+.celebrate__stamp {
+  animation: celebrate-stamp 620ms cubic-bezier(0.2, 1.5, 0.3, 1) both;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
+}
+
+.celebrate__name {
+  margin: var(--sp-3) 0 0;
+  color: #fff;
+  animation: celebrate-rise 520ms 140ms var(--ease-out) both;
+}
+
+.celebrate__sub {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  animation: celebrate-rise 520ms 220ms var(--ease-out) both;
+}
+
+.celebrate__cta {
+  margin-top: var(--sp-5);
+  min-width: 180px;
+  animation: celebrate-rise 520ms 320ms var(--ease-out) both;
+}
+
+@keyframes celebrate-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes celebrate-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.9) rotate(-14deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.94) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-2deg);
+  }
+}
+
+@keyframes celebrate-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

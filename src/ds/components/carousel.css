@@ -1,0 +1,34 @@
+.pk-carousel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--sp-1);
+  /* cards fade out at the container's edges instead of a hard crop */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 24px,
+    black calc(100% - 44px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 24px,
+    black calc(100% - 44px),
+    transparent 100%
+  );
+}
+
+.pk-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.pk-carousel > * {
+  flex: none;
+  scroll-snap-align: start;
+}

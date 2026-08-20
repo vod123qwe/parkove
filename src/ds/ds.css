@@ -1,0 +1,36 @@
+/* Parkove DS entry stylesheet. The app composes components; it does not restyle them. */
+
+@import './tokens/colors.css';
+@import './tokens/core.css';
+@import './tokens/typography.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--content-primary);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+}
