@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Move, StickyNote, Trash2, X } from 'lucide-react'
+import { Move, StickyNote, Trash2, X } from 'lucide-react'
 import { deleteMark, updateMark } from './photos'
 import { noteType } from './memory'
 import { WavePlayer } from './WavePlayer'
@@ -94,10 +94,7 @@ export function MemoryViewer({
             )}
             {m.kind === 'audio' && m.url && (
               <div className="memview__audio">
-                <span className="memview__kind">
-                  <Mic size={16} /> Notatka głosowa
-                </span>
-                <WavePlayer src={m.url} blob={m.blob} />
+                <WavePlayer src={m.url} blob={m.blob} layout="stack" />
               </div>
             )}
             {m.kind === 'note' && (

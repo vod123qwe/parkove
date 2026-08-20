@@ -13,11 +13,14 @@ export function WavePlayer({
   src,
   blob,
   autoPlay,
+  layout = 'row',
 }: {
   src: string
   blob?: Blob
   /** a memory you walked up to plays itself; one you tapped waits for you */
   autoPlay?: boolean
+  /** 'stack' puts the wave above the button, for when it owns the screen */
+  layout?: 'row' | 'stack'
 }) {
   const audio = useRef<HTMLAudioElement | null>(null)
   const [peaks, setPeaks] = useState<number[] | null>(null)
@@ -59,8 +62,44 @@ export function WavePlayer({
 
   const bars = peaks ?? Array.from({ length: BARS }, () => 0.25)
 
+  const play = (isPlaying: boolean, el: typeof audio) => (
+    <button
+      className="wave__play"
+      aria-label={isPlaying ? 'Pauza' : 'Odtwórz'}
+      onClick={() => {
+        const node = el.current
+        if (!node) return
+        if (node.paused) void node.play()
+        else node.pause()
+      }}
+    >
+      {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+    </button>
+  )
+
+  const bars2 = (values: number[], done: number, el: typeof audio) => (
+    <div
+      className="wave__bars"
+      role="presentation"
+      onClick={(e) => {
+        const node = el.current
+        if (!node || !node.duration) return
+        const box = e.currentTarget.getBoundingClientRect()
+        node.currentTime = ((e.clientX - box.left) / box.width) * node.duration
+      }}
+    >
+      {values.map((v, i) => (
+        <span
+          key={i}
+          className={i / BARS <= done ? 'is-done' : undefined}
+          style={{ height: `${Math.round(v * 100)}%` }}
+        />
+      ))}
+    </div>
+  )
+
   return (
-    <div className="wave">
+    <div className={layout === 'stack' ? 'wave -stack' : 'wave'}>
       <audio
         ref={audio}
         src={src}
@@ -77,36 +116,17 @@ export function WavePlayer({
           if (el.duration) setProgress(el.currentTime / el.duration)
         }}
       />
-      <button
-        className="wave__play"
-        aria-label={playing ? 'Pauza' : 'Odtwórz'}
-        onClick={() => {
-          const el = audio.current
-          if (!el) return
-          if (el.paused) void el.play()
-          else el.pause()
-        }}
-      >
-        {playing ? <Pause size={18} /> : <Play size={18} />}
-      </button>
-      <div
-        className="wave__bars"
-        role="presentation"
-        onClick={(e) => {
-          const el = audio.current
-          if (!el || !el.duration) return
-          const box = e.currentTarget.getBoundingClientRect()
-          el.currentTime = ((e.clientX - box.left) / box.width) * el.duration
-        }}
-      >
-        {bars.map((v, i) => (
-          <span
-            key={i}
-            className={i / BARS <= progress ? 'is-done' : undefined}
-            style={{ height: `${Math.round(v * 100)}%` }}
-          />
-        ))}
-      </div>
+      {layout === 'stack' ? (
+        <>
+          {bars2(bars, progress, audio)}
+          {play(playing, audio)}
+        </>
+      ) : (
+        <>
+          {play(playing, audio)}
+          {bars2(bars, progress, audio)}
+        </>
+      )}
     </div>
   )
 }

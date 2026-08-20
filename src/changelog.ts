@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.36.1'
+export const VERSION = '0.37.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.37.0',
+    date: '2026-08-20',
+    title: 'A voice note on nothing but blur',
+    changes: [
+      ['changed', 'A voice note full screen lost its panel: the wave sits in the middle of the blurred backdrop, the play button underneath it and the caption below that, all centred'],
+      ['changed', 'The photo carousel in the profile no longer fades its edges, and its prints came down a little'],
+      ['fixed', 'The stacked wave had no height: in a column the flex grow was eating it'],
+    ],
+  },
   {
     version: '0.36.1',
     date: '2026-08-20',

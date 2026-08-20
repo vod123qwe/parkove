@@ -162,7 +162,7 @@ export function ProfileModal({
       <section className="prof-section">
         <h3 className="t-title prof-sectitle">Zdjęcia z wypraw</h3>
         {photos.length ? (
-          <Carousel className="prof-photos" aria-label="Zdjęcia z wypraw">
+          <Carousel fade={false} className="prof-photos" aria-label="Zdjęcia z wypraw">
             {photos.map((ph, i) => (
               <Polaroid
                 key={ph.id}
