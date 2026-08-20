@@ -14,6 +14,9 @@ html,
 body {
   margin: 0;
   padding: 0;
+  /* the strip behind the home indicator belongs to the document: without this
+     it falls back to white and cuts a line under the map */
+  background: var(--bg-page);
 }
 
 body {

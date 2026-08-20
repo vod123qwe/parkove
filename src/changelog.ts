@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.19.0'
+export const VERSION = '0.19.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.19.1',
+    date: '2026-08-20',
+    title: 'No white line at the bottom',
+    changes: [
+      ['fixed', 'The strip behind the home indicator went white after the status bar fix. It belongs to the document, so it now carries the app background instead of the browser default'],
+    ],
+  },
   {
     version: '0.19.0',
     date: '2026-08-20',

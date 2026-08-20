@@ -8,6 +8,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f6f8f5",
+  "theme_color": "#f6f8f5",
   "categories": [
     "travel",
     "lifestyle",

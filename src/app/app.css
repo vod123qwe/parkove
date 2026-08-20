@@ -7,6 +7,8 @@
 .app-map {
   position: absolute;
   inset: 0;
+  /* any sliver the canvas leaves at an edge should read as map, not as paper */
+  background: var(--bg-page);
 }
 
 /* HUD: city progress top left, profile top right */
