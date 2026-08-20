@@ -5,14 +5,30 @@
   "category": "personal",
   "status": "wip",
   "type": "web-server",
-  "tags": ["pwa", "mapa", "grywalizacja", "gps", "krakow", "design-system"],
-  "tech": ["vite", "react", "maplibre", "indexeddb"],
+  "tags": [
+    "pwa",
+    "mapa",
+    "grywalizacja",
+    "gps",
+    "krakow",
+    "design-system"
+  ],
+  "tech": [
+    "vite",
+    "react",
+    "maplibre",
+    "indexeddb"
+  ],
   "launch": {
     "dev": "npm run dev",
-    "devUrl": "http://localhost:5183"
+    "devUrl": "http://localhost:5183",
+    "url": "https://vod123qwe.github.io/parkove/"
   },
-  "links": {},
+  "links": {
+    "repo": "https://github.com/vod123qwe/parkove",
+    "live": "https://vod123qwe.github.io/parkove/"
+  },
   "icon": "map",
   "accent": "#2E7D4F",
-  "notes": "v0.7.0 (2026-08-19): 48 miejsc/60 pkt, questy: Krakus, Zakrzówek, Jordana, Skałki Twardowskiego, Skawina. Dylematy moralne przy punktach, karty parków (hero+opis+udogodnienia), peek nad żywą mapą, 6 stylów mapy. Czeka: pieczątki (assety od Jarka), podsumowanie wyprawy, mapa 3D."
+  "notes": "Live na GitHub Pages, instalowalna PWA. Poligon testowy na Ruczaju do testow wyprawy z domu."
 }

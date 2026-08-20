@@ -35,9 +35,32 @@ self.addEventListener('activate', (event) => {
       const keep = new Set([SHELL, RUNTIME, TILES])
       for (const key of await caches.keys()) if (!keep.has(key)) await caches.delete(key)
       await self.clients.claim()
+      await warmAssets()
     })(),
   )
 })
+
+/**
+ * On the very first visit the page loads its assets before this worker takes
+ * control, so nothing of the build would be cached yet and the second, offline
+ * open would fail. Read the cached shell and pull in what it references.
+ */
+async function warmAssets() {
+  const shell = await caches.open(SHELL)
+  const res = (await shell.match(scoped('index.html'))) ?? (await shell.match(scoped('')))
+  if (!res) return
+  const html = await res.clone().text()
+  const urls = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css))"/g)].map((m) =>
+    new URL(m[1], self.registration.scope).toString(),
+  )
+  const runtime = await caches.open(RUNTIME)
+  await Promise.all(
+    urls.map(async (url) => {
+      if (await runtime.match(url)) return
+      await runtime.add(url).catch(() => {})
+    }),
+  )
+}
 
 async function trim(cache, limit) {
   if (!limit) return
