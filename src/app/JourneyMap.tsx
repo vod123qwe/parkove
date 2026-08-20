@@ -22,6 +22,7 @@ export function JourneyMap({
   onSelectMark,
   placing = false,
   onPlace,
+  bottomPadding = 48,
 }: {
   track: Pt[]
   points: QuestPoi[]
@@ -31,6 +32,8 @@ export function JourneyMap({
   /** while moving a pin, the next tap on this map is its new home */
   placing?: boolean
   onPlace?: (coords: Pt) => void
+  /** room the sheet takes at the bottom, so the whole route stays visible */
+  bottomPadding?: number
 }) {
   const holder = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MapGL | null>(null)
@@ -38,6 +41,8 @@ export function JourneyMap({
   cb.current = { onSelectMark, onPlace, placing }
   const data = useRef({ track, points, collected, marks })
   data.current = { track, points, collected, marks }
+  const padRef = useRef(bottomPadding)
+  padRef.current = bottomPadding
 
   useEffect(() => {
     if (!holder.current) return
@@ -163,7 +168,11 @@ export function JourneyMap({
             [west, south],
             [east, north],
           ],
-          { padding: 48, maxZoom: 17, duration: 0 },
+          {
+            padding: { top: 96, left: 40, right: 40, bottom: padRef.current + 24 },
+            maxZoom: 17,
+            duration: 0,
+          },
         )
       } else if (line.length === 1) {
         map.jumpTo({ center: line[0], zoom: 16.5 })

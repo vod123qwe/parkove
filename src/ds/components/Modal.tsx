@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { ReactNode, UIEvent } from 'react'
 import { cx } from '../cx'
 import { useOverlay } from '../useOverlay'
@@ -65,7 +66,12 @@ export function Modal({
     setScrolled((e.target as HTMLDivElement).scrollTop > 4)
   }
 
-  return (
+  /*
+   * Straight into the body: a screen must not inherit a transform or a filter
+   * from whatever opened it. Nested inside a dimmed, shifted screen it came out
+   * dimmed and shifted too.
+   */
+  return createPortal(
     <div className={cx('pk-modal', `-${presentation}`, closing && '-closing', className)}>
       <div className="pk-modal__panel" role="dialog" aria-modal="true" aria-label={title}>
         <NavBar title={title} variant={action} onAction={requestClose} scrolled={scrolled} className="pk-modal__nav" />
@@ -73,6 +79,7 @@ export function Modal({
           <div className="pk-modal__inner">{children}</div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

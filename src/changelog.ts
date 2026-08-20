@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.25.0'
+export const VERSION = '0.26.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.26.0',
+    date: '2026-08-20',
+    title: 'The walk card behaves like a card',
+    changes: [
+      ['fixed', 'Opening a walk now frames the whole route in the part of the map you can actually see, above the card'],
+      ['fixed', 'Pulling the card down no longer throws you back to the start. It settles at its smallest size, showing the name and the button that replays the walk'],
+      ['changed', 'That card lost its grabber: it belongs to the screen, so it should not look like something you can dismiss. The rename control became a proper icon button, the same size as every other one'],
+      ['changed', 'Photos of a walk lie in a deck now: overlapping, each a little crooked, and touching one straightens it and lifts it out of the pile. Their shadows have room instead of being cut off'],
+      ['fixed', 'A point opened from a walk came out dimmed and shifted, because it inherited the dimming of the screen underneath. Screens are now mounted at the top of the page, so nothing tints them'],
+    ],
+  },
   {
     version: '0.25.0',
     date: '2026-08-20',

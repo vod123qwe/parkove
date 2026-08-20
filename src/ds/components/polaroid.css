@@ -9,6 +9,7 @@
   box-shadow: var(--elevation-2);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transform: rotate(var(--pk-tilt, 0deg));
   transition: transform var(--motion-base) var(--ease-out);
 }
 

@@ -1135,20 +1135,16 @@
   padding-bottom: var(--sp-4);
 }
 
-.journey__name {
+.journey__namerow {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--content-primary);
-  text-align: left;
-  cursor: pointer;
 }
 
-.journey__name svg {
-  color: var(--content-tertiary);
+.journey__nametext {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .journey__nameinput {
@@ -1189,11 +1185,71 @@
   resize: vertical;
 }
 
-/* full-bleed row of pictures, scrolling past the sheet padding */
-.journey__photos {
-  gap: var(--sp-4);
-  padding: var(--sp-2) var(--sp-6) var(--sp-2) 20px;
+/*
+ * A deck rather than a row: the pictures overlap and sit a touch crooked, each
+ * one a little different, so it reads like photos dropped on a table. The
+ * generous padding is not decoration: a scroller clips its overflow, so the
+ * shadows need room to live inside it.
+ */
+.journey__deck {
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding: var(--sp-5) var(--sp-8) var(--sp-6) 20px;
   margin-inline: calc(-1 * var(--sp-6));
+}
+
+.journey__deck::-webkit-scrollbar {
+  display: none;
+}
+
+.journey__deck > * {
+  flex: none;
+  scroll-snap-align: center;
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    z-index 0s;
+}
+
+/* first card on top, the rest tucked under it, each tilted its own way */
+.journey__deck > * + * {
+  margin-left: -30px;
+}
+
+.journey__deck > *:nth-child(1) {
+  transform: rotate(-2.4deg);
+  z-index: 6;
+}
+.journey__deck > *:nth-child(2) {
+  transform: rotate(1.8deg) translateY(6px);
+  z-index: 5;
+}
+.journey__deck > *:nth-child(3) {
+  transform: rotate(-1.1deg) translateY(2px);
+  z-index: 4;
+}
+.journey__deck > *:nth-child(4) {
+  transform: rotate(2.6deg) translateY(8px);
+  z-index: 3;
+}
+.journey__deck > *:nth-child(5) {
+  transform: rotate(-3deg) translateY(4px);
+  z-index: 2;
+}
+.journey__deck > *:nth-child(n + 6) {
+  transform: rotate(1.2deg) translateY(7px);
+  z-index: 1;
+}
+
+/* touching one straightens it and brings it out of the pile */
+.journey__deck > *:active,
+.journey__deck > *:focus-visible,
+.journey__deck > *:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.03);
+  z-index: 9;
 }
 
 .journey__danger {

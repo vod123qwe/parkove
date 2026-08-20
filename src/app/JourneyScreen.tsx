@@ -15,7 +15,7 @@ import {
 import {
   BottomSheet,
   Button,
-  Carousel,
+  IconButton,
   List,
   ListItem,
   NavBar,
@@ -108,6 +108,7 @@ export function JourneyScreen({
         collected={walked}
         marks={marks}
         onSelectMark={setMarkId}
+        bottomPadding={Math.round(window.innerHeight * 0.62)}
         placing={!!movingId}
         onPlace={(coords) => {
           if (movingId) void updateMark(movingId, { coords })
@@ -121,7 +122,8 @@ export function JourneyScreen({
         <div className="jscreen__placing t-body-sm">Dotknij mapy, żeby przenieść ten pin</div>
       )}
 
-      <BottomSheet open={!movingId} modal={false} onClose={onClose}>
+      {/* a card, not a sheet: no grabber, and it can never be thrown away */}
+      <BottomSheet open={!movingId} modal={false} onClose={onClose} handle={false} minHeight={216}>
         <div className="journey">
           {editingName ? (
             <input
@@ -139,10 +141,16 @@ export function JourneyScreen({
               }}
             />
           ) : (
-            <button className="journey__name" onClick={() => setEditingName(true)}>
-              <span className="t-headline">{name}</span>
-              <Pencil size={15} />
-            </button>
+            <div className="journey__namerow">
+              <h2 className="t-headline journey__nametext">{name}</h2>
+              <IconButton
+                aria-label="Zmień nazwę wyprawy"
+                variant="tonal"
+                onClick={() => setEditingName(true)}
+              >
+                <Pencil size={18} />
+              </IconButton>
+            </div>
           )}
           <p className="t-caption journey__when">
             {parkName} · {fmtDate(journey.startedAt)}, {fmtClock(journey.startedAt)}
@@ -200,18 +208,17 @@ export function JourneyScreen({
 
           <h3 className="t-title journey__section">Zdjęcia</h3>
           {photos.length > 0 && (
-            <Carousel fade={false} className="journey__photos" aria-label="Zdjęcia z tej wyprawy">
-              {photos.map((ph, i) => (
+            <div className="journey__deck" role="list" aria-label="Zdjęcia z tej wyprawy">
+              {photos.map((ph) => (
                 <Polaroid
                   key={ph.id}
                   src={ph.url!}
                   caption={ph.caption || undefined}
                   meta={fmtClock(ph.at)}
-                  tilt={i % 2 ? 1.5 : -1.5}
                   onClick={() => setMarkId(ph.id)}
                 />
               ))}
-            </Carousel>
+            </div>
           )}
           <PhotoButton
             parkId={journey.parkId}

@@ -14,12 +14,20 @@ export type BottomSheetProps = {
   modal?: boolean
   /** full-bleed media at the top; it replaces the text header (title lives on the image) */
   hero?: ReactNode
+  /** the grabber; off when the sheet is really a card that belongs to a screen */
+  handle?: boolean
+  /**
+   * Lowest resting height in px. With it the sheet cannot be dragged away: it
+   * settles here instead, showing whatever fits (a title and one button), which
+   * is what you want when the sheet IS the screen's content.
+   */
+  minHeight?: number
 }
 
 // iOS-like sheet: two detents (auto-height and full), draggable anywhere,
 // inner scroll only at full; a downward drag from scrollTop 0 collapses.
 // Every close path animates out through useOverlay before unmounting.
-type Detent = 'auto' | 'full'
+type Detent = 'min' | 'auto' | 'full'
 
 const FULL_VH = 0.92
 const AUTO_VH = 0.62
@@ -38,6 +46,8 @@ export function BottomSheet({
   className,
   modal = true,
   hero,
+  handle = true,
+  minHeight,
 }: BottomSheetProps) {
   const { shown, closing, requestClose } = useOverlay(open, onClose, EXIT_MS)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -61,7 +71,7 @@ export function BottomSheet({
     if (!head || !content) return
     const vh = window.innerHeight
     // in hero mode the handle floats over the image, so it takes no layout space
-    const headH = hero != null ? 0 : head.offsetHeight - HEAD_OVERLAP
+    const headH = hero != null ? 0 : Math.max(0, head.offsetHeight - HEAD_OVERLAP)
     const natural = headH + content.scrollHeight + 4
     const full = Math.min(natural, vh * FULL_VH)
     let auto = Math.min(natural, vh * AUTO_VH)
@@ -101,8 +111,13 @@ export function BottomSheet({
   }
 
   const restingT = useCallback(
-    (d: Detent) => (heights ? (d === 'full' ? 0 : heights.full - heights.auto) : 0),
-    [heights],
+    (d: Detent) => {
+      if (!heights) return 0
+      if (d === 'full') return 0
+      if (d === 'min') return Math.max(0, heights.full - (minHeight ?? heights.auto))
+      return heights.full - heights.auto
+    },
+    [heights, minHeight],
   )
 
   useLayoutEffect(() => {
@@ -188,6 +203,10 @@ export function BottomSheet({
       if (detent === 'full' && heights.auto < heights.full && t < autoT + 80) {
         setDetent('auto')
         setTranslate(autoT, true)
+      } else if (minHeight != null) {
+        // a sheet with a floor never leaves: it settles at its smallest size
+        setDetent('min')
+        setTranslate(restingT('min'), true)
       } else {
         requestClose()
       }
@@ -225,9 +244,11 @@ export function BottomSheet({
         onWheel={onWheel}
       >
         <div ref={headRef} className={cx('pk-sheet__head', hero != null && '-overlay')}>
-          <div className="pk-sheet__grab">
-            <div className="pk-sheet__handle" />
-          </div>
+          {handle && (
+            <div className="pk-sheet__grab">
+              <div className="pk-sheet__handle" />
+            </div>
+          )}
           {hero == null && title != null && <h2 className="pk-sheet__title t-headline">{title}</h2>}
         </div>
         <div ref={contentRef} className={cx('pk-sheet__content', hero != null && '-hero')}>

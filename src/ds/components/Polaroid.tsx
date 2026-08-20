@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { cx } from '../cx'
 import './polaroid.css'
 
@@ -17,7 +18,7 @@ export function Polaroid({ src, caption, meta, tilt = 0, onClick, className }: P
   return (
     <Tag
       className={cx('pk-polaroid', className)}
-      style={{ transform: `rotate(${tilt}deg)` }}
+      style={{ '--pk-tilt': `${tilt}deg` } as CSSProperties}
       onClick={onClick}
       type={onClick ? 'button' : undefined}
     >
