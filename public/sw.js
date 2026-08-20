@@ -13,7 +13,13 @@ const TILES = `parkove-tiles-${VERSION}`
 const TILE_LIMIT = 900
 
 const SHELL_URLS = ['', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'apple-touch-icon.png']
-const TILE_HOSTS = ['tiles.openfreemap.org', 'server.arcgisonline.com', 'services.arcgisonline.com']
+const TILE_HOSTS = [
+  'tiles.openfreemap.org',
+  'server.arcgisonline.com',
+  'services.arcgisonline.com',
+  // elevation, for the relief look
+  's3.amazonaws.com',
+]
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com']
 
 const scoped = (path) => new URL(path, self.registration.scope).toString()
