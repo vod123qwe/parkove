@@ -1,14 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, ChevronRight, MapPin, Mic, Pencil, StickyNote, Trash2 } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, Polaroid, Stat } from '../ds'
+import {
+  Camera,
+  Check,
+  ChevronRight,
+  Clock,
+  Footprints,
+  MapPin,
+  Mic,
+  Pencil,
+  StickyNote,
+  Trash2,
+} from 'lucide-react'
+import { BottomSheet, Button, List, ListItem, Polaroid, Stat, StatGrid } from '../ds'
 import { deleteJourney, updateJourney, useGameState } from './state'
 import type { Journey } from './state'
 import { questForPark } from './data/quests'
-import { usePhotos } from './photos'
+import { useMarks } from './photos'
 import { PhotoButton } from './PhotoButton'
 
 const fmtDate = (at: number) =>
   new Date(at).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })
+
+const fmtClock = (at: number) =>
+  new Date(at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
 
 function fmtTime(ms: number) {
   const s = Math.floor(ms / 1000)
@@ -31,12 +45,13 @@ export function JourneySheet({
   journey: Journey
   parkName: string
   onClose: () => void
-  onOpenPhoto: (photoId: string) => void
+  onOpenPhoto: (markId: string) => void
 }) {
   const { parks } = useGameState()
-  const marks = usePhotos().filter((m) => m.journeyId === journey.id)
+  const marks = useMarks().filter((m) => m.journeyId === journey.id)
   const photos = marks.filter((m) => m.kind === 'photo' && m.url)
   const notes = marks.filter((m) => m.kind !== 'photo')
+
   const [name, setName] = useState(journey.name ?? parkName)
   const [editingName, setEditingName] = useState(false)
   const [note, setNote] = useState(journey.note ?? '')
@@ -50,8 +65,8 @@ export function JourneySheet({
     () => () => {
       const n = latest.current.name.trim()
       if (n && n !== journey.name) updateJourney(journey.id, { name: n })
-      const note = latest.current.note.trim()
-      if (note !== (journey.note ?? '')) updateJourney(journey.id, { note })
+      const written = latest.current.note.trim()
+      if (written !== (journey.note ?? '')) updateJourney(journey.id, { note: written })
     },
     // the journey identity is what matters here, not its current fields
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,43 +103,30 @@ export function JourneySheet({
           </button>
         )}
         <p className="t-caption journey__when">
-          {parkName} · {fmtDate(journey.startedAt)}
+          {parkName} · {fmtDate(journey.startedAt)}, {fmtClock(journey.startedAt)}
         </p>
 
-        <div className="journey__stats">
-          <Stat value={fmtTime(journey.endedAt - journey.startedAt)} label="czas" />
+        <StatGrid className="journey__stats">
+          <Stat icon={<Clock />} value={fmtTime(journey.endedAt - journey.startedAt)} label="czas" />
           <Stat
+            icon={<Footprints />}
             value={`${(journey.distanceM / 1000).toFixed(1).replace('.', ',')} km`}
             label="dystans"
           />
-          {notes.length > 0 && (
-          <>
-            <h3 className="t-title journey__section">Notatki</h3>
-            <List>
-              {notes.map((m) => (
-                <ListItem
-                  key={m.id}
-                  icon={m.kind === 'audio' ? <Mic /> : <StickyNote />}
-                  leadTone="gold"
-                  title={m.caption || (m.kind === 'audio' ? 'Nagranie bez podpisu' : 'Pusta notatka')}
-                  meta={new Date(m.at).toLocaleTimeString('pl-PL', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                  className="-stacked"
-                  onClick={() => onOpenPhoto(m.id)}
-                  trailing={<ChevronRight size={18} className="park-parking__chevron" />}
-                />
-              ))}
-            </List>
-          </>
-        )}
-
-        {points.length > 0 && (
-            <Stat value={`${journey.points.length}/${points.length}`} label="punkty" />
+          {points.length > 0 && (
+            <Stat
+              icon={<MapPin />}
+              value={`${journey.points.length}/${points.length}`}
+              label="punkty"
+            />
           )}
-          {photos.length > 0 && <Stat value={String(photos.length)} label="zdjęcia" />}
-        </div>
+          {photos.length > 0 && (
+            <Stat icon={<Camera />} value={String(photos.length)} label="zdjęcia" />
+          )}
+          {notes.length > 0 && (
+            <Stat icon={<StickyNote />} value={String(notes.length)} label="notatki" />
+          )}
+        </StatGrid>
 
         <h3 className="t-title journey__section">Notatka</h3>
         <textarea
@@ -160,13 +162,33 @@ export function JourneySheet({
           onSaved={onOpenPhoto}
         />
 
+        {notes.length > 0 && (
+          <>
+            <h3 className="t-title journey__section">Notatki i nagrania</h3>
+            <List>
+              {notes.map((m) => (
+                <ListItem
+                  key={m.id}
+                  icon={m.kind === 'audio' ? <Mic /> : <StickyNote />}
+                  leadTone="gold"
+                  title={m.caption || (m.kind === 'audio' ? 'Nagranie bez podpisu' : 'Pusta notatka')}
+                  meta={fmtClock(m.at)}
+                  className="-stacked"
+                  onClick={() => onOpenPhoto(m.id)}
+                  trailing={<ChevronRight size={18} className="park-parking__chevron" />}
+                />
+              ))}
+            </List>
+          </>
+        )}
+
         {points.length > 0 && (
           <>
             <h3 className="t-title journey__section">Punkty</h3>
             <List>
               {points.map((poi) => {
                 const onThisWalk = walked.has(poi.id)
-                const ever = collected.has(poi.id)
+                const at = journey.times?.[poi.id]
                 return (
                   <ListItem
                     key={poi.id}
@@ -175,10 +197,10 @@ export function JourneySheet({
                     title={poi.name}
                     meta={
                       onThisWalk
-                        ? journey.times?.[poi.id]
-                          ? `zaliczony o ${new Date(journey.times[poi.id]).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}`
+                        ? at
+                          ? `zaliczony o ${fmtClock(at)}`
                           : 'zaliczony na tej wyprawie'
-                        : ever
+                        : collected.has(poi.id)
                           ? 'zaliczony innym razem'
                           : 'jeszcze nieodkryty'
                     }

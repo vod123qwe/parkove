@@ -21,3 +21,50 @@
   letter-spacing: 0.02em;
   color: var(--content-tertiary);
 }
+
+/* ---- card form: icon, number, label, room to breathe ---- */
+
+.pk-stat.-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-sunken);
+}
+
+.pk-stat__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  border-radius: var(--radius-pill);
+  background: var(--bg-primary-subtle);
+  color: var(--content-accent);
+}
+
+.pk-stat__icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.75;
+}
+
+.pk-stat__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.pk-stat.-card .pk-stat__value {
+  font-size: 22px;
+  line-height: 26px;
+}
+
+.pk-statgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}

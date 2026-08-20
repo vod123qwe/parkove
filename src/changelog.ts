@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.18.0'
+export const VERSION = '0.18.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.18.1',
+    date: '2026-08-20',
+    title: 'Stats that can breathe',
+    changes: [
+      ['changed', 'Walk stats are cards in two columns now, each with its own icon, instead of four numbers crammed into one line'],
+      ['added', 'DS: Stat takes an icon and StatGrid lays the cards out; both are in the catalog'],
+      ['fixed', 'The notes list had slipped inside the stats block in the walk sheet'],
+    ],
+  },
   {
     version: '0.18.0',
     date: '2026-08-20',

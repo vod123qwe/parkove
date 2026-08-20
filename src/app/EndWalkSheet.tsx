@@ -1,5 +1,5 @@
-import { Check, MapPin } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, Stat } from '../ds'
+import { Camera, Check, Clock, Footprints, MapPin, StickyNote } from 'lucide-react'
+import { BottomSheet, Button, List, ListItem, Stat, StatGrid } from '../ds'
 import { collectPoint, useGameState } from './state'
 import { questForPark } from './data/quests'
 import { distanceM, formatDistance } from './geo'
@@ -47,16 +47,17 @@ export function EndWalkSheet({ onClose, onConfirm }: { onClose: () => void; onCo
               : 'Spacer bez punktów też się liczy: zapiszę trasę, czas i dystans.'}
         </p>
 
-        <div className="endwalk__stats">
-          <Stat value={fmtTime(Date.now() - expedition.startedAt)} label="czas" />
+        <StatGrid className="endwalk__stats">
+          <Stat icon={<Clock />} value={fmtTime(Date.now() - expedition.startedAt)} label="czas" />
           <Stat
+            icon={<Footprints />}
             value={`${(expedition.distanceM / 1000).toFixed(1).replace('.', ',')} km`}
             label="dystans"
           />
-          {total > 0 && <Stat value={`${done}/${total}`} label="punkty" />}
-          {shots > 0 && <Stat value={String(shots)} label="zdjęcia" />}
-          {notes > 0 && <Stat value={String(notes)} label="notatki" />}
-        </div>
+          {total > 0 && <Stat icon={<MapPin />} value={`${done}/${total}`} label="punkty" />}
+          {shots > 0 && <Stat icon={<Camera />} value={String(shots)} label="zdjęcia" />}
+          {notes > 0 && <Stat icon={<StickyNote />} value={String(notes)} label="notatki" />}
+        </StatGrid>
 
         {missed.length > 0 && (
           <>

@@ -36,6 +36,7 @@ import {
   ProgressRing,
   Segmented,
   Stat,
+  StatGrid,
   Toast,
 } from '../ds'
 import { VERSION } from '../changelog'
@@ -708,13 +709,21 @@ export function Catalog() {
         <Section
           id="stats"
           title="Stats"
-          lead="Tabular numerals in the display face. For the profile and the family view."
+          lead="Tabular numerals in the display face. Plain for a profile header; with an icon each stat becomes a card, and StatGrid lays them out two by two, which is how a walk summary reads best."
         >
           <div className="cat-spec cat-stats">
             <Stat value="23%" label="Krakowa odkryte" />
             <Stat value="12" label="parków odwiedzonych" />
             <Stat value="47,2 km" label="w parkach" />
             <Stat value="6" label="złotych odznak" />
+          </div>
+          <div className="cat-spec">
+            <StatGrid>
+              <Stat icon={<Compass />} value="48 min" label="czas" />
+              <Stat icon={<Footprints />} value="3,4 km" label="dystans" />
+              <Stat icon={<MapPin />} value="4/6" label="punkty" />
+              <Stat icon={<Camera />} value="7" label="zdjęcia" />
+            </StatGrid>
           </div>
         </Section>
       </main>

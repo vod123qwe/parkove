@@ -1,5 +1,5 @@
-import { Footprints, Lock, MapPin } from 'lucide-react'
-import { Button, Modal, Stamp, Stat } from '../ds'
+import { Camera, Clock, Footprints, Lock, MapPin, StickyNote } from 'lucide-react'
+import { Button, Modal, Stamp, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
 import type { Journey } from './state'
 import { questForPark } from './data/quests'
@@ -46,16 +46,19 @@ export function WalkSummary({
         <h2 className="t-headline summary__name">{journey.name ?? parkName}</h2>
         <p className="t-caption summary__where">{parkName}</p>
 
-        <div className="summary__stats">
-          <Stat value={fmtTime(journey.endedAt - journey.startedAt)} label="czas" />
+        <StatGrid className="summary__stats">
+          <Stat icon={<Clock />} value={fmtTime(journey.endedAt - journey.startedAt)} label="czas" />
           <Stat
+            icon={<Footprints />}
             value={`${(journey.distanceM / 1000).toFixed(1).replace('.', ',')} km`}
             label="dystans"
           />
-          {total > 0 && <Stat value={`${journey.points.length}/${total}`} label="punkty" />}
-          {photos > 0 && <Stat value={String(photos)} label="zdjęcia" />}
-          {notes > 0 && <Stat value={String(notes)} label="notatki" />}
-        </div>
+          {total > 0 && (
+            <Stat icon={<MapPin />} value={`${journey.points.length}/${total}`} label="punkty" />
+          )}
+          {photos > 0 && <Stat icon={<Camera />} value={String(photos)} label="zdjęcia" />}
+          {notes > 0 && <Stat icon={<StickyNote />} value={String(notes)} label="notatki" />}
+        </StatGrid>
 
         <div className={`summary__badge${complete ? ' -earned' : ''}`}>
           <Stamp
