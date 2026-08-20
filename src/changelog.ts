@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.14.0'
+export const VERSION = '0.14.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.14.1',
+    date: '2026-08-20',
+    title: 'Full screen on iOS',
+    changes: [
+      ['fixed', 'The installed app no longer paints a white bar over the top of the map: the map now runs under the status bar, with a soft gradient so the clock stays readable'],
+    ],
+  },
   {
     version: '0.14.0',
     date: '2026-08-20',

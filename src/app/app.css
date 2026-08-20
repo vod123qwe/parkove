@@ -3,6 +3,22 @@
   inset: 0;
   overflow: hidden;
 }
+/*
+ * On an installed iOS app the map runs under the status bar, and iOS always
+ * writes that clock in white. This keeps it readable over a light map without
+ * hiding the map: a short gradient, only as tall as the inset itself.
+ */
+.app-shell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.12) 62%, transparent);
+}
 
 .app-map {
   position: absolute;
