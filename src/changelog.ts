@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.29.1'
+export const VERSION = '0.30.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.30.0',
+    date: '2026-08-20',
+    title: 'The dial, drawn properly',
+    changes: [
+      ['changed', 'The throttle became an arc of rounded ticks across the bottom of the screen, dragged sideways, with the ticks lighting up in lime behind the handle. The handle is a dark green pill with a lime edge and four dots, riding the arc and tilting with it'],
+      ['changed', 'Speed no longer snaps: asking for a faster walk spins it up over about half a second, and letting go lets it coast down. The number next to the clock shows it building'],
+      ['changed', 'The bottom of the replay reads in one column now: the memory, then the walk clock right aligned in mono, then the dial'],
+      ['changed', 'The top of a replay is just the way out. The title, the gradient and the blur under it are gone, so nothing sits between you and the ground'],
+      ['fixed', 'A drag that could not capture the pointer used to die silently; sheets and the dial now carry on without it'],
+    ],
+  },
   {
     version: '0.29.1',
     date: '2026-08-20',

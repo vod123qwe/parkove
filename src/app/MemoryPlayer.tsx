@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import { ChevronLeft, Pause } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
 import { CINEMATIC } from './data/mapstyles'
@@ -34,7 +34,15 @@ const TURN_TAU = 420
  */
 const MAX_RATE = 90
 /** travel of the handle, in pixels, from the middle to either end */
-const DIAL_THROW = 96
+const DIAL_THROW = 130
+/** how long the walk takes to reach the speed you asked for: it spins up */
+const RATE_TAU = 480
+/** how far the arc opens to each side, in degrees */
+const DIAL_SWEEP = 52
+/** the circle everything on the dial is drawn around, in viewBox units */
+const DIAL_CX = 150
+const DIAL_CY = 210
+const DIAL_R = 176
 
 /** the wall clock of a memory, for the small line under it */
 const clockOf = (at: number) =>
@@ -62,13 +70,11 @@ type Memory =
  */
 export function MemoryPlayer({
   journey,
-  parkName,
   points,
   marks,
   onClose,
 }: {
   journey: Journey
-  parkName: string
   points: QuestPoi[]
   marks: Array<WalkMark & { url?: string }>
   onClose: () => void
@@ -77,12 +83,15 @@ export function MemoryPlayer({
   const mapRef = useRef<MapGL | null>(null)
   const readyRef = useRef(false)
   const lineRef = useRef<Timeline | null>(null)
+  /** what the dial asks for, and what the walk is actually doing right now */
+  const targetRef = useRef(0)
   const rateRef = useRef(0)
   const elapsedRef = useRef(0)
   const bearingRef = useRef<number | null>(null)
   const seenRef = useRef<Set<string>>(new Set())
   const dwellUntil = useRef(0)
   const easingRef = useRef(false)
+  const shownRate = useRef(0)
   const [easing, setEasing] = useState(false)
 
   const [rate, setRate] = useState(0)
@@ -307,6 +316,20 @@ export function MemoryPlayer({
     const step = (now: number) => {
       const dt = now - last
       last = now
+
+      // a walk does not jump to a speed: it gathers it, and it coasts down
+      const target = targetRef.current
+      if (rateRef.current !== target) {
+        const k = 1 - Math.exp(-dt / RATE_TAU)
+        rateRef.current += (target - rateRef.current) * k
+        if (Math.abs(target - rateRef.current) < 0.04) rateRef.current = target
+        shownRate.current += 1
+        if (shownRate.current > 4) {
+          shownRate.current = 0
+          setRate(rateRef.current)
+        }
+      }
+
       let r = rateRef.current
       // standing at a memory: the walk holds itself still for a moment
       if (now < dwellUntil.current) r = 0
@@ -347,6 +370,7 @@ export function MemoryPlayer({
         if (next === timeline.totalMs || next === 0) {
           posRef.current = 0
           setPos(0)
+          targetRef.current = 0
           rateRef.current = 0
           setRate(0)
         }
@@ -361,26 +385,30 @@ export function MemoryPlayer({
   // ---- the dial: a throttle that stays where you leave it ----
   const posRef = useRef(0)
   const [pos, setPos] = useState(0)
-  const dragFrom = useRef<{ y: number; pos: number } | null>(null)
+  const dragFrom = useRef<{ x: number; pos: number } | null>(null)
 
-  /** the handle moves in a straight line, the speed rises as its square */
+  /** the handle rides the arc; the speed it asks for rises as its square */
   const applyPos = (next: number) => {
-    const p = Math.abs(next) < 0.06 ? 0 : Math.max(-1, Math.min(1, next))
+    const p = Math.abs(next) < 0.05 ? 0 : Math.max(-1, Math.min(1, next))
     posRef.current = p
     setPos(p)
-    const r = Math.sign(p) * MAX_RATE * p * p
-    rateRef.current = r
-    setRate(r)
+    targetRef.current = Math.sign(p) * MAX_RATE * p * p
   }
 
   const onDialDown = (e: React.PointerEvent) => {
-    e.currentTarget.setPointerCapture(e.pointerId)
-    dragFrom.current = { y: e.clientY, pos: posRef.current }
+    try {
+      // capture keeps the drag alive outside the arc; losing it is survivable
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      // some engines refuse: the drag still works through this element
+    }
+    dragFrom.current = { x: e.clientX, pos: posRef.current }
   }
   const onDialMove = (e: React.PointerEvent) => {
     const from = dragFrom.current
     if (!from) return
-    applyPos(from.pos + (from.y - e.clientY) / DIAL_THROW)
+    // sideways along the arc: right walks on, left walks back
+    applyPos(from.pos + (e.clientX - from.x) / DIAL_THROW)
   }
   const onDialUp = () => {
     dragFrom.current = null
@@ -392,14 +420,6 @@ export function MemoryPlayer({
     <div className="memplay">
       <div ref={holder} className="memplay__map" />
 
-      {/* progressive blur: four bands, each blurrier and masked lower down */}
-      <div className="memplay__veil" aria-hidden="true">
-        <span style={{ '--b': '2px', '--from': '0%', '--to': '32%' } as CSSProperties} />
-        <span style={{ '--b': '6px', '--from': '18%', '--to': '58%' } as CSSProperties} />
-        <span style={{ '--b': '14px', '--from': '38%', '--to': '78%' } as CSSProperties} />
-        <span style={{ '--b': '26px', '--from': '58%', '--to': '100%' } as CSSProperties} />
-      </div>
-
       <div className="memplay__floor" aria-hidden="true">
         <span style={{ '--b': '2px', '--from': '0%', '--to': '34%' } as CSSProperties} />
         <span style={{ '--b': '7px', '--from': '20%', '--to': '60%' } as CSSProperties} />
@@ -407,28 +427,11 @@ export function MemoryPlayer({
         <span style={{ '--b': '28px', '--from': '62%', '--to': '100%' } as CSSProperties} />
       </div>
 
-      <div className="memplay__top">
-        <button className="memplay__back" aria-label="Wyjdź ze wspomnień" onClick={onClose}>
-          <ChevronLeft size={20} />
-        </button>
-        <div className="memplay__title">
-          <span className="t-body-strong">{journey.name ?? parkName}</span>
-          <span className="t-caption memplay__sub">{parkName}</span>
-        </div>
-      </div>
+      <button className="memplay__back" aria-label="Wyjdź ze wspomnień" onClick={onClose}>
+        <ChevronLeft size={20} />
+      </button>
 
-      <div className="memplay__clock">
-        <span className="t-caption memplay__clocklabel">czas wyprawy</span>
-        <span className="memplay__time">{fmtClock(elapsed)}</span>
-        <span className="t-caption memplay__clocklabel">
-          {easing
-            ? 'zwalniam przy punkcie'
-            : rate === 0
-              ? 'przesuń suwak'
-              : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
-        </span>
-      </div>
-
+      <div className="memplay__bottom">
       {memory && (
         <div className="memplay__memory">
           {memory.kind === 'mark' ? (
@@ -436,18 +439,18 @@ export function MemoryPlayer({
               <>
                 <span className="memplay__kind">Zdjęcie</span>
                 <img className="memplay__snap" src={memory.mark.url} alt={memory.mark.caption} />
-                {memory.mark.caption && <p className="memplay__hand">{memory.mark.caption}</p>}
+                {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
               </>
             ) : memory.mark.kind === 'audio' && memory.mark.url ? (
               <>
                 <span className="memplay__kind">Notatka głosowa</span>
                 <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
-                {memory.mark.caption && <p className="memplay__hand">{memory.mark.caption}</p>}
+                {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
               </>
             ) : (
               <>
                 <span className="memplay__kind">Notatka</span>
-                <p className="memplay__postit">{memory.mark.caption || 'Pusta notatka'}</p>
+                <p className="memplay__said">{memory.mark.caption || 'Pusta notatka'}</p>
               </>
             )
           ) : (
@@ -462,29 +465,87 @@ export function MemoryPlayer({
         </div>
       )}
 
-      <div
-        className="memplay__dial"
-        onPointerDown={onDialDown}
-        onPointerMove={onDialMove}
-        onPointerUp={onDialUp}
-        onPointerCancel={onDialUp}
-      >
-        <div className="memplay__dialtrack" aria-hidden="true">
-          {Array.from({ length: 21 }, (_, i) => (
-            <span key={i} className={i === 10 ? '-mid' : undefined} />
-          ))}
-        </div>
-        <button
-          className="memplay__handle"
-          style={{ transform: `translateY(${-pos * DIAL_THROW}px)` }}
-          aria-label="Suwak przewijania wyprawy"
-          onClick={() => applyPos(0)}
-        >
-          {rate === 0 ? <span className="memplay__grip" /> : <Pause size={16} />}
-        </button>
-        <span className="t-caption memplay__dialhint">
-          {rate === 0 ? 'przesuń w górę' : rate > 0 ? 'idziesz' : 'wracasz'}
+        <div className="memplay__clock">
+        <span className="t-caption memplay__clocklabel">czas wyprawy</span>
+        <span className="memplay__time">{fmtClock(elapsed)}</span>
+        <span className="memplay__clocklabel -small">
+          {easing
+            ? 'zwalniam przy punkcie'
+            : rate === 0
+              ? 'przesuń suwak'
+              : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
         </span>
+        </div>
+
+
+        <div
+          className="memplay__dial"
+          onPointerDown={onDialDown}
+          onPointerMove={onDialMove}
+          onPointerUp={onDialUp}
+          onPointerCancel={onDialUp}
+        >
+          {/* one centre for everything: ticks, arc and handle share it */}
+          <svg className="memplay__arc" viewBox="0 0 300 110" aria-hidden="true">
+            <path
+              d="M 11.3 101.6 A 176 176 0 0 1 288.7 101.6"
+              fill="none"
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            {Array.from({ length: 45 }, (_, i) => {
+              const at = (i / 44) * 2 - 1
+              const a = at * DIAL_SWEEP * (Math.PI / 180)
+              const lit = pos !== 0 && (pos > 0 ? at > 0 && at <= pos : at < 0 && at >= pos)
+              return (
+                <line
+                  key={i}
+                  x1={DIAL_CX + Math.sin(a) * (DIAL_R + 4)}
+                  y1={DIAL_CY - Math.cos(a) * (DIAL_R + 4)}
+                  x2={DIAL_CX + Math.sin(a) * (DIAL_R + 26)}
+                  y2={DIAL_CY - Math.cos(a) * (DIAL_R + 26)}
+                  stroke={lit ? 'var(--bg-lime)' : 'rgba(255,255,255,0.4)'}
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                />
+              )
+            })}
+
+            {/* the handle rides the same circle, so it tilts as it travels */}
+            <g transform={`rotate(${pos * DIAL_SWEEP} ${DIAL_CX} ${DIAL_CY})`}>
+              <rect
+                x={DIAL_CX - 33}
+                y={DIAL_CY - DIAL_R - 18}
+                width="66"
+                height="36"
+                rx="18"
+                fill="#21401a"
+                stroke="var(--bg-lime)"
+                strokeWidth="2"
+              />
+              {[-3, 3].map((dx) =>
+                [-3, 3].map((dy) => (
+                  <rect
+                    key={`${dx}${dy}`}
+                    x={DIAL_CX + dx - 1.6}
+                    y={DIAL_CY - DIAL_R + dy - 1.6}
+                    width="3.2"
+                    height="3.2"
+                    rx="1"
+                    fill="var(--bg-lime)"
+                  />
+                )),
+              )}
+            </g>
+          </svg>
+
+          <button
+            className="memplay__dialreset"
+            aria-label="Zatrzymaj przewijanie"
+            onClick={() => applyPos(0)}
+          />
+        </div>
       </div>
     </div>
   )

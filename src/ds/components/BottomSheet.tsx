@@ -180,7 +180,11 @@ export function BottomSheet({
         return
       }
       d.mode = 'drag'
-      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+      try {
+        ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+      } catch {
+        // capture refused: the drag continues on this element anyway
+      }
     }
     if (d.mode !== 'drag') return
 

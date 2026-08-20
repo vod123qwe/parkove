@@ -1780,19 +1780,12 @@
   inset: 0;
 }
 
-/* everything floating over imagery gets white type and its own shadow */
-.memplay__top {
+/* the only thing at the top is the way out */
+.memplay__back {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + var(--sp-3));
   left: var(--sp-4);
-  right: var(--sp-4);
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-}
-
-.memplay__back {
+  z-index: 3;
   flex: none;
   display: grid;
   place-items: center;
@@ -1807,237 +1800,14 @@
   cursor: pointer;
 }
 
-.memplay__title {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  color: #ffffff;
-  text-shadow: 0 1px 12px rgb(0 0 0 / 0.6);
-}
+/* ---- the bottom: the map dissolves into darkness, then memory, clock, dial ---- */
 
-.memplay__sub {
-  color: rgb(255 255 255 / 0.75);
-}
-
-.memplay__clock {
-  position: absolute;
-  /* above the darkness, not inside it: the floor starts at 46% */
-  right: var(--sp-4);
-  bottom: calc(46% + var(--sp-4));
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  color: #ffffff;
-  text-shadow: 0 1px 12px rgb(0 0 0 / 0.6);
-}
-
-.memplay__clocklabel {
-  color: rgb(255 255 255 / 0.7);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.memplay__time {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 23px;
-  line-height: 28px;
-  letter-spacing: 0.01em;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---- the dial: a throttle you leave where you want it ---- */
-
-.memplay__dial {
-  position: absolute;
-  right: var(--sp-4);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
-  z-index: 3;
-  width: 72px;
-  height: 216px;
-  display: grid;
-  place-items: center;
-  touch-action: none;
-}
-
-.memplay__dialtrack {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-  pointer-events: none;
-}
-
-.memplay__dialtrack span {
-  display: block;
-  width: 14px;
-  height: 2px;
-  border-radius: 1px;
-  background: rgb(255 255 255 / 0.45);
-}
-
-.memplay__dialtrack span.-mid {
-  width: 26px;
-  background: #8ce563;
-}
-
-.memplay__handle {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 34px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: #2f4a28;
-  color: #ffffff;
-  box-shadow: 0 6px 18px rgb(0 0 0 / 0.45);
-  cursor: grab;
-  transition: transform 90ms linear;
-}
-
-.memplay__grip {
-  width: 14px;
-  height: 8px;
-  border-radius: 2px;
-  background-image: radial-gradient(rgb(255 255 255 / 0.85) 1px, transparent 1px);
-  background-size: 5px 4px;
-}
-
-.memplay__dialhint {
-  position: absolute;
-  bottom: -20px;
-  right: 0;
-  color: rgb(255 255 255 / 0.75);
-  white-space: nowrap;
-}
-
-/* ---- a memory arriving: no frame, just the screen going dark under it ---- */
-
-.memplay__memory {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  padding: var(--sp-20) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-10));
-  color: #ffffff;
-  /* the frame is the darkness itself, so the map keeps showing through */
-  background: linear-gradient(
-    to top,
-    rgb(4 9 5 / 0.97) 0%,
-    rgb(4 9 5 / 0.94) 42%,
-    rgb(4 9 5 / 0.72) 72%,
-    rgb(4 9 5 / 0.28) 90%,
-    transparent 100%
-  );
-  animation: memory-rise 420ms var(--ease-screen);
-}
-
-@keyframes memory-rise {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-}
-
-.memplay__memclose {
-  position: absolute;
-  top: var(--sp-8);
-  right: var(--sp-5);
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: var(--radius-btn);
-  corner-shape: var(--corner-smooth);
-  background: rgb(255 255 255 / 0.16);
-  color: #ffffff;
-  cursor: pointer;
-}
-
-.memplay__kind {
-  font-family: var(--font-text);
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 0.62);
-}
-
-/* the photo lands like a polaroid dropped on the table */
-.memplay__snap {
-  width: 62%;
-  max-width: 240px;
-  max-height: 34vh;
-  object-fit: cover;
-  padding: 8px 8px 22px;
-  background: #fdfdf8;
-  border-radius: 4px;
-  transform: rotate(-2.2deg);
-  box-shadow: 0 14px 34px rgb(0 0 0 / 0.45);
-}
-
-/* a sticky note: rounded, a touch crooked, words in your own hand */
-.memplay__postit {
-  margin: 0;
-  max-width: 20ch;
-  padding: var(--sp-5) var(--sp-5) var(--sp-6);
-  border-radius: 22px;
-  corner-shape: var(--corner-smooth);
-  background: #fdfcf4;
-  color: var(--content-primary);
-  font-family: var(--font-hand);
-  font-size: 28px;
-  line-height: 32px;
-  transform: rotate(-1.6deg);
-  box-shadow: 0 16px 36px rgb(0 0 0 / 0.42);
-}
-
-/* somebody's own words, in their own hand */
-.memplay__hand {
-  margin: 0;
-  max-width: 22ch;
-  font-family: var(--font-hand);
-  font-size: 30px;
-  line-height: 34px;
-  color: #ffffff;
-}
-
-.memplay__poiname {
-  margin: 0;
-}
-
-.memplay__teaser {
-  margin: 0;
-  color: rgb(255 255 255 / 0.78);
-  max-width: 34ch;
-}
-
-.memplay__stamp {
-  font-family: var(--font-text);
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 0.5);
-}
-
-/* the same blur under the memory, so the map dissolves instead of being covered */
 .memplay__floor {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 46%;
+  height: 52%;
   z-index: 1;
   pointer-events: none;
 }
@@ -2051,26 +1821,161 @@
   -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
 }
 
-/* ---- the header sits on a progressive blur, not on a bar ---- */
-
-.memplay__veil {
+.memplay__bottom {
   position: absolute;
-  top: 0;
   left: 0;
   right: 0;
-  height: calc(env(safe-area-inset-top, 0px) + 116px);
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgb(6 12 7 / 0.55), transparent);
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-16) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-3));
+  color: #ffffff;
+  background: linear-gradient(
+    to top,
+    rgb(4 9 5 / 0.97) 0%,
+    rgb(4 9 5 / 0.94) 46%,
+    rgb(4 9 5 / 0.7) 76%,
+    rgb(4 9 5 / 0.24) 92%,
+    transparent 100%
+  );
 }
 
-.memplay__veil span {
+.memplay__memory {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  animation: memory-rise 420ms var(--ease-screen);
+}
+
+@keyframes memory-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+.memplay__kind {
+  font-family: var(--font-text);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.55);
+}
+
+/* the photo lands like a polaroid dropped on the table */
+.memplay__snap {
+  width: 58%;
+  max-width: 220px;
+  max-height: 26vh;
+  object-fit: cover;
+  padding: 8px 8px 20px;
+  background: #fdfdf8;
+  border-radius: 4px;
+  transform: rotate(-2.2deg);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.45);
+}
+
+/*
+ * Somebody's own words, quoted. Bold italic in the display face rather than
+ * handwriting: over imagery the heavier letter holds its shape, and the slant
+ * is what makes it read as a quote.
+ */
+.memplay__said {
+  margin: var(--sp-1) 0 var(--sp-3);
+  max-width: 20ch;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-style: italic;
+  font-size: 29px;
+  line-height: 35px;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.memplay__poiname {
+  margin: var(--sp-1) 0 0;
+}
+
+.memplay__teaser {
+  margin: 0 0 var(--sp-2);
+  color: rgb(255 255 255 / 0.78);
+  max-width: 34ch;
+}
+
+.memplay__stamp {
+  font-family: var(--font-text);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.72);
+}
+
+.memplay__clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-self: flex-end;
+  color: #ffffff;
+}
+
+.memplay__clocklabel {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.62);
+}
+
+.memplay__clocklabel.-small {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.memplay__time {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 38px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the dial: an arc of rounded ticks with a handle riding it ---- */
+
+.memplay__dial {
+  position: relative;
+  width: min(320px, 100%);
+  aspect-ratio: 300 / 110;
+  margin: var(--sp-2) auto 0;
+  touch-action: none;
+  cursor: grab;
+}
+
+.memplay__arc {
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(var(--b));
-  -webkit-backdrop-filter: blur(var(--b));
-  mask-image: linear-gradient(to bottom, #000 var(--from), transparent var(--to));
-  -webkit-mask-image: linear-gradient(to bottom, #000 var(--from), transparent var(--to));
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* a tap in the middle of the arc stops the walk */
+.memplay__dialreset {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 80px;
+  height: 46px;
+  transform: translateX(-50%);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 /* ---- a voice note drawn as its own waveform ---- */
@@ -2330,12 +2235,15 @@
   cursor: pointer;
 }
 
-/* credits go to the very bottom, quiet, out of the clock's way */
+/* credits go to the top right, away from both the button and the memory */
 .memplay .maplibregl-ctrl-bottom-left,
 .memplay .maplibregl-ctrl-bottom-right {
-  bottom: 0;
+  bottom: auto;
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-2));
+  right: var(--sp-2);
+  left: auto;
   z-index: 3;
-  opacity: 0.4;
+  opacity: 0.38;
   font-size: 9px;
 }
 

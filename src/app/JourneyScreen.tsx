@@ -326,7 +326,6 @@ export function JourneyScreen({
       {replay && (
         <MemoryPlayer
           journey={journey}
-          parkName={parkName}
           points={points}
           marks={marks}
           onClose={() => setReplay(false)}
