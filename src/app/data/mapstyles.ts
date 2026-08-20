@@ -64,3 +64,46 @@ export function resolveMapStyle(id: MapStyleId, isDark: boolean): { key: string;
   if (resolved === 'satellite') return { key: 'satellite', spec: SATELLITE }
   return { key: resolved, spec: URLS[resolved] }
 }
+
+/**
+ * The style for replaying a walk: imagery for the ground plus the vector
+ * tiles we already load, used only to extrude buildings. In a flat city the
+ * buildings are the relief, so a tilted camera has something to fly between.
+ */
+export const CINEMATIC: StyleSpecification = {
+  version: 8,
+  glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+  sources: {
+    sat: {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      ],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: 'Esri, Maxar, Earthstar Geographics',
+    },
+    ofm: {
+      type: 'vector',
+      url: 'https://tiles.openfreemap.org/planet',
+      attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
+    },
+  },
+  layers: [
+    { id: 'sat', type: 'raster', source: 'sat' },
+    {
+      id: 'buildings-3d',
+      type: 'fill-extrusion',
+      source: 'ofm',
+      'source-layer': 'building',
+      minzoom: 14,
+      paint: {
+        'fill-extrusion-color': '#dfe4d8',
+        'fill-extrusion-opacity': 0.55,
+        // most buildings carry a height; the rest get a sensible storey guess
+        'fill-extrusion-height': ['coalesce', ['get', 'render_height'], ['get', 'height'], 9],
+        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+      },
+    },
+  ],
+}

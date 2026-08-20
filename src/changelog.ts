@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.22.0'
+export const VERSION = '0.23.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.23.0',
+    date: '2026-08-20',
+    title: 'Walk it again',
+    changes: [
+      ['added', 'Memories mode: from a walk in the journal you can walk the same route again. Satellite imagery, a tilted camera and extruded buildings, your past self moving along the line, and a throttle in the corner: push it up to go, further to go faster, below the middle to walk backwards'],
+      ['added', 'Photos, recordings, notes and points arrive as you reach the places they were left at, with the walk clock running next to them'],
+      ['added', 'Tapping a photo, a recording or a note opens it full screen over a blurred backdrop, and you swipe between them like a stack of slides. Captions can be written there, and pins moved or deleted'],
+      ['changed', 'The replay paces itself between the moments we actually know: the start, the end, and the minute each point was reached'],
+    ],
+  },
   {
     version: '0.22.0',
     date: '2026-08-20',

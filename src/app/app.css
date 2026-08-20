@@ -1644,3 +1644,431 @@
 .stampscreen__actions {
   margin-top: var(--sp-10);
 }
+
+/* ---- walking the same route again ---- */
+
+.memplay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: #0f1a0d;
+  animation: memplay-in 320ms var(--ease-out);
+}
+
+@keyframes memplay-in {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.memplay__map {
+  position: absolute;
+  inset: 0;
+}
+
+/* everything floating over imagery gets white type and its own shadow */
+.memplay__top {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3));
+  left: var(--sp-4);
+  right: var(--sp-4);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.memplay__back {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+  color: var(--content-primary);
+  box-shadow: var(--elevation-2);
+  cursor: pointer;
+}
+
+.memplay__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: #ffffff;
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.6);
+}
+
+.memplay__sub {
+  color: rgb(255 255 255 / 0.75);
+}
+
+.memplay__clock {
+  position: absolute;
+  right: var(--sp-5);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 232px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: #ffffff;
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.6);
+}
+
+.memplay__clocklabel {
+  color: rgb(255 255 255 / 0.7);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.memplay__time {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 46px;
+  line-height: 48px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the dial: a throttle you leave where you want it ---- */
+
+.memplay__dial {
+  position: absolute;
+  right: var(--sp-4);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  z-index: 3;
+  width: 72px;
+  height: 208px;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+
+.memplay__dialtrack {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.memplay__dialtrack span {
+  display: block;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: rgb(255 255 255 / 0.45);
+}
+
+.memplay__dialtrack span.-mid {
+  width: 26px;
+  background: #8ce563;
+}
+
+.memplay__handle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #2f4a28;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.45);
+  cursor: grab;
+  transition: transform var(--motion-fast) linear;
+}
+
+.memplay__grip {
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+  background-image: radial-gradient(rgb(255 255 255 / 0.85) 1px, transparent 1px);
+  background-size: 5px 4px;
+}
+
+.memplay__dialhint {
+  position: absolute;
+  bottom: -20px;
+  right: 0;
+  color: rgb(255 255 255 / 0.75);
+  white-space: nowrap;
+}
+
+/* ---- a memory arriving ---- */
+
+.memplay__card {
+  position: absolute;
+  left: var(--sp-4);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  z-index: 2;
+  width: min(62%, 260px);
+  padding: var(--sp-4);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-3);
+  animation: pk-toast-in 260ms var(--ease-out);
+}
+
+.memplay__cardclose {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  border: 0;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--content-tertiary);
+  cursor: pointer;
+}
+
+.memplay__photo {
+  width: 100%;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
+.memplay__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--content-tertiary);
+}
+
+.memplay__cap,
+.memplay__poiname {
+  margin: var(--sp-2) 0 0;
+}
+
+.memplay__audio {
+  width: 100%;
+  margin-top: var(--sp-3);
+}
+
+.memplay__note {
+  margin: var(--sp-2) 0 0;
+  font-family: var(--font-hand);
+  font-size: 24px;
+  line-height: 28px;
+  color: var(--content-primary);
+}
+
+.journey__replay {
+  margin-top: var(--sp-2);
+}
+
+/* ---- memories as slides, over a blurred version of where you were ---- */
+
+.memview {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  background: rgb(10 16 11 / 0.72);
+  backdrop-filter: blur(22px) saturate(0.9);
+  -webkit-backdrop-filter: blur(22px) saturate(0.9);
+  animation: memview-in 220ms var(--ease-out);
+}
+
+@keyframes memview-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.memview__top {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--sp-3)) var(--sp-4) var(--sp-3);
+}
+
+.memview__close {
+  display: grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+  color: var(--content-primary);
+  box-shadow: var(--elevation-2);
+  cursor: pointer;
+}
+
+.memview__count {
+  color: rgb(255 255 255 / 0.8);
+  font-variant-numeric: tabular-nums;
+}
+
+/* native snap scrolling: swiping between slides should feel like the OS */
+.memview__rail {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.memview__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.memview__slide {
+  flex: none;
+  width: 100%;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: 0 var(--sp-5);
+}
+
+.memview__photo {
+  max-width: 100%;
+  max-height: 62vh;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-3);
+}
+
+.memview__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.7);
+}
+
+.memview__audio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  padding: var(--sp-8) var(--sp-6);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface-raised);
+}
+
+.memview__audio audio {
+  width: 100%;
+}
+
+/* a note keeps its paper: handwriting on gold, big enough to read at arm length */
+.memview__note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  width: 100%;
+  max-width: 420px;
+  padding: var(--sp-6);
+  border-radius: var(--radius-xl);
+  background: var(--bg-gold);
+  box-shadow: var(--elevation-3);
+}
+
+.memview__note .memview__kind {
+  color: rgb(64 45 0 / 0.65);
+}
+
+.memview__notetext,
+.memview__notefield {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-family: var(--font-hand);
+  font-size: 30px;
+  line-height: 36px;
+  color: var(--content-on-gold);
+  cursor: text;
+  resize: none;
+}
+
+.memview__caption {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+
+.memview__captext,
+.memview__capfield {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: center;
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 24px;
+  color: #ffffff;
+  cursor: text;
+}
+
+.memview__capfield::placeholder,
+.memview__captext {
+  color: rgb(255 255 255 / 0.75);
+}
+
+.memview__foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-4) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+}
+
+.memview__when {
+  color: rgb(255 255 255 / 0.65);
+}
+
+.memview__actions {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.memview__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: var(--control-md);
+  padding-inline: var(--sp-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 0.14);
+  color: #ffffff;
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}

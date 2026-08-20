@@ -9,6 +9,7 @@ import {
   Mic,
   Pencil,
   StickyNote,
+  Play,
   Trash2,
 } from 'lucide-react'
 import {
@@ -29,8 +30,9 @@ import type { QuestPoi } from './data/quests'
 import { updateMark, useMarks } from './photos'
 import { PhotoButton } from './PhotoButton'
 import { JourneyMap } from './JourneyMap'
-import { MarkSheet } from './MarkSheet'
+import { MemoryViewer } from './MemoryViewer'
 import { PoiModal } from './PoiSheet'
+import { MemoryPlayer } from './MemoryPlayer'
 
 const fmtDate = (at: number) =>
   new Date(at).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -75,6 +77,7 @@ export function JourneyScreen({
   const [markId, setMarkId] = useState<string | null>(null)
   const [movingId, setMovingId] = useState<string | null>(null)
   const [poi, setPoi] = useState<QuestPoi | null>(null)
+  const [replay, setReplay] = useState(false)
 
   // dragging the sheet away is a normal way to leave, and it fires no blur:
   // whatever was typed still has to survive that
@@ -96,7 +99,6 @@ export function JourneyScreen({
   const collected = new Set(parks[journey.parkId]?.points ?? [])
   const walked = new Set(journey.points)
   const points = quest?.pois ?? []
-  const openMark = markId ? (marks.find((m) => m.id === markId) ?? null) : null
 
   return (
     <div className="jscreen">
@@ -145,6 +147,18 @@ export function JourneyScreen({
           <p className="t-caption journey__when">
             {parkName} · {fmtDate(journey.startedAt)}, {fmtClock(journey.startedAt)}
           </p>
+
+          {journey.track.length > 1 && (
+            <Button
+              full
+              size="lg"
+              icon={<Play size={18} />}
+              className="journey__replay"
+              onClick={() => setReplay(true)}
+            >
+              Przejdź tę trasę jeszcze raz
+            </Button>
+          )}
 
           <StatGrid className="journey__stats">
             <Stat
@@ -290,14 +304,25 @@ export function JourneyScreen({
         </div>
       </BottomSheet>
 
-      {openMark && !movingId && (
-        <MarkSheet
-          mark={openMark}
+      {markId && !movingId && marks.length > 0 && (
+        <MemoryViewer
+          marks={marks}
+          startId={markId}
           onClose={() => setMarkId(null)}
-          onMove={() => {
-            setMovingId(openMark.id)
+          onMove={(id) => {
+            setMovingId(id)
             setMarkId(null)
           }}
+        />
+      )}
+
+      {replay && (
+        <MemoryPlayer
+          journey={journey}
+          parkName={parkName}
+          points={points}
+          marks={marks}
+          onClose={() => setReplay(false)}
         />
       )}
 
