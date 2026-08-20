@@ -1711,8 +1711,9 @@
 
 .memplay__clock {
   position: absolute;
-  right: var(--sp-5);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 232px);
+  /* same right edge as the dial, and a clear gap above it */
+  right: var(--sp-4);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6) + 216px + var(--sp-8));
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -1744,7 +1745,7 @@
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
   z-index: 3;
   width: 72px;
-  height: 208px;
+  height: 216px;
   display: grid;
   place-items: center;
   touch-action: none;
@@ -1785,7 +1786,7 @@
   color: #ffffff;
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.45);
   cursor: grab;
-  transition: transform var(--motion-fast) linear;
+  transition: transform 90ms linear;
 }
 
 .memplay__grip {

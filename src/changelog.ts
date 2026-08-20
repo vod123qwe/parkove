@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.23.0'
+export const VERSION = '0.23.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.23.1',
+    date: '2026-08-20',
+    title: 'Smoother, faster replays',
+    changes: [
+      ['changed', 'The camera now aims a little up the route and turns towards it gradually, so a corner reads as turning your head instead of a cut'],
+      ['changed', 'The throttle goes much further: the top of the dial skims a whole walk in under a minute, while the lower half stays fine enough to creep along'],
+      ['fixed', 'The walk clock had grown into the dial below it; they share a right edge now, with room between them'],
+      ['changed', 'Stat cards put the icon above the number, so a two word value like "40 min" no longer breaks across lines'],
+    ],
+  },
   {
     version: '0.23.0',
     date: '2026-08-20',

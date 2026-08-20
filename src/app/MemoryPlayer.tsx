@@ -8,12 +8,22 @@ import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import type { Journey } from './state'
 import type { WalkMark } from './photos'
 import type { QuestPoi } from './data/quests'
-import { distanceM } from './geo'
+import { bearingDeg, distanceM } from './geo'
 
 /** how far ahead of the marker a memory counts as "we are passing it" */
 const REACH_M = 22
-/** the dial runs from a slow walk to a fast skim, in playback multipliers */
-const MAX_RATE = 12
+/** the camera aims at a point this far up the route, so it turns before you do */
+const LOOKAHEAD_M = 28
+/** how long the camera takes to settle on a new heading, in ms */
+const TURN_TAU = 420
+/**
+ * At the top the dial should skim a whole walk in under a minute, but the
+ * bottom half has to stay usable, so the throttle is squared: half travel is
+ * a tenth of the top speed.
+ */
+const MAX_RATE = 90
+/** travel of the handle, in pixels, from the middle to either end */
+const DIAL_THROW = 96
 
 /** a walk is usually minutes, so read it as mm:ss until it passes an hour */
 const fmtClock = (ms: number) => {
@@ -54,6 +64,7 @@ export function MemoryPlayer({
   const lineRef = useRef<Timeline | null>(null)
   const rateRef = useRef(0)
   const elapsedRef = useRef(0)
+  const bearingRef = useRef<number | null>(null)
   const seenRef = useRef<Set<string>>(new Set())
 
   const [rate, setRate] = useState(0)
@@ -224,11 +235,27 @@ export function MemoryPlayer({
   }, [])
 
   // ---- moving through the walk ----
-  const draw = (ms: number) => {
+  const draw = (ms: number, dt = 0) => {
     const map = mapRef.current
     if (!map || !readyRef.current) return
     const metres = metresAt(timeline, ms)
-    const { at, bearing } = pointAt(track, timeline.dist, metres)
+    const { at, bearing: segment } = pointAt(track, timeline.dist, metres)
+
+    // aim at where the route goes next, not at the step underfoot: a corner
+    // then reads as a turn of the head instead of a cut
+    const ahead = pointAt(track, timeline.dist, metres + LOOKAHEAD_M).at
+    const target =
+      Math.abs(ahead[0] - at[0]) + Math.abs(ahead[1] - at[1]) > 1e-7
+        ? bearingDeg(at, ahead)
+        : segment
+    if (bearingRef.current == null) bearingRef.current = target
+    else {
+      // shortest way round, eased by time rather than by frames
+      let delta = ((target - bearingRef.current + 540) % 360) - 180
+      const k = dt > 0 ? 1 - Math.exp(-dt / TURN_TAU) : 1
+      bearingRef.current += delta * k
+    }
+    const bearing = bearingRef.current
     ;(map.getSource('mem-me') as { setData: (d: unknown) => void } | undefined)?.setData({
       type: 'Feature',
       properties: {},
@@ -264,7 +291,7 @@ export function MemoryPlayer({
         if (next !== elapsedRef.current) {
           elapsedRef.current = next
           setElapsed(next)
-          draw(next)
+          draw(next, dt)
           // rewinding should let a memory happen again on the way back
           if (r < 0) {
             const metres = metresAt(timeline, next)
@@ -274,6 +301,8 @@ export function MemoryPlayer({
           }
         }
         if (next === timeline.totalMs || next === 0) {
+          posRef.current = 0
+          setPos(0)
           rateRef.current = 0
           setRate(0)
         }
@@ -286,28 +315,35 @@ export function MemoryPlayer({
   }, [])
 
   // ---- the dial: a throttle that stays where you leave it ----
-  const dialRef = useRef<HTMLDivElement>(null)
-  const dragFrom = useRef<{ y: number; rate: number } | null>(null)
+  const posRef = useRef(0)
+  const [pos, setPos] = useState(0)
+  const dragFrom = useRef<{ y: number; pos: number } | null>(null)
+
+  /** the handle moves in a straight line, the speed rises as its square */
+  const applyPos = (next: number) => {
+    const p = Math.abs(next) < 0.06 ? 0 : Math.max(-1, Math.min(1, next))
+    posRef.current = p
+    setPos(p)
+    const r = Math.sign(p) * MAX_RATE * p * p
+    rateRef.current = r
+    setRate(r)
+  }
 
   const onDialDown = (e: React.PointerEvent) => {
     e.currentTarget.setPointerCapture(e.pointerId)
-    dragFrom.current = { y: e.clientY, rate: rateRef.current }
+    dragFrom.current = { y: e.clientY, pos: posRef.current }
   }
   const onDialMove = (e: React.PointerEvent) => {
     const from = dragFrom.current
     if (!from) return
-    // up is faster: 90 px of travel covers the whole range
-    const next = Math.max(-MAX_RATE, Math.min(MAX_RATE, from.rate + (from.y - e.clientY) / 90 * MAX_RATE))
-    const snapped = Math.abs(next) < 0.6 ? 0 : next
-    rateRef.current = snapped
-    setRate(snapped)
+    applyPos(from.pos + (from.y - e.clientY) / DIAL_THROW)
   }
   const onDialUp = () => {
     dragFrom.current = null
   }
 
   const done = elapsed >= timeline.totalMs
-  const tilt = Math.max(-1, Math.min(1, rate / MAX_RATE))
+  const fmtRate = (r: number) => (Math.abs(r) >= 10 ? Math.round(Math.abs(r)) : Math.abs(r).toFixed(1))
 
   return (
     <div className="memplay">
@@ -327,7 +363,7 @@ export function MemoryPlayer({
         <span className="t-caption memplay__clocklabel">czas wyprawy</span>
         <span className="memplay__time">{fmtClock(elapsed)}</span>
         <span className="t-caption memplay__clocklabel">
-          {done ? 'koniec trasy' : rate === 0 ? 'przesuń suwak' : `${rate > 0 ? '' : '−'}${Math.abs(rate).toFixed(1)}×`}
+          {done ? 'koniec trasy' : rate === 0 ? 'przesuń suwak' : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
         </span>
       </div>
 
@@ -373,7 +409,6 @@ export function MemoryPlayer({
 
       <div
         className="memplay__dial"
-        ref={dialRef}
         onPointerDown={onDialDown}
         onPointerMove={onDialMove}
         onPointerUp={onDialUp}
@@ -386,12 +421,9 @@ export function MemoryPlayer({
         </div>
         <button
           className="memplay__handle"
-          style={{ transform: `translateY(${-tilt * 92}px)` }}
+          style={{ transform: `translateY(${-pos * DIAL_THROW}px)` }}
           aria-label="Suwak przewijania wyprawy"
-          onClick={() => {
-            rateRef.current = 0
-            setRate(0)
-          }}
+          onClick={() => applyPos(0)}
         >
           {rate === 0 ? <span className="memplay__grip" /> : <Pause size={16} />}
         </button>
