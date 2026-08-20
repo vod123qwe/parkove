@@ -1945,13 +1945,14 @@
 
 /* the photo lands like a polaroid dropped on the table */
 .memplay__snap {
-  width: 58%;
-  max-width: 220px;
-  max-height: 26vh;
+  width: 76%;
+  max-width: 286px;
+  max-height: 34vh;
   object-fit: cover;
-  padding: 8px 8px 20px;
+  padding: 9px 9px 22px;
   background: #fdfdf8;
-  border-radius: 4px;
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
   transform: rotate(-2.2deg);
   box-shadow: 0 14px 34px rgb(0 0 0 / 0.45);
 }

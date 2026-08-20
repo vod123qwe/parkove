@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.33.0'
+export const VERSION = '0.33.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.33.1',
+    date: '2026-08-20',
+    title: 'Bigger prints',
+    changes: [
+      ['changed', 'Polaroids are about a third larger and a little rounder, both in the deck and when one arrives during a replay'],
+    ],
+  },
   {
     version: '0.33.0',
     date: '2026-08-20',

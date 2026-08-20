@@ -1,11 +1,12 @@
 .pk-polaroid {
   display: flex;
   flex-direction: column;
-  width: 148px;
+  width: 192px;
   padding: var(--sp-2) var(--sp-2) var(--sp-3);
   border: none;
   background: #fdfdf8;
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
   box-shadow: var(--elevation-2);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -18,7 +19,8 @@
   aspect-ratio: 1;
   background: #e7e7de;
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
 }
 
 .pk-polaroid__frame img {
