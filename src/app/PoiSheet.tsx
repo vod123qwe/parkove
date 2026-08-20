@@ -2,6 +2,7 @@ import { Lock, MapPin, Sparkles } from 'lucide-react'
 import { Modal } from '../ds'
 import { Dilemma } from './Dilemma'
 import type { QuestPoi } from './data/quests'
+import { asset } from './assets'
 
 /** full-screen point card: photos and the whole story, readable anytime */
 export function PoiModal({
@@ -21,7 +22,7 @@ export function PoiModal({
         <>
           {poi.photo && (
             <figure className="poi-photo">
-              <img src={poi.photo} alt={poi.name} loading="lazy" />
+              <img src={asset(poi.photo)} alt={poi.name} loading="lazy" />
               {poi.photoCredit && <figcaption className="t-caption">{poi.photoCredit}</figcaption>}
             </figure>
           )}

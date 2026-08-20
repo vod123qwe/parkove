@@ -5,6 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import parksData from './data/parks.json'
 import { circlePolygon, trackSegments } from './geo'
 import { buildPinImages, pinImageId } from './pins'
+import { asset } from './assets'
 
 const KRAKOW: [number, number] = [19.9445, 50.0555]
 
@@ -279,7 +280,7 @@ export function MapView({
         const id = `stamp-${pin.parkId}`
         if (map.hasImage(id)) continue
         try {
-          const res = await fetch(`/stamps/${pin.parkId}.png`)
+          const res = await fetch(asset(`stamps/${pin.parkId}.png`))
           if (!res.ok) continue
           const bmp = await createImageBitmap(await res.blob())
           if (!map.hasImage(id)) map.addImage(id, bmp)

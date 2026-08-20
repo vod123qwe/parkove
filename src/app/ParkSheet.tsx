@@ -28,6 +28,7 @@ import { PhotoButton } from './PhotoButton'
 import { PARK_INFO } from './data/parkinfo'
 import { amenitiesFor, isFood } from './data/amenities'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
+import { asset } from './assets'
 import { checkIn, collectPoint, startExpedition, stopExpedition, useGameState } from './state'
 import { walkName } from './naming'
 import { distanceToParkM, formatDistance, pointInPark } from './geo'
@@ -134,7 +135,7 @@ export function ParkSheet({
       hero={
         <div className="park-heroslot">
           <MediaHero
-            images={info?.photos?.map((p) => ({ src: p.src, credit: p.credit })) ?? []}
+            images={info?.photos?.map((p) => ({ src: asset(p.src), credit: p.credit })) ?? []}
             title={park.properties.name}
             meta={heroMeta}
             fallback={<Trees strokeWidth={1.5} />}
@@ -226,7 +227,7 @@ export function ParkSheet({
             return (
               <button key={poi.id} className="poicard" onClick={() => onOpenPoi(poi)} role="listitem">
                 <div className="poicard__media">
-                  {poi.photo ? <img src={poi.photo} alt="" loading="lazy" /> : <MapPin />}
+                  {poi.photo ? <img src={asset(poi.photo)} alt="" loading="lazy" /> : <MapPin />}
                   {got && (
                     <span className="poicard__check">
                       <Check size={13} />

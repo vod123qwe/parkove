@@ -4,6 +4,7 @@ import type { ParkFeature } from './ParkSheet'
 import type { QuestPoi } from './data/quests'
 import type { ParkingInfo } from './data/parking'
 import { KIND_META } from './kinds'
+import { asset } from './assets'
 
 /** peek: the park in one glance; swipe up for the full sheet */
 export function ParkPeekContent({
@@ -59,7 +60,7 @@ export function PoiPeekContent({
   return (
     <button className="peek-poi" onClick={onOpen}>
       <span className="peek-poi__media">
-        {poi.photo ? <img src={poi.photo} alt="" /> : <MapPin />}
+        {poi.photo ? <img src={asset(poi.photo)} alt="" /> : <MapPin />}
       </span>
       <span className="peek-poi__text">
         <span className="peek-poi__name">{poi.name}</span>

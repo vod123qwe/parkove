@@ -4,7 +4,7 @@ import { cx } from '../cx'
 import './stamp.css'
 
 export type StampProps = {
-  /** park id; the artwork lives at /stamps/<id>.png */
+  /** park id; the artwork lives at <base>stamps/<id>.png */
   parkId: string
   name: string
   earned?: boolean
@@ -35,7 +35,12 @@ export function Stamp({
         {missing ? (
           <div className="pk-stamp__placeholder">{fallback}</div>
         ) : (
-          <img src={`/stamps/${parkId}.png`} alt={name} loading="lazy" onError={() => setMissing(true)} />
+          <img
+            src={`${import.meta.env.BASE_URL}stamps/${parkId}.png`}
+            alt={name}
+            loading="lazy"
+            onError={() => setMissing(true)}
+          />
         )}
       </div>
       {showName && <span className="pk-stamp__name">{name}</span>}
