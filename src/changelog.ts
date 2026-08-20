@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.19.1'
+export const VERSION = '0.20.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.20.0',
+    date: '2026-08-20',
+    title: 'One plus instead of three icons',
+    changes: [
+      ['changed', 'The walk bar carries a single plus now. It opens three labelled buttons: add a photo, add a recording, add a note'],
+      ['changed', 'Recording moved into its own sheet with a big microphone: hold it, talk, let go, then keep it or record again'],
+      ['fixed', 'The map takes the full height of the screen on a phone, instead of stopping short of the home indicator'],
+    ],
+  },
   {
     version: '0.19.1',
     date: '2026-08-20',

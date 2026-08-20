@@ -1,14 +1,17 @@
 .app-shell {
   position: fixed;
   inset: 0;
+  /* an installed app on iOS hands us the whole screen, insets included, but
+     only lvh promises the largest viewport: plain 100% can stop short of the
+     home indicator and leave a strip the map never reaches */
+  height: 100vh;
+  height: 100lvh;
   overflow: hidden;
 }
 
 .app-map {
   position: absolute;
   inset: 0;
-  /* any sliver the canvas leaves at an edge should read as map, not as paper */
-  background: var(--bg-page);
 }
 
 /* HUD: city progress top left, profile top right */
@@ -1183,9 +1186,9 @@
   color: var(--content-error);
 }
 
-/* ---- voice and note buttons in the walk bar ---- */
+/* ---- one plus, three ways to leave something behind ---- */
 
-.app-voicebtn {
+.app-addbtn {
   flex: none;
   display: grid;
   place-items: center;
@@ -1193,19 +1196,113 @@
   height: var(--control-md);
   border: 0;
   border-radius: var(--radius-pill);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--motion-base) var(--ease-out);
+}
+
+.app-addbtn.-open {
+  transform: rotate(90deg);
+  background: var(--bg-surface-sunken);
+  color: var(--content-secondary);
+}
+
+.app-addmenu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-3));
+  width: min(calc(100% - 2 * var(--sp-4)), 420px);
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  animation: pk-toast-in 220ms var(--ease-out);
+}
+
+/* the items are pills so they read as one stack rising out of the plus */
+.app-addmenu__item {
+  justify-content: flex-start;
+}
+
+.app-addmenu__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: var(--control-md);
+  padding: 0 var(--sp-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-primary-subtle);
+  color: var(--content-accent);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: var(--elevation-1);
+}
+
+.app-addmenu__catch {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  border: 0;
+  background: transparent;
+}
+
+/* ---- holding the mic ---- */
+
+.voice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-5);
+  padding-bottom: var(--sp-4);
+}
+
+.voice__lead {
+  margin: 0;
+  text-align: center;
+  color: var(--content-secondary);
+}
+
+.voice__hint {
+  margin: 0;
+  color: var(--content-error);
+  text-align: center;
+}
+
+.voice__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  width: 100%;
+}
+
+.voice__mic {
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  border: 0;
+  border-radius: var(--radius-pill);
   background: var(--bg-primary-subtle);
   color: var(--content-accent);
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
   transition: transform var(--motion-fast) var(--ease-out);
 }
 
 /* holding it down should feel like holding a button down */
-.app-voicebtn.-recording {
+.voice__mic.-recording {
   background: var(--content-error);
   color: var(--content-on-primary);
-  transform: scale(1.08);
+  transform: scale(1.06);
   animation: rec-pulse 1.1s var(--ease-in-out) infinite;
 }
 

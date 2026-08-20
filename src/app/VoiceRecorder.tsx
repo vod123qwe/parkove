@@ -13,30 +13,35 @@ function pickMime() {
 }
 
 /**
- * Hold to record, release to hear it back. Nothing is saved until you say so,
- * because a walk is full of accidental presses and half sentences.
+ * Hold the button, talk, let go, hear it back. Nothing is saved until you say
+ * so, because a walk is full of accidental presses and half sentences.
  */
-export function VoiceButton({
+export function VoiceRecorder({
   parkId,
   journeyId,
   coords,
   onSaved,
-  onHint,
+  onClose,
 }: {
   parkId: string
   journeyId?: string
   coords?: [number, number]
   onSaved?: (id: string) => void
-  /** something to say when the press was too short or the mic was refused */
-  onHint?: (message: string) => void
+  onClose: () => void
 }) {
   const [recording, setRecording] = useState(false)
+  const [seconds, setSeconds] = useState(0)
+  const [hint, setHint] = useState<string | null>(null)
   const [review, setReview] = useState<{ blob: Blob; url: string; ms: number } | null>(null)
   const rec = useRef<MediaRecorder | null>(null)
   const chunks = useRef<Blob[]>([])
   const startedAt = useRef(0)
-  const hintRef = useRef(onHint)
-  hintRef.current = onHint
+
+  useEffect(() => {
+    if (!recording) return
+    const t = setInterval(() => setSeconds(Math.round((Date.now() - startedAt.current) / 1000)), 250)
+    return () => clearInterval(t)
+  }, [recording])
 
   useEffect(
     () => () => {
@@ -47,6 +52,7 @@ export function VoiceButton({
 
   const start = async () => {
     if (recording || review) return
+    setHint(null)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mime = pickMime()
@@ -60,18 +66,19 @@ export function VoiceButton({
         const ms = Date.now() - startedAt.current
         const blob = new Blob(chunks.current, { type: mime || 'audio/webm' })
         if (ms < MIN_MS || blob.size === 0) {
-          hintRef.current?.('Przytrzymaj przycisk, żeby nagrać')
+          setHint('Za krótko. Przytrzymaj przycisk i mów.')
           return
         }
         setReview({ blob, url: URL.createObjectURL(blob), ms })
       }
       startedAt.current = Date.now()
+      setSeconds(0)
       recorder.start()
       rec.current = recorder
       setRecording(true)
       navigator.vibrate?.(20)
     } catch {
-      hintRef.current?.('Brak dostępu do mikrofonu')
+      setHint('Brak dostępu do mikrofonu. Sprawdź uprawnienia w ustawieniach.')
     }
   }
 
@@ -91,29 +98,15 @@ export function VoiceButton({
   }
 
   return (
-    <>
-      <button
-        className={`app-voicebtn${recording ? ' -recording' : ''}`}
-        aria-label={recording ? 'Nagrywam, puść żeby zakończyć' : 'Przytrzymaj, żeby nagrać notatkę'}
-        onPointerDown={(e) => {
-          e.preventDefault()
-          void start()
-        }}
-        onPointerUp={stop}
-        onPointerCancel={stop}
-        onPointerLeave={stop}
-      >
-        <Mic size={20} />
-      </button>
-
-      {review && (
-        <BottomSheet open onClose={discard} title="Nagranie">
-          <div className="voicereview">
-            <p className="t-body voicereview__lead">
+    <BottomSheet open onClose={onClose} title="Notatka głosowa">
+      <div className="voice">
+        {review ? (
+          <>
+            <p className="t-body voice__lead">
               {Math.round(review.ms / 1000)} sekund. Przesłuchaj i zdecyduj, czy zostaje na mapie.
             </p>
             <audio className="marksheet__audio" src={review.url} controls autoPlay />
-            <div className="voicereview__actions">
+            <div className="voice__actions">
               <Button
                 full
                 size="lg"
@@ -127,18 +120,41 @@ export function VoiceButton({
                     blob: review.blob,
                   })
                   discard()
+                  onClose()
                   onSaved?.(saved.id)
                 }}
               >
                 Zostaw tutaj
               </Button>
               <Button full variant="ghost" icon={<Trash2 size={18} />} onClick={discard}>
-                Odrzuć
+                Nagraj jeszcze raz
               </Button>
             </div>
-          </div>
-        </BottomSheet>
-      )}
-    </>
+          </>
+        ) : (
+          <>
+            <p className="t-body voice__lead">
+              {recording
+                ? `Nagrywam… ${seconds} s. Puść, kiedy skończysz.`
+                : 'Przytrzymaj przycisk i mów. Nagranie zostanie tam, gdzie teraz stoisz.'}
+            </p>
+            <button
+              className={`voice__mic${recording ? ' -recording' : ''}`}
+              aria-label="Przytrzymaj, żeby nagrać"
+              onPointerDown={(e) => {
+                e.preventDefault()
+                void start()
+              }}
+              onPointerUp={stop}
+              onPointerCancel={stop}
+              onPointerLeave={stop}
+            >
+              <Mic size={34} />
+            </button>
+            {hint && <p className="t-caption voice__hint">{hint}</p>}
+          </>
+        )}
+      </div>
+    </BottomSheet>
   )
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, LocateFixed, Mic, RefreshCw, Sparkles } from 'lucide-react'
+import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, LocateFixed, RefreshCw, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
@@ -66,8 +66,6 @@ export function App() {
   const [photoId, setPhotoId] = useState<string | null>(null)
   const [movingPhotoId, setMovingPhotoId] = useState<string | null>(null)
   const [photoAdded, setPhotoAdded] = useState<string | null>(null)
-  /** one-liner from the field: no mic access, press held too briefly */
-  const [hint, setHint] = useState<string | null>(null)
   /** confirmation before a walk becomes a journal entry */
   const [endingWalk, setEndingWalk] = useState(false)
   /** the walk that just ended, waiting to show its summary */
@@ -433,7 +431,6 @@ export function App() {
             onRequestStop={() => setEndingWalk(true)}
             onPhoto={setPhotoAdded}
             onMark={setPhotoId}
-            onHint={setHint}
           />
         </>
       ) : (
@@ -618,17 +615,6 @@ export function App() {
           icon={<Camera size={18} />}
           title="Dotknij mapy"
           text="Tam postawię ten pin ze zdjęciem"
-          offset={76}
-        />
-      )}
-
-      {hint && (
-        <Toast
-          open
-          onClose={() => setHint(null)}
-          icon={<Mic size={18} />}
-          title={hint}
-          autoMs={4000}
           offset={76}
         />
       )}
