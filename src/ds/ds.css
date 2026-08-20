@@ -37,3 +37,33 @@ body {
 button {
   font: inherit;
 }
+
+/*
+ * What sits under a screen. A push moves the layer below aside and dims it a
+ * touch, which is the cue that says "you went deeper, back will bring you
+ * here". A cover leaves it in place, because it is presented over, not into.
+ */
+[data-pk-pushed] .app-shell,
+[data-pk-pushed] .jscreen,
+[data-pk-pushed] .pk-modal.-cover .pk-modal__panel {
+  transform: translateX(-22px);
+  filter: brightness(0.94);
+}
+
+.app-shell,
+.jscreen,
+.pk-modal.-cover .pk-modal__panel {
+  transition:
+    transform var(--motion-screen) var(--ease-screen),
+    filter var(--motion-screen) var(--ease-screen);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell,
+  .jscreen,
+  .pk-modal__panel,
+  .pk-modal .pk-modal__panel {
+    transition: none;
+    animation-duration: 1ms;
+  }
+}

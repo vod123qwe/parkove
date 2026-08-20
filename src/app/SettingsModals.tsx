@@ -20,7 +20,7 @@ export function AppearanceModal({ open, onClose }: { open: boolean; onClose: () 
     setTheme(t)
   }
   return (
-    <Modal open={open} onClose={onClose} title="Wygląd aplikacji" action="back">
+    <Modal open={open} onClose={onClose} title="Wygląd aplikacji" action="back" presentation="push">
       <p className="t-body-sm settings-lead">
         Motyw stosuje się od razu, także do katalogu komponentów. Auto podąża za ustawieniem
         systemu.
@@ -43,7 +43,7 @@ export function MapStyleModal({
   onMapStyle: (id: MapStyleId) => void
 }) {
   return (
-    <Modal open={open} onClose={onClose} title="Wygląd mapy" action="back">
+    <Modal open={open} onClose={onClose} title="Wygląd mapy" action="back" presentation="push">
       <p className="t-body-sm settings-lead">
         Domyślny styl podąża za motywem aplikacji. Zmiana jest widoczna od razu po zamknięciu tego
         ekranu.

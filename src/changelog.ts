@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.23.1'
+export const VERSION = '0.24.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.24.0',
+    date: '2026-08-20',
+    title: 'Screens that move like a phone',
+    changes: [
+      ['changed', 'Screens now arrive the way phones do it. Something presented over your work rises from the bottom: the profile, the walk summary, a screening. Going a level deeper slides in from the right: a stamp, a walk, a point, the settings'],
+      ['changed', 'While a screen is pushed on top, the one below slides aside and dims a little, so back has somewhere to go back to'],
+      ['changed', 'All of it on one curve, the one iOS uses for sheets: quick to leave, slow to land, no bounce. Anyone who asked their phone for less motion gets none'],
+    ],
+  },
   {
     version: '0.23.1',
     date: '2026-08-20',

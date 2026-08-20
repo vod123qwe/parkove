@@ -19,7 +19,7 @@ export function StampsModal({ open, onClose }: { open: boolean; onClose: () => v
   })
 
   return (
-    <Modal open={open} onClose={onClose} title="Pieczątki" action="back">
+    <Modal open={open} onClose={onClose} title="Pieczątki" action="back" presentation="push">
       <p className="t-body-sm stamps-lead">
         Zdobyte: <strong>{earned}</strong> z {FEATURES.length}. Pieczątkę dostajesz za komplet
         punktów w parku, po zamknięciu wyprawy.

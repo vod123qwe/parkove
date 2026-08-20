@@ -19,7 +19,7 @@ export function ParkingModal({
 }) {
   const spots = PARKING[parkId] ?? []
   return (
-    <Modal open={open} onClose={onClose} title="Parking" action="back">
+    <Modal open={open} onClose={onClose} title="Parking" action="back" presentation="push">
       <p className="t-body-sm parking-lead">
         Sugerowane miejsca parkingowe przy: <strong>{parkName}</strong>. Pierwsze na liście
         pokazujemy na mapie.

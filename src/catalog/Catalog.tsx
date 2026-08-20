@@ -604,7 +604,7 @@ export function Catalog() {
         <Section
           id="modal"
           title="Modal"
-          lead="Full-screen stage with a gentle enter, for content that needs the whole view: point cards with photos and long reads."
+          lead="Full-screen stage for content that needs the whole view: point cards with photos and long reads. It arrives the way phones do it: presentation=\"cover\" rises from the bottom for something shown over your work, presentation=\"push\" slides in from the right for going a level deeper, and the screen below then shifts aside and dims."
         >
           <div className="cat-spec">
             <Button variant="tonal" onClick={() => setModalOpen(true)}>

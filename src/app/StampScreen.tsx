@@ -31,7 +31,7 @@ export function StampScreen({
   const photos = useMarks().filter((m) => m.parkId === park.id && m.kind === 'photo' && m.url)
 
   return (
-    <Modal open onClose={onClose} title="Pieczątka" action="back">
+    <Modal open onClose={onClose} title="Pieczątka" action="back" presentation="push">
       <div className="stampscreen">
         <div className="stampscreen__art">
           <Stamp

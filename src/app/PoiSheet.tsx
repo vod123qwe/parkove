@@ -17,7 +17,7 @@ export function PoiModal({
   onClose: () => void
 }) {
   return (
-    <Modal open={poi != null} onClose={onClose} title={poi?.name}>
+    <Modal open={poi != null} onClose={onClose} title={poi?.name} action="back" presentation="push">
       {poi && (
         <>
           {poi.photo && (

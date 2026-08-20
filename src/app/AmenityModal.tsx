@@ -19,6 +19,7 @@ export function AmenityModal({
 
   return (
     <Modal
+      presentation="push"
       open={kind != null}
       onClose={onClose}
       title={wantFood ? 'Kawiarnie i jedzenie' : 'Place zabaw'}

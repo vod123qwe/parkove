@@ -32,6 +32,9 @@
   --motion-slow: 320ms;
   --ease-out: cubic-bezier(0.2, 0, 0, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  /* screens: leaves quickly, lands slowly, never bounces (the iOS sheet curve) */
+  --ease-screen: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-screen: 360ms;
 
   /* control sizes */
   --control-sm: 36px;

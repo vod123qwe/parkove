@@ -13,7 +13,19 @@
   flex-direction: column;
   background: var(--bg-page);
   isolation: isolate;
-  animation: pk-modal-in 300ms var(--ease-out);
+}
+
+/*
+ * Two arrivals, the way phones do it. The curve is the one iOS uses for
+ * sheets: quick to leave, slow to land, no bounce.
+ */
+.pk-modal.-cover .pk-modal__panel {
+  animation: pk-cover-in 380ms var(--ease-screen);
+}
+
+.pk-modal.-push .pk-modal__panel {
+  animation: pk-push-in 340ms var(--ease-screen);
+  box-shadow: -12px 0 32px rgb(16 24 18 / 0.18);
 }
 
 /* the bar floats over the scrolling content so the blur has something behind it */
@@ -29,8 +41,12 @@
   pointer-events: none;
 }
 
-.pk-modal.-closing .pk-modal__panel {
-  animation: pk-modal-out 220ms var(--ease-out) forwards;
+.pk-modal.-cover.-closing .pk-modal__panel {
+  animation: pk-cover-out 300ms var(--ease-screen) forwards;
+}
+
+.pk-modal.-push.-closing .pk-modal__panel {
+  animation: pk-push-out 280ms var(--ease-screen) forwards;
 }
 
 .pk-modal__content {
@@ -48,16 +64,26 @@
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-8));
 }
 
-@keyframes pk-modal-in {
+@keyframes pk-cover-in {
   from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.985);
+    transform: translateY(100%);
   }
 }
 
-@keyframes pk-modal-out {
+@keyframes pk-cover-out {
   to {
-    opacity: 0;
-    transform: translateY(10px) scale(0.99);
+    transform: translateY(100%);
+  }
+}
+
+@keyframes pk-push-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pk-push-out {
+  to {
+    transform: translateX(100%);
   }
 }

@@ -1545,17 +1545,14 @@
   inset: 0;
   z-index: 80;
   background: var(--bg-page);
-  animation: jscreen-in 240ms var(--ease-out);
+  /* a walk from the journal is one level deeper, so it arrives from the side */
+  animation: jscreen-in 340ms var(--ease-screen);
+  box-shadow: -12px 0 32px rgb(16 24 18 / 0.18);
 }
 
 @keyframes jscreen-in {
   from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
+    transform: translateX(100%);
   }
 }
 
@@ -1652,17 +1649,13 @@
   inset: 0;
   z-index: 120;
   background: #0f1a0d;
-  animation: memplay-in 320ms var(--ease-out);
+  /* a screening is presented over everything, so it rises from the bottom */
+  animation: memplay-in 420ms var(--ease-screen);
 }
 
 @keyframes memplay-in {
   from {
-    opacity: 0;
-    transform: scale(1.02);
-  }
-  to {
-    opacity: 1;
-    transform: none;
+    transform: translateY(100%);
   }
 }
 
@@ -1883,15 +1876,24 @@
   background: rgb(10 16 11 / 0.72);
   backdrop-filter: blur(22px) saturate(0.9);
   -webkit-backdrop-filter: blur(22px) saturate(0.9);
-  animation: memview-in 220ms var(--ease-out);
+  animation: memview-in 300ms var(--ease-screen);
 }
 
+/* the blur fades in while the slide rises: a lightbox, not a page */
 @keyframes memview-in {
   from {
     opacity: 0;
   }
-  to {
-    opacity: 1;
+}
+
+.memview__rail {
+  animation: memview-rise 340ms var(--ease-screen);
+}
+
+@keyframes memview-rise {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
   }
 }
 
