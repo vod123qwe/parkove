@@ -193,7 +193,7 @@ export function MemoryPlayer({
         type: 'line',
         source: 'mem-done',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': '#8ce563', 'line-width': 6 },
+        paint: { 'line-color': '#7ce93f', 'line-width': 6 },
       })
 
       map.addSource('mem-stops', {
@@ -207,8 +207,8 @@ export function MemoryPlayer({
                 s.body.kind === 'mark'
                   ? s.body.mark.kind === 'photo'
                     ? `photo-${s.body.mark.id}`
-                    : pinImageId(s.body.mark.kind, s.body.mark.kind)
-                  : pinImageId(s.body.poi.category, 'done'),
+                    : pinImageId(s.body.mark.kind, 'replay')
+                  : pinImageId(s.body.poi.category, 'replay'),
             },
             geometry: {
               type: 'Point',
@@ -244,7 +244,7 @@ export function MemoryPlayer({
         source: 'mem-me',
         paint: {
           'circle-radius': 9,
-          'circle-color': '#8ce563',
+          'circle-color': '#7ce93f',
           'circle-stroke-width': 3,
           'circle-stroke-color': '#0f1a0d',
         },
@@ -485,55 +485,58 @@ export function MemoryPlayer({
           onPointerUp={onDialUp}
           onPointerCancel={onDialUp}
         >
-          {/* one centre for everything: ticks, arc and handle share it */}
-          <svg className="memplay__arc" viewBox="0 0 300 110" aria-hidden="true">
-            <path
-              d="M 11.3 101.6 A 176 176 0 0 1 288.7 101.6"
-              fill="none"
-              stroke="rgba(255,255,255,0.3)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            {Array.from({ length: 45 }, (_, i) => {
-              const at = (i / 44) * 2 - 1
-              const a = at * DIAL_SWEEP * (Math.PI / 180)
-              const lit = pos !== 0 && (pos > 0 ? at > 0 && at <= pos : at < 0 && at >= pos)
-              return (
-                <line
-                  key={i}
-                  x1={DIAL_CX + Math.sin(a) * (DIAL_R + 4)}
-                  y1={DIAL_CY - Math.cos(a) * (DIAL_R + 4)}
-                  x2={DIAL_CX + Math.sin(a) * (DIAL_R + 26)}
-                  y2={DIAL_CY - Math.cos(a) * (DIAL_R + 26)}
-                  stroke={lit ? 'var(--bg-lime)' : 'rgba(255,255,255,0.4)'}
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                />
-              )
-            })}
+          {/* ticks and the arc live under a shadow that eats their ends */}
+          <div className="memplay__arcwrap">
+            <svg className="memplay__arc" viewBox="0 0 300 110" aria-hidden="true">
+              <path
+                d="M 11.3 101.6 A 176 176 0 0 1 288.7 101.6"
+                fill="none"
+                stroke="rgba(255,255,255,0.5)"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              {Array.from({ length: 53 }, (_, i) => {
+                const at = (i / 52) * 2 - 1
+                const a = at * DIAL_SWEEP * (Math.PI / 180)
+                return (
+                  <line
+                    key={i}
+                    x1={DIAL_CX + Math.sin(a) * (DIAL_R + 5)}
+                    y1={DIAL_CY - Math.cos(a) * (DIAL_R + 5)}
+                    x2={DIAL_CX + Math.sin(a) * (DIAL_R + 30)}
+                    y2={DIAL_CY - Math.cos(a) * (DIAL_R + 30)}
+                    stroke="rgba(255,255,255,0.62)"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                  />
+                )
+              })}
+            </svg>
+          </div>
 
-            {/* the handle rides the same circle, so it tilts as it travels */}
+          {/* the handle sits above that shadow, so it never dims */}
+          <svg className="memplay__handlelayer" viewBox="0 0 300 110" aria-hidden="true">
             <g transform={`rotate(${pos * DIAL_SWEEP} ${DIAL_CX} ${DIAL_CY})`}>
               <rect
-                x={DIAL_CX - 33}
-                y={DIAL_CY - DIAL_R - 18}
-                width="66"
-                height="36"
-                rx="18"
-                fill="#21401a"
-                stroke="var(--bg-lime)"
-                strokeWidth="2"
+                x={DIAL_CX - 34}
+                y={DIAL_CY - DIAL_R - 19}
+                width="68"
+                height="38"
+                rx="19"
+                fill="#2c5527"
+                stroke="#5fe336"
+                strokeWidth="3"
               />
-              {[-3, 3].map((dx) =>
-                [-3, 3].map((dy) => (
+              {[-3.5, 3.5].map((dx) =>
+                [-3.5, 3.5].map((dy) => (
                   <rect
                     key={`${dx}${dy}`}
-                    x={DIAL_CX + dx - 1.6}
-                    y={DIAL_CY - DIAL_R + dy - 1.6}
-                    width="3.2"
-                    height="3.2"
-                    rx="1"
-                    fill="var(--bg-lime)"
+                    x={DIAL_CX + dx - 1.5}
+                    y={DIAL_CY - DIAL_R + dy - 1.5}
+                    width="3"
+                    height="3"
+                    rx="0.8"
+                    fill="#ffffff"
                   />
                 )),
               )}

@@ -1926,23 +1926,23 @@
 .memplay__clocklabel {
   font-family: var(--font-mono);
   font-weight: 500;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 10px;
+  line-height: 14px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgb(255 255 255 / 0.62);
 }
 
 .memplay__clocklabel.-small {
-  font-size: 11px;
+  font-size: 9px;
   letter-spacing: 0.12em;
 }
 
 .memplay__time {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 32px;
-  line-height: 38px;
+  font-size: 17px;
+  line-height: 22px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1957,12 +1957,39 @@
   cursor: grab;
 }
 
-.memplay__arc {
+/*
+ * The ticks sit under a shadow that eats their ends: brightest under the
+ * handle, gone at the edges. That fade is what makes the arc feel like a dial
+ * and not like a row of lines.
+ */
+.memplay__arcwrap {
+  position: absolute;
+  inset: 0;
+  mask-image: radial-gradient(
+    115% 165% at 50% 118%,
+    #000 42%,
+    rgb(0 0 0 / 0.35) 72%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    115% 165% at 50% 118%,
+    #000 42%,
+    rgb(0 0 0 / 0.35) 72%,
+    transparent 100%
+  );
+}
+
+.memplay__arc,
+.memplay__handlelayer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
+}
+
+.memplay__handlelayer {
+  filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.55));
 }
 
 /* a tap in the middle of the arc stops the walk */

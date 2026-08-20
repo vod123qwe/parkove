@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.30.0'
+export const VERSION = '0.30.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.30.1',
+    date: '2026-08-20',
+    title: 'Pins and ticks, to the reference',
+    changes: [
+      ['changed', 'Pins in a replay have their own look: a dark green disc with a lime edge and a lime mark inside, photos as a circle in a white ring, and the walked line in a brighter green'],
+      ['changed', 'The dial ticks are thin and fade out at both ends under a shadow, the way a real dial reads. The handle keeps its own light, with four white dots'],
+      ['changed', 'The walk clock is half the size again, so the map keeps the attention'],
+    ],
+  },
   {
     version: '0.30.0',
     date: '2026-08-20',

@@ -48,6 +48,7 @@ export type PinVariant =
   | 'playground'
   | 'audio'
   | 'note'
+  | 'replay'
 
 const SIZE = 96 // rendered at 2x of the on-map size
 
@@ -63,12 +64,16 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
     audio: [colors.accentStrong, colors.accentStrong, colors.lime],
     note: [colors.paper, colors.accentStrong, colors.ink],
   }
-  const [fill, stroke, icon] = themed[variant] ?? [
-    variant === 'done' ? colors.gold : colors.surface,
-    variant === 'active' ? colors.accentStrong : colors.accent,
-    variant === 'done' ? colors.onGold : colors.accent,
-  ]
-  const ring = variant === 'active' ? 5 : 3.5
+  const [fill, stroke, icon] =
+    // the replay is its own world: dark discs with a lime edge, over imagery
+    variant === 'replay'
+      ? [colors.deep, colors.lime, colors.lime]
+      : (themed[variant] ?? [
+          variant === 'done' ? colors.gold : colors.surface,
+          variant === 'active' ? colors.accentStrong : colors.accent,
+          variant === 'done' ? colors.onGold : colors.accent,
+        ])
+  const ring = variant === 'active' ? 5 : variant === 'replay' ? 4.5 : 3.5
   const r = SIZE / 2 - ring
   const iconScale = 2.1
   const iconOffset = (SIZE - 24 * iconScale) / 2
@@ -111,8 +116,8 @@ export async function buildPinImages(colors: Record<string, string>) {
   for (const [category, paths] of Object.entries(ICONS)) {
     const own = ['parking', 'food', 'playground', 'audio', 'note']
     const variants: PinVariant[] = own.includes(category)
-      ? [category as PinVariant]
-      : ['open', 'done', 'active']
+      ? [category as PinVariant, 'replay']
+      : ['open', 'done', 'active', 'replay']
     for (const variant of variants) {
       try {
         out.push([pinImageId(category, variant), await rasterise(pinSvg(paths, variant, colors))])
@@ -167,6 +172,7 @@ export function pinColors() {
     gold: v('--bg-gold'),
     onGold: v('--content-on-gold'),
     lime: v('--bg-lime'),
+    deep: v('--bg-primary'),
     onPrimary: v('--content-on-primary'),
     paper: v('--bg-surface'),
     ink: v('--content-primary'),
