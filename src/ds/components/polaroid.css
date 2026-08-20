@@ -1,7 +1,7 @@
 .pk-polaroid {
   display: flex;
   flex-direction: column;
-  width: 192px;
+  width: 172px;
   padding: var(--sp-2) var(--sp-2) var(--sp-3);
   border: none;
   background: #fdfdf8;
