@@ -386,7 +386,6 @@ export function MemoryPlayer({
     dragFrom.current = null
   }
 
-  const done = elapsed >= timeline.totalMs
   const fmtRate = (r: number) => (Math.abs(r) >= 10 ? Math.round(Math.abs(r)) : Math.abs(r).toFixed(1))
 
   return (
@@ -422,13 +421,11 @@ export function MemoryPlayer({
         <span className="t-caption memplay__clocklabel">czas wyprawy</span>
         <span className="memplay__time">{fmtClock(elapsed)}</span>
         <span className="t-caption memplay__clocklabel">
-          {done
-            ? 'koniec trasy'
-            : easing
-              ? 'zwalniam przy punkcie'
-              : rate === 0
-                ? 'przesuń suwak'
-                : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
+          {easing
+            ? 'zwalniam przy punkcie'
+            : rate === 0
+              ? 'przesuń suwak'
+              : `${rate > 0 ? '' : '−'}${fmtRate(rate)}×`}
         </span>
       </div>
 

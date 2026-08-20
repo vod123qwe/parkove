@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.29.0'
+export const VERSION = '0.29.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.29.1',
+    date: '2026-08-20',
+    title: 'The clock reads like an instrument',
+    changes: [
+      ['changed', 'The walk clock in a replay sits above the darkness now, half the size, set in JetBrains Mono, with the map credits moved out of its way'],
+      ['changed', 'No more "end of route" line: the label under the clock only says what the throttle is doing'],
+    ],
+  },
   {
     version: '0.29.0',
     date: '2026-08-20',

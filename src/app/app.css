@@ -1402,10 +1402,10 @@
 }
 
 .voice__clock {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 40px;
-  line-height: 44px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 40px;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
 }
@@ -1821,9 +1821,9 @@
 
 .memplay__clock {
   position: absolute;
-  /* same right edge as the dial, and a clear gap above it */
+  /* above the darkness, not inside it: the floor starts at 46% */
   right: var(--sp-4);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6) + 216px + var(--sp-10));
+  bottom: calc(46% + var(--sp-4));
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -1839,11 +1839,11 @@
 }
 
 .memplay__time {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 46px;
-  line-height: 48px;
-  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 28px;
+  letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1927,7 +1927,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--sp-3);
-  padding: var(--sp-20) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-8));
+  padding: var(--sp-20) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-10));
   color: #ffffff;
   /* the frame is the darkness itself, so the map keeps showing through */
   background: linear-gradient(
@@ -2330,10 +2330,21 @@
   cursor: pointer;
 }
 
-/* the map credits belong above the darkness, not inside the memory */
+/* credits go to the very bottom, quiet, out of the clock's way */
 .memplay .maplibregl-ctrl-bottom-left,
 .memplay .maplibregl-ctrl-bottom-right {
-  bottom: 46%;
-  opacity: 0.55;
-  font-size: 10px;
+  bottom: 0;
+  z-index: 3;
+  opacity: 0.4;
+  font-size: 9px;
+}
+
+.memplay .maplibregl-ctrl-attrib {
+  background: none;
+  color: #ffffff;
+  padding: 0 var(--sp-2);
+}
+
+.memplay .maplibregl-ctrl-attrib a {
+  color: #ffffff;
 }
