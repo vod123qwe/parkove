@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.24.0'
+export const VERSION = '0.25.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.25.0',
+    date: '2026-08-20',
+    title: 'Full height, and one size for rows',
+    changes: [
+      ['fixed', 'The app no longer slides under a strip at the bottom. It was measured against the largest possible viewport instead of the visible one, which turned the whole app into a scrolling page and cut the content off. Screens now fill exactly the height you can see'],
+      ['changed', 'A sheet keeps its actions in a bar stuck to the bottom: one wide button and the dangerous things beside it. Moving a pin became a small button under the title, where it belongs'],
+      ['fixed', 'List rows had two different title sizes depending on whether they carried a sentence. One size everywhere now'],
+      ['added', 'DS: ActionBar, the sticky row of actions, with its own page in the catalog'],
+    ],
+  },
   {
     version: '0.24.0',
     date: '2026-08-20',

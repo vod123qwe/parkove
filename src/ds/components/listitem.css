@@ -84,9 +84,9 @@ button.pk-listitem:hover {
   padding-bottom: var(--sp-4);
 }
 
+/* a stacked row wraps its title; the size stays the same as everywhere else */
 .pk-listitem.-stacked .pk-listitem__title {
   white-space: normal;
-  font-size: 15px;
 }
 
 .pk-listitem__trailing {

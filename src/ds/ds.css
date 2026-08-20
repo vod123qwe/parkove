@@ -14,8 +14,13 @@ html,
 body {
   margin: 0;
   padding: 0;
-  /* the strip behind the home indicator belongs to the document: without this
-     it falls back to white and cuts a line under the map */
+  height: 100%;
+  /* the app owns the screen: the document itself must never scroll, or the
+     whole thing slides under a strip at the bottom */
+  overflow: hidden;
+  overscroll-behavior: none;
+  /* the strip behind the home indicator belongs to the document, so it carries
+     the app background instead of the browser default white */
   background: var(--bg-page);
 }
 

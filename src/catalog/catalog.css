@@ -415,3 +415,11 @@
   width: 100%;
   animation: none;
 }
+
+/* the catalog shows the bar in place, not stuck to the page bottom */
+.cat-actionbar-inline {
+  position: static;
+  margin: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+}

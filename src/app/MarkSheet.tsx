@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Move, Pencil, Trash2 } from 'lucide-react'
-import { BottomSheet, Button } from '../ds'
+import { ActionBar, BottomSheet, Button, IconButton } from '../ds'
 import { deleteMark, updateMark } from './photos'
 import type { WalkMark } from './photos'
 
@@ -52,6 +52,12 @@ export function MarkSheet({
   return (
     <BottomSheet open modal={false} onClose={onClose} title={TITLES[mark.kind]}>
       <div className="marksheet">
+        <div className="marksheet__quick">
+          <Button variant="tonal" size="md" icon={<Move size={16} />} onClick={onMove}>
+            Przesuń pin
+          </Button>
+        </div>
+
         {mark.kind === 'photo' && mark.url && (
           <img className="marksheet__img" src={mark.url} alt={text || 'Zdjęcie z wyprawy'} />
         )}
@@ -95,21 +101,22 @@ export function MarkSheet({
           </button>
         )}
 
-        <div className="marksheet__actions">
-          <Button variant="tonal" icon={<Move size={18} />} onClick={onMove}>
-            Przesuń pin
+        <ActionBar>
+          <Button size="lg" onClick={onClose}>
+            Zamknij
           </Button>
-          <Button
-            variant="ghost"
-            icon={<Trash2 size={18} />}
+          <IconButton
+            aria-label="Usuń"
+            variant="tonal"
+            className="marksheet__delete"
             onClick={() => {
               void deleteMark(mark.id)
               onClose()
             }}
           >
-            Usuń
-          </Button>
-        </div>
+            <Trash2 size={18} />
+          </IconButton>
+        </ActionBar>
       </div>
     </BottomSheet>
   )

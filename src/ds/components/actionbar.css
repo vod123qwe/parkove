@@ -1,0 +1,19 @@
+.pk-actionbar {
+  position: sticky;
+  bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  /* full bleed: it has to reach the edges to read as a bar, not as a row */
+  margin: var(--sp-6) calc(-1 * var(--sp-6)) calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  padding: var(--sp-3) var(--sp-6) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  background: var(--bg-surface-raised);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* the decision takes the room; what sits next to it stays a square */
+.pk-actionbar > *:first-child {
+  flex: 1;
+  min-width: 0;
+}

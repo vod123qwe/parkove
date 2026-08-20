@@ -1,11 +1,9 @@
 .app-shell {
   position: fixed;
   inset: 0;
-  /* an installed app on iOS hands us the whole screen, insets included, but
-     only lvh promises the largest viewport: plain 100% can stop short of the
-     home indicator and leave a strip the map never reaches */
-  height: 100vh;
-  height: 100lvh;
+  /* dvh, not lvh: lvh is taller than what is actually visible, which pushed
+     the whole app into a scroll and cut the content at the bottom */
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -1438,10 +1436,14 @@
   resize: vertical;
 }
 
-.marksheet__actions {
+/* the small move button sits right under the title, before the thing itself */
+.marksheet__quick {
   display: flex;
-  gap: var(--sp-2);
-  margin-top: var(--sp-2);
+  margin-bottom: var(--sp-1);
+}
+
+.marksheet__delete {
+  color: var(--content-error);
 }
 
 /* ---- listening back before it stays ---- */

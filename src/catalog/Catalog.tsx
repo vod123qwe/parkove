@@ -16,10 +16,12 @@ import {
   Navigation,
   Route,
   Sparkles,
+  Trash2,
   Trees,
   Waves,
 } from 'lucide-react'
 import {
+  ActionBar,
   BottomSheet,
   Button,
   Carousel,
@@ -76,6 +78,7 @@ const NAV = [
   ['navbar', 'Nav bar'],
   ['peek', 'Peek card'],
   ['toast', 'Toast'],
+  ['actionbar', 'Action bar'],
   ['segmented', 'Segmented'],
   ['stats', 'Stats'],
 ] as const
@@ -683,6 +686,21 @@ export function Catalog() {
               onAction={() => {}}
               className="cat-toast-inline"
             />
+          </div>
+        </Section>
+
+        <Section
+          id="actionbar"
+          title="Action bar"
+          lead="The row of actions at the bottom of a sheet, stuck there while the content scrolls past. The first child stretches, so the shape is one wide decision plus the small dangerous things beside it. Shown here inline, without the sheet around it."
+        >
+          <div className="cat-spec cat-actionbardemo">
+            <ActionBar className="cat-actionbar-inline">
+              <Button size="lg">Zamknij</Button>
+              <IconButton aria-label="Usuń" variant="tonal">
+                <Trash2 size={18} />
+              </IconButton>
+            </ActionBar>
           </div>
         </Section>
 
