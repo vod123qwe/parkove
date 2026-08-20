@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, Sparkles } from 'lucide-react'
+import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, RefreshCw, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
@@ -27,6 +27,7 @@ import { EndWalkSheet } from './EndWalkSheet'
 import { JourneySheet } from './JourneySheet'
 import { stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
+import { useUpdateAvailable } from './update'
 import { isDarkNow, onDarkChange } from './theme'
 import { getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import type { MapStyleId } from './data/mapstyles'
@@ -359,6 +360,8 @@ export function App() {
   }, [journey])
 
   // photo pins belong to a walk: on the everyday map they would be clutter
+  const updateReady = useUpdateAvailable()
+  const [updateHidden, setUpdateHidden] = useState(false)
   const walkPhotos = usePhotos()
   const shownWalkId = expedition?.id ?? journeyId
   const photoPins = useMemo(
@@ -604,6 +607,18 @@ export function App() {
           }}
           autoMs={9000}
           offset={76}
+        />
+      )}
+
+      {updateReady && !updateHidden && !onWalk && !openPhoto && (
+        <Toast
+          open
+          onClose={() => setUpdateHidden(true)}
+          icon={<RefreshCw size={18} />}
+          title="Jest nowsza wersja"
+          text="Odświeżenie wczyta ją, postęp zostaje"
+          actionLabel="Odśwież"
+          onAction={() => window.location.reload()}
         />
       )}
 

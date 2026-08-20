@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.17.0'
+export const VERSION = '0.17.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.17.1',
+    date: '2026-08-20',
+    title: 'Notices a new version',
+    changes: [
+      ['added', 'The app checks whether a newer build is live and offers a refresh, because an installed app on iOS tends to resume the old page instead of loading the new one. Never during a walk: a reload would lose it'],
+    ],
+  },
   {
     version: '0.17.0',
     date: '2026-08-20',
