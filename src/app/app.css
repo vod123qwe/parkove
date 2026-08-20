@@ -1219,8 +1219,10 @@
   scroll-snap-type: x proximity;
   scroll-behavior: smooth;
   scrollbar-width: none;
-  padding: var(--sp-5) var(--sp-8) var(--sp-6) 20px;
+  /* room on both sides so the first and last print can reach the middle */
+  padding: var(--sp-5) 34% var(--sp-6) 20px;
   margin-inline: calc(-1 * var(--sp-6));
+  scroll-padding-inline: 20px;
 }
 
 .journey__deck::-webkit-scrollbar {
@@ -1235,42 +1237,14 @@
     z-index 0s;
 }
 
-/* first card on top, the rest tucked under it, each tilted its own way */
+/* they overlap; which one sits on top is decided by the scroll position */
 .journey__deck > * + * {
-  margin-left: -30px;
+  margin-left: -34px;
 }
 
-.journey__deck > *:nth-child(1) {
-  transform: rotate(-2.4deg);
-  z-index: 6;
-}
-.journey__deck > *:nth-child(2) {
-  transform: rotate(1.8deg) translateY(6px);
-  z-index: 5;
-}
-.journey__deck > *:nth-child(3) {
-  transform: rotate(-1.1deg) translateY(2px);
-  z-index: 4;
-}
-.journey__deck > *:nth-child(4) {
-  transform: rotate(2.6deg) translateY(8px);
-  z-index: 3;
-}
-.journey__deck > *:nth-child(5) {
-  transform: rotate(-3deg) translateY(4px);
-  z-index: 2;
-}
-.journey__deck > *:nth-child(n + 6) {
-  transform: rotate(1.2deg) translateY(7px);
-  z-index: 1;
-}
-
-/* touching one straightens it and brings it out of the pile */
-.journey__deck > *:active,
-.journey__deck > *:focus-visible,
-.journey__deck > *:hover {
-  transform: rotate(0deg) translateY(-6px) scale(1.03);
-  z-index: 9;
+/* the one nearest the middle is already forward, so a press just presses */
+.journey__deck > *:active {
+  filter: brightness(0.96);
 }
 
 .journey__danger {

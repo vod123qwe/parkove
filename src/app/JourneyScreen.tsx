@@ -19,7 +19,6 @@ import {
   List,
   ListItem,
   NavBar,
-  Polaroid,
   Stat,
   StatGrid,
 } from '../ds'
@@ -30,6 +29,7 @@ import type { QuestPoi } from './data/quests'
 import { updateMark, useMarks } from './photos'
 import { PhotoButton } from './PhotoButton'
 import { JourneyMap } from './JourneyMap'
+import { PhotoDeck } from './PhotoDeck'
 import { MemoryViewer } from './MemoryViewer'
 import { PoiModal } from './PoiSheet'
 import { MemoryPlayer } from './MemoryPlayer'
@@ -208,17 +208,7 @@ export function JourneyScreen({
 
           <h3 className="t-title journey__section">Zdjęcia</h3>
           {photos.length > 0 && (
-            <div className="journey__deck" role="list" aria-label="Zdjęcia z tej wyprawy">
-              {photos.map((ph) => (
-                <Polaroid
-                  key={ph.id}
-                  src={ph.url!}
-                  caption={ph.caption || undefined}
-                  meta={fmtClock(ph.at)}
-                  onClick={() => setMarkId(ph.id)}
-                />
-              ))}
-            </div>
+            <PhotoDeck photos={photos} onOpen={setMarkId} />
           )}
           <PhotoButton
             parkId={journey.parkId}
