@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { Mic, Plus, Square, StickyNote, X } from 'lucide-react'
 import { Button, Card } from '../ds'
 import { useGameState } from './state'
@@ -32,6 +33,7 @@ export function ExpeditionBar({
 }) {
   const { expedition } = useGameState()
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [recording, setRecording] = useState(false)
   const [, tick] = useState(0)
 
@@ -40,6 +42,15 @@ export function ExpeditionBar({
     return () => clearInterval(t)
   }, [])
 
+  // the stack sinks back one by one, so it has to outlive the click that closed it
+  const shut = () => {
+    setClosing(true)
+    window.setTimeout(() => {
+      setOpen(false)
+      setClosing(false)
+    }, 280)
+  }
+
   if (!expedition) return null
   const km = (expedition.distanceM / 1000).toFixed(1).replace('.', ',')
   const here = expedition.where?.coords ?? expedition.track[expedition.track.length - 1]
@@ -47,16 +58,12 @@ export function ExpeditionBar({
   return (
     <>
       {/* a tap anywhere else closes the menu instead of poking the map */}
-      {open && (
-        <button
-          className="app-addmenu__catch"
-          aria-label="Zamknij menu"
-          onClick={() => setOpen(false)}
-        />
+      {open && !closing && (
+        <button className="app-addmenu__catch" aria-label="Zamknij menu" onClick={shut} />
       )}
 
       {open && (
-        <div className="app-addmenu">
+        <div className={`app-addmenu${closing ? ' -out' : ''}`}>
           <PhotoButton
             parkId={expedition.parkId}
             journeyId={expedition.id}
@@ -64,16 +71,18 @@ export function ExpeditionBar({
             label="Dodaj zdjęcie"
             full={false}
             className="app-addmenu__item"
+            style={{ '--rise': 2, '--sink': 0 } as CSSProperties}
             onSaved={(id) => {
-              setOpen(false)
+              shut()
               onPhoto?.(id)
             }}
           />
           <Button
             className="app-addmenu__item"
+            style={{ '--rise': 1, '--sink': 1 } as CSSProperties}
             icon={<Mic size={18} />}
             onClick={() => {
-              setOpen(false)
+              shut()
               setRecording(true)
             }}
           >
@@ -81,9 +90,10 @@ export function ExpeditionBar({
           </Button>
           <Button
             className="app-addmenu__item"
+            style={{ '--rise': 0, '--sink': 2 } as CSSProperties}
             icon={<StickyNote size={18} />}
             onClick={async () => {
-              setOpen(false)
+              shut()
               const saved = await addMark({
                 kind: 'note',
                 parkId: expedition.parkId,
@@ -115,7 +125,7 @@ export function ExpeditionBar({
             className={`app-addbtn${open ? ' -open' : ''}`}
             aria-label={open ? 'Zamknij' : 'Dodaj zdjęcie, nagranie albo notatkę'}
             aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => (open ? shut() : setOpen(true))}
           >
             {open ? <X size={20} /> : <Plus size={22} />}
           </button>

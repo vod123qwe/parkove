@@ -567,7 +567,6 @@ export function App() {
           journey={journey}
           parkName={journeyPark.properties.name}
           onClose={() => setJourneyId(null)}
-          onOpenPhoto={setPhotoId}
         />
       )}
 

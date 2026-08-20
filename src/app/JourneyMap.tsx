@@ -20,17 +20,22 @@ export function JourneyMap({
   collected,
   marks,
   onSelectMark,
+  placing = false,
+  onPlace,
 }: {
   track: Pt[]
   points: QuestPoi[]
   collected: Set<string>
   marks: Array<WalkMark & { url?: string }>
   onSelectMark: (id: string) => void
+  /** while moving a pin, the next tap on this map is its new home */
+  placing?: boolean
+  onPlace?: (coords: Pt) => void
 }) {
   const holder = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MapGL | null>(null)
-  const cb = useRef(onSelectMark)
-  cb.current = onSelectMark
+  const cb = useRef({ onSelectMark, onPlace, placing })
+  cb.current = { onSelectMark, onPlace, placing }
   const data = useRef({ track, points, collected, marks })
   data.current = { track, points, collected, marks }
 
@@ -167,10 +172,32 @@ export function JourneyMap({
 
     map.on('load', () => void draw())
     map.on('click', (e: MapLayerMouseEvent) => {
+      if (cb.current.placing) {
+        cb.current.onPlace?.([e.lngLat.lng, e.lngLat.lat])
+        return
+      }
       if (!map.getLayer('j-mark-hit')) return
       const hit = map.queryRenderedFeatures(e.point, { layers: ['j-mark-hit'] })[0]
-      if (hit?.properties?.markId) cb.current(String(hit.properties.markId))
+      if (hit?.properties?.markId) cb.current.onSelectMark(String(hit.properties.markId))
     })
+    // moving a pin changes the data, so keep a way to refresh it in place
+    ;(map as unknown as { __redrawMarks: () => void }).__redrawMarks = () => {
+      const things = data.current.marks
+      ;(map.getSource('j-marks') as { setData: (d: unknown) => void } | undefined)?.setData({
+        type: 'FeatureCollection',
+        features: things
+          .filter((m) => m.coords)
+          .map((m) => ({
+            type: 'Feature',
+            properties: {
+              markId: m.id,
+              icon: m.kind === 'photo' ? `photo-${m.id}` : pinImageId(m.kind, m.kind),
+            },
+            geometry: { type: 'Point', coordinates: m.coords as Pt },
+          })),
+      } as never)
+    }
+
     // the screen animates in, so the canvas learns its size a beat later
     const t = window.setTimeout(() => map.resize(), 260)
 
@@ -182,6 +209,12 @@ export function JourneyMap({
     // built once per screen: the walk it shows never changes underneath
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // marks move and get deleted while the screen is open
+  useEffect(() => {
+    const map = mapRef.current as unknown as { __redrawMarks?: () => void } | null
+    map?.__redrawMarks?.()
+  }, [marks])
 
   return <div ref={holder} className="journeymap" />
 }

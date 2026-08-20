@@ -24,6 +24,11 @@
   );
 }
 
+.pk-carousel.-nofade {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
 .pk-carousel::-webkit-scrollbar {
   display: none;
 }

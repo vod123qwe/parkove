@@ -1161,16 +1161,9 @@
 
 /* full-bleed row of pictures, scrolling past the sheet padding */
 .journey__photos {
-  display: flex;
   gap: var(--sp-4);
-  overflow-x: auto;
-  padding: var(--sp-2) var(--sp-6);
+  padding: var(--sp-2) var(--sp-6) var(--sp-2) 20px;
   margin-inline: calc(-1 * var(--sp-6));
-  scrollbar-width: none;
-}
-
-.journey__photos::-webkit-scrollbar {
-  display: none;
 }
 
 .journey__danger {
@@ -1214,14 +1207,14 @@
   left: 0;
   right: 0;
   margin-inline: auto;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-3));
+  /* 24 px above the bar: the bar is a 44 px control in 8 px padding */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + 60px + var(--sp-6));
   width: min(calc(100% - 2 * var(--sp-4)), 420px);
   z-index: 12;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--sp-2);
-  animation: pk-toast-in 220ms var(--ease-out);
+  gap: var(--sp-1);
   pointer-events: none;
 }
 
@@ -1229,6 +1222,36 @@
 .app-addmenu__item {
   pointer-events: auto;
   box-shadow: var(--elevation-2);
+  animation: add-rise 260ms var(--ease-out) both;
+  /* the one nearest the plus arrives first */
+  animation-delay: calc(var(--rise, 0) * 55ms);
+}
+
+.app-addmenu.-out .app-addmenu__item {
+  animation: add-sink 180ms var(--ease-out) both;
+  animation-delay: calc(var(--sink, 0) * 45ms);
+}
+
+@keyframes add-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes add-sink {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 }
 
 .app-addmenu__catch {
@@ -1238,6 +1261,7 @@
   border: 0;
   background: transparent;
 }
+
 
 /* ---- holding the mic ---- */
 
@@ -1480,4 +1504,57 @@
 
 .journeymap .maplibregl-ctrl-attrib {
   font-size: 10px;
+}
+
+/* ---- a walk from the journal: its map, and the details over it ---- */
+
+.jscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--bg-page);
+  animation: jscreen-in 240ms var(--ease-out);
+}
+
+@keyframes jscreen-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* the map takes the whole screen; the sheet rides over it */
+.jscreen .journeymap {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+}
+
+.jscreen__nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.jscreen__placing {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-8));
+  margin-inline: auto;
+  width: fit-content;
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-raised);
+  color: var(--content-secondary);
+  box-shadow: var(--elevation-2);
+  z-index: 3;
 }

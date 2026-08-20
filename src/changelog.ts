@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.20.1'
+export const VERSION = '0.21.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.21.0',
+    date: '2026-08-20',
+    title: 'The walk screen behaves',
+    changes: [
+      ['changed', 'A walk from the journal is now its route on a full screen with the details in a sheet over it: pull the sheet down to look at the map, up to read everything'],
+      ['fixed', 'Photos, recordings, notes and points opened behind the walk screen, on the live map. They open inside it now, and a point can be read again with its whole story'],
+      ['changed', 'Photos of a walk are a plain carousel like in the profile, with no white fade at the edges and a wider gap on the left'],
+      ['changed', 'The plus menu sits 24 px above the bar, its buttons are closer together, and they rise and sink one after another'],
+    ],
+  },
   {
     version: '0.20.0',
     date: '2026-08-20',

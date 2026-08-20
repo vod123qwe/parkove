@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { Camera } from 'lucide-react'
 import { Button } from '../ds'
 import { addPhoto } from './photos'
@@ -19,6 +20,7 @@ export function PhotoButton({
   full = true,
   variant = 'primary',
   className,
+  style,
 }: {
   parkId: string
   poiId?: string
@@ -31,6 +33,7 @@ export function PhotoButton({
   full?: boolean
   variant?: 'primary' | 'tonal' | 'ghost'
   className?: string
+  style?: CSSProperties
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
@@ -57,6 +60,7 @@ export function PhotoButton({
         onClick={() => inputRef.current?.click()}
         disabled={busy}
         className={className}
+        style={style}
       >
         {busy ? 'Zapisuję…' : label}
       </Button>
