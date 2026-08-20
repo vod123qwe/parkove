@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.34.0'
+export const VERSION = '0.35.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.35.0',
+    date: '2026-08-20',
+    title: 'Fading ticks and a proper player everywhere',
+    changes: [
+      ['changed', 'The dial ticks are longer, thinner and denser, and they fade away along their own length as well as at the ends: they dissolve into the arc instead of stopping at it'],
+      ['changed', 'Every voice note now uses our own player, waveform and all. The bare system control that showed up in the full screen viewer and in the walk sheet is gone'],
+      ['changed', 'The walk card gives its title twenty more points of room below the white edge'],
+    ],
+  },
   {
     version: '0.34.0',
     date: '2026-08-20',

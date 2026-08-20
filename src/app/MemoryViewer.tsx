@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Mic, Move, StickyNote, Trash2, X } from 'lucide-react'
 import { deleteMark, updateMark } from './photos'
 import { noteType } from './memory'
+import { WavePlayer } from './WavePlayer'
 import type { WalkMark } from './photos'
 
 const fmtWhen = (at: number) =>
@@ -96,7 +97,7 @@ export function MemoryViewer({
                 <span className="memview__kind">
                   <Mic size={16} /> Notatka głosowa
                 </span>
-                <audio src={m.url} controls preload="metadata" />
+                <WavePlayer src={m.url} blob={m.blob} />
               </div>
             )}
             {m.kind === 'note' && (

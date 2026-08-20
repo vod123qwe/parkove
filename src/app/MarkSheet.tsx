@@ -3,6 +3,7 @@ import { Move, Pencil, Trash2 } from 'lucide-react'
 import { ActionBar, BottomSheet, Button, IconButton } from '../ds'
 import { deleteMark, updateMark } from './photos'
 import type { WalkMark } from './photos'
+import { WavePlayer } from './WavePlayer'
 
 const fmtWhen = (at: number) =>
   new Date(at).toLocaleString('pl-PL', {
@@ -62,7 +63,7 @@ export function MarkSheet({
           <img className="marksheet__img" src={mark.url} alt={text || 'Zdjęcie z wyprawy'} />
         )}
         {mark.kind === 'audio' && mark.url && (
-          <audio className="marksheet__audio" src={mark.url} controls preload="metadata" />
+          <WavePlayer src={mark.url} blob={mark.blob} />
         )}
 
         <p className="t-caption marksheet__when">{fmtWhen(mark.at)}</p>

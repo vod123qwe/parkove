@@ -622,22 +622,22 @@ export function MemoryPlayer({
               <path
                 d="M 11.3 101.6 A 176 176 0 0 1 288.7 101.6"
                 fill="none"
-                stroke="rgba(255,255,255,0.5)"
-                strokeWidth="2"
+                stroke="rgba(255,255,255,0.18)"
+                strokeWidth="1.6"
                 strokeLinecap="round"
               />
-              {Array.from({ length: 53 }, (_, i) => {
-                const at = (i / 52) * 2 - 1
+              {Array.from({ length: 61 }, (_, i) => {
+                const at = (i / 60) * 2 - 1
                 const a = at * DIAL_SWEEP * (Math.PI / 180)
                 return (
                   <line
                     key={i}
-                    x1={DIAL_CX + Math.sin(a) * (DIAL_R + 5)}
-                    y1={DIAL_CY - Math.cos(a) * (DIAL_R + 5)}
-                    x2={DIAL_CX + Math.sin(a) * (DIAL_R + 30)}
-                    y2={DIAL_CY - Math.cos(a) * (DIAL_R + 30)}
-                    stroke="rgba(255,255,255,0.62)"
-                    strokeWidth="1.3"
+                    x1={DIAL_CX + Math.sin(a) * (DIAL_R + 1)}
+                    y1={DIAL_CY - Math.cos(a) * (DIAL_R + 1)}
+                    x2={DIAL_CX + Math.sin(a) * (DIAL_R + 35)}
+                    y2={DIAL_CY - Math.cos(a) * (DIAL_R + 35)}
+                    stroke="rgba(255,255,255,0.72)"
+                    strokeWidth="1.1"
                     strokeLinecap="round"
                   />
                 )

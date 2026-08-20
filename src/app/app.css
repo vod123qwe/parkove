@@ -1143,6 +1143,12 @@
 
 /* ---- one walk from the journal ---- */
 
+/* the card has no grabber, so the title needs the room the grabber used to
+   take: twenty more points between the white edge and the name */
+.jscreen .pk-sheet__inner {
+  padding-top: 48px;
+}
+
 .journey {
   display: flex;
   flex-direction: column;
@@ -1495,8 +1501,18 @@
   background: var(--bg-surface-sunken);
 }
 
-.marksheet__audio {
-  width: 100%;
+/* on paper the wave needs its own contrast, not the white of the sheet */
+.marksheet .wave__bars span {
+  background: var(--border-default);
+}
+
+.marksheet .wave__bars span.is-done {
+  background: var(--bg-primary);
+}
+
+.marksheet .wave__play {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
 }
 
 .marksheet__when {
@@ -2093,8 +2109,8 @@
 
 .memplay__dial {
   position: relative;
-  width: min(320px, 100%);
-  aspect-ratio: 300 / 110;
+  width: min(330px, 100%);
+  aspect-ratio: 300 / 116;
   margin: var(--sp-2) auto 0;
   touch-action: none;
   cursor: grab;
@@ -2111,11 +2127,25 @@
   /* two fades at once: out to the sides, and in towards the centre of the
      circle, so each tick is brightest at its outer tip */
   mask-image:
-    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%),
-    radial-gradient(circle at 50% 205%, transparent 52%, rgb(0 0 0 / 0.55) 62%, #000 78%);
+    linear-gradient(to right, transparent 0%, #000 26%, #000 74%, transparent 100%),
+    radial-gradient(
+      circle at 50% 205%,
+      transparent 44%,
+      rgb(0 0 0 / 0.18) 56%,
+      rgb(0 0 0 / 0.55) 68%,
+      rgb(0 0 0 / 0.85) 78%,
+      #000 88%
+    );
   -webkit-mask-image:
-    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%),
-    radial-gradient(circle at 50% 205%, transparent 52%, rgb(0 0 0 / 0.55) 62%, #000 78%);
+    linear-gradient(to right, transparent 0%, #000 26%, #000 74%, transparent 100%),
+    radial-gradient(
+      circle at 50% 205%,
+      transparent 44%,
+      rgb(0 0 0 / 0.18) 56%,
+      rgb(0 0 0 / 0.55) 68%,
+      rgb(0 0 0 / 0.85) 78%,
+      #000 88%
+    );
   mask-composite: intersect;
   -webkit-mask-composite: source-in;
 }
@@ -2303,20 +2333,34 @@
   color: rgb(255 255 255 / 0.7);
 }
 
+/* a recording on the dim backdrop: a quiet panel, not a white slab */
 .memview__audio {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--sp-5);
   align-items: center;
   width: 100%;
   max-width: 420px;
   padding: var(--sp-8) var(--sp-6);
   border-radius: var(--radius-xl);
-  background: var(--bg-surface-raised);
+  corner-shape: var(--corner-smooth);
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.12);
 }
 
-.memview__audio audio {
+/* the wave gets room to breathe when it has a whole slide to itself */
+.memview__audio .wave {
   width: 100%;
+}
+
+.memview__audio .wave__bars {
+  height: 64px;
+  gap: 4px;
+}
+
+.memview__audio .wave__play {
+  width: 52px;
+  height: 52px;
 }
 
 /* a note keeps its paper: handwriting on a sheet, big enough to read at arm length */
