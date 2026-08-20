@@ -29,6 +29,7 @@ import { PARK_INFO } from './data/parkinfo'
 import { amenitiesFor, isFood } from './data/amenities'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
 import { checkIn, collectPoint, startExpedition, stopExpedition, useGameState } from './state'
+import { walkName } from './naming'
 import { distanceToParkM, formatDistance, pointInPark } from './geo'
 import type { ParkGeometry, Pt } from './geo'
 import { pointsTotal, questForPark } from './data/quests'
@@ -297,7 +298,13 @@ export function ParkSheet({
               Zakończ wyprawę
             </Button>
           ) : (
-            <Button full size="lg" icon={<Compass size={18} />} onClick={() => { startExpedition(park.id); onClose() }}>
+            <Button full size="lg" icon={<Compass size={18} />} onClick={() => {
+              // the tap is the gesture iOS needs before it will consider notifications
+              if ('Notification' in window && Notification.permission === 'default')
+                void Notification.requestPermission().catch(() => {})
+              startExpedition(park.id, walkName(park.properties.name))
+              onClose()
+            }}>
               Start wyprawy
             </Button>
           )}

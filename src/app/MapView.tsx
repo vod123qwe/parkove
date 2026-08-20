@@ -3,6 +3,7 @@ import { Map as MapGL } from 'maplibre-gl'
 import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import parksData from './data/parks.json'
+import { circlePolygon, trackSegments } from './geo'
 import { buildPinImages, pinImageId } from './pins'
 
 const KRAKOW: [number, number] = [19.9445, 50.0555]
@@ -53,6 +54,12 @@ type Props = {
   quest: QuestOverlay | null
   /** active expedition GPS track */
   track: Array<[number, number]> | null
+  /** live position during a walk: dot, accuracy halo and heading */
+  me: { coords: [number, number]; accuracy: number; course: number | null } | null
+  /** camera rides along with the dot until the map is touched */
+  followMe: boolean
+  /** a pan, zoom or rotate made by hand hands the camera back to the walker */
+  onUserPan: () => void
   /** resolved style; key changes re-add the app layers on top of the new style */
   mapStyle: { key: string; spec: string | StyleSpecification }
   /** stamp pins for collected parks, shown when zoomed in */
@@ -77,6 +84,8 @@ function readMapColors() {
     poiDone: v('--bg-gold'),
     poiOpen: v('--bg-surface'),
     poiStroke: v('--map-visited-stroke'),
+    me: v('--content-info'),
+    meRing: v('--bg-surface'),
   }
 }
 
@@ -120,11 +129,54 @@ const parkingFC = (parking: { coords: [number, number]; active?: boolean } | nul
     : [],
 })
 
-const trackFC = (track: Array<[number, number]> | null) => ({
+const trackFC = (track: Array<[number, number]> | null) => {
+  const segments = trackSegments(track ?? [])
+  const walked = segments
+    .filter((seg) => seg.length >= 2)
+    .map((seg) => ({
+      type: 'Feature' as const,
+      properties: { kind: 'walk' },
+      geometry: { type: 'LineString' as const, coordinates: seg },
+    }))
+  // a jump between two segments means the phone stopped reporting: draw it dashed
+  const gaps = segments.slice(1).map((seg, i) => ({
+    type: 'Feature' as const,
+    properties: { kind: 'gap' },
+    geometry: {
+      type: 'LineString' as const,
+      coordinates: [segments[i][segments[i].length - 1], seg[0]],
+    },
+  }))
+  return { type: 'FeatureCollection' as const, features: [...walked, ...gaps] }
+}
+
+const meFC = (me: Props['me']) => ({
+  type: 'FeatureCollection' as const,
+  features: me
+    ? [
+        {
+          type: 'Feature' as const,
+          properties: { course: me.course ?? 0, moving: me.course != null },
+          geometry: { type: 'Point' as const, coordinates: me.coords },
+        },
+      ]
+    : [],
+})
+
+const meHaloFC = (me: Props['me']) => ({
   type: 'FeatureCollection' as const,
   features:
-    track && track.length >= 2
-      ? [{ type: 'Feature' as const, properties: {}, geometry: { type: 'LineString' as const, coordinates: track } }]
+    me && me.accuracy > 8
+      ? [
+          {
+            type: 'Feature' as const,
+            properties: {},
+            geometry: {
+              type: 'Polygon' as const,
+              coordinates: circlePolygon(me.coords, Math.min(me.accuracy, 120)),
+            },
+          },
+        ]
       : [],
 })
 
@@ -140,6 +192,9 @@ export function MapView({
   focus,
   quest,
   track,
+  me,
+  followMe,
+  onUserPan,
   mapStyle,
   stampPins,
   onSelectStamp,
@@ -153,17 +208,21 @@ export function MapView({
   const visitedRef = useRef(visited)
   const questRef = useRef(quest)
   const trackRef = useRef(track)
+  const meRef = useRef(me)
+  const followRef = useRef(followMe)
   const parkingRef = useRef(parking)
   const stampPinsRef = useRef(stampPins)
   const amenityPinsRef = useRef(amenityPins)
   // the map handler is registered once, so callbacks must be read fresh
-  const cbRef = useRef({ onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity })
-  cbRef.current = { onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity }
+  const cbRef = useRef({ onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan })
+  cbRef.current = { onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan }
   const initialStyle = useRef(mapStyle)
   const currentStyleKey = useRef(mapStyle.key)
   visitedRef.current = visited
   questRef.current = quest
   trackRef.current = track
+  meRef.current = me
+  followRef.current = followMe
   parkingRef.current = parking
   stampPinsRef.current = stampPins
   amenityPinsRef.current = amenityPins
@@ -269,8 +328,42 @@ export function MapView({
         id: 'track-line',
         type: 'line',
         source: 'track',
+        filter: ['==', ['get', 'kind'], 'walk'] as never,
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: { 'line-color': c.track, 'line-width': 3.5, 'line-opacity': 0.85 },
+      })
+      // dashed = the phone was asleep or lost signal, we do not know this stretch
+      map.addLayer({
+        id: 'track-gap',
+        type: 'line',
+        source: 'track',
+        filter: ['==', ['get', 'kind'], 'gap'] as never,
+        layout: { 'line-cap': 'round' },
+        paint: {
+          'line-color': c.track,
+          'line-width': 2,
+          'line-opacity': 0.45,
+          'line-dasharray': [1.5, 2.5],
+        },
+      })
+      map.addSource('me-halo', { type: 'geojson', data: meHaloFC(meRef.current) as never })
+      map.addLayer({
+        id: 'me-halo-fill',
+        type: 'fill',
+        source: 'me-halo',
+        paint: { 'fill-color': c.me, 'fill-opacity': 0.12 },
+      })
+      map.addSource('me', { type: 'geojson', data: meFC(meRef.current) as never })
+      map.addLayer({
+        id: 'me-dot',
+        type: 'circle',
+        source: 'me',
+        paint: {
+          'circle-radius': 7,
+          'circle-color': c.me,
+          'circle-stroke-width': 3,
+          'circle-stroke-color': c.meRing,
+        },
       })
       map.addSource('quest-pois', { type: 'geojson', data: questFC(questRef.current) as never })
       // generous invisible hit area: pins are small, fingers are not
@@ -368,6 +461,10 @@ export function MapView({
       map.setPaintProperty('parks-fill', 'fill-color', fill as never)
       map.setPaintProperty('parks-line', 'line-color', stroke as never)
       map.setPaintProperty('track-line', 'line-color', c.track)
+      map.setPaintProperty('track-gap', 'line-color', c.track)
+      map.setPaintProperty('me-dot', 'circle-color', c.me)
+      map.setPaintProperty('me-dot', 'circle-stroke-color', c.meRing)
+      map.setPaintProperty('me-halo-fill', 'fill-color', c.me)
       map.setPaintProperty(
         'quest-poi-dots',
         'circle-color',
@@ -378,6 +475,15 @@ export function MapView({
     ;(map as unknown as { __addAppLayers: () => void }).__addAppLayers = addAppLayers
 
     map.on('load', addAppLayers)
+
+    // a gesture made by hand stops the camera from chasing the walker: without
+    // this the map keeps yanking itself back while you try to look around
+    const handOnMap = (e: { originalEvent?: unknown }) => {
+      if (e.originalEvent && followRef.current) cbRef.current.onUserPan()
+    }
+    map.on('dragstart', handOnMap)
+    map.on('zoomstart', handOnMap)
+    map.on('rotatestart', handOnMap)
 
     // one handler, explicit priority: pins beat the park polygon under them
     map.on('click', (e: MapLayerMouseEvent) => {
@@ -492,6 +598,21 @@ export function MapView({
     if (!map || !loadedRef.current) return
     ;(map.getSource('track') as { setData: (d: unknown) => void } | undefined)?.setData(trackFC(track))
   }, [track])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !loadedRef.current) return
+    ;(map.getSource('me') as { setData: (d: unknown) => void } | undefined)?.setData(meFC(me))
+    ;(map.getSource('me-halo') as { setData: (d: unknown) => void } | undefined)?.setData(meHaloFC(me))
+    if (!me || !followMe) return
+    // easeTo, not flyTo: a walk moves a few metres at a time and flying zooms out
+    map.easeTo({
+      center: me.coords,
+      zoom: Math.max(map.getZoom(), 16.2),
+      duration: 800,
+      padding: { top: 0, left: 0, right: 0, bottom: 140 },
+    })
+  }, [me, followMe])
 
   useEffect(() => {
     const map = mapRef.current

@@ -897,16 +897,89 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-4);
+  padding: var(--sp-2);
 }
 
-.app-expbar__pulse {
+/* the camera keeps its own label off: the icon is the whole button */
+.app-expbar__photo {
   flex: none;
-  width: 10px;
-  height: 10px;
+}
+
+.app-expbar__meta {
+  flex: 1;
+  text-align: center;
+  color: var(--content-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-expbar__stop {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: var(--control-md);
+  padding-inline: var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-sunken);
+  color: var(--content-secondary);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ---- live status card at the top ---- */
+
+.app-expstatus {
+  flex: 1;
+  min-width: 0;
+  margin-right: var(--sp-3);
+}
+
+.app-expstatus__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* the one thing that says "this is happening right now" */
+.app-expstatus__live {
+  flex: none;
+  width: 8px;
+  height: 8px;
   border-radius: var(--radius-pill);
   background: var(--content-accent);
-  animation: exp-pulse 1.6s var(--ease-in-out) infinite;
+  box-shadow: 0 0 0 0 rgb(76 101 64 / 0.5);
+  animation: exp-pulse 1.8s var(--ease-in-out) infinite;
+}
+
+.app-expstatus__next {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--content-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-expstatus__count {
+  color: var(--content-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-expstatus__arrow {
+  flex: none;
+  color: var(--content-accent);
+  margin-left: 2px;
 }
 
 @keyframes exp-pulse {
@@ -921,37 +994,22 @@
   }
 }
 
-.app-expbar__text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
-}
+/* ---- back to my position ---- */
 
-.app-expbar__title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 20px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.app-expbar__meta {
-  color: var(--content-tertiary);
-}
-
-.app-expbar__compass {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+.app-recenter {
+  position: absolute;
+  right: var(--sp-4);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4));
+  z-index: 11;
+  display: grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-raised);
   color: var(--content-accent);
-  padding: 0 var(--sp-1);
-}
-
-.app-expbar__compass span {
-  color: var(--content-tertiary);
+  box-shadow: var(--elevation-2);
+  cursor: pointer;
+  animation: pk-toast-in 220ms var(--ease-out);
 }

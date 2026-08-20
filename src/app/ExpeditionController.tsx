@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { appendTrackPoint, collectPoint, useGameState } from './state'
+import { collectPoint, recordFix, useGameState } from './state'
 import { distanceM } from './geo'
 import type { Pt } from './geo'
 import { questForPark } from './data/quests'
@@ -7,18 +7,37 @@ import type { QuestPoi } from './data/quests'
 
 /**
  * Headless expedition engine: while an expedition is active it keeps the
- * screen awake (Wake Lock), records the GPS track and detects quest POIs
- * in radius. PWA constraint accepted in the brief: works with the app
- * open and the screen on, like route recording in AllTrails.
+ * screen awake (Wake Lock), records the GPS track and watches the distance to
+ * every point that is still open. PWA constraint accepted in the brief: this
+ * works with the app open and the screen on, like route recording in AllTrails.
  */
-export function ExpeditionController({ onReveal }: { onReveal: (poi: QuestPoi) => void }) {
+
+/** heads-up range: far enough to start looking around, close enough to mean it */
+const NEAR_M = 50
+/** the point counts as reached at this distance, unless GPS is vaguer than that */
+const ARRIVE_M = 15
+/** ...and never further than this, however bad the signal claims to be */
+const ARRIVE_MAX_M = 35
+
+export function ExpeditionController({
+  onNear,
+  onArrive,
+}: {
+  onNear: (poi: QuestPoi, distance: number) => void
+  onArrive: (poi: QuestPoi) => void
+}) {
   const { expedition, parks } = useGameState()
   const parkId = expedition?.parkId ?? null
   const collectedRef = useRef<Set<string>>(new Set())
   collectedRef.current = new Set(parkId ? (parks[parkId]?.points ?? []) : [])
+  // one heads-up per point per walk, otherwise it fires on every GPS tick
+  const warnedRef = useRef<Set<string>>(new Set())
+  const cbRef = useRef({ onNear, onArrive })
+  cbRef.current = { onNear, onArrive }
 
   useEffect(() => {
     if (!parkId) return
+    warnedRef.current = new Set()
     const quest = questForPark(parkId)
 
     let watchId: number | null = null
@@ -26,16 +45,34 @@ export function ExpeditionController({ onReveal }: { onReveal: (poi: QuestPoi) =
       watchId = navigator.geolocation.watchPosition(
         (pos) => {
           const pt: Pt = [pos.coords.longitude, pos.coords.latitude]
-          appendTrackPoint(pt)
+          const accuracy = pos.coords.accuracy ?? 999
+          // the phone reports heading only sometimes, so fall back on the walk
+          const course =
+            pos.coords.heading != null && !Number.isNaN(pos.coords.heading)
+              ? pos.coords.heading
+              : null
+          recordFix({ coords: pt, accuracy, course })
           if (!quest) return
+
+          const reach = Math.min(Math.max(ARRIVE_M, accuracy), ARRIVE_MAX_M)
+          let closest: { poi: QuestPoi; d: number } | null = null
           for (const poi of quest.pois) {
             if (collectedRef.current.has(poi.id)) continue
-            if (distanceM(pt, poi.coords) <= poi.radius) {
+            const d = distanceM(pt, poi.coords)
+            // a point may declare a wider radius than the default reach
+            if (d <= Math.max(reach, Math.min(poi.radius, ARRIVE_MAX_M))) {
               collectPoint(parkId, poi.id)
-              navigator.vibrate?.([80, 40, 160])
-              onReveal(poi)
-              break
+              collectedRef.current.add(poi.id)
+              navigator.vibrate?.([90, 60, 180])
+              cbRef.current.onArrive(poi)
+              return
             }
+            if (!closest || d < closest.d) closest = { poi, d }
+          }
+          if (closest && closest.d <= NEAR_M && !warnedRef.current.has(closest.poi.id)) {
+            warnedRef.current.add(closest.poi.id)
+            navigator.vibrate?.(40)
+            cbRef.current.onNear(closest.poi, closest.d)
           }
         },
         () => {
@@ -69,7 +106,7 @@ export function ExpeditionController({ onReveal }: { onReveal: (poi: QuestPoi) =
     }
     // collectedRef is a ref on purpose: re-subscribing the GPS watch on every collect is wasteful
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parkId, onReveal])
+  }, [parkId])
 
   return null
 }

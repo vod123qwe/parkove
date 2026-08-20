@@ -10,6 +10,8 @@ import { addPhoto } from './photos'
 export function PhotoButton({
   parkId,
   poiId,
+  journeyId,
+  coords,
   defaultCaption,
   label = 'Dodaj zdjęcie',
   full = true,
@@ -18,6 +20,10 @@ export function PhotoButton({
 }: {
   parkId: string
   poiId?: string
+  /** the walk this picture belongs to, so it shows up on that route */
+  journeyId?: string
+  /** where the phone was standing: the photo becomes a pin there */
+  coords?: [number, number]
   defaultCaption?: string
   label?: string
   full?: boolean
@@ -33,7 +39,7 @@ export function PhotoButton({
     if (!file) return
     setBusy(true)
     const note = window.prompt('Podpis pod zdjęciem (możesz zostawić puste)', defaultCaption ?? '')
-    await addPhoto(parkId, file, (note ?? '').trim(), poiId)
+    await addPhoto({ parkId, blob: file, caption: (note ?? '').trim(), poiId, journeyId, coords })
     setBusy(false)
   }
 

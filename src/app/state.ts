@@ -10,18 +10,28 @@ export type ParkProgress = {
   points: string[]
 }
 
+/** one GPS reading: where, how sure, which way we are heading */
+export type Fix = { coords: Pt; accuracy: number; course: number | null }
+
 export type Expedition = {
+  /** shared with the journey it becomes, so photos can point at it */
+  id: string
   parkId: string
+  /** what the walk gets called in the journal, e.g. "Ruczaj, czwartek" */
+  name: string
   startedAt: number
   track: Pt[]
   distanceM: number
   /** poi ids collected during this walk */
   collected: string[]
+  /** latest position, null until the first fix arrives */
+  where: Fix | null
 }
 
 export type Journey = {
   id: string
   parkId: string
+  name?: string
   startedAt: number
   endedAt: number
   distanceM: number
@@ -127,9 +137,22 @@ export function answerDilemma(parkId: string, poiId: string, option: number) {
   commit({ ...state, answers: { ...state.answers, [answerKey(parkId, poiId)]: option } })
 }
 
-export function startExpedition(parkId: string) {
+export function startExpedition(parkId: string, name: string) {
+  const startedAt = Date.now()
   commit(
-    { ...state, expedition: { parkId, startedAt: Date.now(), track: [], distanceM: 0, collected: [] } },
+    {
+      ...state,
+      expedition: {
+        id: `j-${startedAt}`,
+        parkId,
+        name,
+        startedAt,
+        track: [],
+        distanceM: 0,
+        collected: [],
+        where: null,
+      },
+    },
     false,
   )
 }
@@ -143,8 +166,9 @@ export function stopExpedition() {
     ? [
         ...state.journeys,
         {
-          id: `j-${exp.startedAt}`,
+          id: exp.id,
           parkId: exp.parkId,
+          name: exp.name,
           startedAt: exp.startedAt,
           endedAt: Date.now(),
           distanceM: Math.round(exp.distanceM),
@@ -156,15 +180,36 @@ export function stopExpedition() {
   commit({ ...state, journeys, expedition: null })
 }
 
-export function appendTrackPoint(pt: Pt) {
+/** a reading this vague would drag the drawn line through buildings */
+const USABLE_ACCURACY_M = 30
+
+/**
+ * Every GPS reading lands here: it always updates where we are (even a vague
+ * one is better than nothing for the dot), but only a decent one is allowed to
+ * extend the drawn path and the distance walked.
+ */
+export function recordFix(fix: Fix) {
   const exp = state.expedition
   if (!exp) return
   const last = exp.track[exp.track.length - 1]
-  // ignore GPS jitter below 3 m so distance does not inflate while standing still
-  if (last && distanceM(last, pt) < 3) return
-  const added = last ? distanceM(last, pt) : 0
+  const moved = last ? distanceM(last, fix.coords) : Infinity
+  // ignore jitter below 3 m so the distance does not inflate while standing still
+  const extend = fix.accuracy <= USABLE_ACCURACY_M && moved >= 3
   commit(
-    { ...state, expedition: { ...exp, track: [...exp.track, pt], distanceM: exp.distanceM + added } },
+    {
+      ...state,
+      expedition: {
+        ...exp,
+        where: fix,
+        track: extend ? [...exp.track, fix.coords] : exp.track,
+        distanceM: extend && last ? exp.distanceM + moved : exp.distanceM,
+      },
+    },
     false,
   )
+}
+
+/** used by the dev simulation, which has no GPS to speak of */
+export function appendTrackPoint(pt: Pt) {
+  recordFix({ coords: pt, accuracy: 5, course: null })
 }

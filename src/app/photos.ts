@@ -8,6 +8,10 @@ export type WalkPhoto = {
   parkId: string
   /** quest point it belongs to, when taken at one */
   poiId?: string
+  /** the walk it was taken on: photo pins are drawn on that route only */
+  journeyId?: string
+  /** where the phone stood; missing for pictures added off a walk */
+  coords?: [number, number]
   caption: string
   at: number
   blob: Blob
@@ -33,9 +37,16 @@ function open(): Promise<IDBDatabase> {
 const listeners = new Set<() => void>()
 const notify = () => listeners.forEach((l) => l())
 
-export async function addPhoto(parkId: string, blob: Blob, caption: string, poiId?: string) {
+export async function addPhoto(input: {
+  parkId: string
+  blob: Blob
+  caption: string
+  poiId?: string
+  journeyId?: string
+  coords?: [number, number]
+}) {
   const db = await open()
-  const photo: WalkPhoto = { id: `p-${Date.now()}`, parkId, poiId, caption, at: Date.now(), blob }
+  const photo: WalkPhoto = { id: `p-${Date.now()}`, at: Date.now(), ...input }
   await new Promise((res, rej) => {
     const tx = db.transaction(STORE, 'readwrite')
     tx.objectStore(STORE).put(photo)
@@ -44,6 +55,23 @@ export async function addPhoto(parkId: string, blob: Blob, caption: string, poiI
   })
   notify()
   return photo
+}
+
+/** move a photo pin, or retitle it, without touching the picture itself */
+export async function updatePhoto(id: string, patch: Partial<Pick<WalkPhoto, 'coords' | 'caption'>>) {
+  const db = await open()
+  await new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite')
+    const store = tx.objectStore(STORE)
+    const req = store.get(id)
+    req.onsuccess = () => {
+      const prev = req.result as WalkPhoto | undefined
+      if (prev) store.put({ ...prev, ...patch })
+    }
+    tx.oncomplete = () => res(null)
+    tx.onerror = () => rej(tx.error)
+  })
+  notify()
 }
 
 export async function deletePhoto(id: string) {

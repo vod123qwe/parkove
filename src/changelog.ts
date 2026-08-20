@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.14.1'
+export const VERSION = '0.15.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,22 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.15.0',
+    date: '2026-08-20',
+    title: 'A walk you can see',
+    changes: [
+      ['added', 'Your position on the map: a dot with a circle showing how sure the GPS is, and the camera rides along until you touch the map (then a button brings it back)'],
+      ['added', 'The top card turns into the live walk: a ring of this walk's points, its name, a pulse, and which way the next point is with the distance'],
+      ['added', 'Two-stage detection: a soft buzz around 50 m to make you look around, and the point counts once you are really there (15 m, or as close as the GPS can promise)'],
+      ['added', 'Arriving now shows a notice with "Czytaj" instead of taking over the screen: the point is already counted, the story can wait for a bench'],
+      ['added', 'A tick on collected pins, so a walked route reads at a glance'],
+      ['added', 'New DS component: Toast, the non-modal notice used for both of those'],
+      ['changed', 'The bottom bar slimmed down to what the thumb needs: camera, time and distance, end of walk'],
+      ['changed', 'The drawn path drops readings vaguer than 30 m and marks gaps (phone asleep, signal lost) with a dashed line instead of a made-up shortcut'],
+      ['changed', 'Walks get names like "Ruczaj, czwartek wieczorem", so the journal reads like a diary'],
+    ],
+  },
   {
     version: '0.14.1',
     date: '2026-08-20',

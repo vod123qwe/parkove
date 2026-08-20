@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { CircleUserRound, List as ListIcon } from 'lucide-react'
-import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing } from '../ds'
+import { CircleUserRound, Crosshair, Footprints, List as ListIcon, Sparkles } from 'lucide-react'
+import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
 import { ParkSheet } from './ParkSheet'
@@ -15,8 +15,10 @@ import { ProfileModal } from './ProfileModal'
 import { AppearanceModal, MapStyleModal } from './SettingsModals'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
+import { ExpeditionStatus } from './ExpeditionStatus'
 import { RevealSheet } from './RevealSheet'
 import { KIND_META } from './kinds'
+import { formatDistance } from './geo'
 import { useGameState } from './state'
 import { isDarkNow, onDarkChange } from './theme'
 import { getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
@@ -46,6 +48,11 @@ export function App() {
   const [listOpen, setListOpen] = useState(false)
   const [focus, setFocus] = useState<MapFocus | null>(null)
   const [reveal, setReveal] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
+  /** heads-up that a point is within sight, and the arrival notice with a story */
+  const [nearNotice, setNearNotice] = useState<{ poi: QuestPoi; distance: number } | null>(null)
+  const [arrival, setArrival] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
+  /** the camera follows the walker until the map is touched */
+  const [followMe, setFollowMe] = useState(true)
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   const [profileOpen, setProfileOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
@@ -203,6 +210,39 @@ export function App() {
     [expedition?.parkId, selectedId],
   )
 
+  /** within sight: a nudge to look around, gone on its own after a moment */
+  const onNear = useCallback((poi: QuestPoi, distance: number) => {
+    // a heads-up about the next point beats an arrival notice already read
+    setArrival(null)
+    setNearNotice({ poi, distance })
+  }, [])
+
+  /**
+   * Arrived. The point is already counted by the engine, so this only offers
+   * the story: reading can wait for a bench, or for home.
+   */
+  const onArrive = useCallback(
+    (poi: QuestPoi) => {
+      const parkId = expedition?.parkId
+      if (!parkId) return
+      setNearNotice(null)
+      setArrival({ parkId, poi })
+      // the phone may be in a pocket with the app merely hidden, not closed
+      if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+        void navigator.serviceWorker?.ready
+          .then((reg) =>
+            reg.showNotification('Jesteś na miejscu', {
+              body: poi.name,
+              icon: `${import.meta.env.BASE_URL}icon-192.png`,
+              tag: `poi-${poi.id}`,
+            }),
+          )
+          .catch(() => {})
+      }
+    },
+    [expedition?.parkId],
+  )
+
   // pin tap: swap the peek page while browsing, open the full card otherwise
   const onSelectPoi = useCallback(
     (poiId: string) => {
@@ -258,6 +298,9 @@ export function App() {
         focus={focus}
         quest={questOverlay}
         track={expedition?.track ?? null}
+        me={expedition?.where ?? null}
+        followMe={onWalk && followMe}
+        onUserPan={() => setFollowMe(false)}
         mapStyle={mapStyleSpec}
         stampPins={stampPins}
         onSelectStamp={selectParkFromMap}
@@ -265,25 +308,40 @@ export function App() {
         onSelectAmenity={setAmenityKind}
         hideStampFor={overlayParkId}
       />
-      <ExpeditionController onReveal={onReveal} />
+      <ExpeditionController onNear={onNear} onArrive={onArrive} />
 
       <header className="app-hud">
-        <Card className="app-hud__card">
-          <ProgressRing value={percent} size="sm" />
-          <div className="app-hud__text">
-            <span className="app-hud__percent">{percent}% Krakowa</span>
-            <span className="app-hud__count t-caption">
-              {visitedCount}/{FEATURES.length} miejsc · {earnedPoints}/{TOTAL_POINTS} pkt
-            </span>
-          </div>
-        </Card>
+        {onWalk ? (
+          <ExpeditionStatus />
+        ) : (
+          <Card className="app-hud__card">
+            <ProgressRing value={percent} size="sm" />
+            <div className="app-hud__text">
+              <span className="app-hud__percent">{percent}% Krakowa</span>
+              <span className="app-hud__count t-caption">
+                {visitedCount}/{FEATURES.length} miejsc · {earnedPoints}/{TOTAL_POINTS} pkt
+              </span>
+            </div>
+          </Card>
+        )}
         <button className="app-profilebtn" aria-label="Profil" onClick={() => setProfileOpen(true)}>
           <CircleUserRound strokeWidth={1.75} />
         </button>
       </header>
 
       {onWalk && expeditionPark ? (
-        <ExpeditionBar parkName={expeditionPark.properties.name} />
+        <>
+          {!followMe && (
+            <button
+              className="app-recenter"
+              aria-label="Wróć do mojej pozycji"
+              onClick={() => setFollowMe(true)}
+            >
+              <Crosshair size={20} />
+            </button>
+          )}
+          <ExpeditionBar onStopped={() => setFollowMe(true)} />
+        </>
       ) : (
         !selected && (
           <div className="app-fab">
@@ -375,6 +433,36 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
+      {onWalk && nearNotice && !arrival && (
+        <Toast
+          open
+          onClose={() => setNearNotice(null)}
+          icon={<Footprints size={18} />}
+          title={`Blisko: ${nearNotice.poi.name}`}
+          text={`${formatDistance(nearNotice.distance)} stąd, rozejrzyj się`}
+          autoMs={8000}
+          offset={76}
+        />
+      )}
+
+      {arrival && (
+        <Toast
+          open
+          onClose={() => setArrival(null)}
+          tone="reward"
+          icon={<Sparkles size={18} />}
+          title={arrival.poi.name}
+          text="Punkt zaliczony, czeka historia"
+          actionLabel="Czytaj"
+          onAction={() => {
+            setReveal(arrival)
+            setArrival(null)
+          }}
+          autoMs={20000}
+          offset={76}
+        />
+      )}
+
       {reveal && (
         <RevealSheet
           parkId={reveal.parkId}

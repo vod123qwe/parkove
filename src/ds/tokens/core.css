@@ -33,6 +33,7 @@
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* control sizes */
+  --control-sm: 36px;
   --control-md: 44px;
   --control-lg: 52px;
   --touch-min: 44px;

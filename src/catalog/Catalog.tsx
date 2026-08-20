@@ -15,6 +15,7 @@ import {
   Mountain,
   Navigation,
   Route,
+  Sparkles,
   Trees,
   Waves,
 } from 'lucide-react'
@@ -35,6 +36,7 @@ import {
   ProgressRing,
   Segmented,
   Stat,
+  Toast,
 } from '../ds'
 import { VERSION } from '../changelog'
 import { ChangelogSheet } from './ChangelogSheet'
@@ -72,6 +74,7 @@ const NAV = [
   ['modal', 'Modal'],
   ['navbar', 'Nav bar'],
   ['peek', 'Peek card'],
+  ['toast', 'Toast'],
   ['segmented', 'Segmented'],
   ['stats', 'Stats'],
 ] as const
@@ -651,6 +654,34 @@ export function Catalog() {
                 </div>
               </div>
             </div>
+          </div>
+        </Section>
+
+        <Section
+          id="toast"
+          title="Toast"
+          lead="A notice that arrives during something else: a point within reach, a photo saved. Never modal, so the map underneath stays live. Two tones: info for a heads-up, reward for something earned."
+        >
+          <div className="cat-spec cat-toastdemo">
+            <Toast
+              open
+              onClose={() => {}}
+              icon={<Footprints size={18} />}
+              title="Blisko: Paczkomat"
+              text="50 m stąd, rozejrzyj się"
+              className="cat-toast-inline"
+            />
+            <Toast
+              open
+              onClose={() => {}}
+              tone="reward"
+              icon={<Sparkles size={18} />}
+              title="Dąb Jagielloński"
+              text="Punkt zaliczony, czeka historia"
+              actionLabel="Czytaj"
+              onAction={() => {}}
+              className="cat-toast-inline"
+            />
           </div>
         </Section>
 

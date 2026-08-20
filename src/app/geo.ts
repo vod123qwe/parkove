@@ -98,3 +98,30 @@ export function simplifyTrack(points: Pt[], tol = 0.00005): Pt[] {
   }
   return points.filter((_, i) => keep[i])
 }
+
+/** polygon approximating a circle of radiusM around center, for GPS accuracy */
+export function circlePolygon(center: Pt, radiusM: number, steps = 48): Pt[][] {
+  const latR = radiusM / 111320
+  const lngR = radiusM / (111320 * Math.cos((center[1] * Math.PI) / 180) || 1)
+  const ring: Pt[] = []
+  for (let i = 0; i <= steps; i++) {
+    const a = (i / steps) * 2 * Math.PI
+    ring.push([center[0] + Math.cos(a) * lngR, center[1] + Math.sin(a) * latR])
+  }
+  return [ring]
+}
+
+/**
+ * A walk recorded by a phone is not one unbroken line: when the screen sleeps
+ * or the signal drops, the next fix lands far away. Splitting on those jumps
+ * keeps the drawn path honest instead of inventing a straight shortcut.
+ */
+export function trackSegments(track: Pt[], gapM = 150): Pt[][] {
+  if (track.length === 0) return []
+  const out: Pt[][] = [[track[0]]]
+  for (let i = 1; i < track.length; i++) {
+    if (distanceM(track[i - 1], track[i]) > gapM) out.push([track[i]])
+    else out[out.length - 1].push(track[i])
+  }
+  return out
+}

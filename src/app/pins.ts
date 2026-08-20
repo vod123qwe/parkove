@@ -53,11 +53,20 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   const r = SIZE / 2 - ring
   const iconScale = 2.1
   const iconOffset = (SIZE - 24 * iconScale) / 2
+  // a collected point wears a tick: gold alone did not read as "done"
+  const tick =
+    variant === 'done'
+      ? `<g transform="translate(${SIZE - 30} 6)">
+    <circle cx="12" cy="12" r="12" fill="${colors.accent}"/>
+    <path d="M6.5 12.5l3.5 3.5 7-7" fill="none" stroke="${colors.surface}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>`
+      : ''
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
   <circle cx="${SIZE / 2}" cy="${SIZE / 2}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${ring * 1.6}"/>
   <g transform="translate(${iconOffset} ${iconOffset}) scale(${iconScale})" fill="none" stroke="${icon}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     ${paths.map((d) => `<path d="${d}"/>`).join('')}
   </g>
+  ${tick}
 </svg>`
 }
 

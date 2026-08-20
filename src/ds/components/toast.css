@@ -1,0 +1,112 @@
+.pk-toast {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--pk-toast-offset, 0px));
+  margin-inline: auto;
+  width: min(calc(100% - 2 * var(--sp-4)), 480px);
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-3);
+  animation: pk-toast-in 280ms var(--ease-out);
+}
+
+.pk-toast.-closing {
+  animation: pk-toast-out 220ms var(--ease-out) forwards;
+  pointer-events: none;
+}
+
+.pk-toast__icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  border-radius: var(--radius-pill);
+  background: var(--bg-primary-subtle);
+  color: var(--content-accent);
+}
+
+.pk-toast.-reward .pk-toast__icon {
+  background: var(--bg-gold);
+  color: var(--content-on-gold);
+}
+
+.pk-toast__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pk-toast__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pk-toast__text {
+  color: var(--content-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pk-toast__action {
+  flex: 0 0 auto;
+  height: var(--control-sm);
+  padding-inline: var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pk-toast__close {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--content-tertiary);
+  cursor: pointer;
+}
+
+@keyframes pk-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pk-toast-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}

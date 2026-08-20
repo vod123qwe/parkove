@@ -402,3 +402,16 @@
     gap: var(--sp-2);
   }
 }
+
+/* the catalog shows toasts in the flow, not pinned to the bottom of the page */
+.cat-toastdemo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.cat-toast-inline {
+  position: static;
+  width: 100%;
+  animation: none;
+}
