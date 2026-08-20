@@ -1819,7 +1819,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 52%;
+  height: 60%;
   z-index: 1;
   pointer-events: none;
 }
@@ -1843,15 +1843,17 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sp-4);
-  padding: var(--sp-16) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-3));
+  padding: var(--sp-20) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-3));
   color: #ffffff;
   text-align: center;
+  /* the darkness reaches a little higher and lets go more slowly */
   background: linear-gradient(
     to top,
     rgb(4 9 5 / 0.97) 0%,
-    rgb(4 9 5 / 0.94) 46%,
-    rgb(4 9 5 / 0.7) 76%,
-    rgb(4 9 5 / 0.24) 92%,
+    rgb(4 9 5 / 0.95) 42%,
+    rgb(4 9 5 / 0.78) 66%,
+    rgb(4 9 5 / 0.42) 84%,
+    rgb(4 9 5 / 0.14) 94%,
     transparent 100%
   );
 }

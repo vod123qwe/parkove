@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.31.0'
+export const VERSION = '0.31.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.31.1',
+    date: '2026-08-20',
+    title: 'A little more darkness',
+    changes: [
+      ['changed', 'The shadow under a replay reaches higher and lets go more slowly, so the map fades into it instead of meeting an edge'],
+    ],
+  },
   {
     version: '0.31.0',
     date: '2026-08-20',
