@@ -101,7 +101,15 @@ async function staleWhileRevalidate(request, cacheName) {
 
 async function shellFirst(request) {
   try {
-    return await fetch(request)
+    const res = await fetch(request)
+    // keep the offline copy current, otherwise a phone that only ever opens
+    // offline would stay on the version it first installed
+    if (res && res.ok) {
+      const cache = await caches.open(SHELL)
+      await cache.put(scoped('index.html'), res.clone())
+      await warmAssets()
+    }
+    return res
   } catch {
     const cache = await caches.open(SHELL)
     return (
