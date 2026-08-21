@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import {
   Check,
   ChevronRight,
@@ -156,24 +157,6 @@ export function JourneyScreen({
             {parkName} · {fmtDate(journey.startedAt)}, {fmtClock(journey.startedAt)}
           </p>
 
-          {journey.track.length > 1 && (
-            <Button
-              full
-              size="lg"
-              icon={<Play size={18} />}
-              className="journey__replay"
-              onClick={() => {
-                // nothing of this screen may stay open under the replay, or
-                // closing a memory there lands you two screens back
-                setMarkId(null)
-                setPoi(null)
-                setReplay(true)
-              }}
-            >
-              Przejdź tę trasę jeszcze raz
-            </Button>
-          )}
-
           {/* only what this screen does not already show below: the points, the
               photos and the notes are all listed a few centimetres down */}
           <StatGrid className="journey__stats">
@@ -308,6 +291,32 @@ export function JourneyScreen({
           </div>
         </div>
       </BottomSheet>
+
+      {journey.track.length > 1 && !movingId && (
+        <div className="jscreen__bar">
+          {/* the same progressive blur as the replay: three masked bands, so the
+              card dissolves into the bar instead of ending at a hard line */}
+          <div className="jscreen__blur" aria-hidden="true">
+            <span style={{ '--b': '2px', '--from': '0%', '--to': '55%' } as CSSProperties} />
+            <span style={{ '--b': '6px', '--from': '26%', '--to': '78%' } as CSSProperties} />
+            <span style={{ '--b': '11px', '--from': '54%', '--to': '100%' } as CSSProperties} />
+          </div>
+          <Button
+            full
+            size="lg"
+            icon={<Play size={18} />}
+            onClick={() => {
+              // nothing of this screen may stay open under the replay, or
+              // closing a memory there lands you two screens back
+              setMarkId(null)
+              setPoi(null)
+              setReplay(true)
+            }}
+          >
+            Przejdź tę trasę jeszcze raz
+          </Button>
+        </div>
+      )}
 
       {markId && !movingId && !replay && marks.length > 0 && (
         <MemoryViewer

@@ -1230,6 +1230,8 @@
 }
 
 .journey {
+  /* room for the bar glued to the bottom edge */
+  padding-bottom: calc(var(--control-lg) + var(--sp-10));
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
@@ -1737,6 +1739,55 @@
 }
 
 /* ---- a walk from the journal: its map, and the details over it ---- */
+
+/*
+ * The one thing you came here to do sits on the bottom edge of the screen, on
+ * its own piece of glass: a gradient so the card dissolves into it, and the
+ * same three-band progressive blur as the replay so whatever scrolls past
+ * underneath stays legible without a hard line across the screen.
+ */
+.jscreen__bar {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  /* the same width as the card it belongs to, so on a wide screen it does not
+     run off past its own edges */
+  width: min(100%, 560px);
+  transform: translateX(-50%);
+  /* above the card: the sheet sits at 100, and a bar hidden behind the thing
+     it belongs to is no bar at all */
+  z-index: 110;
+  padding: var(--sp-6) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  background: linear-gradient(
+    to top,
+    var(--bg-page) 0%,
+    color-mix(in srgb, var(--bg-page) 92%, transparent) 46%,
+    color-mix(in srgb, var(--bg-page) 55%, transparent) 74%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.jscreen__bar > .pk-btn {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.jscreen__blur {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.jscreen__blur span {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--b));
+  -webkit-backdrop-filter: blur(var(--b));
+  mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+  -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+}
 
 .jscreen {
   position: fixed;

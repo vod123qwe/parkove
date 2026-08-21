@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.45.0'
+export const VERSION = '0.45.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.45.1',
+    date: '2026-08-21',
+    title: 'Walking the route again is a bar, not a row',
+    changes: [
+      ['changed', 'Przejdz te trase jeszcze raz left the scrolling card and took the bottom edge of the screen: a bar on its own glass, with a gradient the card dissolves into and the same three-band progressive blur the replay uses'],
+    ],
+  },
   {
     version: '0.45.0',
     date: '2026-08-21',
