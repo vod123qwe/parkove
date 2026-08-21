@@ -111,6 +111,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Dolina Bolechowicka ma około 1,5 km i jest jedną z najkrótszych podkrakowskich dolinek. Za to widokowo bije większość dłuższych.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Bolechowicka'],
+        photo: '/photos/poi-dolina-bolechowicka-taras.jpg',
+        photoCredit: 'Fot. Panek · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.783529, 50.153078],
         radius: 35,
       },
@@ -151,6 +153,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Dno doliny, przy ścieżce. Szukaj miejsca, gdzie z ziemi wychodzi strumień.',
         reveal:
           'Ta sama woda, która wypływa ze źródła, wcześniej zniknęła gdzieś wyżej w skale. Na Jurze potoki potrafią po prostu przepaść i wrócić kilkaset metrów dalej.',
+        photo: '/photos/poi-dolina-kobylanska-zrodlo-antoniego.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.755807, 50.155341],
         radius: 30,
       },
@@ -188,6 +192,8 @@ export const DOLINKI_QUESTS: Quest[] = [
           counterpoint:
             'Bez tablicy o cmentarzu wie tylko ten, kto tu mieszka od pokoleń, a to znaczy, że za jedno pokolenie nie będzie wiedział nikt. Z tablicą przychodzą też ludzie, którzy przyszli dla atrakcji, a nie dla pamięci. Trzecia droga, mała informacja bez wielkiego szyldu, próbuje mieć jedno bez drugiego.',
         },
+        photo: '/photos/poi-dolina-kobylanska-cmentarz-choleryczny.jpg',
+        photoCredit: 'Fot. Flyz1 · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.749801, 50.152418],
         radius: 40,
       },
@@ -233,6 +239,8 @@ export const DOLINKI_QUESTS: Quest[] = [
             'Słup bez opowieści jest tylko kawałkiem drewna i łatwo go pomylić z ozdobą. Ale granica, o której nikt nie pamięta, zamienia się w płaską historię, w której nic nikogo nie kosztowało. Ten słup jest pretekstem, żeby ktoś opowiedział, co znaczyło mieszkać przy nim.',
         },
         sources: ['https://pl.wikipedia.org/wiki/Kopiec_Bzowskich'],
+        photo: '/photos/poi-dolina-kluczwody-slupy-graniczne.jpg',
+        photoCredit: 'Fot. Unknown authorUnknown author · Public domain · Wikimedia Commons',
         coords: [19.817802, 50.164218],
         radius: 40,
       },
@@ -267,6 +275,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Jaskinia Mamutowa w tej samej dolinie jest dziś celem wspinaczy: drogi w jej ścianach dochodzą do VI.8.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Kluczwody'],
+        photo: '/photos/poi-dolina-kluczwody-jaskinia-maczna.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.81962, 50.163992],
         radius: 30,
       },
@@ -330,6 +340,8 @@ export const DOLINKI_QUESTS: Quest[] = [
             'Miejsce, którego nikt nie widzi, nie ma nikogo, kto by go bronił. Ale rzecz, która rośnie milimetr na dekadę, nie odbuduje się przez to, że ktoś obiecał uważać. Ścieżka i barierka są nudnym kompromisem, który zwykle działa.',
         },
         sources: ['https://pl.wikipedia.org/wiki/Szum_(wodospad)'],
+        photo: '/photos/poi-dolina-bedkowska-szum.jpg',
+        photoCredit: 'Fot. Łukasz Śmigasiewicz · CC BY-SA 3.0 pl · Wikimedia Commons',
         coords: [19.743411, 50.174809],
         radius: 40,
       },
@@ -347,6 +359,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'To największa jaskinia Wyżyny Krakowsko-Częstochowskiej. Nazwę wzięła od nietoperzy: i tych kopalnych, i tych, które nadal tu zimują.',
         sources: ['https://pl.wikipedia.org/wiki/Jaskinia_Nietoperzowa'],
+        photo: '/photos/poi-dolina-bedkowska-nietoperzowa.jpg',
+        photoCredit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.774532, 50.19395],
         radius: 45,
       },
@@ -362,6 +376,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Skała nad Brandysową Polaną, zaraz przy wodospadzie Szum.',
         reveal:
           'Nazwy skał w Dolinie Będkowskiej wymyślali wspinacze i to widać: obok Dupy Słonia znajdziesz Stumilowy Kras i Żabajowe Plecy.',
+        photo: '/photos/poi-dolina-bedkowska-dupa-slonia.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.743373, 50.175866],
         radius: 35,
       },
@@ -378,6 +394,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Dolina Będkowska ciągnie się od obniżenia przy drodze krajowej z Krakowa do Olkusza aż do przysiółka Łączki. Wszystko to jest dzieło jednego potoku.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_B%C4%99dkowska'],
+        photo: '/photos/poi-dolina-bedkowska-zrodlo-bedkowki.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.753531, 50.181715],
         radius: 35,
       },
@@ -393,6 +411,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Dolny wylot doliny, po stronie Łączek. Otwory w skale kilka metrów nad ścieżką.',
         reveal:
           'W Dolinie Będkowskiej takich schronisk i jaskiń jest kilkadziesiąt. Nazwane są tylko te, które ktoś zmierzył i opisał.',
+        photo: '/photos/poi-dolina-bedkowska-laczki.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.738284, 50.14893],
         radius: 40,
       },
@@ -416,6 +436,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Wylot Doliny Racławki spotyka się w Dubiu z wylotem Doliny Szklarki, na wysokości około 275 metrów. Dwie doliny kończą się w jednym miejscu.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Rac%C5%82awki'],
+        photo: '/photos/poi-dolina-raclawki-zamczysko.jpg',
+        photoCredit: 'Fot. 13piotrek · CC BY 3.0 · Wikimedia Commons',
         coords: [19.683741, 50.163543],
         radius: 50,
       },
@@ -433,6 +455,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Do jaskini prowadzi ścieżka edukacyjna z numerowanymi przystankami. Ten wąwóz jest jej drugim przystankiem.',
         sources: ['https://pl.wikipedia.org/wiki/Jaskinia_%C5%BBarska'],
+        photo: '/photos/poi-dolina-raclawki-jaskinia-zarska.jpg',
+        photoCredit: 'Fot. Paweł Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.70363, 50.164977],
         radius: 40,
       },
@@ -450,6 +474,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Skały tej doliny pochodzą z dewonu, karbonu i górnej jury, czyli z przedziału ponad trzystu milionów lat. W jednym kamieniołomie widać kilka z nich.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Rac%C5%82awki'],
+        photo: '/photos/poi-dolina-raclawki-lom-pisarski.jpg',
+        photoCredit: 'Fot. ARKADIUSZ MARKIEWICZ · CC BY-SA 3.0 · Wikimedia Commons',
         coords: [19.685259, 50.164414],
         radius: 40,
       },
@@ -504,6 +530,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Klasztor w Czernej jest podwójnym sanktuarium: Matki Bożej Szkaplerznej i świętego Rafała Kalinowskiego. Doliną chodzili pustelnicy, stąd nazwy źródeł.',
         sources: ['https://pl.wikipedia.org/wiki/Klasztor_Karmelit%C3%B3w_Bosych_w_Czernej'],
+        photo: '/photos/poi-dolina-eliaszowki-zrodlo-eliasza.jpg',
+        photoCredit: 'Fot. Kgbo · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.639918, 50.172953],
         radius: 35,
       },
@@ -591,6 +619,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Potok Szklarka uchodzi do Racławki. Te dwie doliny są parą: kończą się w tym samym miejscu, w Dubiu.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Szklarki'],
+        photo: '/photos/poi-dolina-szklarki-bukowe-skaly.jpg',
+        photoCredit: 'Fot. Jvaclavik · CC0 · Wikimedia Commons',
         coords: [19.721044, 50.194597],
         radius: 70,
       },
@@ -606,6 +636,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Górna część doliny, przy ścieżce w dnie.',
         reveal:
           'Dolinki Krakowskie to osiem dolin i wszystkie mają ten sam mechanizm: woda plus wapień plus czas. Różnią się tym, co po drodze zdążył postawić człowiek.',
+        photo: '/photos/poi-dolina-szklarki-zrodlo-pioro.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.729485, 50.197518],
         radius: 35,
       },

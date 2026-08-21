@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.49.0'
+export const VERSION = '0.50.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.50.0',
+    date: '2026-08-21',
+    title: 'Photographs on the points, boxes for the practical things',
+    changes: [
+      ['added', 'Sixty three points got a photograph from Wikimedia Commons, with the author and licence in the data. Points without one fell from 117 to 54, and the rest carry names we invented, which Commons does not have'],
+      ['changed', 'The place card reordered: description, then the points, then the practical pair. Playground and food are two boxes side by side with a short status and a quiet chevron, instead of two rows of prose'],
+      ['changed', 'Map pins speak one language now. The start screen wears the same dark disc, white ring and lime mark as a replay, so the same route no longer looks like two different apps. Parking says it in blue, same shape'],
+      ['fixed', 'A pin size expression with zoom nested inside a multiplication silently killed the whole symbol layer: cafe and playground pins were rings with nothing in them'],
+      ['fixed', 'Three places where Polish grammar counted wrong: 3 punktów, 6 miejsca, quest: 3 punktów'],
+    ],
+  },
   {
     version: '0.49.0',
     date: '2026-08-21',

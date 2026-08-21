@@ -56,7 +56,8 @@ const SIZE = 96 // rendered at 2x of the on-map size
 function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, string>) {
   // practical categories get their own hue so they read apart from nature green
   const themed: Record<string, [string, string, string]> = {
-    parking: [colors.infoSubtle, colors.infoBorder, colors.info],
+    // parking mówi niebieskim, ale tym samym kształtem: ciemny krążek, biała obwódka
+    parking: [colors.parkingFill, colors.paper, colors.parkingIcon],
     food: [colors.foodSubtle, colors.foodBorder, colors.food],
     playground: [colors.playSubtle, colors.playBorder, colors.play],
     // things you left yourself, told apart from the game and from the collection:
@@ -64,26 +65,26 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
     audio: [colors.accentStrong, colors.accentStrong, colors.lime],
     note: [colors.paper, colors.accentStrong, colors.ink],
   }
+  /*
+   * Jeden język dla całej mapy: ciemny krążek, biała obwódka, limonkowy znak.
+   * Wcześniej ekran startowy miał białe krążki z zieloną obwódką, a wspomnienia
+   * ciemne, więc ta sama trasa wyglądała jak dwie różne aplikacje. Stan nadal
+   * widać: zaliczony punkt nosi ptaszka, aktywny grubszą obwódkę.
+   */
   const [fill, stroke, icon] =
-    // the replay is its own world: dark discs with a lime edge, over imagery
-    variant === 'replay'
-      ? [colors.trailFill, colors.paper, colors.trailIcon]
-      : (themed[variant] ?? [
-          variant === 'done' ? colors.gold : colors.surface,
-          variant === 'active' ? colors.accentStrong : colors.accent,
-          variant === 'done' ? colors.onGold : colors.accent,
-        ])
-  const ring = variant === 'active' ? 5 : variant === 'replay' ? 4.5 : 3.5
+    themed[variant] ?? [colors.trailFill, colors.paper, colors.trailIcon]
+  const ring = variant === 'active' ? 6 : 4.5
   const r = SIZE / 2 - ring
-  // a smaller mark inside the same disc: it reads calmer on imagery
-  const iconScale = variant === 'replay' ? 1.72 : 2.1
+  // mniejszy znak w tym samym krążku: spokojniej czyta się na zdjęciu
+  const iconScale = 1.72
   const iconOffset = (SIZE - 24 * iconScale) / 2
   // a collected point wears a tick: gold alone did not read as "done"
+  // ptaszek na złocie, bo złoto należy do kolekcji: to znak zdobycia
   const tick =
     variant === 'done'
       ? `<g transform="translate(${SIZE - 30} 6)">
-    <circle cx="12" cy="12" r="12" fill="${colors.accent}"/>
-    <path d="M6.5 12.5l3.5 3.5 7-7" fill="none" stroke="${colors.surface}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12" cy="12" r="12" fill="${colors.gold}" stroke="${colors.paper}" stroke-width="2"/>
+    <path d="M6.5 12.5l3.5 3.5 7-7" fill="none" stroke="${colors.onGold}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
   </g>`
       : ''
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
@@ -181,6 +182,8 @@ export function pinColors() {
     onPrimary: v('--content-on-primary'),
     paper: v('--bg-surface'),
     ink: v('--content-primary'),
+    parkingFill: v('--map-parking-fill'),
+    parkingIcon: v('--map-parking-icon'),
     infoSubtle: v('--bg-info-subtle'),
     info: v('--content-info'),
     infoBorder: v('--border-info'),

@@ -1,6 +1,6 @@
-import { Coffee, Navigation, ToyBrick } from 'lucide-react'
-import { IconButton, List, ListItem, Modal } from '../ds'
-import { KIND_LABEL, amenitiesFor, isFood, walkUrl } from './data/amenities'
+import { ChevronRight, Coffee, ToyBrick } from 'lucide-react'
+import { List, ListItem, Modal } from '../ds'
+import { KIND_LABEL, amenitiesFor, isFood } from './data/amenities'
 
 /** the list behind a food or playground pin, with walking directions */
 export function AmenityModal({
@@ -33,6 +33,8 @@ export function AmenityModal({
         wiersza, żeby zobaczyć to miejsce na mapie. Dane z OpenStreetMap, więc godziny warto
         sprawdzić na miejscu.
       </p>
+      {/* wiersz jest klikalny, więc nie może mieć przycisku w środku: to byłby
+          zagnieżdżony button. Prowadzenie siedzi na karcie po wyborze miejsca */}
       <List className="parking-list">
         {spots.map((s) => (
           <ListItem
@@ -42,15 +44,7 @@ export function AmenityModal({
             title={s.name}
             meta={KIND_LABEL[s.kind]}
             onClick={() => onPick(s.id)}
-            trailing={
-              <IconButton
-                aria-label={`Prowadź: ${s.name}`}
-                variant="tonal"
-                onClick={() => window.open(walkUrl(s.coords), '_blank', 'noopener')}
-              >
-                <Navigation size={18} />
-              </IconButton>
-            }
+            trailing={<ChevronRight size={18} className="park-parking__chevron" />}
           />
         ))}
       </List>

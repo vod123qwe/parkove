@@ -75,6 +75,9 @@ const roles = {
   'bg-info-subtle': [t('B', 96), t('B', 22)],
   'content-info': [t('B', 42), t('B', 82)],
   'border-info': [t('B', 55), t('B', 65)],
+  // pin parkingu w nowym języku mapy: ciemny krążek, jasny znak w środku
+  'map-parking-fill': [t('B', 28), t('B', 24)],
+  'map-parking-icon': [t('B', 84), t('B', 80)],
 
   // food and drink
   'bg-food-subtle': [t('F', 95), t('F', 22)],

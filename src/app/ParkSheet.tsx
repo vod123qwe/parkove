@@ -16,8 +16,6 @@ import {
   Button,
   Carousel,
   Collapsible,
-  List,
-  ListItem,
   MediaHero,
   ProgressRing,
   Stamp,
@@ -144,9 +142,16 @@ export function ParkSheet({
     return [...own, ...fromPois.filter((p) => !seen.has(p.src))]
   })()
   const spots = amenitiesFor(park.id)
-  const hasFood = spots.some((a) => isFood(a.kind))
-  const hasPlay = spots.some((a) => !isFood(a.kind))
-  const heroMeta = `${kind.label} · ${ha} ha${quest ? ` · quest: ${quest.pois.length} punktów` : ''}`
+  /** polska odmiana: 1 miejsce, 2 miejsca, 5 miejsc */
+  const plPlaces = (n: number) =>
+    n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'miejsca' : 'miejsc'
+  const foodCount = spots.filter((a) => isFood(a.kind)).length
+  const playCount = spots.length - foodCount
+  const hasFood = foodCount > 0
+  const hasPlay = playCount > 0
+  const plPoints = (n: number) =>
+    n === 1 ? 'punkt' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'punkty' : 'punktów'
+  const heroMeta = `${kind.label} · ${ha} ha${quest ? ` · ${quest.pois.length} ${plPoints(quest.pois.length)}` : ''}`
 
   return (
     <BottomSheet
@@ -215,33 +220,6 @@ export function ParkSheet({
         </Collapsible>
       )}
 
-      {info?.amenities && (
-        <List className="park-amenities">
-          {info.amenities.playground && (
-            <ListItem
-              className="-stacked"
-              icon={<ToyBrick />}
-              leadTone={info.amenities.playground.has ? 'accent' : 'neutral'}
-              title={info.amenities.playground.has ? 'Plac zabaw' : 'Bez placu zabaw'}
-              meta={info.amenities.playground.note}
-              trailing={hasPlay ? <ChevronRight size={18} className="park-parking__chevron" /> : undefined}
-              onClick={hasPlay ? () => onOpenAmenity('playground') : undefined}
-            />
-          )}
-          {info.amenities.food && (
-            <ListItem
-              className="-stacked"
-              icon={<Coffee />}
-              leadTone={info.amenities.food.has ? 'accent' : 'neutral'}
-              title={info.amenities.food.has ? 'Kawiarnia lub jedzenie' : 'Bez gastronomii'}
-              meta={info.amenities.food.note}
-              trailing={hasFood ? <ChevronRight size={18} className="park-parking__chevron" /> : undefined}
-              onClick={hasFood ? () => onOpenAmenity('food') : undefined}
-            />
-          )}
-        </List>
-      )}
-
       {quest && (
         <Carousel className="park-carousel" aria-label="Punkty wyprawy">
           {quest.pois.map((poi) => {
@@ -263,6 +241,61 @@ export function ParkSheet({
           })}
         </Carousel>
       )}
+
+      {/*
+        Dwa pudełka obok siebie zamiast dwóch wierszy listy: plac zabaw i kawa to
+        jedno pytanie („da się tam wyjść z dzieckiem?"), więc odpowiedź powinna
+        być jednym spojrzeniem, a nie czytaniem dwóch akapitów.
+      */}
+      {info?.amenities && (
+        <div className="park-amenities">
+          {info.amenities.playground && (
+            <button
+              className={`park-amenity${info.amenities.playground.has ? ' -yes' : ''}`}
+              onClick={hasPlay ? () => onOpenAmenity('playground') : undefined}
+              disabled={!hasPlay}
+            >
+              <ToyBrick size={20} />
+              <span className="t-body-strong park-amenity__title">Plac zabaw</span>
+              <span className="t-caption park-amenity__status">
+                {info.amenities.playground.has
+                  ? playCount > 1
+                    ? `${playCount} w okolicy`
+                    : 'jest na miejscu'
+                  : 'nie ma'}
+              </span>
+              {hasPlay && (
+                <span className="park-amenity__go" aria-hidden="true">
+                  <ChevronRight size={16} />
+                </span>
+              )}
+            </button>
+          )}
+          {info.amenities.food && (
+            <button
+              className={`park-amenity${info.amenities.food.has ? ' -yes' : ''}`}
+              onClick={hasFood ? () => onOpenAmenity('food') : undefined}
+              disabled={!hasFood}
+            >
+              <Coffee size={20} />
+              <span className="t-body-strong park-amenity__title">Kawa i jedzenie</span>
+              <span className="t-caption park-amenity__status">
+                {info.amenities.food.has
+                  ? foodCount > 1
+                    ? `${foodCount} ${plPlaces(foodCount)} w okolicy`
+                    : 'jedno miejsce'
+                  : 'nie ma'}
+              </span>
+              {hasFood && (
+                <span className="park-amenity__go" aria-hidden="true">
+                  <ChevronRight size={16} />
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+      )}
+
 
       {suggestedParking(park.id) && (
         <button className="park-parking -info" onClick={onOpenParking}>

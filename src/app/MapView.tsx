@@ -577,10 +577,22 @@ export function MapView({
         source: 'amenities',
         layout: {
           'icon-image': ['get', 'icon'] as never,
+          /*
+           * MapLibre nie pozwala zagnieździć wyrażenia z 'zoom' w innym, więc
+           * zaznaczenie nie może być mnożnikiem na zewnątrz: 'case' siedzi w
+           * wartościach interpolacji. Inaczej cała warstwa symboli nie wstaje i
+           * na mapie zostają same obwódki bez ikon.
+           */
           'icon-size': [
-            '*',
-            ['case', ['get', 'active'], 1.45, 1],
-            ['interpolate', ['linear'], ['zoom'], 12, 0.2, 15, 0.3, 17, 0.4],
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            12,
+            ['case', ['boolean', ['get', 'active'], false], 0.29, 0.2],
+            15,
+            ['case', ['boolean', ['get', 'active'], false], 0.44, 0.3],
+            17,
+            ['case', ['boolean', ['get', 'active'], false], 0.58, 0.4],
           ] as never,
           'icon-allow-overlap': true,
         },

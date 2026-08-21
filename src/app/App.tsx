@@ -22,7 +22,7 @@ import { ExpeditionStatus } from './ExpeditionStatus'
 import { MarkSheet } from './MarkSheet'
 import { updateMark, useMarks } from './photos'
 import { RevealSheet } from './RevealSheet'
-import { distanceToParkM, formatDistance } from './geo'
+import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { beginWalk } from './walk'
 import { EndWalkSheet } from './EndWalkSheet'
@@ -371,6 +371,19 @@ export function App() {
   const updateReady = useUpdateAvailable()
   const [updateHidden, setUpdateHidden] = useState(false)
   const walkMarks = useMarks()
+
+  /*
+   * Zdjęć konkretnej kawiarni czy placu zabaw nie ma w Wikimedia Commons i nie
+   * będzie. Ale Ty tam bywasz: zdjęcia zrobione w promieniu 80 metrów od tego
+   * pinu są jego zdjęciami i z czasem tych miejsc będzie coraz więcej.
+   */
+  const spotPhotos = useMemo(() => {
+    if (!activeSpot) return []
+    return walkMarks.filter(
+      (m) => m.kind === 'photo' && m.url && m.coords && distanceM(m.coords, activeSpot.coords) <= 80,
+    )
+  }, [walkMarks, activeSpot])
+
   const shownWalkId = expedition?.id ?? null
   const photoPins = useMemo(
     () =>
@@ -584,7 +597,7 @@ export function App() {
       </button>
 
       <PeekCard
-        open={peekOpen}
+        open={peekOpen && !activeSpot}
         onDismiss={clearSelection}
         page={peekIndex}
         pages={peekPages.length}
@@ -943,6 +956,15 @@ export function App() {
       />
       {activeSpot && (
         <div className="app-spotcard">
+          {spotPhotos.length > 0 && (
+            <div className="app-spotcard__shots">
+              {spotPhotos.slice(0, 3).map((m) => (
+                <button key={m.id} className="app-spotcard__shot" onClick={() => setPhotoId(m.id)}>
+                  <img src={m.url} alt={m.caption || 'Zdjęcie tego miejsca'} />
+                </button>
+              ))}
+            </div>
+          )}
           <div className="app-spotcard__body">
             <p className="t-body-strong">{activeSpot.name}</p>
             <p className="t-caption park-muted">

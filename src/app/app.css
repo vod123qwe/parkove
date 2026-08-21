@@ -176,11 +176,62 @@
 }
 
 /* amenity rows: hairline dividers above and below the group frame it in */
+/* dwa pudełka obok siebie: jedno spojrzenie zamiast dwóch akapitów */
 .park-amenities {
-  margin: 0 calc(-1 * var(--sp-3)) var(--sp-12);
-  padding: var(--sp-2) 0;
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin: var(--sp-5) 0;
+}
+
+.park-amenity {
+  display: flex;
+  min-height: 118px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
+  padding: var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  color: var(--content-tertiary);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.park-amenity:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.park-amenity.-yes {
+  color: var(--content-accent);
+}
+
+.park-amenity__title {
+  margin-top: var(--sp-2);
+  color: var(--content-primary);
+}
+
+.park-amenity__status {
+  color: var(--content-tertiary);
+}
+
+/* delikatny znak, że to pudełko jest klikalne: kwadracik z zaokrągleniem,
+   jaśniejszy od tła pudełka, w dolnym prawym narożniku */
+.park-amenity__go {
+  align-self: flex-end;
+  margin-top: var(--sp-3);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface);
+  color: var(--content-accent);
 }
 
 /* quest poi carousel in the park sheet: full bleed, the edge fade starts
@@ -1075,6 +1126,36 @@
   background: var(--bg-surface-raised);
   box-shadow: var(--elevation-3);
   animation: looks-in 220ms var(--ease-screen);
+}
+
+/* Twoje zdjęcia tego miejsca: mały pasek nad nazwą */
+.app-spotcard {
+  flex-wrap: wrap;
+}
+
+.app-spotcard__shots {
+  flex: 0 0 100%;
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.app-spotcard__shot {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+  overflow: hidden;
+  background: var(--bg-surface-sunken);
+  cursor: pointer;
+}
+
+.app-spotcard__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .app-spotcard__body {

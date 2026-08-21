@@ -32,6 +32,8 @@
   --bg-info-subtle: #edf4ff; /* B96 */
   --content-info: #3b668f; /* B42 */
   --border-info: #5d87b1; /* B55 */
+  --map-parking-fill: #13456b; /* B28 */
+  --map-parking-icon: #afd5ff; /* B84 */
   --bg-food-subtle: #ffede4; /* F95 */
   --content-food: #8f4500; /* F38 */
   --border-food: #b85f16; /* F50 */
@@ -73,6 +75,8 @@
   --bg-info-subtle: #00375b; /* B22 */
   --content-info: #a6d0fe; /* B82 */
   --border-info: #77a2cd; /* B65 */
+  --map-parking-fill: #023c62; /* B24 */
+  --map-parking-icon: #a0caf8; /* B80 */
   --bg-food-subtle: #572700; /* F22 */
   --content-food: #ffbe95; /* F82 */
   --border-food: #e8843b; /* F65 */
@@ -115,6 +119,8 @@
     --bg-info-subtle: #00375b; /* B22 */
     --content-info: #a6d0fe; /* B82 */
     --border-info: #77a2cd; /* B65 */
+    --map-parking-fill: #023c62; /* B24 */
+    --map-parking-icon: #a0caf8; /* B80 */
     --bg-food-subtle: #572700; /* F22 */
     --content-food: #ffbe95; /* F82 */
     --border-food: #e8843b; /* F65 */
