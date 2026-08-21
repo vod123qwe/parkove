@@ -5,3 +5,7 @@ dist/
 .DS_Store
 Thumbs.db
 .tmp/
+
+# kopie robocze pieczatek: zrodla leza juz w assets-in/, tu tylko wejscie dla
+# npm run stamps:files, wiec nie ma po co trzymac ich w gicie dwa razy
+assets-in/stamps/*.png

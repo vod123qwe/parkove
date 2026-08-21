@@ -5,14 +5,20 @@
 //
 // Each file is trimmed, its background made transparent (flood fill from the
 // edge, so the sticker's cream outline survives) and written square at 768 px.
+//
+// Output is a palette PNG (PNG8, 128 colours). These stickers are flat
+// illustrations, so quantising costs nothing visible at 76 to 260 px on screen
+// and turns 1.3 MB into 90 kB. Nineteen stamps ship as 1.7 MB instead of 20 MB,
+// which on a phone over mobile data is the whole difference.
 
 import sharp from 'sharp'
-import { readdirSync, mkdirSync, existsSync } from 'node:fs'
+import { readdirSync, mkdirSync, existsSync, statSync } from 'node:fs'
 import { resolve, dirname, basename, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const OUT_SIZE = 768 // 2x what the largest on-map pin needs
 const BG_TOLERANCE = 20
+const PALETTE_COLORS = 128
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const inDir = resolve(root, 'assets-in/stamps')
@@ -81,9 +87,10 @@ for (const file of files) {
       sharp(png)
         .trim({ threshold: 1 }) // drop the now-transparent margin
         .resize(OUT_SIZE, OUT_SIZE, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-        .png({ compressionLevel: 9 })
+        .png({ palette: true, colors: PALETTE_COLORS, compressionLevel: 9, effort: 10 })
         .toFile(out),
     )
-  console.log(`  ${existed ? 'updated' : 'added  '} ${id}.png  (source ${info.width}x${info.height})`)
+  const kb = Math.round(statSync(out).size / 1024)
+  console.log(`  ${existed ? 'updated' : 'added  '} ${id}.png  ${String(kb).padStart(4)} kB  (source ${info.width}x${info.height})`)
 }
 console.log(`done: ${files.length} stamps in public/stamps/`)
