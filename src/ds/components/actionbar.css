@@ -9,16 +9,25 @@
   padding: var(--sp-5) var(--sp-6) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
 }
 
-/* gradient zamiast płyty: treść wjeżdża pod pasek, nie kończy się na ścianie */
+/*
+ * Gradient zamiast płyty: treść wjeżdża pod pasek, nie kończy się na ścianie.
+ * Stopni jest kilka, bo dwa przystanki zostawiały widoczny próg w miejscu,
+ * gdzie krycie przestawało być pełne.
+ */
 .pk-actionbar__glass {
   position: absolute;
-  inset: 0;
+  inset: 0 0 -1px;
   z-index: -1;
   background: linear-gradient(
     to top,
-    var(--bg-surface-raised) 42%,
-    color-mix(in srgb, var(--bg-surface-raised) 70%, transparent) 78%,
-    transparent
+    var(--bg-surface-raised) 0%,
+    color-mix(in srgb, var(--bg-surface-raised) 97%, transparent) 38%,
+    color-mix(in srgb, var(--bg-surface-raised) 86%, transparent) 55%,
+    color-mix(in srgb, var(--bg-surface-raised) 64%, transparent) 69%,
+    color-mix(in srgb, var(--bg-surface-raised) 38%, transparent) 81%,
+    color-mix(in srgb, var(--bg-surface-raised) 16%, transparent) 91%,
+    color-mix(in srgb, var(--bg-surface-raised) 4%, transparent) 97%,
+    transparent 100%
   );
   pointer-events: none;
 }
@@ -28,8 +37,22 @@
   inset: 0;
   backdrop-filter: blur(var(--b));
   -webkit-backdrop-filter: blur(var(--b));
-  mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
-  -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+  mask-image: linear-gradient(
+    to top,
+    #000 var(--from),
+    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
+    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
+    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
+    transparent var(--to)
+  );
+  -webkit-mask-image: linear-gradient(
+    to top,
+    #000 var(--from),
+    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
+    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
+    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
+    transparent var(--to)
+  );
 }
 
 .pk-actionbar__row {

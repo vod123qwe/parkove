@@ -76,19 +76,48 @@
   inset: 0;
   backdrop-filter: blur(var(--b));
   -webkit-backdrop-filter: blur(var(--b));
-  mask-image: linear-gradient(to bottom, black var(--from), transparent var(--to));
-  -webkit-mask-image: linear-gradient(to bottom, black var(--from), transparent var(--to));
+  /* maska też wielostopniowa: dwa przystanki dają prostą, a prosta kończy się
+     widocznym progiem tam, gdzie rozmycie nagle mija */
+  mask-image: linear-gradient(
+    to bottom,
+    #000 var(--from),
+    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
+    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
+    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
+    transparent var(--to)
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 var(--from),
+    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
+    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
+    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
+    transparent var(--to)
+  );
 }
 
+/*
+ * Tło nagłówka gasło wcześniej na ostatnich 28 px, więc oko łapało linię tam,
+ * gdzie kryjąca biel zamieniała się w gradient. Teraz gradient idzie przez całą
+ * wysokość i ma kilka stopni: krycie spada powoli u góry, szybciej w środku,
+ * znowu powoli przy krawędzi. To ta sama sztuczka co wygładzanie krzywej,
+ * pojedynczy skok jasności jest widoczny, seria małych nie jest.
+ */
 .pk-sheet__head::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -1px 0 0;
   z-index: -1;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    var(--bg-surface-raised) calc(100% - 28px),
+    var(--bg-surface-raised) 0%,
+    color-mix(in srgb, var(--bg-surface-raised) 97%, transparent) 42%,
+    color-mix(in srgb, var(--bg-surface-raised) 88%, transparent) 58%,
+    color-mix(in srgb, var(--bg-surface-raised) 68%, transparent) 71%,
+    color-mix(in srgb, var(--bg-surface-raised) 42%, transparent) 82%,
+    color-mix(in srgb, var(--bg-surface-raised) 18%, transparent) 91%,
+    color-mix(in srgb, var(--bg-surface-raised) 5%, transparent) 97%,
     transparent 100%
   );
 }

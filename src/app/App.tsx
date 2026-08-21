@@ -254,6 +254,7 @@ export function App() {
   )
 
   const clearSelection = useCallback(() => {
+    setAmenitySpotId(null)
     setSelectedId(null)
     setPeekIndex(0)
     setExpanded(false)
@@ -262,6 +263,7 @@ export function App() {
   // map tap on a park: peek while browsing, the full sheet during a walk
   const selectParkFromMap = useCallback(
     (id: string) => {
+      setAmenitySpotId(null)
       setSelectedId(id)
       setPeekIndex(0)
       setExpanded(onWalk)
@@ -272,6 +274,7 @@ export function App() {
   )
 
   const openFromList = (f: ParkFeature) => {
+    setAmenitySpotId(null)
     setListOpen(false)
     setSelectedId(f.id)
     setPeekIndex(0)
@@ -324,6 +327,12 @@ export function App() {
   const onSelectPoi = useCallback(
     (poiId: string) => {
       if (!overlayParkId) return
+      /*
+       * Zaznaczone jest zawsze jedno miejsce. Karta kawiarni albo placu zabaw
+       * opisuje TO, co wskazałeś, więc wybór czegokolwiek innego musi ją zdjąć,
+       * inaczej na dole zostaje kartka o placu, a na mapie świeci już tężnia.
+       */
+      setAmenitySpotId(null)
       const quest = questForPark(overlayParkId)
       const idx = quest?.pois.findIndex((p) => p.id === poiId) ?? -1
       if (idx < 0) return
@@ -339,6 +348,7 @@ export function App() {
 
   const onSelectParking = useCallback(() => {
     if (!selected) return
+    setAmenitySpotId(null)
     const parking = suggestedParking(selected.id)
     if (peekOpen && parking) {
       setPeekIndex(peekPages.length - 1)
@@ -352,6 +362,7 @@ export function App() {
     (dir: 1 | -1) => {
       const next = Math.max(0, Math.min(peekPages.length - 1, peekIndex + dir))
       if (next === peekIndex) return
+      setAmenitySpotId(null)
       setPeekIndex(next)
       flyToSlide(peekPages[next])
     },
