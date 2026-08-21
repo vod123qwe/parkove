@@ -718,4 +718,41 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       verified: false,
     },
   },
+  'dolina-bolechowicka': {
+    description: [
+      "Rezerwat Wąwóz Bolechowicki, jedna z ośmiu dolin Parku Krajobrazowego Dolinki Krakowskie, około 15 km od Rynku. Wejście zamyka Brama Bolechowicka: dwie wapienne skały wysokie na 25 metrów, widoczne z daleka.",
+      "To najkrótsza z podkrakowskich dolinek, około 1,5 kilometra, i najbardziej efektowna na wejściu. Dnem płynie potok Bolechówka, a kilkaset metrów za bramą jest dwustopniowy wodospad, rzadkość na Jurze.",
+      "Na spacer w obie strony wystarczy godzina, więc to najlżejsza z trzech dolin. Skały nad ścieżką są rejonem wspinaczkowym, więc przy dobrej pogodzie zawsze ktoś tu wisi na linie.",
+    ],
+    amenities: {
+      playground: { has: false, note: "Placu zabaw nie ma. Łąki przed bramą i za nią nadrabiają z nawiązką." },
+      food: { has: false, note: "W dolinie nic nie kupisz. Woda i kanapki z domu, sklep w Bolechowicach." },
+      verified: false,
+    },
+  },
+  'dolina-kobylanska': {
+    description: [
+      "Jar Kobylański, zwany też Doliną Karniowską, około 16 km od Rynku. Najbardziej wspinaczkowa z trzech dolin: kilkadziesiąt wapiennych skał po obu stronach, z nazwami wymyślonymi przez wspinaczy.",
+      "Dno doliny jest łagodne i szerokie, więc idzie się wygodnie, a skały ma się nad głową po obu stronach. Po drodze źródło, mała jaskinia i miejsca na piknik.",
+      "Na uboczu, na zachodnim skraju, leży cmentarz choleryczny z dziewiętnastego wieku. Cicha rzecz, o której nie mówi żadna tablica.",
+    ],
+    amenities: {
+      playground: { has: false, note: "Bez placu zabaw, ale są miejsca piknikowe i zadaszenia w dnie doliny." },
+      food: { has: false, note: "Nic na miejscu. Najbliżej w Kobylanach." },
+      verified: false,
+    },
+  },
+  'dolina-kluczwody': {
+    description: [
+      "Rezerwat Dolina Kluczwody, nazywanej też Doliną Wierzchówki, około 14 km od Rynku, czyli najbliżej z całych Dolinek. Dolina ma około sześciu kilometrów, rezerwat obejmuje jej najciekawszy odcinek.",
+      "Tu jest najwięcej historii: zrekonstruowane słupy graniczne z czasów rozbiorów, skały o nazwach Zamkowa Skała i Zamkowa Strażnica, i jaskinie w Mącznej Skale. Górny odcinek doliny, koło Wierzchowia, ma największe jaskinie całej Jury.",
+      "Ze wschodniego zbocza, z Mącznych Skał, widać cały górny odcinek doliny. To najlepszy punkt na przerwę.",
+    ],
+    amenities: {
+      playground: { has: false, note: "Placu zabaw nie ma." },
+      food: { has: false, note: "Nic w dolinie. Sklep w Białym Kościele albo w Wierzchowiu." },
+      verified: false,
+    },
+  },
+
 }

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.45.1'
+export const VERSION = '0.46.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.46.0',
+    date: '2026-08-21',
+    title: 'Dolinki Krakowskie, three of them',
+    changes: [
+      ['added', 'Three valleys outside the city: Dolina Kluczwody, Dolina Bolechowicka and Dolina Kobylanska, 14 to 16 km from the Main Square. Fifteen points between them, from the Brama Bolechowicka rock gate and a two-step waterfall to reconstructed partition border posts and a cholera cemetery'],
+      ['added', 'The list of places has tabs: everything, the valleys, the city. A forty minute park and a half day trip are not the same outing'],
+      ['added', 'A place can now ask for fewer points than it has. Each valley gives its stamp at three of five and keeps the rest as a reason to come back'],
+      ['changed', 'Dodaj notatke on a walk card is Dodaj podsumowanie, because the note you write at home and the note you drop on the route are two different things'],
+    ],
+  },
   {
     version: '0.45.1',
     date: '2026-08-21',

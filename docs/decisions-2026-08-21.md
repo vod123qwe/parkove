@@ -61,3 +61,34 @@ znakowanych szlaków, a nazwane rzeczy leżą po obu stronach.
 Najpierw **przegląd i sprzątanie interfejsu**, potem Dolinki. Powód: mniej
 powierzchni do rozbudowy i nie dokładamy zakładek do ekranów, które i tak
 chcemy przerzedzić.
+
+## Co zbudowane (v0.46.0)
+
+- `src/app/data/quests-dolinki.ts`: trzy wyprawy, po 5 punktów, `stampAt: 3`.
+  Współrzędne punktów to węzły OSM (Overpass), fakty w opisach z polskiej
+  Wikipedii, linki w `sources`.
+- `parks.json`: trzy wieloboki. Bolechowicka 21,3 ha i Kluczwody 34,9 ha to
+  granice rezerwatów z OSM (Nominatim, `polygon_geojson`). Kobylańska nie jest
+  rezerwatem, więc jej 72,7 ha to otoczka wypukła nazwanych obiektów w jarze,
+  rozepchnięta o 90 m. Nowy `kind: 'valley'` i `group: 'dolinki'`.
+- `parkinfo.ts`, `transit.ts`, `parking.ts`: opisy, dojazd (numery autobusów
+  NIEPOTWIERDZONE, dlatego nacisk na kolej do Zabierzowa), parking pod Bramą
+  Bolechowicką ze współrzędnych OSM.
+- Zakładki w liście miejsc: Wszystkie / Dolinki / Parki. Krótkie etykiety, bo
+  „Dolinki Krakowskie" i „Parki Krakowskie" nie mieszczą się w segmentowanym
+  przełączniku na 375 px.
+- Jedna definicja pieczątki (`progress.ts`): próg z danych, domyślnie wszystkie
+  punkty. Profil przestał liczyć pieczątkę za samo wejście.
+
+### Zostało do zrobienia
+
+- **Zdjęcia**: żadna dolina nie ma zdjęcia, więc hero pokazuje ikonę zamiast
+  obrazu. Do zrobienia jak przy parkach, z Wikimedia Commons.
+- **Kopiec Bzowskich** (50,1639 / 19,7549) i **Schronisko na Kawcu**
+  (50,1625 / 19,7661) leżą poza jarem Kobylańskiej, więc nie weszły. Kopiec ma
+  mocną historię (mogiła dwóch Bzowskich, 200-letni krzyż, punkt obserwacyjny
+  rosyjskich służb granicznych, panorama Krakowa i Tatr) i zasługuje na osobne
+  miejsce przy Będkowicach.
+- Cztery dalsze doliny: Będkowska (8,1 km, więc raczej dwa miejsca), Szklarki,
+  Racławki, Eliaszówki (727 odcinków ścieżek i 42 obiekty historyczne).
+- Numery linii autobusowych do sprawdzenia w terenie (`verified: false`).

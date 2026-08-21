@@ -60,6 +60,16 @@ export const PARKING: Record<string, ParkingInfo[]> = {
       coords: [19.9125, 50.0657],
     },
   ],
+  'dolina-bolechowicka': [
+    {
+      id: 'bolechowicka-brama',
+      name: 'Parking przy wejściu do doliny',
+      hint: 'Kilka miejsc przy drodze pod Bramą Bolechowicką, po stronie Karniowic. W pogodny weekend zajmuje się szybko.',
+      fee: 'Bezpłatny',
+      coords: [19.780403, 50.154033],
+    },
+  ],
+
 }
 
 export const suggestedParking = (parkId: string) => PARKING[parkId]?.[0] ?? null

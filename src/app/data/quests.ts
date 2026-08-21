@@ -9,6 +9,8 @@
  * meant to start a conversation on the bench. The counterpoint argues the
  * other side whichever option you pick, so nobody "wins" the question.
  */
+import { DOLINKI_QUESTS } from './quests-dolinki'
+
 export type PoiDilemma = {
   question: string
   options: string[]
@@ -62,7 +64,7 @@ export type Quest = {
   stampAt?: number
 }
 
-export const QUESTS: Quest[] = [
+const KRAKOW_QUESTS: Quest[] = [
   {
     parkId: 'kopiec-krakusa',
     pois: [
@@ -2565,6 +2567,10 @@ export const QUESTS: Quest[] = [
     ],
   },
 ]
+
+/** miasto plus wypady za miasto, w jednej liście, bo mechanika jest ta sama */
+export const QUESTS: Quest[] = [...KRAKOW_QUESTS, ...DOLINKI_QUESTS]
+
 
 export const questForPark = (parkId: string) => QUESTS.find((q) => q.parkId === parkId)
 

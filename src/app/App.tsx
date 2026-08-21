@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Camera, CircleUserRound, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, RefreshCw, Sparkles } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
+import { BottomSheet, Button, List, ListItem, PeekCard, ProgressRing, Segmented, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
 import { ParkSheet } from './ParkSheet'
@@ -54,6 +54,8 @@ export function App() {
   const [expanded, setExpanded] = useState(false)
   const [parkingOpen, setParkingOpen] = useState(false)
   const [listOpen, setListOpen] = useState(false)
+  /** which collection the list shows: everything, the day trips, or the city */
+  const [listTab, setListTab] = useState<'all' | 'dolinki' | 'parki'>('all')
   const [focus, setFocus] = useState<MapFocus | null>(null)
   const [reveal, setReveal] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   /** heads-up that a point is within sight, and the arrival notice with a story */
@@ -367,6 +369,20 @@ export function App() {
     [],
   )
 
+  const groupOf = (f: ParkFeature) => f.properties.group ?? 'parki'
+  const shownParks = useMemo(
+    () => (listTab === 'all' ? sortedParks : sortedParks.filter((f) => groupOf(f) === listTab)),
+    [sortedParks, listTab],
+  )
+  const LIST_TABS = useMemo(
+    () => [
+      { value: 'all' as const, label: 'Wszystkie' },
+      { value: 'dolinki' as const, label: 'Dolinki' },
+      { value: 'parki' as const, label: 'Parki' },
+    ],
+    [],
+  )
+
   return (
     <div className="app-shell">
       <MapView
@@ -549,8 +565,17 @@ export function App() {
       </PeekCard>
 
       <BottomSheet open={listOpen} onClose={() => setListOpen(false)} title="Miejsca do odkrycia">
+        {/* the city and the day trips are different kinds of outing, so they get
+            their own tabs rather than one long mixed list */}
+        <Segmented
+          className="app-listtabs"
+          options={LIST_TABS}
+          value={listTab}
+          onChange={setListTab}
+          aria-label="Rodzaj miejsc"
+        />
         <List className="app-parklist">
-          {sortedParks.map((f) => {
+          {shownParks.map((f) => {
             const p = progress[f.id]
             const visited = !!p
             const kind = KIND_META[f.properties.kind] ?? KIND_META.park

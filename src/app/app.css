@@ -83,6 +83,10 @@
   box-shadow: var(--elevation-2);
 }
 
+.app-listtabs {
+  margin: 0 0 var(--sp-4);
+}
+
 .app-parklist {
   display: flex;
   flex-direction: column;

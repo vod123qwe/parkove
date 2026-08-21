@@ -38,7 +38,15 @@ import type { QuestPoi } from './data/quests'
 
 export type ParkFeature = {
   id: string
-  properties: { id: string; name: string; kind: string; areaHa: number; center: [number, number] }
+  properties: {
+    id: string
+    name: string
+    kind: string
+    areaHa: number
+    center: [number, number]
+    /** which collection a place belongs to; missing means a Kraków park */
+    group?: 'dolinki'
+  }
   geometry: ParkGeometry
 }
 

@@ -50,6 +50,27 @@ export const TRANSIT: Record<string, TransitInfo> = {
     note: 'Z Krakowa dojedziesz też koleją do stacji Skawina, potem 10 minut spacerem.',
     verified: false,
   },
+  // Dolinki: to już nie MPK, a strefa aglomeracyjna. Numery bez potwierdzenia,
+  // dlatego verified: false i nacisk na to, co pewne, czyli kolej do Zabierzowa.
+  'dolina-bolechowicka': {
+    stop: 'Bolechowice',
+    mode: 'bus',
+    note: 'Autobusy aglomeracyjne z Krakowa w stronę Zabierzowa i Bolechowic. Pewniejsza jest kolej: pociąg do Zabierzowa, potem około 4 km. Samochodem parking pod bramą.',
+    verified: false,
+  },
+  'dolina-kobylanska': {
+    stop: 'Kobylany',
+    mode: 'bus',
+    note: 'Autobusem w stronę Zabierzowa i Kobylan. Koleją do Zabierzowa i dalej około 5 km, więc tę dolinę najłatwiej zrobić samochodem.',
+    verified: false,
+  },
+  'dolina-kluczwody': {
+    stop: 'Biały Kościół',
+    mode: 'bus',
+    note: 'Autobusy w stronę Wielkiej Wsi i Olkusza zatrzymują się w Białym Kościele, stamtąd do doliny kilkanaście minut spacerem.',
+    verified: false,
+  },
+
 }
 
 export const MODE_LABEL: Record<TransitInfo['mode'], string> = {

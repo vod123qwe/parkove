@@ -174,7 +174,7 @@ export function JourneyScreen({
 
           {note || writing ? (
             <>
-              <h3 className="t-title journey__section">Notatka</h3>
+              <h3 className="t-title journey__section">Podsumowanie</h3>
               <textarea
                 className="journey__note"
                 value={note}
@@ -196,7 +196,7 @@ export function JourneyScreen({
               className="journey__addnote"
               onClick={() => setWriting(true)}
             >
-              Dodaj notatkę
+              Dodaj podsumowanie
             </Button>
           )}
 
