@@ -219,6 +219,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   bednarskiego: {
     photos: [
+      { src: '/photos/park-bednarskiego-new.jpg', credit: 'Fot. Mariokol · domena publiczna · Wikimedia Commons' },
       { src: '/photos/park-bednarskiego-1.jpg', credit: "Fot. Jakub Hałun · CC BY 4.0 · Wikimedia Commons" },
       { src: '/photos/park-bednarskiego-2.jpg', credit: "Fot. Jakub Hałun · CC BY 4.0 · Wikimedia Commons" },
     ],
@@ -801,6 +802,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'dolina-eliaszowki': {
     photos: [
+      { src: '/photos/park-eliaszowki-zrodlo.jpg', credit: 'Fot. Kgbo · CC BY-SA 4.0 · Wikimedia Commons' },
       { src: '/photos/dolina-eliaszowki.jpg', credit: 'Fot. Kgbo · CC BY-SA 4.0 · Wikimedia Commons' },
       { src: '/photos/eliaszowki-czerna.jpg', credit: 'Fot. Cancre · CC BY-SA 4.0 · Wikimedia Commons' },
     ],

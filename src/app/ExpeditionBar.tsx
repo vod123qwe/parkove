@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { List as ListIcon, Mic, Plus, Square, StickyNote, X } from 'lucide-react'
 import { Button } from '../ds'
 import { useGameState } from './state'
@@ -34,6 +34,7 @@ export function ExpeditionBar({
   onPhoto,
   onMark,
   onOpenPoints,
+  spotCard,
 }: {
   /** ending is irreversible, so the bar only asks for it */
   onRequestStop: () => void
@@ -43,11 +44,14 @@ export function ExpeditionBar({
   onMark?: (markId: string) => void
   /** karta miejsca z listą punktów */
   onOpenPoints?: () => void
+  /** wybrana kawiarnia albo plac zabaw: zajmuje miejsce karty „co dalej" */
+  spotCard?: ReactNode
 }) {
   const { expedition, parks } = useGameState()
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
   const [recording, setRecording] = useState(false)
+  const [pop, setPop] = useState(false)
   const [, tick] = useState(0)
 
   useEffect(() => {
@@ -189,6 +193,16 @@ export function ExpeditionBar({
       )}
 
       <div className="app-expbar">
+        {/* odrobina progressive bluru w tym samym gradiencie: dwa pasma, żeby
+            mapa pod HUD-em cofnęła się o pół kroku, a nie zniknęła */}
+        <div className="app-expbar__floor" aria-hidden="true">
+          <span style={{ '--b': '2px', '--from': '0%', '--to': '58%' } as CSSProperties} />
+          <span style={{ '--b': '6px', '--from': '30%', '--to': '100%' } as CSSProperties} />
+        </div>
+        {spotCard ? (
+          <div className="app-expbar__swap">{spotCard}</div>
+        ) : (
+        <>
         {/*
           Karta jest przyciskiem: dotknięcie otwiera to, o czym mówi. Blisko to
           historia następnego punktu, daleko karta miejsca. Bez tego była jedyną
@@ -252,6 +266,8 @@ export function ExpeditionBar({
             )}
           </div>
         </button>
+        </>
+        )}
 
         <div className="app-expactions">
           <div className="app-expaction">
@@ -262,10 +278,17 @@ export function ExpeditionBar({
           </div>
           <div className="app-expaction">
             <button
-              className={`app-expaction__btn -primary${open ? ' -open' : ''}`}
+              className={`app-expaction__btn -primary${open ? ' -open' : ''}${pop ? ' -pop' : ''}`}
               aria-label={open ? 'Zamknij' : 'Dodaj zdjęcie, nagranie albo notatkę'}
               aria-expanded={open}
-              onClick={() => (open ? shut() : setOpen(true))}
+              onClick={() => {
+                // sprężynka trwa tyle, ile animacja: potem klasa schodzi, żeby
+                // dała się odpalić ponownie
+                setPop(true)
+                window.setTimeout(() => setPop(false), 380)
+                if (open) shut()
+                else setOpen(true)
+              }}
             >
               {open ? <X size={24} /> : <Plus size={26} />}
             </button>

@@ -976,13 +976,25 @@
   bottom: calc(env(safe-area-inset-bottom, 0px) + 252px);
 }
 
-/* HUD wyprawy to karta plus przyciski plus podpisy: około 250 px */
-.app-shell.-walking .app-locate {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 272px);
+
+/* dwa pasma rozmycia w tej samej podłodze co gradient */
+.app-expbar__floor {
+  position: absolute;
+  left: calc(-1 * var(--sp-6));
+  right: calc(-1 * var(--sp-6));
+  bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  top: -12%;
+  z-index: -1;
+  pointer-events: none;
 }
 
-.app-shell.-walking .app-look {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 272px + 40px + var(--sp-2));
+.app-expbar__floor span {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--b));
+  -webkit-backdrop-filter: blur(var(--b));
+  mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+  -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
 }
 
 /* przygaszenie pod HUD, żeby białe podpisy przycisków czytały się na trawie */
@@ -994,11 +1006,12 @@
   bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
   top: -8%;
   z-index: -1;
+  /* pod trzema przyciskami ciemniej, żeby podpisy nie walczyły z jasną trawą */
   background: linear-gradient(
     to top,
-    rgb(8 14 8 / 0.72) 0%,
-    rgb(8 14 8 / 0.5) 42%,
-    rgb(8 14 8 / 0.18) 74%,
+    rgb(6 11 6 / 0.86) 0%,
+    rgb(6 11 6 / 0.66) 34%,
+    rgb(6 11 6 / 0.3) 68%,
     transparent 100%
   );
   pointer-events: none;
@@ -1204,6 +1217,31 @@
 .app-expaction__btn.-open {
   background: var(--bg-primary);
   color: var(--content-on-primary);
+  /* plus przekręca się w krzyżyk, zamiast po prostu zniknąć */
+  transform: rotate(135deg);
+}
+
+/* sprężynka po dotknięciu: ugięcie, przeskok ponad rozmiar, wyjście */
+.app-expaction__btn.-primary {
+  animation: exp-ring 3.2s var(--ease-in-out) infinite;
+}
+
+.app-expaction__btn.-primary.-pop {
+  animation:
+    exp-pop 360ms var(--ease-out),
+    exp-ring 3.2s var(--ease-in-out) infinite;
+}
+
+@keyframes exp-pop {
+  0% {
+    transform: scale(0.88);
+  }
+  55% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .app-expaction__label {
@@ -1213,6 +1251,17 @@
   letter-spacing: 0.01em;
   color: #ffffff;
   text-shadow: 0 1px 8px rgb(8 14 8 / 0.7);
+}
+
+.app-expbar__swap {
+  animation: swap-in 220ms var(--ease-screen) both;
+}
+
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
 }
 
 .app-expbar {
@@ -1250,7 +1299,8 @@
 .app-locate {
   position: absolute;
   right: var(--sp-4);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4));
+  /* pod przyciskiem menu: 48 px menu, 44 px odstępu, potem styl mapy i ten */
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4) + 48px + 44px + 40px + var(--sp-2));
   z-index: 11;
   display: grid;
   place-items: center;
@@ -1284,6 +1334,8 @@
  */
 .app-spotcard {
   position: absolute;
+  border-radius: 26px;
+  corner-shape: var(--corner-smooth);
   left: var(--sp-4);
   right: var(--sp-4);
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
@@ -1291,12 +1343,20 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
-  border-radius: var(--radius-lg);
-  corner-shape: var(--corner-smooth);
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-5);
   background: var(--bg-surface-raised);
   box-shadow: var(--elevation-3);
   animation: looks-in 220ms var(--ease-screen);
+}
+
+/* w pasku wyprawy karta miejsca zajmuje miejsce karty „co dalej": bez własnego
+   pozycjonowania, bo pasek już stoi tam, gdzie ma stać */
+.app-expbar__swap .app-spotcard {
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  animation: none;
 }
 
 /* Twoje zdjęcia tego miejsca: mały pasek nad nazwą */
@@ -1337,10 +1397,7 @@
 .app-look {
   position: absolute;
   right: var(--sp-4);
-  bottom: calc(
-    env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4) + 40px +
-      var(--sp-2)
-  );
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4) + 48px + 44px);
   z-index: 11;
   display: grid;
   place-items: center;
@@ -1381,10 +1438,7 @@
 .app-looks {
   position: absolute;
   right: var(--sp-4);
-  bottom: calc(
-    env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4) +
-      var(--control-md) + var(--sp-2) + var(--control-md) + var(--sp-2)
-  );
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4) + 48px + 44px + 40px + var(--sp-2) + 40px + var(--sp-3));
   z-index: 13;
   display: flex;
   flex-direction: column;
@@ -1395,8 +1449,7 @@
   background: var(--bg-surface-raised);
   box-shadow: var(--elevation-3);
   animation: looks-in 200ms var(--ease-screen);
-  transform-origin: bottom right;
-  /* never as tall as the status bar: on a short screen the list scrolls */
+  transform-origin: top right;
   max-height: calc(var(--screen-h) - env(safe-area-inset-top, 0px) - 260px);
   overflow-y: auto;
 }
@@ -1717,11 +1770,12 @@
   -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
 }
 
+/* pigułki na hug, wyśrodkowane, ciaśniej: napis ma decydować o szerokości */
 .app-addmenu__stack {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: var(--sp-4);
+  align-items: center;
+  gap: var(--sp-2);
 }
 
 /*
@@ -1738,9 +1792,10 @@
   /* w pełni owalna, jak w inspiracji: promień większy niż połowa wysokości */
   border-radius: var(--radius-pill);
   corner-shape: var(--corner-smooth);
-  background: rgb(16 22 16 / 0.42);
-  backdrop-filter: blur(18px) saturate(1.1);
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  /* więcej szkła, mniej farby: tło ledwo widoczne, rozmycie mocne */
+  background: rgb(16 22 16 / 0.24);
+  backdrop-filter: blur(28px) saturate(1.15);
+  -webkit-backdrop-filter: blur(28px) saturate(1.15);
   color: #ffffff;
   box-shadow: none;
   animation: add-rise 260ms var(--ease-out) both;
@@ -1749,8 +1804,8 @@
 
 .app-addmenu .app-addmenu__item.pk-btn:active {
   transform: scale(0.975);
-  background: rgb(16 22 16 / 0.62);
-  border-color: rgb(255 255 255 / 0.34);
+  background: rgb(16 22 16 / 0.44);
+  border-color: rgb(255 255 255 / 0.36);
 }
 
 .app-addmenu.-out .app-addmenu__item.pk-btn {

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronRight, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, Map as MapIcon, Menu, Palette, RefreshCw, Sparkles, ToyBrick, X } from 'lucide-react'
-import { BottomSheet, Button, IconButton, List, ListItem, PeekCard, ProgressRing, Segmented, Toast } from '../ds'
+import { Award, Camera, ChevronRight, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, Map as MapIcon, Menu, Palette, RefreshCw, Sparkles, ToyBrick } from 'lucide-react'
+import { BottomSheet, Button, List, ListItem, PeekCard, ProgressRing, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
+import { SpotCard } from './SpotCard'
 import { asset } from './assets'
 import { getName, greeting } from './profile'
 import type { MapFocus } from './MapView'
@@ -34,7 +35,7 @@ import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import type { MapStyleId } from './data/mapstyles'
 import { suggestedParking } from './data/parking'
-import { KIND_LABEL, amenitiesFor, isFood, walkUrl } from './data/amenities'
+import { amenitiesFor, isFood } from './data/amenities'
 import type { ParkingInfo } from './data/parking'
 import { pointsTotal, questForPark, photosForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
@@ -519,6 +520,17 @@ export function App() {
             onPhoto={setPhotoAdded}
             onMark={setPhotoId}
             onOpenPoints={expeditionPark ? () => { selectParkFromMap(expeditionPark.id); setExpanded(true) } : undefined}
+            spotCard={
+              activeSpot ? (
+                <SpotCard
+                  spot={activeSpot}
+                  placeName={selected?.properties.name}
+                  photos={spotPhotos}
+                  onOpenPhoto={setPhotoId}
+                  onClose={() => setAmenitySpotId(null)}
+                />
+              ) : null
+            }
           />
         </>
       ) : (
@@ -953,34 +965,16 @@ export function App() {
         mapStyle={mapStyle}
         onMapStyle={pickMapStyle}
       />
-      {activeSpot && (
-        <div className="app-spotcard">
-          {spotPhotos.length > 0 && (
-            <div className="app-spotcard__shots">
-              {spotPhotos.slice(0, 3).map((m) => (
-                <button key={m.id} className="app-spotcard__shot" onClick={() => setPhotoId(m.id)}>
-                  <img src={m.url} alt={m.caption || 'Zdjęcie tego miejsca'} />
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="app-spotcard__body">
-            <p className="t-body-strong">{activeSpot.name}</p>
-            <p className="t-caption park-muted">
-              {KIND_LABEL[activeSpot.kind]} · {selected?.properties.name}
-            </p>
-          </div>
-          <Button
-            variant="tonal"
-            icon={<Compass size={16} />}
-            onClick={() => window.open(walkUrl(activeSpot.coords), '_blank', 'noopener')}
-          >
-            Prowadź
-          </Button>
-          <IconButton aria-label="Zamknij" variant="ghost" onClick={() => setAmenitySpotId(null)}>
-            <X size={18} />
-          </IconButton>
-        </div>
+      {/* poza wyprawą karta miejsca stoi sama na dole; w trakcie wyprawy
+          wchodzi w miejsce karty „co dalej", bo na dole ma być jedna rzecz */}
+      {activeSpot && !onWalk && (
+        <SpotCard
+          spot={activeSpot}
+          placeName={selected?.properties.name}
+          photos={spotPhotos}
+          onOpenPhoto={setPhotoId}
+          onClose={() => setAmenitySpotId(null)}
+        />
       )}
 
       {selected && (

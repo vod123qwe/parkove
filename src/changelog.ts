@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.52.0'
+export const VERSION = '0.53.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,19 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.53.0',
+    date: '2026-08-21',
+    title: 'One thing at the bottom, and better photographs of two places',
+    changes: [
+      ['fixed', 'Park Bednarskiego showed a squirrel, which says nothing about the park. It shows the park now. Worth saying plainly: Wikimedia Commons has no photograph of its quarry walls at all, so the alley is the best that exists'],
+      ['fixed', 'Dolina Eliaszowki led with a close-up of a signpost. It leads with the spring of Saint Elias instead'],
+      ['changed', 'A tapped cafe, playground or parking no longer stacks its card under the walk card. It takes its place, same shape and same spot, and closing it brings the walk back. The two actions are icons now, because two words ate width that a 375 point screen does not have'],
+      ['changed', 'The map style and locate buttons moved under the menu, 44 points below it, out of the way of everything at the bottom'],
+      ['changed', 'The plus springs when pressed and turns into a cross rather than swapping icons. The three memory pills hug their labels, sit closer together, and are far more glass than paint'],
+      ['changed', 'The floor under the three buttons is darker and carries a little progressive blur, so white labels hold on bright grass'],
+    ],
+  },
   {
     version: '0.52.0',
     date: '2026-08-21',
