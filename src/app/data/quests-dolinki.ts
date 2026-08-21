@@ -111,8 +111,6 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Dolina Bolechowicka ma około 1,5 km i jest jedną z najkrótszych podkrakowskich dolinek. Za to widokowo bije większość dłuższych.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Bolechowicka'],
-        photo: '/photos/poi-dolina-bolechowicka-taras.jpg',
-        photoCredit: 'Fot. Panek · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.783529, 50.153078],
         radius: 35,
       },
@@ -239,8 +237,6 @@ export const DOLINKI_QUESTS: Quest[] = [
             'Słup bez opowieści jest tylko kawałkiem drewna i łatwo go pomylić z ozdobą. Ale granica, o której nikt nie pamięta, zamienia się w płaską historię, w której nic nikogo nie kosztowało. Ten słup jest pretekstem, żeby ktoś opowiedział, co znaczyło mieszkać przy nim.',
         },
         sources: ['https://pl.wikipedia.org/wiki/Kopiec_Bzowskich'],
-        photo: '/photos/poi-dolina-kluczwody-slupy-graniczne.jpg',
-        photoCredit: 'Fot. Unknown authorUnknown author · Public domain · Wikimedia Commons',
         coords: [19.817802, 50.164218],
         radius: 40,
       },
@@ -450,8 +446,6 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Dolina Będkowska ciągnie się od obniżenia przy drodze krajowej z Krakowa do Olkusza aż do przysiółka Łączki. Wszystko to jest dzieło jednego potoku.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_B%C4%99dkowska'],
-        photo: '/photos/poi-dolina-bedkowska-zrodlo-bedkowki.jpg',
-        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.753531, 50.181715],
         radius: 35,
       },
@@ -656,8 +650,6 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Skała widoczna z drogi biegnącej dnem doliny, w jej dolnej części.',
         reveal:
           'Dolina Szklarki ma około dziewięciu kilometrów i ciągnie się od Jerzmanowic przez Szklary do Dubia, gdzie jej wylot spotyka się z wylotem Doliny Racławki.',
-        photo: '/photos/dolina-szklarki.jpg',
-        photoCredit: 'Fot. marek7400 · CC BY 3.0 · Wikimedia Commons',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Szklarki'],
         coords: [19.717043, 50.17755],
         radius: 45,

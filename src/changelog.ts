@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.57.0'
+export const VERSION = '0.58.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.58.0',
+    date: '2026-08-22',
+    title: 'Every photograph looked at, twenty two of them thrown out',
+    changes: [
+      ['fixed', 'All eighty five point photographs reviewed on contact sheets, one by one, and twenty two of them showed something else than the point. Name matching cannot catch this: a file titled Park Jordana can perfectly well show the pond instead of the monument, which is exactly what happened'],
+      ['fixed', 'The Jordan monument and the alley of busts had each other photographs. Swapped'],
+      ['fixed', 'Thrown out, with the reason recorded in the script: a propaganda poster for border posts, a decorative plate for a monument, a live musician for a guitar sculpture, an old postcard for a pond, a bar interior for the Krakow meridian, a bird on a twig for the biggest rock of a valley, St Adalbert from the Main Square for a church of the same name elsewhere, an information board for a spring, and a dragon shared by two different parks'],
+      ['changed', 'A point with no photograph shows none. Better an honest gap than a picture of somewhere else, and the gaps are a list of things to shoot'],
+    ],
+  },
   {
     version: '0.57.0',
     date: '2026-08-22',
