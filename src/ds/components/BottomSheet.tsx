@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { cx } from '../cx'
 import { useOverlay } from '../useOverlay'
 import './bottomsheet.css'
@@ -255,6 +255,15 @@ export function BottomSheet({
         onWheel={onWheel}
       >
         <div ref={headRef} className={cx('pk-sheet__head', hero != null && '-overlay')}>
+          {/*
+            Progresywny blur trzema pasmami zamiast jednego: pod tytułem mocny,
+            przy dolnej krawędzi żaden, więc treść nie wchodzi pod szybę skokiem.
+          */}
+          <div className="pk-sheet__glass" aria-hidden="true">
+            <span style={{ '--b': '18px', '--from': '0%', '--to': '46%' } as CSSProperties} />
+            <span style={{ '--b': '9px', '--from': '0%', '--to': '72%' } as CSSProperties} />
+            <span style={{ '--b': '3px', '--from': '0%', '--to': '100%' } as CSSProperties} />
+          </div>
           {handle && (
             <div className="pk-sheet__grab">
               <div className="pk-sheet__handle" />

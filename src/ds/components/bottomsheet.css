@@ -59,18 +59,25 @@
   cursor: grab;
 }
 
-/* the fade zone lives INSIDE the header's last 28px, so untouched content
-   below starts fully crisp and only fades once it scrolls underneath */
-.pk-sheet__head::after {
-  content: '';
+/*
+ * Szyba nagłówka: trzy pasma rozmycia zamiast jednego. Pod tytułem mocne,
+ * niżej coraz słabsze, przy krawędzi żadne, więc treść wjeżdża pod tytuł
+ * miękko, a nie wpada w matową płytę.
+ */
+.pk-sheet__glass {
   position: absolute;
   inset: 0;
   z-index: -2;
   pointer-events: none;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  mask-image: linear-gradient(to bottom, black calc(100% - 30px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 30px), transparent 100%);
+}
+
+.pk-sheet__glass span {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--b));
+  -webkit-backdrop-filter: blur(var(--b));
+  mask-image: linear-gradient(to bottom, black var(--from), transparent var(--to));
+  -webkit-mask-image: linear-gradient(to bottom, black var(--from), transparent var(--to));
 }
 
 .pk-sheet__head::before {
@@ -100,7 +107,7 @@
 }
 
 .pk-sheet__title {
-  margin: var(--sp-2) 0 var(--sp-5);
+  margin: var(--sp-2) 0 var(--sp-2);
 }
 
 .pk-sheet__content {

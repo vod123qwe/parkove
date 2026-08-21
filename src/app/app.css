@@ -617,6 +617,8 @@
 /* stamp on the park hero, like a passport mark */
 /* podpis parku pod tytułem, nad zdjęciami: rodzaj, hektary, liczba punktów */
 
+/* podpis należy do tytułu, więc stoi bliżej niego niż galerii pod nim. Bez
+   ujemnego marginesu: wchodził pod szybę nagłówka i wyglądał na przymglony */
 .park-herometa {
   margin: 0 0 var(--sp-4);
   color: var(--content-tertiary);

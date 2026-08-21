@@ -1,22 +1,45 @@
 .pk-actionbar {
   position: sticky;
-  /* --pk-sheet-shift: ile arkusza wisi pod ekranem (patrz BottomSheet) */
-  /* Zmierzone: przy tym offsecie dolna krawędź paska siada dokładnie na dole
-     widocznej części arkusza na obu detentach. */
+  /* --pk-sheet-shift: ile arkusza wisi pod ekranem (patrz BottomSheet). Przy tym
+     offsecie dolna krawędź paska siada na dole widocznej części na obu detentach */
   bottom: var(--pk-sheet-shift, 0px);
   z-index: 2;
+  /* full bleed: it has to reach the edges to read as a bar, not as a row */
+  margin: var(--sp-6) calc(-1 * var(--sp-6)) calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  padding: var(--sp-5) var(--sp-6) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+}
+
+/* gradient zamiast płyty: treść wjeżdża pod pasek, nie kończy się na ścianie */
+.pk-actionbar__glass {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    var(--bg-surface-raised) 42%,
+    color-mix(in srgb, var(--bg-surface-raised) 70%, transparent) 78%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+.pk-actionbar__glass span {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--b));
+  -webkit-backdrop-filter: blur(var(--b));
+  mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+  -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+}
+
+.pk-actionbar__row {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  /* full bleed: it has to reach the edges to read as a bar, not as a row */
-  margin: var(--sp-6) calc(-1 * var(--sp-6)) calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
-  padding: var(--sp-3) var(--sp-6) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
-  background: var(--bg-surface-raised);
-  border-top: 1px solid var(--border-subtle);
 }
 
 /* the decision takes the room; what sits next to it stays a square */
-.pk-actionbar > *:first-child {
+.pk-actionbar__row > *:first-child {
   flex: 1;
   min-width: 0;
 }

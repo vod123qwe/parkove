@@ -42,6 +42,11 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       verified: false,
     },
   },
+  'skawina-pilsudskiego': {
+    photos: [
+      { src: '/photos/park-skawina-miejski.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
+    ],
+  },
   'skawina-blonia': {
     photos: [
       { src: '/photos/park-skawina-blonia-1.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
@@ -73,7 +78,12 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       verified: false,
     },
   },
-    'kopiec-krakusa': {
+  'park-jordana': {
+    photos: [
+      { src: '/photos/park-jordana-widok.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
+    ],
+  },
+  'kopiec-krakusa': {
     photos: [
       { src: '/photos/park-kopiec-krakusa-2.jpg', credit: "Fot. Dawid Galus · CC BY-SA 3.0 pl · Wikimedia Commons" },
     ],
@@ -612,7 +622,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       verified: false,
     },
   },
-    zakrzowek: {
+  zakrzowek: {
     photos: [
       { src: '/photos/park-zakrzowek-1.jpg', credit: "Fot. Wojciech Zabolotny · CC BY-SA 3.0 · Wikimedia Commons" },
       { src: '/photos/park-zakrzowek-2.jpg', credit: "Fot. Wojciech Zabolotny · CC BY-SA 3.0 · Wikimedia Commons" },
@@ -697,7 +707,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       verified: false,
     },
   },
-    'skalki-twardowskiego': {
+  'skalki-twardowskiego': {
     photos: [
       { src: '/photos/park-skalki-twardowskiego-1.jpg', credit: "Fot. MartinVeselka · CC BY-SA 4.0 · Wikimedia Commons" },
       { src: '/photos/park-skalki-twardowskiego-2.jpg', credit: "Fot. MartinVeselka · CC BY-SA 4.0 · Wikimedia Commons" },
