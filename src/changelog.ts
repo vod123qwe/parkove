@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.43.0'
+export const VERSION = '0.44.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.44.0',
+    date: '2026-08-21',
+    title: 'The percentage is gone',
+    changes: [
+      ['changed', 'No more percentage of Krakow. The ring and the number left the corner of the map, and the big number left the profile. A percentage of a city is a number, not a reason to go outside, and nothing was put in its place on purpose. The board of squares in the profile stays, because that one is a picture rather than a score'],
+    ],
+  },
   {
     version: '0.43.0',
     date: '2026-08-21',

@@ -21,7 +21,6 @@ export function ProfileModal({
   open,
   onClose,
   parks,
-  percent,
   visitedCount,
   onOpenStamps,
   onOpenAppearance,
@@ -33,7 +32,6 @@ export function ProfileModal({
   open: boolean
   onClose: () => void
   parks: ParkFeature[]
-  percent: number
   visitedCount: number
   onOpenStamps: () => void
   onOpenAppearance: () => void
@@ -107,9 +105,8 @@ export function ProfileModal({
         {/* the city as a board: one square per place, filled once you have been */}
         <div className="prof-cover">
           <div className="prof-cover__head">
-            <span className="prof-cover__pct">{percent}%</span>
             <div className="prof-cover__text">
-              <p className="t-body-strong">Krakowa odkryte</p>
+              <p className="t-body-strong">Gdzie już byłeś</p>
               <p className="t-body-sm park-muted">
                 {visitedCount} z {parks.length} miejsc · {km.toFixed(1).replace('.', ',')} km w
                 parkach

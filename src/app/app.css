@@ -31,8 +31,14 @@
   z-index: 10;
   display: flex;
   align-items: flex-start;
+  /* the walk status takes the left when there is one; the profile keeps the
+     right either way */
   justify-content: space-between;
   pointer-events: none;
+}
+
+.app-hud > .app-profilebtn:only-child {
+  margin-left: auto;
 }
 
 .app-hud > * {
@@ -62,31 +68,6 @@
 
 .app-profilebtn:hover {
   color: var(--content-primary);
-}
-
-.app-hud__card {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-2);
-  border-radius: var(--radius-xl);
-  corner-shape: var(--corner-smooth);
-}
-
-.app-hud__text {
-  display: flex;
-  flex-direction: column;
-}
-
-.app-hud__percent {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 20px;
-}
-
-.app-hud__count {
-  color: var(--content-tertiary);
 }
 
 /* list trigger, bottom center */
@@ -451,16 +432,6 @@
 }
 
 /* the number carries the progress, so it gets the display face at full size */
-.prof-cover__pct {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 44px;
-  line-height: 44px;
-  letter-spacing: -0.02em;
-  color: var(--content-accent);
-  font-variant-numeric: tabular-nums;
-}
-
 .prof-cover__text p {
   margin: 0;
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Camera, CircleUserRound, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, RefreshCw, Sparkles } from 'lucide-react'
-import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
+import { BottomSheet, Button, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
 import { ParkSheet } from './ParkSheet'
@@ -41,7 +41,6 @@ import parksData from './data/parks.json'
 import './app.css'
 
 const FEATURES = parksData.features as unknown as ParkFeature[]
-const TOTAL_POINTS = FEATURES.reduce((s, f) => s + pointsTotal(f.id), 0)
 
 type PeekPage =
   | { t: 'park' }
@@ -122,12 +121,6 @@ export function App() {
     for (const id of completedIds) if (!prev.has(id)) pendingStamps.current.push(id)
   }, [completedIds])
 
-  const earnedPoints = FEATURES.reduce((s, f) => {
-    const p = progress[f.id]
-    if (!p) return s
-    return s + (questForPark(f.id) ? p.points.length : 1)
-  }, 0)
-  const percent = Math.round((earnedPoints / TOTAL_POINTS) * 100)
   const visitedCount = FEATURES.filter((f) => visitedIds.has(f.id)).length
 
   const selected = FEATURES.find((f) => f.id === selectedId) ?? null
@@ -408,20 +401,11 @@ export function App() {
       />
       <ExpeditionController onNear={onNear} onArrive={onArrive} />
 
+      {/* nothing on the left when not walking: a percentage of a city is a
+          number, not a reason to go outside. Something may earn this corner
+          later; until then the map has it */}
       <header className="app-hud">
-        {onWalk ? (
-          <ExpeditionStatus />
-        ) : (
-          <Card className="app-hud__card">
-            <ProgressRing value={percent} size="sm" />
-            <div className="app-hud__text">
-              <span className="app-hud__percent">{percent}% Krakowa</span>
-              <span className="app-hud__count t-caption">
-                {visitedCount}/{FEATURES.length} miejsc · {earnedPoints}/{TOTAL_POINTS} pkt
-              </span>
-            </div>
-          </Card>
-        )}
+        {onWalk && <ExpeditionStatus />}
         <button className="app-profilebtn" aria-label="Profil" onClick={() => setProfileOpen(true)}>
           <CircleUserRound strokeWidth={1.75} />
         </button>
@@ -757,7 +741,6 @@ export function App() {
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
         parks={FEATURES}
-        percent={percent}
         visitedCount={visitedCount}
         onOpenStamps={() => setStampsOpen(true)}
         onOpenAppearance={() => setAppearanceOpen(true)}
