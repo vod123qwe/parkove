@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Camera, CircleUserRound, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, RefreshCw, Sparkles } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, PeekCard, ProgressRing, Segmented, Toast } from '../ds'
+import { Camera, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, RefreshCw, Sparkles, ToyBrick, X } from 'lucide-react'
+import { BottomSheet, Button, IconButton, List, ListItem, PeekCard, ProgressRing, Segmented, Toast } from '../ds'
+import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
+import { asset } from './assets'
 import type { MapFocus } from './MapView'
 import { ParkSheet } from './ParkSheet'
 import type { ParkFeature } from './ParkSheet'
@@ -19,7 +21,6 @@ import { ExpeditionStatus } from './ExpeditionStatus'
 import { MarkSheet } from './MarkSheet'
 import { updateMark, useMarks } from './photos'
 import { RevealSheet } from './RevealSheet'
-import { KIND_META } from './kinds'
 import { distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { beginWalk } from './walk'
@@ -33,9 +34,9 @@ import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import type { MapStyleId } from './data/mapstyles'
 import { suggestedParking } from './data/parking'
-import { amenitiesFor, isFood } from './data/amenities'
+import { KIND_LABEL, amenitiesFor, isFood, walkUrl } from './data/amenities'
 import type { ParkingInfo } from './data/parking'
-import { pointsTotal, questForPark } from './data/quests'
+import { pointsTotal, questForPark, photosForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 import parksData from './data/parks.json'
 import './app.css'
@@ -86,6 +87,8 @@ export function App() {
   const [looksOpen, setLooksOpen] = useState(false)
   const [celebrate, setCelebrate] = useState<{ id: string; name: string } | null>(null)
   const [amenityKind, setAmenityKind] = useState<'food' | 'playground' | null>(null)
+  /** wybrana konkretna kawiarnia albo plac zabaw: pin rośnie, mapa centruje */
+  const [amenitySpotId, setAmenitySpotId] = useState<string | null>(null)
   const [mapStyle, setMapStyleState] = useState<MapStyleId>(getMapStyle)
 
   const pickMapStyle = (id: MapStyleId) => {
@@ -126,6 +129,25 @@ export function App() {
   const visitedCount = FEATURES.filter((f) => visitedIds.has(f.id)).length
 
   const selected = FEATURES.find((f) => f.id === selectedId) ?? null
+
+  /** wybrana kawiarnia albo plac zabaw: mapa jedzie do pinu, pin się zaznacza */
+  const pickAmenity = (id: string) => {
+    const spot = selected ? amenitiesFor(selected.id).find((a) => a.id === id) : null
+    if (!spot) return
+    setAmenitySpotId(id)
+    setAmenityKind(null)
+    setExpanded(false)
+    setFocus({ center: spot.coords, zoom: 17.2, ts: Date.now() })
+  }
+
+  const activeSpot = useMemo(
+    () =>
+      selected && amenitySpotId
+        ? (amenitiesFor(selected.id).find((a) => a.id === amenitySpotId) ?? null)
+        : null,
+    [selected, amenitySpotId],
+  )
+
   const expeditionPark = expedition ? FEATURES.find((f) => f.id === expedition.parkId) : null
   const onWalk = !!expedition
   const peekOpen = !!selected && !expanded && !onWalk
@@ -370,10 +392,55 @@ export function App() {
   )
 
   const groupOf = (f: ParkFeature) => f.properties.group ?? 'parki'
+
+  /*
+   * Lista układa się tak, jak podejmuje się decyzję: najbliższe najpierw, w
+   * trzech kubełkach według stanu. Alfabet był najgorszą możliwą kolejnością,
+   * bo nazwa nie mówi ani gdzie to jest, ani czy tam już byłeś.
+   */
+  /** polska odmiana: 1 punkt, 2 punkty, 5 punktów */
+  const plPoints = (n: number) =>
+    n === 1 ? 'punkt' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'punkty' : 'punktów'
+
+  const LIST_GROUPS = [
+    { key: 'started' as const, label: 'Zaczęte' },
+    { key: 'fresh' as const, label: 'Nietknięte' },
+    { key: 'done' as const, label: 'Zdobyte' },
+  ]
   const shownParks = useMemo(
     () => (listTab === 'all' ? sortedParks : sortedParks.filter((f) => groupOf(f) === listTab)),
     [sortedParks, listTab],
   )
+  const grouped = useMemo(() => {
+    const rows = shownParks.map((f) => {
+      const p = progress[f.id]
+      const visited = !!p
+      const total = pointsTotal(f.id)
+      const earned = questForPark(f.id) ? (p?.points.length ?? 0) : visited ? 1 : 0
+      const done = completedIds.has(f.id)
+      const spots = amenitiesFor(f.id)
+      return {
+        f,
+        earned,
+        total,
+        done,
+        visited,
+        hasPlay: spots.some((a) => !isFood(a.kind)),
+        hasFood: spots.some((a) => isFood(a.kind)),
+        away: myFix ? distanceToParkM(myFix.coords, f.geometry) : null,
+      }
+    })
+    const order = (a: (typeof rows)[number], b: (typeof rows)[number]) =>
+      a.away != null && b.away != null
+        ? a.away - b.away
+        : a.f.properties.name.localeCompare(b.f.properties.name, 'pl')
+    return {
+      started: rows.filter((r) => r.visited && !r.done).sort(order),
+      fresh: rows.filter((r) => !r.visited).sort(order),
+      done: rows.filter((r) => r.done).sort(order),
+    }
+  }, [shownParks, progress, completedIds, myFix])
+
   const LIST_TABS = useMemo(
     () => [
       { value: 'all' as const, label: 'Wszystkie' },
@@ -405,7 +472,12 @@ export function App() {
         stampPins={stampPins}
         onSelectStamp={selectParkFromMap}
         amenityPins={amenityPins}
-        onSelectAmenity={setAmenityKind}
+        activeAmenityId={amenitySpotId}
+        onSelectAmenity={(kind, id) => {
+          // klik w pin: pokaż to jedno miejsce, nie całą listę kategorii
+          if (id) pickAmenity(id)
+          else setAmenityKind(kind)
+        }}
         hideStampFor={overlayParkId}
         photoPins={photoPins}
         onSelectPhoto={setPhotoId}
@@ -574,28 +646,47 @@ export function App() {
           onChange={setListTab}
           aria-label="Rodzaj miejsc"
         />
-        <List className="app-parklist">
-          {shownParks.map((f) => {
-            const p = progress[f.id]
-            const visited = !!p
-            const kind = KIND_META[f.properties.kind] ?? KIND_META.park
-            const quest = questForPark(f.id)
-            const total = pointsTotal(f.id)
-            const earned = quest ? (p?.points.length ?? 0) : visited ? 1 : 0
-            const done = earned >= total
-            return (
-              <ListItem
-                key={f.id}
-                icon={kind.icon}
-                leadTone={done ? 'gold' : visited ? 'accent' : 'neutral'}
-                title={f.properties.name}
-                meta={`${kind.label} · ${String(f.properties.areaHa).replace('.', ',')} ha${quest ? ` · quest ${earned}/${total}` : ''}`}
-                trailing={<ProgressRing value={(earned / total) * 100} size="sm" />}
-                onClick={() => openFromList(f)}
-              />
-            )
-          })}
-        </List>
+        {LIST_GROUPS.map((group) => {
+          const rows = grouped[group.key]
+          if (!rows.length) return null
+          return (
+            <section key={group.key} className="app-listgroup">
+              <h3 className="t-title app-listgroup__head">
+                {group.label} <span className="app-listgroup__count">{rows.length}</span>
+              </h3>
+              <List className="app-parklist">
+                {rows.map(({ f, earned, total, done, visited, hasPlay, hasFood }) => (
+                  <ListItem
+                    key={f.id}
+                    photo={{ src: asset(heroPhoto(f.id) ?? photosForPark(f.id)[0]?.src ?? ''), alt: '' }}
+                    title={f.properties.name}
+                    meta={
+                      done
+                        ? 'zdobyte'
+                        : questForPark(f.id)
+                          ? visited
+                            ? `${earned} z ${total} punktów`
+                            : `${total} ${plPoints(total)} do odkrycia`
+                          : visited
+                            ? 'odwiedzone'
+                            : 'jeszcze nieodkryte'
+                    }
+                    metaExtra={
+                      hasPlay || hasFood ? (
+                        <>
+                          {hasPlay && <ToyBrick aria-label="plac zabaw" />}
+                          {hasFood && <Coffee aria-label="kawa albo jedzenie" />}
+                        </>
+                      ) : undefined
+                    }
+                    trailing={<ProgressRing value={(earned / total) * 100} size="sm" />}
+                    onClick={() => openFromList(f)}
+                  />
+                ))}
+              </List>
+            </section>
+          )
+        })}
       </BottomSheet>
 
       <ParkSheet
@@ -787,12 +878,34 @@ export function App() {
         mapStyle={mapStyle}
         onMapStyle={pickMapStyle}
       />
+      {activeSpot && (
+        <div className="app-spotcard">
+          <div className="app-spotcard__body">
+            <p className="t-body-strong">{activeSpot.name}</p>
+            <p className="t-caption park-muted">
+              {KIND_LABEL[activeSpot.kind]} · {selected?.properties.name}
+            </p>
+          </div>
+          <Button
+            variant="tonal"
+            icon={<Compass size={16} />}
+            onClick={() => window.open(walkUrl(activeSpot.coords), '_blank', 'noopener')}
+          >
+            Prowadź
+          </Button>
+          <IconButton aria-label="Zamknij" variant="ghost" onClick={() => setAmenitySpotId(null)}>
+            <X size={18} />
+          </IconButton>
+        </div>
+      )}
+
       {selected && (
         <AmenityModal
           parkId={selected.id}
           parkName={selected.properties.name}
           kind={amenityKind}
           onClose={() => setAmenityKind(null)}
+          onPick={pickAmenity}
         />
       )}
       <StampsModal open={stampsOpen} onClose={() => setStampsOpen(false)} />

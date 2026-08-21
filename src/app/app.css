@@ -87,6 +87,25 @@
   margin: 0 0 var(--sp-4);
 }
 
+/* trzy kubełki stanu: nagłówek mówi, na co patrzysz, licznik ile tego jest */
+.app-listgroup + .app-listgroup {
+  margin-top: var(--sp-6);
+}
+
+.app-listgroup__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-2);
+}
+
+.app-listgroup__count {
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--content-tertiary);
+}
+
 .app-parklist {
   display: flex;
   flex-direction: column;
@@ -1036,6 +1055,33 @@
  * from inside a settings screen means never seeing them next to each other.
  * Sits directly above the locate button and speaks the same shape.
  */
+/*
+ * Wybrana kawiarnia albo plac zabaw: pasek nad dolną krawędzią, bo mapa ma
+ * zostać widoczna. Pin jest zaznaczony i wycentrowany, więc karta ma tylko
+ * powiedzieć, na co patrzysz, i dać jedno wyjście: prowadź.
+ */
+.app-spotcard {
+  position: absolute;
+  left: var(--sp-4);
+  right: var(--sp-4);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  z-index: 14;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-3);
+  animation: looks-in 220ms var(--ease-screen);
+}
+
+.app-spotcard__body {
+  flex: 1;
+  min-width: 0;
+}
+
 .app-look {
   position: absolute;
   right: var(--sp-4);

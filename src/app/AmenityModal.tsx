@@ -8,11 +8,14 @@ export function AmenityModal({
   parkName,
   kind,
   onClose,
+  onPick,
 }: {
   parkId: string
   parkName: string
   kind: 'food' | 'playground' | null
   onClose: () => void
+  /** wybór konkretnego miejsca: mapa jedzie do pinu, pin się zaznacza */
+  onPick: (id: string) => void
 }) {
   const wantFood = kind === 'food'
   const spots = amenitiesFor(parkId).filter((s) => isFood(s.kind) === wantFood)
@@ -26,8 +29,9 @@ export function AmenityModal({
       action="back"
     >
       <p className="t-body-sm parking-lead">
-        {wantFood ? 'Jedzenie i kawa' : 'Place zabaw'} w okolicy: <strong>{parkName}</strong>. Dane
-        z OpenStreetMap, więc godziny warto sprawdzić na miejscu.
+        {wantFood ? 'Jedzenie i kawa' : 'Place zabaw'} w okolicy: <strong>{parkName}</strong>. Dotknij
+        wiersza, żeby zobaczyć to miejsce na mapie. Dane z OpenStreetMap, więc godziny warto
+        sprawdzić na miejscu.
       </p>
       <List className="parking-list">
         {spots.map((s) => (
@@ -37,6 +41,7 @@ export function AmenityModal({
             leadTone="accent"
             title={s.name}
             meta={KIND_LABEL[s.kind]}
+            onClick={() => onPick(s.id)}
             trailing={
               <IconButton
                 aria-label={`Prowadź: ${s.name}`}

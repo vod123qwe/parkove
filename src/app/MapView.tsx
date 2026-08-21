@@ -80,7 +80,9 @@ type Props = {
   onSelectStamp: (parkId: string) => void
   /** food and playground spots of the selected park */
   amenityPins: AmenityPin[]
-  onSelectAmenity: (kind: 'food' | 'playground') => void
+  onSelectAmenity: (kind: 'food' | 'playground', id: string) => void
+  /** zaznaczona kawiarnia albo plac zabaw: rośnie i dostaje obwódkę */
+  activeAmenityId: string | null
   /** stamp of this park steps aside so its quest pins stay readable */
   hideStampFor: string | null
   /** what the current walk left behind, drawn as thumbnails and small pins */
@@ -123,11 +125,13 @@ const questFC = (quest: QuestOverlay | null) => ({
   })),
 })
 
-const amenityFC = (pins: AmenityPin[]) => ({
+const amenityFC = (pins: AmenityPin[], activeId?: string | null) => ({
   type: 'FeatureCollection' as const,
   features: pins.map((p) => ({
     type: 'Feature' as const,
-    properties: { kind: p.kind, icon: pinImageId(p.kind, p.kind) },
+    // id i flaga jadą w danych, żeby dało się kliknąć w KONKRETNĄ kawiarnię,
+    // a nie tylko w kategorię, i żeby zaznaczona urosła
+    properties: { id: p.id, kind: p.kind, active: p.id === activeId, icon: pinImageId(p.kind, p.kind) },
     geometry: { type: 'Point' as const, coordinates: p.coords },
   })),
 })
@@ -232,6 +236,7 @@ export function MapView({
   onSelectStamp,
   amenityPins,
   onSelectAmenity,
+  activeAmenityId,
   hideStampFor,
   photoPins,
   onSelectPhoto,
@@ -554,12 +559,29 @@ export function MapView({
         paint: { 'circle-radius': 20, 'circle-color': 'transparent' },
       })
       map.addLayer({
+        id: 'amenity-halo',
+        type: 'circle',
+        source: 'amenities',
+        filter: ['==', ['get', 'active'], true] as never,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 13, 14, 17, 26] as never,
+          'circle-color': c.poiOpen,
+          'circle-opacity': 0.25,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': c.poiOpen,
+        },
+      })
+      map.addLayer({
         id: 'amenity-pins',
         type: 'symbol',
         source: 'amenities',
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 12, 0.2, 15, 0.3, 17, 0.4] as never,
+          'icon-size': [
+            '*',
+            ['case', ['get', 'active'], 1.45, 1],
+            ['interpolate', ['linear'], ['zoom'], 12, 0.2, 15, 0.3, 17, 0.4],
+          ] as never,
           'icon-allow-overlap': true,
         },
       })
@@ -608,7 +630,7 @@ export function MapView({
         },
       })
       // pins must never disappear behind a sticker
-      for (const layer of ['amenity-pins', 'parking-pin', 'quest-poi-dots']) {
+      for (const layer of ['amenity-halo', 'amenity-pins', 'parking-pin', 'quest-poi-dots']) {
         if (map.getLayer(layer)) map.moveLayer(layer)
       }
       for (const layer of ['amenity-hit', 'parking-hit', 'quest-poi-hit']) {
@@ -683,7 +705,10 @@ export function MapView({
       }
       const amenity = hit('amenity-hit')
       if (amenity?.properties?.kind) {
-        cb.onSelectAmenity(amenity.properties.kind as 'food' | 'playground')
+        cb.onSelectAmenity(
+          amenity.properties.kind as 'food' | 'playground',
+          String(amenity.properties.id ?? ''),
+        )
         return
       }
       const stamp = hit('stamp-pin-hit')
@@ -879,9 +904,9 @@ export function MapView({
     const map = mapRef.current
     if (!map || !loadedRef.current) return
     ;(map.getSource('amenities') as { setData: (d: unknown) => void } | undefined)?.setData(
-      amenityFC(amenityPins),
+      amenityFC(amenityPins, activeAmenityId),
     )
-  }, [amenityPins])
+  }, [amenityPins, activeAmenityId])
 
   useEffect(() => {
     const map = mapRef.current

@@ -6,8 +6,12 @@ export type ListItemProps = {
   icon?: ReactNode
   /** leading disc tone; accent for visited things, gold for completed */
   leadTone?: 'neutral' | 'accent' | 'gold'
+  /** square photo slot instead of the icon disc */
+  photo?: { src: string; alt?: string }
   title: string
   meta?: string
+  /** dopisek po metadanych, na ikonki w jednej linii z postępem */
+  metaExtra?: ReactNode
   trailing?: ReactNode
   onClick?: () => void
   className?: string
@@ -15,9 +19,11 @@ export type ListItemProps = {
 
 export function ListItem({
   icon,
+  photo,
   leadTone = 'neutral',
   title,
   meta,
+  metaExtra,
   trailing,
   onClick,
   className,
@@ -25,10 +31,21 @@ export function ListItem({
   const Tag = onClick ? 'button' : 'div'
   return (
     <Tag className={cx('pk-listitem', className)} onClick={onClick} type={onClick ? 'button' : undefined}>
-      {icon != null && <span className={cx('pk-listitem__lead', `-${leadTone}`)}>{icon}</span>}
+      {photo ? (
+        <span className="pk-listitem__lead -photo">
+          <img src={photo.src} alt={photo.alt ?? ''} loading="lazy" />
+        </span>
+      ) : (
+        icon != null && <span className={cx('pk-listitem__lead', `-${leadTone}`)}>{icon}</span>
+      )}
       <span className="pk-listitem__text">
         <span className="pk-listitem__title">{title}</span>
-        {meta != null && <span className="pk-listitem__meta">{meta}</span>}
+        {(meta != null || metaExtra != null) && (
+          <span className="pk-listitem__meta">
+            {meta}
+            {metaExtra}
+          </span>
+        )}
       </span>
       {trailing != null && <span className="pk-listitem__trailing">{trailing}</span>}
     </Tag>

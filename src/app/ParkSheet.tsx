@@ -33,7 +33,7 @@ import { checkIn, collectPoint, stopExpedition, useGameState } from './state'
 import { beginWalk } from './walk'
 import { distanceToParkM, formatDistance, pointInPark } from './geo'
 import type { ParkGeometry, Pt } from './geo'
-import { pointsTotal, questForPark } from './data/quests'
+import { pointsTotal, questForPark, photosForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 
 export type ParkFeature = {
@@ -132,6 +132,17 @@ export function ParkSheet({
   }
 
   const info = PARK_INFO[park.id]
+  /*
+   * Nagłówek bierze zdjęcia parku, a gdy ich nie ma, zdjęcia jego punktów.
+   * Pięć pilotażowych parków miało opisane punkty ze zdjęciami i mimo to pustą
+   * ikonę na górze karty, bo nikt nie wpisał im galerii osobno.
+   */
+  const gallery = (() => {
+    const own = info?.photos ?? []
+    const fromPois = photosForPark(park.id)
+    const seen = new Set(own.map((p) => p.src))
+    return [...own, ...fromPois.filter((p) => !seen.has(p.src))]
+  })()
   const spots = amenitiesFor(park.id)
   const hasFood = spots.some((a) => isFood(a.kind))
   const hasPlay = spots.some((a) => !isFood(a.kind))
@@ -146,7 +157,7 @@ export function ParkSheet({
       hero={
         <div className="park-heroslot">
           <MediaHero
-            images={info?.photos?.map((p) => ({ src: asset(p.src), credit: p.credit })) ?? []}
+            images={gallery.map((p) => ({ src: asset(p.src), credit: p.credit }))}
             title={park.properties.name}
             meta={heroMeta}
             fallback={<Trees strokeWidth={1.5} />}

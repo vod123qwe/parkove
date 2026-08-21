@@ -2575,4 +2575,14 @@ export const QUESTS: Quest[] = [...KRAKOW_QUESTS, ...DOLINKI_QUESTS]
 export const questForPark = (parkId: string) => QUESTS.find((q) => q.parkId === parkId)
 
 /** total collectible points for a park: quest POIs, or 1 (the entry) without a quest */
+/**
+ * Zdjęcia punktów tego miejsca, jako zapas dla nagłówka karty. Park bez własnego
+ * zdjęcia, ale z opisanymi punktami, nie musi pokazywać pustej ikony: to, co
+ * zobaczysz na miejscu, jest już sfotografowane w jego punktach.
+ */
+export const photosForPark = (parkId: string) =>
+  (questForPark(parkId)?.pois ?? [])
+    .filter((poi) => poi.photo)
+    .map((poi) => ({ src: poi.photo as string, credit: poi.photoCredit }))
+
 export const pointsTotal = (parkId: string) => questForPark(parkId)?.pois.length ?? 1

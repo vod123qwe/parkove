@@ -832,3 +832,6 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
 
 }
+
+/** pierwsze zdjęcie miejsca, do miniatury na liście */
+export const heroPhoto = (parkId: string) => PARK_INFO[parkId]?.photos?.[0]?.src
