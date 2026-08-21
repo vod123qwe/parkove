@@ -403,7 +403,7 @@ const KRAKOW_QUESTS: Quest[] = [
             'Renaturyzacja realnie obniża fale powodziowe, więc wydatek zwraca się przy pierwszej dużej wodzie. Ale każde pokolenie jest przekonane, że wie lepiej niż poprzednie, a nasze wnuki będą oglądać nasze decyzje z takim samym zdziwieniem.',
         },
         sources: ['https://skawina.tv/skawina-odkryj-piekno-przyrody-i-parki/'],
-        coords: [19.81908, 49.9736],
+        coords: [19.82035, 49.97402],
         radius: 45,
       },
     ],
@@ -577,7 +577,7 @@ const KRAKOW_QUESTS: Quest[] = [
           options: ["Wolno, to sztuka", "Nie, to zniekształca pamięć", "Zależy, czy widz o tym wie"],
           counterpoint: "Bez tych obrazów pokolenia pod zaborami nie miałyby wspólnego wyobrażenia o własnym kraju, a to trzymało naród razem. Ale dziś większość ludzi pamięta Grunwald właśnie jako scenę Matejki, nie jako bitwę, o której wiemy niewiele.",
         },
-        coords: [19.93503, 50.06394],
+        coords: [19.94105, 50.06539],
         radius: 30,
       },
       {

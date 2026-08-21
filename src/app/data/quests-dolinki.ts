@@ -591,8 +591,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Potok Szklarka uchodzi do Racławki. Te dwie doliny są parą: kończą się w tym samym miejscu, w Dubiu.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Szklarki'],
-        coords: [19.721486, 50.195163],
-        radius: 40,
+        coords: [19.721044, 50.194597],
+        radius: 70,
       },
       {
         id: 'zrodlo-pioro',

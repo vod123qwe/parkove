@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.48.0'
+export const VERSION = '0.48.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.48.1',
+    date: '2026-08-21',
+    title: 'Every point checked against the map',
+    changes: [
+      ['fixed', 'Two more points were in the wrong place. The Matejko monument was 459 metres from the monument, in the western Planty, while our own description said it stands between the Barbakan and the Florian Gate. Bukowe Skaly in Dolina Szklarki was 70 metres out'],
+      ['changed', 'The Skawina oxbow moved a second time. My first correction was a guess at the park boundary nearest the water, and it was 102 metres from the oxbow the map actually knows by name'],
+      ['added', 'The audit now checks all 136 points against OpenStreetMap by name inside each park. Seventy seven have a match and seventy six of them agree to within nine metres. The rest carry names we invented, so this method cannot judge them'],
+    ],
+  },
   {
     version: '0.48.0',
     date: '2026-08-21',

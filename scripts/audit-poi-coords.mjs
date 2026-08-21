@@ -87,7 +87,15 @@ const bboxOf = (feature, padDeg = 0.0015) => {
 
 // kumi bywa nieosiagalny, a .de rzuca 504 i dziala przy nastepnej probie,
 // wiec cierpliwosc jest tu wazniejsza niz liczba serwerow
-const EPS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']
+// UWAGA: overpass.osm.ch odpowiada 200 i pustą listą na każde pytanie, bo ma
+// pustą bazę (timestamp_osm_base to numer, nie data). Taka odpowiedź wygląda
+// jak „w tym parku nic nie ma", czyli audyt zgłasza sukces, nie sprawdziwszy
+// niczego. Dlatego nie ma go na liście, a każda odpowiedź jest walidowana.
+const EPS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+]
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 async function fetchPark(parkId, bbox) {
@@ -120,6 +128,10 @@ out tags center;`
         const text = await res.text()
         if (!text.startsWith('{')) throw new Error('nie JSON: ' + text.slice(0, 40))
         const json = JSON.parse(text)
+        // pusta baza udaje poprawną odpowiedź: znacznik czasu musi być datą
+        const stamp = json.osm3s?.timestamp_osm_base ?? ''
+        if (!/^\d{4}-\d{2}-\d{2}/.test(stamp)) throw new Error('serwer bez danych: ' + stamp)
+        if (json.remark) throw new Error('remark: ' + json.remark)
         const rows = (json.elements ?? [])
           .map((e) => {
             const c = e.center ?? { lat: e.lat, lon: e.lon }
@@ -160,7 +172,77 @@ if (process.argv.includes('--precision')) {
   process.exit(0)
 }
 
-const only = process.argv.find((a) => a.startsWith('--only='))?.slice(7)
+const only2 = process.argv.find((a) => a.startsWith('--only='))?.slice(7)
+
+// Tryb zapasowy: Nominatim zamiast Overpassa. Szuka nazwy punktu OGRANICZONY do
+// prostokąta parku (viewbox + bounded), więc to szukanie po nazwie i po miejscu
+// naraz. Działa tylko dla punktów, które mają nazwę własną istniejącą w OSM;
+// nasze opisowe nazwy („Stok Rękawki") nic nie znajdą i to jest brak sygnału,
+// a nie zielone światło.
+if (process.argv.includes('--nominatim')) {
+  const rows = readPois().filter((p) => !only2 || p.parkId === only2)
+  console.log(`sprawdzam ${rows.length} punktow przez Nominatim
+`)
+  const out = []
+  for (const poi of rows) {
+    const f = byId.get(poi.parkId)
+    if (!f) continue
+    const [s0, w0, n0, e0] = bboxOf(f, 0.001).split(',').map(Number)
+    const url =
+      'https://nominatim.openstreetmap.org/search?' +
+      new URLSearchParams({
+        q: poi.name,
+        format: 'jsonv2',
+        limit: '3',
+        viewbox: `${w0},${n0},${e0},${s0}`,
+        bounded: '1',
+      })
+    await sleep(1300)
+    let hits = []
+    try {
+      const res = await fetch(url, { headers: { 'User-Agent': 'parkove-dev/0.48 (jarek local)' } })
+      hits = await res.json()
+    } catch (e) {
+      console.log(`BLAD  ${poi.parkId}/${poi.id}: ${e.message}`)
+      continue
+    }
+    if (!Array.isArray(hits) || !hits.length) continue
+    /*
+     * Nominatim w trybie bounded dopasowuje na siłę: na „Pomnik Kraka" oddał
+     * „Jan Matejko" 500 m dalej i audyt krzyknął fałszywie. Trafienie musi więc
+     * dzielić z naszą nazwą jakieś znaczące słowo, a nie tylko rodzaj obiektu.
+     */
+    const GENERIC = ['pomnik', 'tablica', 'punkt', 'widokowy', 'park', 'staw', 'jaskinia', 'zrodlo', 'skala', 'skaly', 'stary', 'nowy', 'wielki', 'maly', 'przy', 'nad', 'jego']
+    const words = (t) =>
+      strip(t)
+        .split(/[^a-z0-9]+/)
+        .filter((w) => w.length > 3 && !GENERIC.includes(w))
+    const mine = words(poi.name ?? '')
+    const shares = (h) => {
+      const theirs = words((h.display_name ?? '').split(',')[0])
+      return mine.length === 0 || theirs.some((w) => mine.some((v) => v.startsWith(w.slice(0, 5)) || w.startsWith(v.slice(0, 5))))
+    }
+    const named = hits.filter(shares)
+    if (!named.length) continue
+    const best = named
+      .map((h) => ({ d: metres(poi, { lat: +h.lat, lon: +h.lon }), h }))
+      .sort((a, b) => a.d - b.d)[0]
+    out.push({ ...poi, dist: Math.round(best.d), hitLat: +best.h.lat, hitLon: +best.h.lon, hitName: best.h.display_name?.split(',')[0] })
+  }
+  out.sort((a, b) => b.dist - a.dist)
+  console.log('=== punkty z trafieniem w OSM, posortowane po odleglosci ===')
+  for (const r of out) {
+    const flag = r.dist > 60 ? 'DALEKO' : 'ok    '
+    console.log(
+      `${flag} ${String(r.dist).padStart(5)} m  ${r.parkId.padEnd(22)} ${r.id.padEnd(20)} ${(r.name ?? '').slice(0, 24).padEnd(24)} nasze ${r.lat},${r.lon} -> OSM ${r.hitLat},${r.hitLon} (${r.hitName})`,
+    )
+  }
+  console.log(`
+sprawdzonych z trafieniem: ${out.length}, z tego daleko: ${out.filter((r) => r.dist > 60).length}`)
+  process.exit(0)
+}
+
+const only = only2
 const pois = readPois().filter((p) => !only || p.parkId === only)
 const parkIds = [...new Set(pois.map((p) => p.parkId))]
 

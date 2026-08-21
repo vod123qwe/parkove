@@ -195,3 +195,55 @@ i pomija parki już zapisane w cache.
 
 Uwaga: precyzja nie łapie wszystkiego. Skawiński dąb miał 5 miejsc po przecinku
 i mimo to stał 205 m obok.
+
+## Audyt dokończony (v0.48.1)
+
+Overpass nie wstał, ale **Nominatim w trybie przestrzennym** okazał się lepszym
+narzędziem: szuka nazwy punktu ograniczony do prostokąta parku (`viewbox` +
+`bounded=1`), czyli po nazwie i po miejscu naraz. 136 punktów, jedno zapytanie na
+punkt, 1,3 s przerwy.
+
+**Wynik: 77 punktów ma trafienie po nazwie w OSM, 76 z nich zgadza się co do
+0 do 9 metrów.** Reszta (59) ma nasze własne, opisowe nazwy („Stok Rękawki",
+„Linia dwóch kopców"), których w OSM nie ma, więc tą metodą się ich nie sprawdzi.
+
+### Poprawione współrzędne (6 punktów)
+
+| Punkt | Błąd | Źródło prawdy |
+|---|---|---|
+| `zakrzowek/kapielisko` | 760 m | skupisko `man_made=pier` w OSM |
+| `planty/matejko` | 459 m | `historic=memorial` „Jan Matejko", Zaułek Książąt Czartoryskich. Nasz własny opis mówił „między Barbakanem a Bramą Floriańską", a współrzędna wskazywała zachodnie Planty |
+| `skawina/starorzecze` | 276 m, potem jeszcze 102 m | Nominatim zna obiekt „Starorzecze Skawinki". Moja pierwsza poprawka (granica parku najbliżej wody) też była zgadywaniem i też była zła |
+| `skawina/dab-pomnik` | 205 m | drzewo z `denotation=natural_monument` |
+| `skawina/sokol` | 165 m | Pałacyk „Sokół" + Pomnik Kazimierza Wielkiego, promień 55 żeby objąć oba |
+| `dolina-szklarki/bukowe-skaly` | 70 m | kanoniczny punkt OSM, promień podniesiony do 70, bo to grupa skał |
+
+### Wnioski metodologiczne
+
+1. **Precyzja współrzędnych to słaby trop.** Z 22 punktów o 3-4 miejscach po
+   przecinku większość okazała się poprawna (Pałac Tarnowskich na `19.9423`
+   trafia co do metra, bo to `19.94230` z obciętym zerem). Odwrotnie też:
+   skawiński dąb miał 5 miejsc i stał 205 m obok.
+2. **Dopasowanie po nazwie musi wymagać wspólnego słowa.** Nominatim w trybie
+   `bounded` dopasowuje na siłę: na „Pomnik Kraka" oddał „Jan Matejko" 500 m
+   dalej i audyt krzyknął fałszywie. Po dodaniu warunku wspólnego znaczącego
+   słowa fałszywy alarm zniknął, a Krak potwierdził się na 1 m.
+3. **Pusta baza udaje poprawną odpowiedź.** `overpass.osm.ch` odpowiada 200 i
+   pustą listą na każde pytanie, bo nie ma danych (`timestamp_osm_base` to numer,
+   nie data). Zapisało mi 44 „sprawdzone" parki z zerem obiektów, czyli audyt
+   raportował sukces, nie sprawdziwszy niczego. Skrypt waliduje teraz znacznik
+   czasu i obecność `remark`.
+
+### Zostało: 16 par punktów zaliczanych jednym staniem
+
+`node` sprawdza też, które punkty leżą bliżej siebie niż ich promienie. Takich par
+jest 16, w tym `kopiec-wandy/szczyt-wandy` i `wanda-matejko` **metr od siebie**.
+To nie błąd współrzędnych, a pytanie projektowe: dwa punkty na jednym miejscu dają
+dwa odkrycia naraz i psują rytm zbierania. Do decyzji Jarka: scalić, rozsunąć albo
+zostawić.
+
+Pary: krakusa (szczyt/azymut 20 m), jordana (pomnik/popiersia 32), krakowski
+(swiatowid/pocalunek 23, pocalunek/zafrasowanie 23), bednarskiego 35, kopiec-wandy
+**1**, bagry 22, wyspianskiego 32, kosciuszki (szczyt/fort 25, fort/kaplica 25),
+panienskie-skaly 39, szwedzki 59, stacja-wisla 76, szymborskiej 13, zielony-jar 64,
+bolechowicka (brama/mur 29, tu akurat słusznie, bo to sąsiadujące skały).
