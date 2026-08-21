@@ -45,6 +45,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   'skawina-pilsudskiego': {
     photos: [
       { src: '/photos/park-skawina-miejski.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
+      // pomnik Kazimierza Wielkiego: stał podpisany jako Błonia, a jest tutaj
+      { src: '/photos/park-skawina-pilsudskiego-2.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
     ],
     description: [
       "Park kieszonkowy w najlepszym sensie: dwa i pół hektara w samym centrum Skawiny, trzy minuty od rynku. Założony w 1927 roku, nosi imię marszałka Piłsudskiego.",
@@ -58,9 +60,12 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     },
   },
   'skawina-blonia': {
-    photos: [
-      { src: '/photos/park-skawina-blonia-1.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
-    ],
+    /*
+     * Bez własnego zdjęcia i to jest świadome. Kartę prowadził pomnik Kazimierza
+     * Wielkiego, który stoi obok Sokoła w parku miejskim, nie tutaj: zdjęcie
+     * wróciło do swojego parku. Commons nie ma żadnej fotografii Błoń, więc
+     * pierwsze prawdziwe zdjęcie tego miejsca zrobisz sam, w trakcie wyprawy.
+     */
     description: [
       "Błonia Skawińskie to zielona przestrzeń na skraju miasta, blisko starorzecza Skawinki. Sześć hektarów łąk i alejek, które lokalnie pełnią rolę i parku, i terenu rekreacyjnego.",
       "Największy atut to otwarta przestrzeń i widok na dolinę rzeki, rzadki w gęsto zabudowanej Skawinie. Wiosną łąki się zielenią, a nad wodą pojawiają się ptaki.",

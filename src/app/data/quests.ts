@@ -26,6 +26,7 @@ export type PoiCategory =
   | 'history'
   | 'meadow'
   | 'climb'
+  | 'play'
 
 export type QuestPoi = {
   id: string
@@ -341,6 +342,9 @@ const KRAKOW_QUESTS: Quest[] = [
   },
   {
     parkId: 'skawina-pilsudskiego',
+    /* tężnia doszła jako czwarty punkt, ale pieczątka zostaje za trzy: kto ma
+       ochotę, dobiera ciekawostkę, kto nie, kończy wyprawę tak jak dotąd */
+    stampAt: 3,
     pois: [
       {
         id: 'dab-pomnik',
@@ -405,6 +409,38 @@ const KRAKOW_QUESTS: Quest[] = [
         sources: ['https://skawina.tv/skawina-odkryj-piekno-przyrody-i-parki/'],
         coords: [19.82035, 49.97402],
         radius: 45,
+      },
+      {
+        id: 'teznia',
+        category: 'water',
+        name: 'Tężnia solankowa',
+        teaser: 'Solanka spływa po tarninie i robi morskie powietrze. [ciekawostka]',
+        description: [
+          'Najnowszy obiekt w parku: tężnia otwarta w kwietniu 2026 roku, postawiona przy starym korycie Skawinki. Solanka spływa po ścianach z gałęzi tarniny, rozbija się na mgłę i robi wokół siebie aerozol, którym się oddycha jak nad morzem.',
+          'Projekt wyszedł z pracowni architektury krajobrazu LandLAB, a bryła jest świadomym nawiązaniem do komory solnej. Budowa kosztowała 485 300 złotych, z czego 242 788 dołożyło Województwo Małopolskie z programu „Małopolskie tężnie solankowe”.',
+          'Punkt dodatkowy: pieczątkę parku dostaniesz za trzy pozostałe.',
+        ],
+        findHint: 'Północna część parku, przy starorzeczu, drewniana konstrukcja z kapiącą wodą.',
+        reveal:
+          'Tężnia nie leczy powietrza w mieście, robi jedną małą chmurę czystego. Skawina, którą Światowa Organizacja Zdrowia wpisała w 2016 roku na dwunaste miejsce najbardziej zanieczyszczonych miast Unii, wydała na tę chmurę pół miliona złotych.',
+        dilemma: {
+          question:
+            'Pół miliona na tężnię w mieście z problemem powietrza: leczyć objaw, czy przyczynę?',
+          options: [
+            'Przyczynę: te pieniądze to filtry i wymiana pieców',
+            'Objaw też się liczy: ludzie oddychają dziś, nie w 2035',
+            'Jedno i drugie, ale najpierw powiedzcie mieszkańcom, co jest czym',
+          ],
+          counterpoint:
+            'Tężnia daje realną ulgę drogom oddechowym i ściąga ludzi do parku, więc nie jest fikcją. Ale kosztuje tyle, co kilkadziesiąt wymian pieca, a te działają cały rok i na całą dzielnicę. Kłopot w tym, że tężnię widać na zdjęciu z otwarcia, a wymienionego pieca nie.',
+        },
+        sources: [
+          'https://www.malopolskie24info.pl/2026/04/27/teznia-solankowa-w-skawinie-oficjalnie-otwarta-nowe-miejsce-relaksu-dla-mieszkancow/',
+          'https://skawina24.com/wspolczesna-interpretacja-komory-solnej-teznia-w-parku/',
+          'https://pl.wikipedia.org/wiki/Skawina',
+        ],
+        coords: [19.82082, 49.97406],
+        radius: 40,
       },
     ],
   },
@@ -2657,6 +2693,95 @@ const KRAKOW_QUESTS: Quest[] = [
         },
         coords: [19.89069, 50.01174],
         radius: 28,
+      },
+    ],
+  },
+  {
+    /*
+     * Błonia Skawińskie: pierwsza wyprawa z punktem CIEKAWOSTKĄ. Pieczątka
+     * wymaga dwóch punktów z trzech (`stampAt`), więc stacja Miast Partnerskich
+     * jest w pełni opcjonalna: kto chce, ten ją znajdzie, kto nie chce, kończy
+     * wyprawę bez poczucia braku.
+     */
+    parkId: 'skawina-blonia',
+    stampAt: 2,
+    pois: [
+      {
+        id: 'park-energii',
+        category: 'play',
+        name: 'Park Energii',
+        teaser: 'Plac zabaw, za który zapłaciła elektrownia.',
+        description: [
+          'Osiem urządzeń, ścianka wspinaczkowa z kolorowymi chwytami, tyrolka, bujaki i huśtawki, wszystko ogrodzone i na bezpiecznej nawierzchni. Otwarty 31 sierpnia 2015 roku jako najnowsza wtedy atrakcja miasta.',
+          'Nazwa nie jest przypadkowa: plac zabaw sfinansowała elektrownia CEZ Skawina, największy w regionie producent energii elektrycznej i ciepła. Miasto dało teren, elektrownia sprzęt, dzieci dostały tyrolkę.',
+        ],
+        findHint: 'Zachodnia część Błoń, ogrodzony plac przy alejce.',
+        reveal:
+          'Ta sama instalacja, która grzeje pół Skawiny, kupiła miastu plac zabaw. Rok później Światowa Organizacja Zdrowia umieściła Skawinę na dwunastym miejscu listy najbardziej zanieczyszczonych miast Unii Europejskiej.',
+        dilemma: {
+          question:
+            'Czy miasto powinno brać pieniądze na plac zabaw od swojego największego emitenta?',
+          options: [
+            'Tak, lepiej niech płaci niż tylko dymi',
+            'Nie, to kupowanie spokoju za drobne',
+            'Tak, ale z jawną umową i twardymi normami',
+          ],
+          counterpoint:
+            'Pieniądze są realne i plac zabaw stoi, a bez nich nie stałby. Ale sponsoring buduje wdzięczność, a wdzięczne miasto trudniej naciska na filtry i normy. Prawnicy nazywają to miękkim wpływem: nikt nikogo nie przekupił, a rozmowa i tak toczy się inaczej.',
+        },
+        sources: [
+          'https://www.cezpolska.pl/pl/dla-mediow/centrum-prasowe/cez-skawina-zaprasza-do-parku-energii-juz-wkrotce-wielkie-otwarcie-placu-zabaw-z-pozytywna-energia-58614',
+          'https://pl.wikipedia.org/wiki/Skawina',
+        ],
+        coords: [19.81728, 49.97104],
+        radius: 45,
+      },
+      {
+        id: 'starorzecze-blon',
+        category: 'water',
+        name: 'Starorzecze na Błoniach',
+        teaser: 'Woda, która została po zakręcie rzeki.',
+        description: [
+          'Ten zbiornik nie jest stawem: to fragment dawnego biegu Skawinki, odcięty od rzeki, kiedy ta zmieniła kurs. Starorzecza żyją inaczej niż rzeka, mają stojącą wodę, więcej roślin i własne ptaki.',
+          'Nazwa rzeki mówi dokładnie o tym, co tu widzisz. W staropolszczyźnie „skać” znaczyło kręcić się, toczyć się, a Skawinka wije się meandrami przez cały swój bieg. Rzeka nazwana od kręcenia zostawiła po sobie zakręt.',
+        ],
+        findHint: 'Zachodni skraj Błoń, woda za pasem drzew.',
+        reveal:
+          'Meander odcina się sam: rzeka podmywa zewnętrzny brzeg zakrętu, aż przerwie szyję pętli i pójdzie prosto. To, co zostaje z boku, nazywa się starorzeczem i zarasta w kilkadziesiąt lat.',
+        sources: ['https://pl.wikipedia.org/wiki/Skawina'],
+        coords: [19.8165, 49.97133],
+        radius: 50,
+      },
+      {
+        id: 'miasta-partnerskie',
+        category: 'history',
+        name: 'Stacja Miast Partnerskich',
+        teaser: 'Siedem tablic, siedem miast, przy każdej drzewo. [ciekawostka]',
+        description: [
+          'Stację Miast Partnerskich odsłonięto na Błoniach 15 maja 2014 roku, w czasie Dni Partnerstwa Miast i jubileuszu 650-lecia Skawiny. Przy tablicach z nazwami partnerów posadzono drzewa, po jednym na miasto.',
+          'Skawina ma siedmiu partnerów i każdy ma datę: Hürth w Niemczech od 1996, Turčianske Teplice na Słowacji od 1999, Thetford w Anglii od 2004, Roztoky w Czechach i Civitanova Marche we Włoszech od 2005, Przemyślany na Ukrainie od 2008, Holešov w Czechach od 2017.',
+          'To punkt dodatkowy: pieczątkę Błoń dostaniesz i bez niego.',
+        ],
+        findHint:
+          'Wschodnia część Błoń, wzdłuż alejki przy strefie sportowej: tablice stoją przy pojedynczych drzewach. [w terenie]',
+        reveal:
+          'Przemyślany zostały partnerem Skawiny w 2008 roku, czternaście lat przed wojną, która z tego kanału zrobiła drogę transportu pomocy. Umowy podpisane bez powodu okazują się gotowe, kiedy powód się znajdzie.',
+        dilemma: {
+          question: 'Partnerstwa miast to folklor z wymianą delegacji, czy realna polityka?',
+          options: [
+            'Realna: kontakty ratują skórę, gdy przychodzi kryzys',
+            'Folklor: wycieczki dla urzędników za publiczne pieniądze',
+            'Zależy, czy poza delegacjami jeżdżą też ludzie',
+          ],
+          counterpoint:
+            'Po 2022 roku partnerstwa gminne przewiozły na Ukrainę konkretne transporty, bo istniały numery telefonów i zaufanie. Ale te same umowy w wielu miastach przez dwie dekady nie zrobiły nic poza obiadem raz w roku. Narzędzie jest dobre tyle, ile ludzie, którzy je trzymają.',
+        },
+        sources: [
+          'https://partnerstwo-skawina.pl/o-nas/',
+          'https://partnerstwo-skawina.pl/miasta-partnerskie/',
+        ],
+        coords: [19.8195, 49.97105],
+        radius: 80,
       },
     ],
   },

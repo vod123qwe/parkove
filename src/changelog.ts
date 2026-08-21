@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.54.0'
+export const VERSION = '0.55.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.55.0',
+    date: '2026-08-21',
+    title: 'Nineteen stickers, and the meadow that turned out to have a story',
+    changes: [
+      ['added', 'Nineteen park stickers imported: nine places that had none (Aleksandry, Bednarskiego, Decjusza, Duchacki, Grzegorzecki, Jalu Kurka, Jerzmanowskich, Panienskie Skaly, Blonia Skawinskie) and ten redrawn. They ship as 1.5 MB instead of 20 MB: flat illustration quantised to 128 colours costs nothing you can see at sticker size'],
+      ['added', 'Blonia Skawinskie has a quest at last, and it is the first one with a point that is pure trivia. The stamp asks for two of three, so the Partner Cities station is genuinely optional: seven towns with dates, a tree by each plaque, unveiled on the meadow in May 2014 for the 650th anniversary of the town charter'],
+      ['added', 'Park Energii on the same meadow: eight pieces of equipment, a zipline and a climbing wall, paid for by the CEZ Skawina power plant in 2015. The question underneath is whether a town should take playground money from its largest emitter'],
+      ['added', 'A brine tower joined the town park in Skawina as its optional fourth point. Opened April 2026 by the old riverbed, 485 thousand zloty, half of it regional money, in a town the WHO ranked twelfth most polluted in the EU in 2016. Symptom or cause is a fair question'],
+      ['fixed', 'Blonia Skawinskie led with a photograph of the Kazimierz Wielki monument, which stands by the Sokol hall in the town park, not on the meadow. The photograph went back to its own park. Commons has no picture of the meadow at all, so the first real one will be yours'],
+    ],
+  },
   {
     version: '0.54.0',
     date: '2026-08-21',
