@@ -253,6 +253,8 @@ export function MapView({
   // the map handler is registered once, so callbacks must be read fresh
   const cbRef = useRef({ onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan, onSelectPhoto, onPlacePhoto })
   cbRef.current = { onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan, onSelectPhoto, onPlacePhoto }
+  /** bumped on every setStyle, so a half finished build knows to stand down */
+  const styleEpoch = useRef(0)
   const initialStyle = useRef(mapStyle)
   const currentStyleKey = useRef(mapStyle.key)
   visitedRef.current = visited
@@ -286,42 +288,78 @@ export function MapView({
       })
     }
 
-    // pin artwork must exist before the symbol layers reference it
+    /*
+     * A style change throws away the style's image atlas, so every pin has to be
+     * handed over again. Drawing them again is another matter: the artwork only
+     * depends on the theme colours, so it is drawn once and kept.
+     */
+    let pinArt: { key: string; images: Array<[string, ImageData]> } | null = null
     const addPinImages = async () => {
-      const images = await buildPinImages(pinColors())
-      for (const [id, bmp] of images) {
+      const colors = pinColors()
+      const key = JSON.stringify(colors)
+      const art =
+        pinArt && pinArt.key === key
+          ? pinArt
+          : { key, images: [...(await buildPinImages(colors))] }
+      pinArt = art
+      for (const [id, bmp] of art.images) {
         if (map.hasImage(id)) map.removeImage(id)
         map.addImage(id, bmp)
       }
     }
 
-    /** stamp artwork per collected park, loaded lazily and ignored when missing */
+    /**
+     * Stamp artwork per collected park, fetched once and kept, misses included:
+     * without that, every change of base map went back to the network for the
+     * same pictures and the same 404s.
+     */
+    const stampArt = new Map<string, ImageBitmap | null>()
     const addStampImages = async (pins: StampPin[]) => {
       for (const pin of pins) {
         const id = `stamp-${pin.parkId}`
         if (map.hasImage(id)) continue
+        if (stampArt.has(pin.parkId)) {
+          const kept = stampArt.get(pin.parkId)
+          if (kept) map.addImage(id, kept)
+          continue
+        }
         try {
           const res = await fetch(asset(`stamps/${pin.parkId}.png`))
-          if (!res.ok) continue
+          if (!res.ok) {
+            stampArt.set(pin.parkId, null)
+            continue
+          }
           const bmp = await createImageBitmap(await res.blob())
+          stampArt.set(pin.parkId, bmp)
           if (!map.hasImage(id)) map.addImage(id, bmp)
         } catch {
           // no artwork for this park yet: the pin simply does not render
+          stampArt.set(pin.parkId, null)
         }
       }
     }
     ;(map as unknown as { __addStampImages: (p: StampPin[]) => void }).__addStampImages = addStampImages
 
+    /** the same, for the thumbnails a walk left behind */
+    const photoArt = new Map<string, ImageData | null>()
     const addPhotoImages = async (pins: MarkPin[]) => {
       const ring = readMapColors().meRing
       for (const pin of pins) {
         if (pin.kind !== 'photo' || !pin.blob) continue
         const id = `photo-${pin.id}`
         if (map.hasImage(id)) continue
+        if (photoArt.has(pin.id)) {
+          const kept = photoArt.get(pin.id)
+          if (kept) map.addImage(id, kept)
+          continue
+        }
         try {
-          map.addImage(id, await buildPhotoImage(pin.blob, ring))
+          const bmp = await buildPhotoImage(pin.blob, ring)
+          photoArt.set(pin.id, bmp)
+          map.addImage(id, bmp)
         } catch {
           // an unreadable picture simply gets no pin
+          photoArt.set(pin.id, null)
         }
       }
     }
@@ -334,11 +372,80 @@ export function MapView({
       }
     }
 
-    // everything Parkove draws on top of the base style; re-run after setStyle
+    /*
+     * Everything Parkove draws on top of the base style; re-run after setStyle.
+     * The latch matters: styledata fires many times while a style loads, and the
+     * source check below only starts saying yes two awaits later, so without it
+     * every one of those events kicked off its own full rebuild in parallel.
+     */
+    /** everything of ours on the map, so a failed attempt can be undone */
+    const APP_LAYERS = [
+      'parks-fill',
+      'parks-line',
+      'track-line',
+      'track-gap',
+      'me-halo-fill',
+      'me-dot',
+      'walk-photo-hit',
+      'walk-photo-pins',
+      'stamp-pin-hit',
+      'stamp-pins-layer',
+      'amenity-pins',
+      'parking-pin',
+      'quest-poi-dots',
+      'amenity-hit',
+      'parking-hit',
+      'quest-poi-hit',
+    ]
+    const APP_SOURCES = [
+      'parks',
+      'track',
+      'me-halo',
+      'me',
+      'quest-pois',
+      'parking',
+      'amenities',
+      'walk-photos',
+      'stamp-pins',
+    ]
+    const wipeAppLayers = () => {
+      for (const id of APP_LAYERS) {
+        try {
+          if (map.getLayer(id)) map.removeLayer(id)
+        } catch {
+          // gone with the style already
+        }
+      }
+      for (const id of APP_SOURCES) {
+        try {
+          if (map.getSource(id)) map.removeSource(id)
+        } catch {
+          // gone with the style already
+        }
+      }
+    }
+
+    let building = false
     const addAppLayers = async () => {
-      if (map.getSource('parks')) return // already on this style
+      if (building || map.getSource('parks')) return // already on this style
+      building = true
+      const epoch = styleEpoch.current
+      try {
+        await buildAppLayers(epoch)
+      } catch {
+        // the style was not ready yet, or it changed mid build: half a map is
+        // worse than none, so clear it and let the next attempt start clean
+        wipeAppLayers()
+      } finally {
+        building = false
+      }
+    }
+
+    const buildAppLayers = async (epoch: number) => {
       await addPinImages()
       await addStampImages(stampPinsRef.current)
+      // the base map changed under us: this style is on its way out anyway
+      if (epoch !== styleEpoch.current || map.getSource('parks')) return
       const c = readMapColors()
       // promoteId: string feature ids only work through a promoted property
       map.addSource('parks', { type: 'geojson', data: parksData as never, promoteId: 'id' })
@@ -457,6 +564,7 @@ export function MapView({
       })
       // stamps for collected parks: only worth showing when zoomed in
       await addPhotoImages(photoPinsRef.current)
+      if (epoch !== styleEpoch.current) return
       map.addSource('walk-photos', { type: 'geojson', data: photoFC(photoPinsRef.current) as never })
       map.addLayer({
         id: 'walk-photo-hit',
@@ -617,12 +725,16 @@ export function MapView({
     if (!map || mapStyle.key === currentStyleKey.current) return
     currentStyleKey.current = mapStyle.key
     loadedRef.current = false
+    styleEpoch.current += 1
     map.setStyle(mapStyle.spec)
     // 'style.load' does not fire after setStyle in MapLibre 5. styledata can
     // even race the OLD style right after the call, so re-add on every
     // styledata-with-loaded-style AND on idle; addAppLayers is idempotent.
     const readd = () => {
-      if (!map.isStyleLoaded()) return
+      // NOT gated on isStyleLoaded: that also waits for every tile in view, so
+      // on a heavy base style the parks, the pins and the walk were missing for
+      // ten seconds or more after a switch. Adding layers only needs the parsed
+      // style, and an attempt that comes too early now cleans up after itself
       ;(map as unknown as { __addAppLayers?: () => void }).__addAppLayers?.()
       if (map.getLayer('parks-fill')) map.off('styledata', readd)
     }

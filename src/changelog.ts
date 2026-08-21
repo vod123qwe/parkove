@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.42.0'
+export const VERSION = '0.42.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.42.1',
+    date: '2026-08-21',
+    title: 'Changing the map is instant again',
+    changes: [
+      ['fixed', 'Changing the base map dragged the whole app down. Rebuilding what Parkove draws on top only checked whether it had already run two awaits later, so every styledata event during a style load, and there are many, started its own full rebuild in parallel. Drawing the pin artwork alone is 318 ms of canvas work, times all of those, on the phone that follows your walk'],
+      ['fixed', 'The parks, pins and walk used to come back only once every tile in view had loaded. They are back in about 150 ms now, measured across the imagery, the dark style and the topographic one'],
+      ['changed', 'Pin artwork is drawn once and kept until the theme changes, and stamp pictures are fetched once, misses included, instead of going back to the network on every change of map'],
+    ],
+  },
   {
     version: '0.42.0',
     date: '2026-08-21',
