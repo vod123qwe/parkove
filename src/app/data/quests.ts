@@ -203,8 +203,8 @@ const KRAKOW_QUESTS: Quest[] = [
           'https://zzm.krakow.pl/aktualnosci/1375-park-zakrzowek-dostepny-dla-mieszkancow.html',
           'https://www.razemwpodrozy.pl/park-zakrzowek-w-krakowie',
         ],
-        coords: [19.9135, 50.0407],
-        radius: 50,
+        coords: [19.9115, 50.0341],
+        radius: 70,
       },
       {
         id: 'urwiska',
@@ -355,7 +355,7 @@ const KRAKOW_QUESTS: Quest[] = [
         reveal:
           'Dąb ma tabliczkę pomnika przyrody, czyli status prawny silniejszy niż większość budynków w mieście. Drzewo można obalić tylko za zgodą urzędu, a budynek obok wyburzy się szybciej.',
         sources: ['https://www.nawycieczke.pl/pl/atrakcja/park-miejski-w-skawinie'],
-        coords: [19.82392, 49.97284],
+        coords: [19.82162, 49.97394],
         radius: 40,
       },
       {
@@ -380,8 +380,8 @@ const KRAKOW_QUESTS: Quest[] = [
         photo: '/photos/skawina-sokol.jpg',
         photoCredit: 'Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons',
         sources: ['https://www.metropoliakrakowska.pl/obiekt-szczegoly/park-miejski-im-marszalka-jozefa-pilsudskiego_aekXoTd423GWh738VCGJ'],
-        coords: [19.8238, 49.9733],
-        radius: 40,
+        coords: [19.82325, 49.97458],
+        radius: 55,
       },
       {
         id: 'starorzecze',
@@ -403,7 +403,7 @@ const KRAKOW_QUESTS: Quest[] = [
             'Renaturyzacja realnie obniża fale powodziowe, więc wydatek zwraca się przy pierwszej dużej wodzie. Ale każde pokolenie jest przekonane, że wie lepiej niż poprzednie, a nasze wnuki będą oglądać nasze decyzje z takim samym zdziwieniem.',
         },
         sources: ['https://skawina.tv/skawina-odkryj-piekno-przyrody-i-parki/'],
-        coords: [19.82175, 49.97363],
+        coords: [19.81908, 49.9736],
         radius: 45,
       },
     ],

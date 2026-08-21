@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.47.0'
+export const VERSION = '0.48.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.48.0',
+    date: '2026-08-21',
+    title: 'Wrong pins moved to where the things actually are',
+    changes: [
+      ['fixed', 'Four points stood in the wrong place. The bathing pontoons at Zakrzowek were 760 metres north of the water, and in the Skawina park the old oak was out by 205 metres, the monument by 165 and the oxbow by 276. All four now sit on the object OpenStreetMap has'],
+      ['added', 'A coordinate audit script. Without a network it lists the points typed by hand, which give themselves away by having three or four decimal places where anything taken from a map has five or six: 22 of 136 points. With a network it compares every point against the matching object in OSM'],
+      ['changed', 'The valleys lost their public transport box. There is no city transport out there and the agglomeration line numbers were a guess, so each valley has a real parking from OSM instead, with the distance to the valley floor'],
+    ],
+  },
   {
     version: '0.47.0',
     date: '2026-08-21',

@@ -1,4 +1,7 @@
-// Suggested public transport per park. Stop names and bus numbers come from OSM
+// Suggested public transport per park. Only inside Kraków: the valleys are in
+// other communes, served by agglomeration lines whose numbers we have not
+// checked, so they get a car and a parking instead of a guess.
+// Stop names and bus numbers come from OSM
 // route relations (2026-08-19); tram numbers are not tagged there, so a tram stop
 // is named without numbers rather than guessed. Google Maps computes the actual
 // route from the user's location, so this box is a hint, not a timetable.
@@ -50,51 +53,7 @@ export const TRANSIT: Record<string, TransitInfo> = {
     note: 'Z Krakowa dojedziesz też koleją do stacji Skawina, potem 10 minut spacerem.',
     verified: false,
   },
-  // Dolinki: to już nie MPK, a strefa aglomeracyjna. Numery bez potwierdzenia,
-  // dlatego verified: false i nacisk na to, co pewne, czyli kolej do Zabierzowa.
-  'dolina-bolechowicka': {
-    stop: 'Bolechowice',
-    mode: 'bus',
-    note: 'Autobusy aglomeracyjne z Krakowa w stronę Zabierzowa i Bolechowic. Pewniejsza jest kolej: pociąg do Zabierzowa, potem około 4 km. Samochodem parking pod bramą.',
-    verified: false,
-  },
-  'dolina-kobylanska': {
-    stop: 'Kobylany',
-    mode: 'bus',
-    note: 'Autobusem w stronę Zabierzowa i Kobylan. Koleją do Zabierzowa i dalej około 5 km, więc tę dolinę najłatwiej zrobić samochodem.',
-    verified: false,
-  },
-  'dolina-kluczwody': {
-    stop: 'Biały Kościół',
-    mode: 'bus',
-    note: 'Autobusy w stronę Wielkiej Wsi i Olkusza zatrzymują się w Białym Kościele, stamtąd do doliny kilkanaście minut spacerem.',
-    verified: false,
-  },
 
-  'dolina-bedkowska': {
-    stop: 'Będkowice',
-    mode: 'bus',
-    note: 'Autobusy aglomeracyjne w stronę Bębła i Jerzmanowic. Będkowice to najwygodniejszy punkt startowy, bo stąd wchodzi się w środek doliny.',
-    verified: false,
-  },
-  'dolina-raclawki': {
-    stop: 'Dubie lub Krzeszowice',
-    mode: 'both',
-    note: 'Koleją do Krzeszowic, dalej autobusem albo kilka kilometrów spacerem do Dubia, gdzie zaczyna się dolina. Najdalsza z Dolinek, więc samochód mocno pomaga.',
-    verified: false,
-  },
-  'dolina-eliaszowki': {
-    stop: 'Czerna, klasztor',
-    mode: 'both',
-    note: 'Koleją do Krzeszowic, potem autobusem do Czernej. Od klasztoru wchodzi się prosto w dolinę.',
-    verified: false,
-  },
-  'dolina-szklarki': {
-    stop: 'Szklary',
-    mode: 'bus',
-    note: 'Autobusy w stronę Jerzmanowic i Olkusza. Dnem doliny biegnie droga, więc dojazd jest łatwy, a spacer mniej dziki niż w pozostałych dolinach.',
-    verified: false,
-  },
 
 }
 

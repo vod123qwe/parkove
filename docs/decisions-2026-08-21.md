@@ -132,3 +132,66 @@ serie, przy większej liczbie zapytań trzeba 9 sekund przerwy.
 - **Diabelski Most** i **klasztor w Czernej** leżą poza rezerwatem Eliaszówki,
   więc są tylko w opisie i w galerii.
 - Numery linii autobusowych: wszystkie wpisy `verified: false`.
+
+## Dojazd: tylko autem (v0.48.0)
+
+Decyzja Jarka: skoro do Dolinek nie dojeżdża MPK, a numery linii
+aglomeracyjnych były moim zgadywaniem, wpisy komunikacji **wylatują**. Zostaje
+dojazd autem.
+
+Wszystkie siedem dolin ma teraz parking ze **współrzędnych węzłów
+`amenity=parking` z OSM**, wybranych jako najbliższe wejściu do doliny, z
+odległością podaną w podpowiedzi. Dwie doliny mają po dwa parkingi.
+
+Arkusz miejsca sam ukrywa sekcję komunikacji, gdy nie ma wpisu w `TRANSIT`,
+więc nie było potrzeby ruszać kodu.
+
+## Błędne współrzędne punktów: audyt
+
+Jarek w terenie: „w parku w Skawinie pomnik jest gdzie indziej, tak samo dąb,
+Zakrzówek gdzie indziej ma baseny". Sprawdzone i potwierdzone wobec OSM:
+
+| Punkt | Było | Jest | Błąd |
+|---|---|---|---|
+| skawina `dab-pomnik` | 49,97284 / 19,82392 | 49,97394 / 19,82162 (drzewo z tagiem pomnika przyrody) | 205 m |
+| skawina `sokol` | 49,9733 / 19,8238 | 49,97458 / 19,82325 (między Pałacykiem Sokół i Pomnikiem Kazimierza Wielkiego), promień 55 | 130-165 m |
+| skawina `starorzecze` | 49,97363 / 19,82175 | 49,9736 / 19,81908 (zachodnia granica parku) | 276 m |
+| zakrzowek `kapielisko` | 50,0407 / 19,9135 | 50,0341 / 19,9115 (skupisko pomostów w OSM), promień 70 | **760 m** |
+
+Uwaga do starorzecza: najbliższa woda w OSM leży **poza** wielobokiem parku, więc
+punkt stoi teraz na granicy parku najbliżej wody. Do sprawdzenia w terenie, czy
+ta treść w ogóle należy do tego parku.
+
+### Narzędzie: `scripts/audit-poi-coords.mjs`
+
+Dwa tryby:
+
+- `--precision` (bez sieci): wypisuje punkty wpisane z ręki. Trop: współrzędne
+  z OSM mają 5 do 6 miejsc po przecinku, wpisane z palca 3 do 4. **22 z 136
+  punktów** ma najwyżej 4 miejsca, czyli siatkę 11 m lub gorszą. Wśród nich były
+  oba zgłoszone przez Jarka.
+- bez flagi: dla każdego punktu szuka w OSM obiektu tej samej klasy (pomnik,
+  drzewo, pomost, woda, jaskinia, skała, budynek z nazwą) w granicach parku i
+  liczy odległość. Flaguje powyżej 60 m. Cache per park w `.tmp/osm-cache.json`,
+  więc można dokończyć w kolejnych podejściach.
+
+**Blokada 2026-08-21:** Overpass przestał odpowiadać w trakcie (najpierw 504, potem
+timeouty), więc pełny audyt 136 punktów nie został dokończony. Skrypt jest gotowy
+i pomija parki już zapisane w cache.
+
+### Lista 22 punktów wpisanych z ręki (do weryfikacji)
+
+3 miejsca po przecinku: `dolina-eliaszowki/siedem-progow`,
+`kopiec-kosciuszki/raclawice-armata`, `wisniowy-sad/flirt-wodorostow`,
+`wyspianskiego/pomnik-nowakowskiego`.
+
+4 miejsca: `jalu-kurka/palac-tarnowskich`, `kopiec-krakusa/azymut`,
+`kopiec-krakusa/rekawka`, `kopiec-wandy/kumir`, `krakowski/swiatowid`,
+`laki-nowohuckie/storczyki`, `mlynowka/kosciol-wojciecha`,
+`park-jordana/popiersia`, `planty/ginczanka`, `planty/narcyz-wiatr`,
+`planty-bienczyckie/gitara`, `planty-bienczyckie/lawendowy-ogrod`,
+`przylasek-rusiecki/zbiornik-1`, `reduta/staw-reduta`, `solvay/dom-lazarza`,
+`szymborskiej/park-kieszonkowy`.
+
+Uwaga: precyzja nie łapie wszystkiego. Skawiński dąb miał 5 miejsc po przecinku
+i mimo to stał 205 m obok.
