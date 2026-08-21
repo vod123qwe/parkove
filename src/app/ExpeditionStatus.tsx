@@ -1,61 +1,38 @@
-import { Navigation2 } from 'lucide-react'
-import { Card, ProgressRing } from '../ds'
+import { useEffect, useState } from 'react'
 import { useGameState } from './state'
-import { questForPark } from './data/quests'
-import { bearingDeg, distanceM, formatDistance } from './geo'
+
+function fmtTime(ms: number) {
+  const s = Math.floor(ms / 1000)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  return h > 0 ? `${h}:${String(m).padStart(2, '0')} H` : `${m} MIN`
+}
 
 /**
- * The top card during a walk. It replaces the city percentage on purpose:
- * while walking, the only numbers that matter are this walk's points and
- * which way the next one is.
+ * Wysiłek do tej pory, jako mała pastylka u góry ekranu.
+ *
+ * Wcześniej stała tu szeroka karta z nazwą wyprawy, pierścieniem postępu i
+ * następnym punktem. Miała trzy wady naraz: rozpychała się pod przycisk menu i
+ * oba białe tła się zlewały, pokazywała to samo zero dwa razy (pusty pierścień
+ * i tekst „0/3"), a nazwa wyprawy w trakcie chodzenia nie służy do niczego.
+ * Postęp i następny punkt zjechały na dół, do kciuka. Tu został sam licznik.
  */
 export function ExpeditionStatus() {
-  const { expedition, parks } = useGameState()
+  const { expedition } = useGameState()
+  const [, tick] = useState(0)
+
+  useEffect(() => {
+    const t = setInterval(() => tick((n) => n + 1), 10000)
+    return () => clearInterval(t)
+  }, [])
+
   if (!expedition) return null
-
-  const quest = questForPark(expedition.parkId)
-  const collected = new Set(parks[expedition.parkId]?.points ?? [])
-  const total = quest?.pois.length ?? 0
-  const done = quest ? quest.pois.filter((p) => collected.has(p.id)).length : 0
-  const here = expedition.where?.coords ?? expedition.track[expedition.track.length - 1]
-
-  const next =
-    quest && here
-      ? quest.pois
-          .filter((p) => !collected.has(p.id))
-          .map((p) => ({ p, d: distanceM(here, p.coords), b: bearingDeg(here, p.coords) }))
-          .sort((a, b) => a.d - b.d)[0]
-      : null
+  const km = (expedition.distanceM / 1000).toFixed(1).replace('.', ',')
 
   return (
-    <Card className="app-hud__card app-expstatus">
-      <ProgressRing value={total ? (done / total) * 100 : 0} size="sm" />
-      <div className="app-hud__text">
-        <span className="app-expstatus__title">
-          <span className="app-expstatus__live" aria-hidden="true" />
-          {expedition.name}
-        </span>
-        <span className="t-caption app-expstatus__next">
-          {total > 0 && <strong className="app-expstatus__count">{done}/{total}</strong>}
-          {next ? (
-            <>
-              <Navigation2
-                size={12}
-                className="app-expstatus__arrow"
-                style={{ transform: `rotate(${Math.round(next.b)}deg)` }}
-                aria-hidden="true"
-              />
-              {next.p.name} · {formatDistance(next.d)}
-            </>
-          ) : !here ? (
-            'szukam sygnału GPS'
-          ) : total > 0 ? (
-            'komplet punktów, kończysz kiedy chcesz'
-          ) : (
-            'nagrywam spacer'
-          )}
-        </span>
-      </div>
-    </Card>
+    <div className="app-timepill">
+      <span className="app-timepill__live" aria-hidden="true" />
+      {fmtTime(Date.now() - expedition.startedAt)} · {km} KM
+    </div>
   )
 }

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.50.0'
+export const VERSION = '0.51.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.51.0',
+    date: '2026-08-21',
+    title: 'One HUD for a walk, down where the thumb is',
+    changes: [
+      ['changed', 'A walk used to speak from two places at once: the top card carried the name, the points and the next stop while the bottom bar carried the time and the distance. The top card is gone. What is left up there is a small mono pill with the time and the kilometres, clear of the menu it used to slide under'],
+      ['changed', 'The bottom is one HUD: a card saying what comes next, with the progress as one dash per point, and three round buttons under it. The side ones are dark glass over the map rather than white discs, the middle one is lime and adds a memory'],
+      ['changed', 'Far from a park the card stops naming a point you cannot reach and gives the way to the park instead. No compass and no rotating arrow: that would mean asking for the gyroscope and pretending to be a navigation app'],
+      ['changed', 'The plus opens over the map now, not above it: three glass pills on a progressive blur with a darkened gradient, and a white round close underneath'],
+    ],
+  },
   {
     version: '0.50.0',
     date: '2026-08-21',

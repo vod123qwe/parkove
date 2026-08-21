@@ -466,7 +466,7 @@ export function App() {
   )
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${onWalk ? ' -walking' : ''}`}>
       <MapView
         visited={visitedIds}
         onSelect={selectParkFromMap}
@@ -520,6 +520,7 @@ export function App() {
             onRequestStop={() => setEndingWalk(true)}
             onPhoto={setPhotoAdded}
             onMark={setPhotoId}
+            onOpenPoints={expeditionPark ? () => { selectParkFromMap(expeditionPark.id); setExpanded(true) } : undefined}
           />
         </>
       ) : (

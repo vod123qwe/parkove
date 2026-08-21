@@ -180,8 +180,8 @@
 .park-amenities {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--sp-3);
-  margin: var(--sp-5) 0;
+  gap: var(--sp-4);
+  margin: var(--sp-6) 0;
 }
 
 .park-amenity {
@@ -190,9 +190,9 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--sp-1);
-  padding: var(--sp-4);
+  padding: var(--sp-5);
   border: 0;
-  border-radius: var(--radius-lg);
+  border-radius: 26px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface-sunken);
   color: var(--content-tertiary);
@@ -965,8 +965,199 @@
 }
 
 /* expedition bar replaces the FAB during a walk */
+/*
+ * W czasie wyprawy HUD na dole jest wysoki (karta plus trzy przyciski), więc
+ * przyciski mapy muszą się nad niego podnieść. Bez tego zasłaniały odległość do
+ * następnego punktu i przycisk Punkty.
+ */
+.app-shell.-walking .app-locate {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 210px);
+}
+
+.app-shell.-walking .app-look {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 210px + var(--control-md) + var(--sp-2));
+}
+
+/* przygaszenie pod HUD, żeby białe podpisy przycisków czytały się na trawie */
+.app-shell.-walking .app-expbar::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--sp-6));
+  right: calc(-1 * var(--sp-6));
+  bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  top: -8%;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    rgb(8 14 8 / 0.72) 0%,
+    rgb(8 14 8 / 0.5) 42%,
+    rgb(8 14 8 / 0.18) 74%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* pastylka z wysiłkiem: mono, wersaliki, mała, żeby nie walczyła z menu */
+.app-timepill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-2);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--content-primary);
+}
+
+.app-timepill__live {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--content-accent);
+  animation: exp-pulse 1.8s var(--ease-in-out) infinite;
+}
+
+/* karta „co dalej" nad przyciskami */
+.app-nextstop {
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  border-radius: 26px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-3);
+}
+
+/* postęp kreskami: jedna na punkt, zapalają się po kolei */
+.app-nextstop__dashes {
+  display: flex;
+  gap: 3px;
+  margin-bottom: var(--sp-3);
+}
+
+.app-nextstop__dashes span {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border-subtle);
+}
+
+.app-nextstop__dashes span.is-on {
+  background: var(--content-accent);
+}
+
+.app-nextstop__row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-3);
+}
+
+.app-nextstop__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-nextstop__label {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--content-tertiary);
+}
+
+.app-nextstop__name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-nextstop__away {
+  flex: none;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--content-secondary);
+}
+
+/* trzy okrągłe przyciski pod kartą, z podpisami */
+.app-expactions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+}
+
+.app-expaction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+/*
+ * Ciemne szkło, nie biały krążek: na zdjęciu satelitarnym przycisk ma leżeć NA
+ * mapie, a nie ją zakrywać. Rozmycie tła plus cienka jasna krawędź robi to,
+ * czego biel nie robi: przepuszcza miejsce, w którym stoisz.
+ */
+.app-expaction__btn {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: var(--radius-pill);
+  background: rgb(16 22 16 / 0.5);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.app-expaction__btn:active {
+  transform: scale(0.94);
+}
+
+.app-expaction__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.app-expaction__btn.-primary {
+  width: 70px;
+  height: 70px;
+  border-color: rgb(255 255 255 / 0.35);
+  background: var(--bg-lime);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  color: var(--content-on-lime);
+  box-shadow: 0 0 0 5px rgb(201 242 77 / 0.16);
+}
+
+.app-expaction__btn.-open {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+.app-expaction__label {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  color: #ffffff;
+  text-shadow: 0 1px 8px rgb(8 14 8 / 0.7);
+}
+
 .app-expbar {
   position: absolute;
+  isolation: isolate;
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
   left: 50%;
   transform: translateX(-50%);
@@ -974,100 +1165,10 @@
   width: min(calc(100% - 2 * var(--sp-4)), 420px);
 }
 
-.app-expbar__card {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-2);
-}
-
 /* the camera keeps its own label off: the icon is the whole button */
-.app-expbar__icon {
-  flex: none;
-  width: var(--control-md);
-  min-width: var(--control-md);
-  padding: 0;
-  justify-content: center;
-}
-
-.app-expbar__meta {
-  flex: 1;
-  text-align: center;
-  color: var(--content-tertiary);
-  font-variant-numeric: tabular-nums;
-}
-
-.app-expbar__stop {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  height: var(--control-md);
-  padding-inline: var(--sp-4);
-  border: 0;
-  border-radius: var(--radius-btn);
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-sunken);
-  color: var(--content-secondary);
-  font-family: var(--font-text);
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-}
-
 /* ---- live status card at the top ---- */
 
-.app-expstatus {
-  flex: 1;
-  min-width: 0;
-  margin-right: var(--sp-3);
-}
-
-.app-expstatus__title {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 20px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* the one thing that says "this is happening right now" */
-.app-expstatus__live {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-pill);
-  background: var(--content-accent);
-  box-shadow: 0 0 0 0 rgb(76 101 64 / 0.5);
-  animation: exp-pulse 1.8s var(--ease-in-out) infinite;
-}
-
-.app-expstatus__next {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-1);
-  color: var(--content-tertiary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.app-expstatus__count {
-  color: var(--content-accent);
-  font-variant-numeric: tabular-nums;
-}
-
-.app-expstatus__arrow {
-  flex: none;
-  color: var(--content-accent);
-  margin-left: 2px;
-}
-
 @keyframes exp-pulse {
   0%,
   100% {
@@ -1497,32 +1598,79 @@
   color: var(--content-secondary);
 }
 
+/*
+ * Menu wspomnień: nie panel nad mapą, a warstwa NA mapie. Trzy pasma
+ * progressive bluru plus przygaszenie od dołu, tak jak w odtwarzaczu wspomnień,
+ * więc miejsce, w którym stoisz, jest nadal widoczne, tylko cofnięte o krok.
+ */
 .app-addmenu {
-  position: absolute;
-  left: 0;
-  right: 0;
-  margin-inline: auto;
-  /* 24 px above the bar: the bar is a 44 px control in 8 px padding */
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + 60px + var(--sp-6));
-  width: min(calc(100% - 2 * var(--sp-4)), 420px);
+  position: fixed;
+  inset: 0;
   z-index: 12;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--sp-1);
+  justify-content: flex-end;
+  padding: 0 var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  animation: add-fade 220ms var(--ease-out) both;
+}
+
+.app-addmenu.-out {
+  animation: add-fade 180ms var(--ease-out) reverse both;
+}
+
+@keyframes add-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.app-addmenu__glass {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgb(8 14 8 / 0.62), rgb(8 14 8 / 0.24) 62%, transparent);
   pointer-events: none;
 }
 
-/* hug the label and rise out of the plus, which sits at the same edge */
-.app-addmenu__item {
-  pointer-events: auto;
-  box-shadow: var(--elevation-2);
+.app-addmenu__glass span {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--b));
+  -webkit-backdrop-filter: blur(var(--b));
+  mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+  -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
+}
+
+.app-addmenu__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-4);
+}
+
+/*
+ * Ciemne szkło, mocno zaokrąglone, ze smooth corners i sporym oddechem.
+ * Selektor musi być mocniejszy niż `.pk-btn.-primary` z DS, inaczej pigułki
+ * wychodzą ciemnozielone jak zwykły przycisk.
+ */
+.app-addmenu .app-addmenu__item.pk-btn {
+  justify-content: center;
+  gap: var(--sp-3);
+  min-height: 62px;
+  padding: var(--sp-4) var(--sp-6);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 28px;
+  corner-shape: var(--corner-smooth);
+  background: rgb(16 22 16 / 0.42);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  color: #ffffff;
+  box-shadow: none;
   animation: add-rise 260ms var(--ease-out) both;
-  /* the one nearest the plus arrives first */
   animation-delay: calc(var(--rise, 0) * 55ms);
 }
 
-.app-addmenu.-out .app-addmenu__item {
+.app-addmenu.-out .app-addmenu__item.pk-btn {
   animation: add-sink 180ms var(--ease-out) both;
   animation-delay: calc(var(--sink, 0) * 45ms);
 }
@@ -1547,6 +1695,27 @@
     opacity: 0;
     transform: translateY(20px);
   }
+}
+
+.app-addmenu__close {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+.app-addmenu__x {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-raised);
+  color: var(--content-primary);
+  box-shadow: var(--elevation-3);
+  cursor: pointer;
 }
 
 .app-addmenu__catch {
