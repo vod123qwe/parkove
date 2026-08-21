@@ -256,14 +256,15 @@ export function BottomSheet({
       >
         <div ref={headRef} className={cx('pk-sheet__head', hero != null && '-overlay')}>
           {/*
-            Progresywny blur trzema pasmami zamiast jednego: pod tytułem mocny,
-            przy dolnej krawędzi żaden, więc treść nie wchodzi pod szybę skokiem.
+            Dwa poziomy rozmycia pod tytułem, oba schowane pod kryjącą częścią
+            zasłony (patrz bottomsheet.css: maska nie obcina backdrop-filter).
+            --h mówi, jak głęboko w pas sięga pasmo.
           */}
           <div className="pk-sheet__glass" aria-hidden="true">
-            {/* --k: jak głęboko w strefę wygaszania sięga to pasmo (1 = do samego końca) */}
-            <span style={{ '--b': '18px', '--k': 0.46 } as CSSProperties} />
-            <span style={{ '--b': '9px', '--k': 0.72 } as CSSProperties} />
-            <span style={{ '--b': '3px', '--k': 1 } as CSSProperties} />
+            <span style={{ '--b': '60px', '--h': '24%' } as CSSProperties} />
+            <span style={{ '--b': '30px', '--h': '44%' } as CSSProperties} />
+            <span style={{ '--b': '12px', '--h': '66%' } as CSSProperties} />
+            <span style={{ '--b': '3px', '--h': '88%' } as CSSProperties} />
           </div>
           {handle && (
             <div className="pk-sheet__grab">

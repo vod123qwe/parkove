@@ -16,47 +16,34 @@
  */
 .pk-actionbar__glass {
   position: absolute;
-  inset: 0 0 -1px;
+  /* zasłona wystaje 12 px NAD pasek: tam gradient dochodzi do zera */
+  inset: -12px 0 0;
   z-index: -1;
   background: linear-gradient(
     to top,
     var(--bg-surface-raised) 0%,
-    color-mix(in srgb, var(--bg-surface-raised) 97%, transparent) 38%,
-    color-mix(in srgb, var(--bg-surface-raised) 86%, transparent) 55%,
-    color-mix(in srgb, var(--bg-surface-raised) 64%, transparent) 69%,
-    color-mix(in srgb, var(--bg-surface-raised) 38%, transparent) 81%,
-    color-mix(in srgb, var(--bg-surface-raised) 16%, transparent) 91%,
-    color-mix(in srgb, var(--bg-surface-raised) 4%, transparent) 97%,
+    var(--bg-surface-raised) 30%,
+    color-mix(in srgb, var(--bg-surface-raised) 92%, transparent) 46%,
+    color-mix(in srgb, var(--bg-surface-raised) 74%, transparent) 60%,
+    color-mix(in srgb, var(--bg-surface-raised) 48%, transparent) 72%,
+    color-mix(in srgb, var(--bg-surface-raised) 24%, transparent) 82%,
+    color-mix(in srgb, var(--bg-surface-raised) 8%, transparent) 91%,
     transparent 100%
   );
   pointer-events: none;
 }
 
+/* to samo co w nagłówku, tylko od dołu: rozmycie zamknięte w kryjącej części
+   gradientu, bo maska nie obcina backdrop-filter (patrz bottomsheet.css) */
 .pk-actionbar__glass span {
   position: absolute;
-  /* to samo co w nagłówku, tylko w górę: pasmo wystaje 28 px NAD pasek, a maska
-     gasi rozmycie do zera na jego górnej krawędzi, równo z alfa 0 gradientu */
-  inset: -28px 0 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--h);
   backdrop-filter: blur(var(--b));
   -webkit-backdrop-filter: blur(var(--b));
-  mask-image: linear-gradient(
-    to top,
-    #000 0,
-    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
-    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
-    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
-    transparent calc((100% - 28px) * var(--k))
-  );
-  -webkit-mask-image: linear-gradient(
-    to top,
-    #000 0,
-    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
-    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
-    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
-    transparent calc((100% - 28px) * var(--k))
-  );
 }
-
 
 .pk-actionbar__row {
   display: flex;

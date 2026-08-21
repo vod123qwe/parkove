@@ -406,6 +406,11 @@ const KRAKOW_QUESTS: Quest[] = [
           counterpoint:
             'Renaturyzacja realnie obniża fale powodziowe, więc wydatek zwraca się przy pierwszej dużej wodzie. Ale każde pokolenie jest przekonane, że wie lepiej niż poprzednie, a nasze wnuki będą oglądać nasze decyzje z takim samym zdziwieniem.',
         },
+        /* Zdjęcie bez współrzędnych, ale kładka nad starym korytem jest w OSM
+           zmapowana tylko w tym parku, więc to ten sam obiekt, kilkadziesiąt
+           metrów dalej wzdłuż wody */
+        photo: '/photos/poi-skawina-pilsudskiego-starorzecze.jpg',
+        photoCredit: 'Fot. Anka Małota · CC BY-SA 3.0 · Wikimedia Commons',
         sources: ['https://skawina.tv/skawina-odkryj-piekno-przyrody-i-parki/'],
         coords: [19.82035, 49.97402],
         radius: 45,
@@ -2729,9 +2734,14 @@ const KRAKOW_QUESTS: Quest[] = [
           counterpoint:
             'Pieniądze są realne i plac zabaw stoi, a bez nich nie stałby. Ale sponsoring buduje wdzięczność, a wdzięczne miasto trudniej naciska na filtry i normy. Prawnicy nazywają to miękkim wpływem: nikt nikogo nie przekupił, a rozmowa i tak toczy się inaczej.',
         },
+        /* Commons nie ma ani jednego zdjęcia tego placu; kadr z galerii, ktą
+           wskazał Jarek, użyty z podpisem, ale bez wolnej licencji */
+        photo: '/photos/poi-skawina-blonia-park-energii.jpg',
+        photoCredit: 'Fot. Jarosław Karasiński · dobrefotografie.pl',
         sources: [
           'https://www.cezpolska.pl/pl/dla-mediow/centrum-prasowe/cez-skawina-zaprasza-do-parku-energii-juz-wkrotce-wielkie-otwarcie-placu-zabaw-z-pozytywna-energia-58614',
           'https://pl.wikipedia.org/wiki/Skawina',
+          'https://dobrefotografie.pl/2020/09/16/park-energii-skawina/',
         ],
         coords: [19.81728, 49.97104],
         radius: 45,

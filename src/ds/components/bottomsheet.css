@@ -60,76 +60,52 @@
 }
 
 /*
- * Szyba nagłówka: trzy pasma rozmycia zamiast jednego. Pod tytułem mocne,
- * niżej coraz słabsze, przy krawędzi żadne, więc treść wjeżdża pod tytuł
- * miękko, a nie wpada w matową płytę.
+ * Szyba nagłówka, według specyfikacji Jarka: tło odrobinę wyższe od pasa,
+ * gradient z bieli do bieli o zerowej alfie, gdzie pełna biel trzyma do 30 procent
+ * wysokości, i progresywne rozmycie od 60 px u góry do zera w tym samym miejscu,
+ * w którym gradient ma alfa 0.
+ *
+ * Dlaczego schodkami, a nie maską: w tym silniku `mask-image` NIE obcina
+ * `backdrop-filter`. Sprawdzone maską z twardą krawędzią w połowie wysokości,
+ * której rozmycie w ogóle nie zauważyło. Progresję daje więc cztery warstwy o
+ * malejącej wysokości i sile: 60, 30, 12, 3. Różnice między sąsiednimi pasmami
+ * maleją, a każda krawędź leży pod jeszcze kryjącą częścią zasłony, więc
+ * schodków nie widać. Ostatnie pasmo ma 3 px dokładnie tam, gdzie zasłona już
+ * praktycznie nie istnieje.
  */
 .pk-sheet__glass {
   position: absolute;
-  inset: 0;
+  /* tło wystaje 12 px pod pas: tam gradient dochodzi do zera */
+  inset: 0 0 -12px;
   z-index: -2;
   pointer-events: none;
 }
 
 .pk-sheet__glass span {
   position: absolute;
-  /*
-   * Pasmo wystaje 28 px PONIŻEJ nagłówka i to jest sedno miękkiego przejścia.
-   * backdrop-filter jest obcinany do własnego pudełka, a taki obcięty brzeg sam
-   * rysuje krawędź, nawet jeśli maska jest tam już przy zerze. Maska gasi więc
-   * rozmycie do zera na wysokości calc(100% - 28px), czyli dokładnie na dolnej
-   * krawędzi nagłówka i dokładnie tam, gdzie gradient tła ma alfa 0. Obcięcie
-   * wypada 28 px niżej, gdzie nie ma juz czego obcinać.
-   */
-  inset: 0 0 -28px;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--h);
   backdrop-filter: blur(var(--b));
   -webkit-backdrop-filter: blur(var(--b));
-  mask-image: linear-gradient(
-    to bottom,
-    #000 0,
-    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
-    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
-    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
-    transparent calc((100% - 28px) * var(--k))
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 0,
-    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
-    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
-    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
-    transparent calc((100% - 28px) * var(--k))
-  );
 }
 
-/* pudelko szyby moze wystawac: samo nic nie rysuje */
-.pk-sheet__glass {
-  overflow: visible;
-}
-
-
-/*
- * Tło nagłówka gasło wcześniej na ostatnich 28 px, więc oko łapało linię tam,
- * gdzie kryjąca biel zamieniała się w gradient. Teraz gradient idzie przez całą
- * wysokość i ma kilka stopni: krycie spada powoli u góry, szybciej w środku,
- * znowu powoli przy krawędzi. To ta sama sztuczka co wygładzanie krzywej,
- * pojedynczy skok jasności jest widoczny, seria małych nie jest.
- */
 .pk-sheet__head::before {
   content: '';
   position: absolute;
-  inset: -1px 0 0;
+  inset: -1px 0 -12px;
   z-index: -1;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
     var(--bg-surface-raised) 0%,
-    color-mix(in srgb, var(--bg-surface-raised) 97%, transparent) 42%,
-    color-mix(in srgb, var(--bg-surface-raised) 88%, transparent) 58%,
-    color-mix(in srgb, var(--bg-surface-raised) 68%, transparent) 71%,
-    color-mix(in srgb, var(--bg-surface-raised) 42%, transparent) 82%,
-    color-mix(in srgb, var(--bg-surface-raised) 18%, transparent) 91%,
-    color-mix(in srgb, var(--bg-surface-raised) 5%, transparent) 97%,
+    var(--bg-surface-raised) 30%,
+    color-mix(in srgb, var(--bg-surface-raised) 92%, transparent) 46%,
+    color-mix(in srgb, var(--bg-surface-raised) 74%, transparent) 60%,
+    color-mix(in srgb, var(--bg-surface-raised) 48%, transparent) 72%,
+    color-mix(in srgb, var(--bg-surface-raised) 24%, transparent) 82%,
+    color-mix(in srgb, var(--bg-surface-raised) 8%, transparent) 91%,
     transparent 100%
   );
 }
@@ -195,10 +171,14 @@
   touch-action: pan-y;
 }
 
-/* fade hint when collapsed content is clipped */
-.pk-sheet__panel:not(.-full) .pk-sheet__content {
-  mask-image: linear-gradient(to bottom, black calc(100% - 28px), transparent);
-}
+/*
+ * Była tu maska wygaszająca dolne 28 px treści na złożonym arkuszu. Znika z
+ * dwoch powodów. Pierwszy: nie było jej widac, bo dolna krawędź treści leży
+ * wtedy pod ekranem. Drugi ważniejszy: maska wymusza osobną warstwę
+ * kompozycji, a backdrop-filter nagłówka próbkuje właśnie tę warstwę i na jej
+ * granicy rysował twardą krawędź w środku rozmycia. Dolne wygaszanie treści
+ * niesie dziś pasek akcji, który ma własny gradient.
+ */
 
 .pk-sheet__inner {
   padding-top: 28px;
