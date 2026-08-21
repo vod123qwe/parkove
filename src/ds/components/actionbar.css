@@ -1,6 +1,9 @@
 .pk-actionbar {
   position: sticky;
-  bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  /* --pk-sheet-shift: ile arkusza wisi pod ekranem (patrz BottomSheet) */
+  /* Zmierzone: przy tym offsecie dolna krawędź paska siada dokładnie na dole
+     widocznej części arkusza na obu detentach. */
+  bottom: var(--pk-sheet-shift, 0px);
   z-index: 2;
   display: flex;
   align-items: center;

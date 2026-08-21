@@ -616,17 +616,9 @@
 
 /* stamp on the park hero, like a passport mark */
 /* podpis parku pod tytułem, nad zdjęciami: rodzaj, hektary, liczba punktów */
-.park-titlerow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  margin-bottom: var(--sp-4);
-}
 
 .park-herometa {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
+  margin: 0 0 var(--sp-4);
   color: var(--content-tertiary);
 }
 
@@ -634,10 +626,39 @@
   margin-bottom: var(--sp-6);
 }
 
-.park-herostamp {
+/* komórka pieczątki: nalepka, tytuł, powod. Linie nad i pod, żeby czytało się
+   jak własna sekcja, a nie jak kolejny akapit opisu */
+.park-stampcell {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: var(--sp-6) 0;
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.park-stampcell__art {
   flex: 0 0 auto;
-  width: 52px;
+  width: 56px;
   pointer-events: none;
+}
+
+.park-stampcell__art.-locked {
+  opacity: 0.8;
+}
+
+.park-stampcell__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.park-stampcell__text p {
+  margin: 0;
+}
+
+.park-stampcell__text p + p {
+  margin-top: 2px;
 }
 
 .park-herostamp.-locked {

@@ -108,6 +108,13 @@ export function BottomSheet({
     translate.current = t
     el.style.transition = animate ? '' : 'none'
     el.style.transform = `translateY(${t}px)`
+    /*
+     * Ile panelu wisi pod ekranem. Arkusz na detencie „auto" jest wyższy od
+     * widoku i zjechany w dół, więc cokolwiek przyklejonego do dołu kontenera
+     * ląduje poza ekranem. Pasek akcji odejmuje tę wartosć i siada na dole
+     * WIDOCZNEJ części.
+     */
+    el.style.setProperty('--pk-sheet-shift', `${Math.max(0, t)}px`)
   }
 
   const restingT = useCallback(

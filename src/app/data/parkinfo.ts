@@ -219,9 +219,9 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   bednarskiego: {
     photos: [
+      { src: '/photos/park-bednarskiego-1.jpg', credit: "Fot. Andrzej Otrębski · CC BY-SA 4.0 · Wikimedia Commons" },
       { src: '/photos/park-bednarskiego-new.jpg', credit: 'Fot. Mariokol · domena publiczna · Wikimedia Commons' },
-      { src: '/photos/park-bednarskiego-1.jpg', credit: "Fot. Jakub Hałun · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-bednarskiego-2.jpg', credit: "Fot. Jakub Hałun · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-bednarskiego-2.jpg', credit: "Fot. Andrzej Otrębski · CC BY-SA 4.0 · Wikimedia Commons" },
     ],
     description: [
       "Park w wyrobisku kamieniołomu na Krzemionkach, otwarty w 1896 roku dzięki uporowi jednego człowieka: Wojciecha Bednarskiego, nauczyciela i radnego, który sam wyłożył pieniądze na pierwsze drzewa.",

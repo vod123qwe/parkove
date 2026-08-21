@@ -12,6 +12,7 @@ import {
   Trees,
 } from 'lucide-react'
 import {
+  ActionBar,
   BottomSheet,
   Button,
   Carousel,
@@ -28,6 +29,7 @@ import { amenitiesFor, isFood, topChips } from './data/amenities'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
 import { asset } from './assets'
 import { checkIn, collectPoint, stopExpedition, useGameState } from './state'
+import { stampNeed } from './progress'
 import { beginWalk } from './walk'
 import { distanceToParkM, formatDistance, pointInPark } from './geo'
 import type { ParkGeometry, Pt } from './geo'
@@ -163,6 +165,25 @@ export function ParkSheet({
     n === 1 ? 'punkt' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'punkty' : 'punktów'
   const heroMeta = `${kind.label} · ${ha} ha${quest ? ` · ${quest.pois.length} ${plPoints(quest.pois.length)}` : ''}`
 
+  /*
+   * Ile trzeba na pieczątkę (reguła mieszka w progress.ts) i jak to powiedzieć.
+   * Miejsce bez questa daje pieczątkę za samo bycie na miejscu.
+   */
+  const need = stampNeed(park.id)
+  const hasStamp = need > 0 ? earned >= need : visited
+  const left = Math.max(0, need - earned)
+  const stampNote = hasStamp
+    ? need > 0
+      ? `Zdobyta za ${need} ${plPoints(need)} wyprawy.`
+      : 'Zdobyta za meldunek na miejscu.'
+    : need > 0
+      ? `Za ${need} ${plPoints(need)} wyprawy. Brakuje ${left}.`
+      : 'Za meldunek na miejscu. Zamelduj się, gdy tam będziesz.'
+  /* jedna linijka autorstwa pod całością, bez powtarzania tego samego nazwiska */
+  const creditLine = [
+    ...new Set(gallery.map((g) => shortCredit(g.credit)?.replace(/^Fot\.\s*/, '')).filter(Boolean)),
+  ].join(' · ')
+
   return (
     <BottomSheet
       open
@@ -175,21 +196,12 @@ export function ParkSheet({
         scrimu, który połykał górną część kadru, a nazwa i tak walczyła z trawaą.
         Zdjęcia dostały własny slider w marginesach strony, jedno na ekran.
       */}
-      {/* pieczątka obok podpisu, nie na kadrze: na jaśniejszym zdjęciu znikała */}
-      <div className="park-titlerow">
-        <p className="t-body-sm park-herometa">{heroMeta}</p>
-        <Stamp
-          parkId={park.id}
-          name={park.properties.name}
-          earned={visited}
-          size="md"
-          fallback={<Trees />}
-          className={`park-herostamp${visited ? '' : ' -locked'}`}
-        />
-      </div>
+      <p className="t-body-sm park-herometa">{heroMeta}</p>
       <div className="park-gallery">
         <PhotoSlider
-          images={gallery.map((p) => ({ src: asset(p.src), credit: shortCredit(p.credit) }))}
+          images={gallery.map((p) => ({ src: asset(p.src) }))}
+          ratio="16:9"
+          showCredit={false}
           fallback={<Trees strokeWidth={1.5} />}
           aria-label={`Zdjęcia: ${park.properties.name}`}
         />
@@ -369,48 +381,45 @@ export function ParkSheet({
         </p>
       )}
 
-      {quest ? (
-        <>
-          {onExpeditionHere ? (
-            <Button full size="lg" icon={<Square size={18} />} onClick={stopExpedition}>
-              Zakończ wyprawę
-            </Button>
-          ) : (
-            <Button full size="lg" icon={<Compass size={18} />} onClick={() => {
-              beginWalk(park.id, park.properties.name)
-              onClose()
-            }}>
-              Start wyprawy
-            </Button>
-          )}
-          <Button
-            full
-            variant="tonal"
-            icon={<MapPin size={16} />}
-            onClick={doCheckIn}
-            disabled={status.s === 'locating'}
-            className="park-secondbtn"
-          >
-            {status.s === 'locating' ? 'Sprawdzam pozycję…' : 'Jestem tu (meldunek)'}
-          </Button>
-          <PhotoButton
-            parkId={park.id}
-            onSaved={onPhotoSaved}
-            className="park-secondbtn"
-            variant="ghost"
-          />
-        </>
-      ) : (
-        <Button full size="lg" icon={<MapPin size={18} />} onClick={doCheckIn} disabled={status.s === 'locating'}>
-          {status.s === 'locating' ? 'Sprawdzam pozycję…' : 'Jestem tu'}
-        </Button>
-      )}
+      {/* meldunek i zdjęcie zostają w treści; decyzja siedzi w pasku na dole */}
+      <Button
+        full
+        variant="tonal"
+        icon={<MapPin size={16} />}
+        onClick={doCheckIn}
+        disabled={status.s === 'locating'}
+        className="park-secondbtn"
+      >
+        {status.s === 'locating' ? 'Sprawdzam pozycję…' : 'Jestem tu (meldunek)'}
+      </Button>
+      <PhotoButton
+        parkId={park.id}
+        onSaved={onPhotoSaved}
+        className="park-secondbtn"
+        variant="ghost"
+      />
 
-      {info?.photos && info.photos.some((p) => p.credit) && (
-        <p className="t-caption park-credits">
-          Zdjęcia: {info.photos.map((p) => p.credit).filter(Boolean).join(' · ')}
-        </p>
-      )}
+      {/*
+        Pieczątka dostaje własną komórkę między liniami: nalepka po lewej, po prawej
+        za co jest i czy już jest. Na zdjęciu ginieła, a nad zdjęciami udawała
+        część nagłówka, którym nie jest.
+      */}
+      <div className="park-stampcell">
+        <Stamp
+          parkId={park.id}
+          name={park.properties.name}
+          earned={hasStamp}
+          size="md"
+          fallback={<Trees />}
+          className={`park-stampcell__art${hasStamp ? '' : ' -locked'}`}
+        />
+        <div className="park-stampcell__text">
+          <p className="t-body-strong">Pieczątka miejsca</p>
+          <p className="t-caption park-muted">{stampNote}</p>
+        </div>
+      </div>
+
+      {creditLine && <p className="t-caption park-credits">Zdjęcia: {creditLine}</p>}
 
       {import.meta.env.DEV && (
         <>
@@ -426,6 +435,27 @@ export function ParkSheet({
           )}
         </>
       )}
+
+      {/* jedna decyzja, przyklejona do dołu: reszta karty przewija się pod nią */}
+      <ActionBar>
+        {onExpeditionHere ? (
+          <Button full size="lg" icon={<Square size={18} />} onClick={stopExpedition}>
+            Zakończ wyprawę
+          </Button>
+        ) : (
+          <Button
+            full
+            size="lg"
+            icon={<Compass size={18} />}
+            onClick={() => {
+              beginWalk(park.id, park.properties.name)
+              onClose()
+            }}
+          >
+            Start wyprawy
+          </Button>
+        )}
+      </ActionBar>
     </BottomSheet>
   )
 }

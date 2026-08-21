@@ -20,3 +20,14 @@ export function isParkComplete(parkId: string, parks: Record<string, ParkProgres
   const need = Math.min(quest.stampAt ?? quest.pois.length, quest.pois.length)
   return mine >= need
 }
+
+/**
+ * Ile punktów żąda pieczątka tego miejsca. Ta sama liczba, na której stoi
+ * `isParkComplete`, wyciągnięta osobno, żeby karta parku mogła powiedzieć, ile
+ * brakuje, bez powtarzania reguły u siebie.
+ */
+export function stampNeed(parkId: string) {
+  const quest = questForPark(parkId)
+  if (!quest) return 0
+  return Math.min(quest.stampAt ?? quest.pois.length, quest.pois.length)
+}
