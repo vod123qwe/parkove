@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Award, ChevronRight, Component, Footprints, Map as MapIcon, Palette, Pencil, Route, Sparkles, Trees } from 'lucide-react'
 import { Button, Carousel, List, ListItem, Modal, Polaroid, Stamp, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
@@ -8,6 +8,7 @@ import { KIND_META } from './kinds'
 import { questForPark } from './data/quests'
 import { isParkComplete } from './progress'
 import { VERSION } from '../changelog'
+import { screenReport, toggleGroundDebug } from './screen'
 import type { ParkFeature } from './ParkSheet'
 
 const fmtDate = (ms: number) =>
@@ -43,6 +44,9 @@ export function ProfileModal({
   /** one sticker up close, on its own page */
   onOpenStamp: (parkId: string) => void
 }) {
+  const taps = useRef(0)
+  const [diag, setDiag] = useState<string | null>(null)
+
   const { parks: progress, journeys } = useGameState()
   const photos = usePhotos().filter((m) => m.kind === 'photo' && m.url)
   const [name, setNameState] = useState(getName)
@@ -259,7 +263,19 @@ export function ProfileModal({
         </List>
       </section>
 
-      <p className="t-caption profile-version">Parkove v{VERSION}</p>
+      {/* trzy dotknięcia wersji: diagnostyka dolnej krawędzi (patrz screen.ts) */}
+      <p
+        className="t-caption profile-version"
+        onClick={() => {
+          taps.current += 1
+          if (taps.current < 3) return
+          taps.current = 0
+          setDiag(toggleGroundDebug() ? screenReport() : null)
+        }}
+      >
+        Parkove v{VERSION}
+      </p>
+      {diag && <p className="t-caption profile-diag">{diag}</p>}
     </Modal>
   )
 }

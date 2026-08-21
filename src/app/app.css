@@ -3198,3 +3198,14 @@
   background: var(--bg-gold);
   color: var(--content-on-gold);
 }
+
+/* wynik diagnostyki dolnej krawędzi: liczby małe, w jednym rzędzie, do zrzutu */
+.profile-diag {
+  margin: var(--sp-2) 0 0;
+  color: var(--content-tertiary);
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  line-height: 15px;
+  text-align: center;
+  word-spacing: 2px;
+}
