@@ -8,6 +8,14 @@ import { useEffect } from 'react'
  * opens, so a note being typed does not resize the screen underneath it.
  */
 export function trackScreenHeight() {
+  /*
+   * Diagnostyka białego paska na telefonie: adres z ?ground=debug maluje tło
+   * dokumentu na magentę. Magentowy pasek u dołu = żaden ekran nie dosięga
+   * krawędzi. Biały = maluje go coś innego, niż myślimy.
+   */
+  if (location.search.includes('ground=debug')) {
+    document.documentElement.dataset.pkGround = 'debug'
+  }
   const apply = () => {
     document.documentElement.style.setProperty('--screen-h', `${Math.round(window.innerHeight)}px`)
   }

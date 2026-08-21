@@ -39,6 +39,17 @@ html[data-pk-dark] body {
   background: #0b1207;
 }
 
+/*
+ * Diagnostyka białego paska (URL z ?ground=debug). Maluje podłoże dokumentu na
+ * magentę. Jeśli pasek u dołu telefonu zrobi się magentowy, to znaczy, że
+ * żaden ekran nie dosięga dolnej krawędzi i świeci tło dokumentu. Jeśli
+ * zostanie biały, maluje go coś innego i szukać trzeba wyżej.
+ */
+html[data-pk-ground='debug'],
+html[data-pk-ground='debug'] body {
+  background: #ff0080;
+}
+
 /* the app scrolls inside its own panels; the bars are noise on top of that */
 :where(.app-shell, .jscreen, .stampscreen, .memview, .memplay, .pk-modal, .pk-sheet) :where(*) {
   scrollbar-width: none;
