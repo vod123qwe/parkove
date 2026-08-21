@@ -291,9 +291,21 @@ const KRAKOW_QUESTS: Quest[] = [
         name: 'Grota Twardowskiego',
         teaser: 'Wejście do największej jaskini w skałkach, sercem legendy o czarnoksiężniku.',
         description: [
-          'Grota Twardowskiego to najsłynniejsza jaskinia Krakowa: korytarze o łącznej długości około 500 metrów, zbadane szczegółowo dopiero w 2019 roku przez grotołazów. Wejście odsłonięto przypadkiem w drugiej połowie XIX wieku, przy pracach w kamieniołomie.',
-          'To tu legenda umieszcza pracownię mistrza Twardowskiego: szlachcica-alchemika z czasów Zygmunta Augusta, który podpisał pakt z diabłem, wywołał duszę Barbary Radziwiłłówny i przechytrzył czarta, wpisując do umowy Rzym, do którego nie zamierzał jechać.',
-          'Wersja krakowska mówi, że pracownia wyleciała w powietrze, a odłamki skał rozsypane po zboczu to jej resztki. Geologia jest mniej dramatyczna: to wapień jurajski i dynamit kamieniołomu. Wejście do jaskini jest dziś zakratowane, bo wewnątrz zimują nietoperze.',
+          'Grota Twardowskiego to najsłynniejsza jaskinia Krakowa: korytarze o łącznej długości około 500 metrów, zbadane i udrożnione dopiero w 2019 roku przez grotołazów. Wejście odsłonięto przypadkiem w drugiej połowie XIX wieku, przy pracach w kamieniołomie.',
+          'Całe Skałki wzięły nazwę od legendy, która właśnie tutaj umieszcza pracownię czarnoksiężnika. Opowieść masz niżej, w swoim własnym miejscu, bo nie jest faktem i nie ma udawać faktu.',
+          'Wejście jest dziś zakratowane, bo wewnątrz zimują nietoperze. Skałę zbudowało ciepłe morze późnej jury: wapienie mają tu do 230 metrów miąższości, siedzą w nich konkrecje krzemionkowe, a miejscami widać ślady drążenia ich powierzchni przez jeżowce.',
+        ],
+        long: [
+          'Wzgórze wygląda dziko, ale prawie cały jego kształt jest robotą ludzi. Działały tu cztery kamieniołomy: Łom Bergera, Skałki Twardowskiego, Kapelanka i Zakrzówek. Wapień szło najpierw pod budownictwo, potem na drogi i do wapienników, a na końcu do zakładów produkujących sodę.',
+          'Zalew Zakrzówek nie jest jeziorem: to wyrobisko jednego z tych kamieniołomów, które wypełniła woda deszczowa. Stąd ta głębokość i przejrzystość, i stąd nurkowie w miejscu, gdzie sto lat temu strzelano dynamitem.',
+          'Grota nie jest tu sama. Na wzgórzu jest kilkanaście jaskiń i schronisk, a ich nazwy są osobną przyjemnością: Jaskinia Jasna, Koguta, Musza, Niska, Pychowicka, Jaskinia w Anastomozach, Jaskinia z Kulkami i Okienko Zbójnickie.',
+          'Warto zatrzymać się nad rokiem 2019. Najsłynniejsza jaskinia Krakowa, ta z legendy znanej każdemu dziecku, została porządnie zbadana i udrożniona mniej niż dekadę temu. Miasto potrafi nie znać swojego najbardziej opowiedzianego miejsca.',
+        ],
+        legend: [
+          'Twardowski był czarnoksiężnikiem na dworze Zygmunta Augusta i to on miał wywołać dla króla duszę Barbary Radziwiłłówny. Cenę znał z góry, bo podpisał cyrograf z diabłem. Wpisał do niego tylko jeden warunek: czart może go zabrać wyłącznie w Rzymie. Do Rzymu, rzecz jasna, nie zamierzał jechać nigdy.',
+          'Diabeł był cierpliwszy. Dopadł go w karczmie, która nazywała się Rzym. Karczmę z tej opowieści można zresztą odwiedzić: drewniana, z początku osiemnastego wieku, stoi przy rynku w Suchej Beskidzkiej i pod koniec lat sześćdziesiątych nadano jej właśnie tę nazwę, na pamiątkę spotkania Twardowskiego z Mefistofelesem.',
+          'W drodze do piekła Twardowski zaczął śpiewać pieśń do Matki Boskiej. Diabeł nie mógł go dalej nieść i puścił. Twardowski zawisł między niebem a piekłem i został na Księżycu. Podobno pajak spuszcza się od niego na nitce do Krakowa i wraca z wiadomościami, co się w mieście dzieje.',
+          'A krakowski rozdział tej historii jest właśnie tutaj: na tym wzgórzu miał stać jego pracownia. Pewnego dnia laboratorium wyleciało w powietrze, a odłamki skał rozsypane po zboczu to jego resztki. Dlatego to Skałki Twardowskiego, a nie żaden Zakrzówek Górny.',
         ],
         findHint: 'Zbocze nad ul. Norymberską, ścieżką w górę od strony zalewu. Wejście zakratowane, oglądasz z zewnątrz.',
         reveal:
@@ -310,6 +322,7 @@ const KRAKOW_QUESTS: Quest[] = [
         sources: [
           'https://www.klubpodroznikow.com/jaskinia-twardowskiego/',
           'https://pl.wikipedia.org/wiki/Ska%C5%82ki_Twardowskiego',
+          'https://pl.wikipedia.org/wiki/Karczma_Rzym',
         ],
         coords: [19.90245, 50.03892],
         radius: 45,

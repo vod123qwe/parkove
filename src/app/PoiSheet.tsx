@@ -1,8 +1,11 @@
 import { BookOpen, Lock, MapPin, Sparkles } from 'lucide-react'
-import { Collapsible, Modal } from '../ds'
+import { useState } from 'react'
+import { Modal, Segmented } from '../ds'
 import { Dilemma } from './Dilemma'
 import type { QuestPoi } from './data/quests'
 import { asset } from './assets'
+
+const MODE_KEY = 'pk-story-mode'
 
 /** full-screen point card: photos and the whole story, readable anytime */
 export function PoiModal({
@@ -16,6 +19,15 @@ export function PoiModal({
   collected: boolean
   onClose: () => void
 }) {
+  /* nawyk czytania trzymamy w pamięci przeglądarki: kto raz wybrał całość, dostaje
+     całość przy następnym punkcie, bez klikania za każdym razem */
+  const [mode, setModeState] = useState<'short' | 'long'>(
+    () => (localStorage.getItem(MODE_KEY) === 'long' ? 'long' : 'short'),
+  )
+  const setMode = (m: 'short' | 'long') => {
+    setModeState(m)
+    localStorage.setItem(MODE_KEY, m)
+  }
   return (
     <Modal open={poi != null} onClose={onClose} title={poi?.name} action="back" presentation="push">
       {poi && (
@@ -26,22 +38,36 @@ export function PoiModal({
               {poi.photoCredit && <figcaption className="t-caption">{poi.photoCredit}</figcaption>}
             </figure>
           )}
+          {/*
+            Przełącznik u góry, nie przycisk na końcu, i to jest różnica jakościowa:
+            na dole dowiadujesz się, że jest więcej, dopiero gdy skończysz czytać.
+            U góry wybierasz, JAK teraz czytasz: krótko w terenie, całość przy planowaniu.
+            Wybór zapamiętany, bo to nawyk, nie decyzja na jeden punkt.
+          */}
+          {poi.long && poi.long.length > 0 && (
+            <Segmented
+              className="poi-mode"
+              aria-label="Ile opowieści"
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'short', label: 'Krótko' },
+                { value: 'long', label: 'Cała historia' },
+              ]}
+            />
+          )}
           {poi.description.map((p, i) => (
             <p key={i} className="t-body poi-para">
               {p}
             </p>
           ))}
-          {/* rozwinięcie tylko tam, gdzie historia na to zasługuje: krótka wersja
-              zostaje domyślna, żeby czytanie nie zastąpiło chodzenia */}
-          {poi.long && poi.long.length > 0 && (
+          {poi.long && mode === 'long' && (
             <div className="poi-long">
-              <Collapsible lines={0} moreLabel="Czytaj dalej" lessLabel="Zwiń">
-                {poi.long.map((p, i) => (
-                  <p key={i} className="t-body poi-para">
-                    {p}
-                  </p>
-                ))}
-              </Collapsible>
+              {poi.long.map((p, i) => (
+                <p key={i} className="t-body poi-para">
+                  {p}
+                </p>
+              ))}
             </div>
           )}
           {/* podanie pod własnym nagłówkiem i innym krojem: fakt to fakt, legenda to legenda */}

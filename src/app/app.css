@@ -3232,14 +3232,16 @@
   color: var(--content-secondary);
 }
 
-/* rozwinięta wersja opowieści: zwinięta do zera, więc widać tylko przycisk */
+/* przelacznik dlugosci opowiesci: u gory karty, nad pierwszym akapitem */
+.poi-mode {
+  margin: 0 0 var(--sp-5);
+}
+
+/* rozwinieta czesc: ten sam rytm akapitow, bez zadnej ramki */
 .poi-long {
   margin: calc(-1 * var(--sp-2)) 0 var(--sp-4);
 }
 
-.poi-long .pk-collapsible__body.-clamped {
-  opacity: 0;
-}
 
 /*
  * Legenda ma własny krój (Kalam, ten sam co w pieczątkach) i lekkie tło, żeby

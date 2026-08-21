@@ -104,20 +104,40 @@ export const PARKING: Record<string, ParkingInfo[]> = {
       coords: [19.816998, 50.164623],
     },
   ],
+  /*
+   * Uwaga na geografię tej doliny: wodospad Szum z Sokolicą leżą w jej środku, a
+   * Jaskinia Nietoperzowa trzy kilometry wyżej, po stronie Jerzmanowic. To dwa
+   * osobne wypady i dwa osobne parkingi. Odległości zmierzone od punktów wyprawy
+   * do parkingów z OSM (2026-08-22).
+   */
   'dolina-bedkowska': [
+    {
+      id: 'bedkowska-brandysowka',
+      name: 'Brandysówka, środek doliny',
+      hint: 'Najbliżej tego, po co się tu jedzie: 148 m do Sokolicy, 292 m do wodospadu Szum. Gruntowy, płatny, przy schronisku, więc od razu jest gdzie zjeść.',
+      fee: 'Płatny',
+      coords: [19.740535, 50.172941],
+    },
+    {
+      id: 'bedkowska-nietoperzowa',
+      name: 'Przy Jaskini Nietoperzowej',
+      hint: 'Osobny wypad, górny koniec doliny po stronie Jerzmanowic: 124 m od wejścia do jaskini. Żwirowy, bez opłaty, dla odwiedzających. Do wodospadu stąd trzy kilometry.',
+      fee: 'Bezpłatny',
+      coords: [19.775846, 50.193216],
+    },
     {
       id: 'bedkowska-srodek',
       name: 'Parking w środku doliny',
-      hint: 'Najbliżej wodospadu Szum, około 200 m od dna doliny. Stąd najwygodniej wejść w Będkowską.',
+      hint: 'Zapas, gdy przy Brandysówce nie ma miejsca: 451 m do Szumu, 465 m do Sokolicy. W OSM bez żadnych tagów, więc opłaty nie znamy.',
       fee: 'Nieznana',
       coords: [19.748334, 50.172255],
     },
     {
-      id: 'bedkowska-brandysowka',
-      name: 'Parking przy Brandysówce',
-      hint: 'Płatny, dla gości schroniska. Kilkaset metrów od wodospadu.',
-      fee: 'Płatny',
-      coords: [19.740535, 50.172941],
+      id: 'bedkowska-bedkowice',
+      name: 'Od Będkowic, dolny wylot',
+      hint: 'Najdalej od punktów (kilometr do Szumu), ale za to od tej strony wchodzi się w dolinę wzdłuż potoku, co samo w sobie jest spacerem.',
+      fee: 'Nieznana',
+      coords: [19.752579, 50.167952],
     },
   ],
   'dolina-raclawki': [
