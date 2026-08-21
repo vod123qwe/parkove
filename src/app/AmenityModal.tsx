@@ -1,6 +1,7 @@
-import { ChevronRight, Coffee, ToyBrick } from 'lucide-react'
+import { ChevronRight, Clock, Coffee, ToyBrick } from 'lucide-react'
 import { List, ListItem, Modal } from '../ds'
-import { KIND_LABEL, amenitiesFor, isFood } from './data/amenities'
+import { KIND_LABEL, amenitiesFor, fmtHours, isFood } from './data/amenities'
+import { detailFor } from './data/amenity-details'
 
 /** the list behind a food or playground pin, with walking directions */
 export function AmenityModal({
@@ -36,17 +37,33 @@ export function AmenityModal({
       {/* wiersz jest klikalny, więc nie może mieć przycisku w środku: to byłby
           zagnieżdżony button. Prowadzenie siedzi na karcie po wyborze miejsca */}
       <List className="parking-list">
-        {spots.map((s) => (
-          <ListItem
-            key={s.id}
-            icon={wantFood ? <Coffee /> : <ToyBrick />}
-            leadTone="accent"
-            title={s.name}
-            meta={KIND_LABEL[s.kind]}
-            onClick={() => onPick(s.id)}
-            trailing={<ChevronRight size={18} className="park-parking__chevron" />}
-          />
-        ))}
+        {spots.map((s) => {
+          /* „Plac zabaw" nic nie mówi. „Plac zabaw · piasek · ogrodzony" już tak */
+          const d = detailFor(parkId, s.id)
+          /* nie powtarzamy nazwy w podpisie: bezimienny plac nazywa sie
+             wlasnie "Plac zabaw", wiec podpis ma dodac cechy, nie echo */
+          const label = s.name === KIND_LABEL[s.kind] ? [] : [KIND_LABEL[s.kind]]
+          const bits = [...label, ...(d?.chips ?? [])]
+          return (
+            <ListItem
+              key={s.id}
+              icon={wantFood ? <Coffee /> : <ToyBrick />}
+              leadTone="accent"
+              title={s.name}
+              meta={bits.length ? bits.join(' · ') : undefined}
+              metaExtra={
+                d?.hours ? (
+                  <span className="park-amenity__hours">
+                    <Clock size={12} />
+                    {fmtHours(d.hours)}
+                  </span>
+                ) : undefined
+              }
+              onClick={() => onPick(s.id)}
+              trailing={<ChevronRight size={18} className="park-parking__chevron" />}
+            />
+          )
+        })}
       </List>
     </Modal>
   )

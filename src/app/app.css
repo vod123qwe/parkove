@@ -1341,9 +1341,9 @@
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
   z-index: 14;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-5);
+  padding: var(--sp-4) var(--sp-4) var(--sp-5) var(--sp-5);
   background: var(--bg-surface-raised);
   box-shadow: var(--elevation-3);
   animation: looks-in 220ms var(--ease-screen);
@@ -1359,13 +1359,22 @@
   animation: none;
 }
 
-/* Twoje zdjęcia tego miejsca: mały pasek nad nazwą */
-.app-spotcard {
-  flex-wrap: wrap;
+/* nazwa i akcje w jednej linii, cechy pełną szerokością pod nią: ikony mają
+   trzymać się nazwy, bo karta rośnie w dół wraz z liczbą cech */
+.app-spotcard__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
 }
 
+.app-spotcard__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Twoje zdjęcia tego miejsca: mały pasek nad nazwą */
 .app-spotcard__shots {
-  flex: 0 0 100%;
   display: flex;
   gap: var(--sp-2);
 }
@@ -1744,7 +1753,12 @@
 }
 
 .app-addmenu.-out {
-  animation: add-fade 180ms var(--ease-out) reverse both;
+  animation: add-fade 260ms var(--ease-out) reverse both;
+}
+
+.app-addmenu.-out .app-addmenu__close {
+  animation: add-sink 240ms var(--ease-screen) both;
+  animation-delay: 120ms;
 }
 
 @keyframes add-fade {
@@ -1809,8 +1823,8 @@
 }
 
 .app-addmenu.-out .app-addmenu__item.pk-btn {
-  animation: add-sink 180ms var(--ease-out) both;
-  animation-delay: calc(var(--sink, 0) * 45ms);
+  animation: add-sink 280ms var(--ease-screen) both;
+  animation-delay: calc(var(--sink, 0) * 50ms);
 }
 
 @keyframes add-rise {
@@ -1824,14 +1838,23 @@
   }
 }
 
+/*
+ * Zejście ma tę samą energię co wejście: pigułka najpierw drgnie w górę, potem
+ * zapada się w stronę plusa. Kaskada idzie od góry, więc czyta się to jak
+ * wciąganie ich z powrotem do przycisku, a nie jak zgaszenie światła.
+ */
 @keyframes add-sink {
-  from {
+  0% {
     opacity: 1;
     transform: none;
   }
-  to {
+  22% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.025);
+  }
+  100% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(26px) scale(0.9);
   }
 }
 
@@ -3030,4 +3053,114 @@
 
 .memplay .maplibregl-ctrl-attrib a {
   color: #ffffff;
+}
+
+/* ── Co to za miejsce ──────────────────────────────────────────────────────
+ * Cechy z OSM (kuchnia, ogródek, nawierzchnia, godziny) jako drobne pastylki.
+ * Nazwa mówi „Plac zabaw", pastylki mówią, czy warto tam iść z dzieckiem.
+ */
+.app-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.app-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px var(--sp-2);
+  border-radius: 9px;
+  line-height: 1.35;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  color: var(--content-secondary);
+  white-space: nowrap;
+}
+
+/* godziny to też pastylka, nie osobna linijka: jeden rząd, jeden rytm */
+.app-chip.-hours {
+  color: var(--content-tertiary);
+}
+
+.app-chip.-hours svg {
+  opacity: 0.75;
+}
+
+/* w karcie wyprawy tło jest już ciemne, więc pastylka musi być jaśniejsza */
+.app-expbar__swap .app-chip {
+  background: rgb(255 255 255 / 0.09);
+}
+
+.park-amenity__chips {
+  margin-top: 2px;
+  color: var(--content-secondary);
+}
+
+.park-amenity__hours {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--content-tertiary);
+}
+
+/*
+ * Pastylka, która wychodzi z aplikacji. Cechy są do czytania, te dwie do
+ * dotknięcia, więc muszą się różnić czymś więcej niż kolorem tekstu: miętowe tło,
+ * obwódka i strzałka „wyjdziesz stąd". Wysokość 32 px, a pole dotyku 44 px
+ * dorobione pseudoelementem, żeby palec trafiał, a rząd się nie rozpędzał.
+ */
+.app-chips.-links {
+  gap: var(--sp-2);
+  margin-top: 2px;
+}
+
+.app-chip.-link {
+  position: relative;
+  gap: var(--sp-2);
+  min-height: 32px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--border-mint);
+  border-radius: 11px;
+  background: var(--bg-mint);
+  color: var(--content-accent);
+  font-weight: 600;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 120ms var(--ease-screen),
+    background 120ms linear;
+}
+
+.app-chip.-link::after {
+  content: '';
+  position: absolute;
+  inset: -6px -2px;
+}
+
+.app-chip.-link:active {
+  transform: scale(0.96);
+  background: var(--bg-surface-sunken);
+}
+
+.app-chip.-link .app-chip__arrow {
+  margin-left: -2px;
+  opacity: 0.7;
+}
+
+/* w pasku wyprawy tło jest ciemne, więc mięta z jasnego motywu by tam krzyczała */
+.app-expbar__swap .app-chip.-link {
+  border-color: rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.14);
+  color: #eaf3e6;
+}
+
+/* akapity w karcie miały domyślne marginesy przeglądarki: 16 px nad nazwą i 12
+   pod podpisem rozpychały nagłówek do 84 px i to od tego karta wyglądała krzywo */
+.app-spotcard__body p {
+  margin: 0;
+}
+
+.app-spotcard__body p + p {
+  margin-top: 2px;
 }

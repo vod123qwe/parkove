@@ -524,6 +524,7 @@ export function App() {
               activeSpot ? (
                 <SpotCard
                   spot={activeSpot}
+                  parkId={selected?.id}
                   placeName={selected?.properties.name}
                   photos={spotPhotos}
                   onOpenPhoto={setPhotoId}
@@ -970,6 +971,7 @@ export function App() {
       {activeSpot && !onWalk && (
         <SpotCard
           spot={activeSpot}
+          parkId={selected?.id}
           placeName={selected?.properties.name}
           photos={spotPhotos}
           onOpenPhoto={setPhotoId}

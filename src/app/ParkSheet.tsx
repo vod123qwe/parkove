@@ -24,7 +24,7 @@ import { KIND_META } from './kinds'
 import { suggestedParking } from './data/parking'
 import { PhotoButton } from './PhotoButton'
 import { PARK_INFO } from './data/parkinfo'
-import { amenitiesFor, isFood } from './data/amenities'
+import { amenitiesFor, isFood, topChips } from './data/amenities'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
 import { asset } from './assets'
 import { checkIn, collectPoint, stopExpedition, useGameState } from './state'
@@ -146,6 +146,9 @@ export function ParkSheet({
   const plPlaces = (n: number) =>
     n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'miejsca' : 'miejsc'
   const foodCount = spots.filter((a) => isFood(a.kind)).length
+  /* cechy z OSM: nawierzchnia i wiek u placu, kuchnia i ogrodek u jedzenia */
+  const playChips = topChips(park.id, false)
+  const foodChips = topChips(park.id, true)
   const playCount = spots.length - foodCount
   const hasFood = foodCount > 0
   const hasPlay = playCount > 0
@@ -264,6 +267,9 @@ export function ParkSheet({
                     : 'jest na miejscu'
                   : 'nie ma'}
               </span>
+              {playChips.length > 0 && (
+                <span className="t-caption park-amenity__chips">{playChips.join(' · ')}</span>
+              )}
               {hasPlay && (
                 <span className="park-amenity__go" aria-hidden="true">
                   <ChevronRight size={16} />
@@ -286,6 +292,9 @@ export function ParkSheet({
                     : 'jedno miejsce'
                   : 'nie ma'}
               </span>
+              {foodChips.length > 0 && (
+                <span className="t-caption park-amenity__chips">{foodChips.join(' · ')}</span>
+              )}
               {hasFood && (
                 <span className="park-amenity__go" aria-hidden="true">
                   <ChevronRight size={16} />

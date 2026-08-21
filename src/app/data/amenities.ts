@@ -2,6 +2,8 @@
 // Curated: named eateries within 120 m of the park (six closest) and up to four
 // playgrounds. Verified against park polygons; the comment says where each sits.
 
+import { detailFor } from './amenity-details'
+
 export type AmenityKind = 'cafe' | 'restaurant' | 'fast_food' | 'ice_cream' | 'playground'
 
 export type AmenitySpot = {
@@ -315,6 +317,75 @@ export const AMENITIES: Record<string, AmenitySpot[]> = {
 export const amenitiesFor = (parkId: string) => AMENITIES[parkId] ?? []
 export const isFood = (k: AmenityKind) => k !== 'playground'
 
+/**
+ * Opinie i zdjęcia lokalu w Google.
+ *
+ * Nie ściągamy tych zdjęć do siebie: Places API wymaga klucza z billingiem (a klucz
+ * w statycznej PWA jest publiczny) i zabrania trzymania zdjęć u siebie. Jedno
+ * dotknięcie do galerii Google jest tanie, legalne i pokazuje więcej niż
+ * kiedykolwiek zmieścilibyśmy na karcie. Współrzędne w zapytaniu, bo sama nazwa
+ * trafia w inny lokal tej samej sieci.
+ */
+export const reviewsUrl = (name: string, [lng, lat]: [number, number]) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${lat},${lng}`)}`
+
 /** walking directions to a spot */
 export const walkUrl = ([lng, lat]: [number, number]) =>
   `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`
+
+/* ── Co to za miejsce ─────────────────────────────────────────────────────────
+ * Dane leżą w amenity-details.ts (generowane z OSM). Tutaj tylko czytanie ich
+ * tak, żeby dało się je pokazać człowiekowi.
+ */
+
+const DAYS: Record<string, string> = {
+  Mo: 'pn', Tu: 'wt', We: 'śr', Th: 'cz', Fr: 'pt', Sa: 'sb', Su: 'nd',
+}
+
+/**
+ * `opening_hours` z OSM czyta się jak kod: „Mo-Su 12:00-23:30". Tłumaczymy na
+ * polski i skracamy do dwóch członów, bo w karcie jest jedna linijka.
+ */
+export function fmtHours(raw: string): string {
+  if (/^24\/7$/.test(raw.trim())) return 'całą dobę'
+  const parts = raw.split(';').map((s) => s.trim()).filter(Boolean)
+  const nice = parts.slice(0, 2).map((part) =>
+    part
+      .replace(/\bMo-Su\b/, 'codziennie')
+      .replace(/\bMo-Fr\b/, 'pn–pt')
+      .replace(/\bSa-Su\b/, 'weekend')
+      .replace(/\b(Mo|Tu|We|Th|Fr|Sa|Su)\b/g, (d) => DAYS[d] ?? d)
+      // zakres dni też z półpauzą, żeby nie wyglądał jak dywiz w kodzie
+      .replace(/(pn|wt|śr|cz|pt|sb|nd)-(pn|wt|śr|cz|pt|sb|nd)/g, '$1–$2')
+      .replace(/(\d{2}:\d{2})-(\d{2}:\d{2})/g, '$1–$2')
+      .replace(/\boff\b/, 'zamknięte')
+      .replace(/:00/g, ''),
+  )
+  return nice.join(', ') + (parts.length > 2 ? '…' : '')
+}
+
+/*
+ * Zastrzeżenia jednego miejsca („plac przy restauracji, dla klientów") nie mogą
+ * opisywać całego parku. Na kaflu pokazujemy tylko cechy, które da się
+ * zobaczyć na miejscu; dostęp i udogodnienia zostają w wierszu i na karcie.
+ */
+const SKIP_ON_TILE = new Set(['dla klientów', 'prywatny', 'wózki ok', 'oświetlony'])
+
+/**
+ * Najczęstsze cechy miejsc danego typu w parku, na kafel w karcie parku:
+ * „6 miejsc · pizza, ogródek". Bez zgadywania: jeśli nic nie wiemy, nic nie ma.
+ */
+export function topChips(parkId: string, food: boolean, limit = 2): string[] {
+  const count = new Map<string, number>()
+  for (const s of amenitiesFor(parkId)) {
+    if (isFood(s.kind) !== food) continue
+    for (const c of detailFor(parkId, s.id)?.chips ?? []) {
+      if (SKIP_ON_TILE.has(c)) continue
+      count.set(c, (count.get(c) ?? 0) + 1)
+    }
+  }
+  return [...count.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, limit)
+    .map(([c]) => c)
+}

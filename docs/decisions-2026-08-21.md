@@ -247,3 +247,53 @@ Pary: krakusa (szczyt/azymut 20 m), jordana (pomnik/popiersia 32), krakowski
 **1**, bagry 22, wyspianskiego 32, kosciuszki (szczyt/fort 25, fort/kaplica 25),
 panienskie-skaly 39, szwedzki 59, stacja-wisla 76, szymborskiej 13, zielony-jar 64,
 bolechowicka (brama/mur 29, tu akurat słusznie, bo to sąsiadujące skały).
+
+
+## Co to za miejsce: etykiety z OSM
+
+Kawiarnia nazywała się tylko „Kawiarnia", a plac zabaw „Plac zabaw". Nazwa nie
+odpowiadała na pytanie, które Jarek zadaje patrząc na kafel: **czy warto tam
+iść?** Dociągnięte z Nominatim `extratags` (210 sprawdzonych miejsc, 162
+trafienia, 128 z tagami) i przetłumaczone na etykiety: `surface=woodchips` →
+„zrębki", `cuisine=pizza;coffee_shop` → „pizza, kawa", `outdoor_seating=yes` →
+„ogródek". Godziny z `opening_hours` tłumaczy `fmtHours`: „Mo-Su 12:00-23:30"
+czyta się jako „codziennie 12–23:30".
+
+Trę decyzje warte zapamiętania:
+
+1. **Tłumaczenie w skrypcie, nie w aplikacji.** `scripts/build-amenity-details.mjs`
+   generuje `src/app/data/amenity-details.ts`. To decyzja redakcyjna, więc ma
+   mieszkać w słowniku, który się poprawia i puszcza od nowa.
+2. **Zastrzeżenia jednego miejsca nie opisują parku.** Kafel Parku Bednarskiego
+   pokazał „dla klientów", bo taki jest jeden z dwóch placów. Na kaflu zostają
+   tylko cechy widoczne na miejscu (`SKIP_ON_TILE`); dostęp i udogodnienia
+   żyją w wierszu listy i na karcie miejsca.
+3. **Nie powtarzamy nazwy w podpisie.** Bezimienny plac nazywa się „Plac zabaw",
+   więc podpis „Plac zabaw · Plac zabaw" był echem. Podpis dodaje cechy albo nic.
+
+### Zdjęcia lokali: dlaczego linkiem, a nie miniaturką
+
+Jarek chciał miniaturki wnętrza i dań. Google Places API wymaga klucza z
+billingiem, a w statycznej PWA na GitHub Pages każdy klucz jest publiczny; licencja
+zabrania też trzymania tych zdjęć u siebie. Commons ma zabytki, nie kawiarnie.
+Stąd dwie pastylki-linki na karcie miejsca: **Zdjęcia i opinie** (Google Maps z
+nazwą i współrzędnymi, bo sama nazwa trafia w inny lokal tej samej sieci) oraz
+**Strona**, gdy OSM zna `website`. Dla bezimiennego placu zabaw linku nie ma,
+bo nie ma czego szukać.
+
+### Karta miejsca: skąd się brała krzywizna
+
+Akapity w karcie miały **domyślne marginesy przeglądarki** (16 px nad nazwą,
+12 pod podpisem), więc blok tekstu miał 84 px zamiast 40 i ikony wisiały w
+połowie niczego. Po wyzerowaniu: nagłówek 44 px (równo z wysokością przycisku),
+cechy pełną szerokością pod nim. Linki dostały 32 px wysokości i pole dotyku
+44 px pseudoelementem, bo 22-px pastylka jest nietrafialna palcem.
+
+## Odlożone na później (prośby Jarka)
+
+- **Karta szczegółów parku, nowy układ:** tytuł **nad** zdjęciami (nie na nich),
+  pod tytułem slider zdjęć, gdzie jedno zdjęcie ma szerokość kontenera minus
+  marginesy i jest zaokrąglone, a pod tym reszta treści.
+- **Swipe na module live** podczas wyprawy: zwija kartę „następny punkt" do
+  samego paska statystyk (minuty, km, punkty).
+- **Ładniejsze kolory ikon** placu zabaw i kawiarni w nowym stylu pinów.

@@ -65,7 +65,7 @@ export function ExpeditionBar({
     window.setTimeout(() => {
       setOpen(false)
       setClosing(false)
-    }, 280)
+    }, 400)
   }
 
   if (!expedition) return null
