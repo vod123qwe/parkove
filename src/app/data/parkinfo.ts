@@ -46,6 +46,16 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     photos: [
       { src: '/photos/park-skawina-miejski.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
     ],
+    description: [
+      "Park kieszonkowy w najlepszym sensie: dwa i pół hektara w samym centrum Skawiny, trzy minuty od rynku. Założony w 1927 roku, nosi imię marszałka Piłsudskiego.",
+      "Rośnie tu około sześćdziesięciu gatunków drzew, a najstarszy dąb jest pomnikiem przyrody i stał tu, zanim ktokolwiek pomyślał o parku. Alejki są asfaltowe, więc jedźdą po nich wózki i rolki, a w środku stoi amfiteatr na miejskie koncerty.",
+      "Od północy park zamyka budynek Towarzystwa Gimnastycznego „Sokół” z 1906 roku, dziś Centrum Kultury i Sportu, z pomnikiem Kazimierza Wielkiego przed wejściem. Od strony rzeki zostało stare zakole Skawinki: najdzikszy fragment parku, z wodą i ptakami.",
+    ],
+    amenities: {
+      playground: { has: true, note: "Dwa place zabaw w środku parku." },
+      food: { has: true, note: "Kinder Club & Cafe, Pan Steskal i Mood w kilku krokach od granicy parku." },
+      verified: false,
+    },
   },
   'skawina-blonia': {
     photos: [
@@ -82,6 +92,16 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     photos: [
       { src: '/photos/park-jordana-widok.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
     ],
+    description: [
+      "Park, od którego wzięły nazwę wszystkie ogrody jordanowskie w Polsce. Doktor Henryk Jordan założył go w 1889 roku na terenie wystawy rolniczo-przemysłowej i od początku był to park do ruchu, nie do spacerów: boiska, przyrządy gimnastyczne i place do zabaw. Jordan sam ustalał plan zajęć, dobierał przewodników grup i prowadził pogadanki o historii Polski.",
+      "Pomysł skopiowały Sanok, Jarosław, Lwów, Nowy Sącz, Tarnopól i Warszawa, a nazwa przylgnęła do wszystkich takich miejsc. Dziś „ogródek jordanowski” to zwykłe polskie słowo na plac zabaw i niewielu pamięta, że pochodzi od nazwiska krakowskiego lekarza.",
+      "Na dwudziestu jeden hektarach jest wszystko, czym park miał być: boiska do siatkówki, piłki i koszykówki, skatepark, wodny plac zabaw, miasteczko ruchu drogowego dla dzieci, staw, górka na sanki i muszla koncertowa. Wzdłuż alei stoi kilkadziesiąt marmurowych popiersi sławnych Polaków: w czasie wojny uratował je Kazimierz Łuczywo, ukrywając w swojej pracowni.",
+    ],
+    amenities: {
+      playground: { has: true, note: "Kilka placów zabaw, do tego wodny plac zabaw i miasteczko ruchu drogowego." },
+      food: { has: true, note: "Organic Coffee & more w parku, a przy Reymonta bary i stołówki studenckie." },
+      verified: false,
+    },
   },
   'kopiec-krakusa': {
     photos: [

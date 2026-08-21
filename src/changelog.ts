@@ -33,6 +33,7 @@ export const CHANGELOG: Release[] = [
       ['changed', 'Both bars are glass now, not plates: a gradient and three bands of blur instead of a solid fill with a hairline. The sheet title gets the same treatment, so content slides under it softly'],
       ['fixed', 'The action bar landed below the screen on a half-open sheet, because the panel is taller than the view and pushed down. The sheet now reports how far it hangs and the bar sits on the bottom of what you can see'],
       ['fixed', 'Park Jordana and the town park in Skawina led with a photograph of one of their own points, so the top of the card told you nothing about the place. Both have a park photograph now'],
+      ['added', 'Park Jordana and the town park in Skawina finally have their own text. Jordana is the park every Polish playground is named after: Doctor Jordan built it in 1889 for running about, not strolling, and Sanok, Jaroslaw, Lwow, Nowy Sacz, Tarnopol and Warsaw copied it. Skawina is two and a half hectares in the middle of town, an oak older than the park itself, and the 1906 Sokol hall closing it from the north'],
       ['fixed', 'Park Bednarskiego had two squirrels in its gallery. Wikimedia keeps a whole category of squirrels photographed there. The park itself replaced them: the quarry bowl and the pavilion above the meadow'],
     ],
   },
