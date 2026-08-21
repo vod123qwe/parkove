@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.39.0'
+export const VERSION = '0.40.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.40.0',
+    date: '2026-08-21',
+    title: 'Pick a map from the map, and stand it up in 3D',
+    changes: [
+      ['added', 'The look of the map is now switched from the map itself, from a button above the locate one, so two basemaps can be compared where it matters instead of from inside a settings screen'],
+      ['added', 'Two more bases: Topograficzna, which is a real topographic map with contour lines and paths, and National Geographic, which is a painting'],
+      ['added', 'Widok 3D is a switch rather than a style: raised ground, shading, extruded buildings and a camera that stays tilted, laid over whichever base is showing, imagery or drawing alike. It survives changing the base and it is remembered'],
+      ['changed', 'A replay now opens on the topographic look with the ground pushed to three times its height, because a map of the ground may as well be a model of it'],
+      ['fixed', 'Tapping a park still works with the ground raised'],
+    ],
+  },
   {
     version: '0.39.0',
     date: '2026-08-20',

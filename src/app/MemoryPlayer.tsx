@@ -93,7 +93,7 @@ export function MemoryPlayer({
 
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
-  const [look, setLook] = useState<ReplayLook>('day')
+  const [look, setLook] = useState<ReplayLook>('topo')
   useDarkChrome()
   const [looksOpen, setLooksOpen] = useState(false)
   /** whatever the memory was opened into: the full screen version of it */
@@ -138,7 +138,7 @@ export function MemoryPlayer({
     if (!holder.current || track.length === 0) return
     const map = new MapGL({
       container: holder.current,
-      style: replayStyle('day'),
+      style: replayStyle('topo'),
       center: track[0],
       zoom: 16.6,
       pitch: 58,

@@ -4,7 +4,15 @@
 
 import type { StyleSpecification } from 'maplibre-gl'
 
-export type MapStyleId = 'auto' | 'minimal' | 'classic' | 'vivid' | 'dark' | 'satellite'
+export type MapStyleId =
+  | 'auto'
+  | 'minimal'
+  | 'classic'
+  | 'vivid'
+  | 'dark'
+  | 'satellite'
+  | 'topo'
+  | 'natgeo'
 
 export type MapStyleDef = {
   id: MapStyleId
@@ -20,7 +28,77 @@ export const MAP_STYLES: MapStyleDef[] = [
   { id: 'vivid', label: 'Żywa', swatch: ['#eaf4e0', '#7cc0f4'] },
   { id: 'dark', label: 'Ciemna', swatch: ['#14181c', '#3a4148'] },
   { id: 'satellite', label: 'Satelita', swatch: ['#2c4a2f', '#1a2e3f'] },
+  { id: 'topo', label: 'Topograficzna', swatch: ['#eee9dc', '#8a9c74'] },
+  { id: 'natgeo', label: 'National Geographic', swatch: ['#f2e8d5', '#c2a163'] },
 ]
+
+/**
+ * Esri publishes a handful of basemaps without a key. Only two of them go deep
+ * enough for a walk through a park: the imagery and the topographic map. The
+ * shaded relief ones stop at zoom 13, which is a whole city in one tile, so
+ * they are no use here and the raised ground does that job better anyway.
+ */
+const esri = (service: string, maxzoom: number) => ({
+  type: 'raster' as const,
+  tiles: [
+    `https://services.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`,
+  ],
+  tileSize: 256,
+  maxzoom,
+  attribution: 'Esri',
+})
+
+/** free global elevation, no key, and it does send CORS headers */
+const DEM = {
+  type: 'raster-dem' as const,
+  tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+  encoding: 'terrarium' as const,
+  tileSize: 256,
+  maxzoom: 15,
+  attribution: 'Elevation: Mapzen, AWS Open Data',
+}
+
+/**
+ * Hills, drawn from the elevation tiles rather than baked into a picture, so
+ * they stay sharp at any zoom. Kept translucent: this is a coat of shadow over
+ * a map that already has contour lines, not a replacement for it.
+ */
+const hillshade = (strength: number) => ({
+  id: 'shade',
+  type: 'hillshade' as const,
+  source: 'dem',
+  paint: {
+    'hillshade-exaggeration': strength,
+    'hillshade-shadow-color': 'rgba(44, 54, 38, 0.55)',
+    'hillshade-highlight-color': 'rgba(255, 253, 244, 0.4)',
+    'hillshade-accent-color': 'rgba(70, 82, 58, 0.3)',
+  } as never,
+})
+
+const TOPO: StyleSpecification = {
+  version: 8,
+  glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+  sources: { topo: esri('World_Topo_Map', 23) },
+  layers: [
+    {
+      id: 'topo',
+      type: 'raster',
+      source: 'topo',
+      // a touch of the colour taken out and a touch more contrast: the contour
+      // lines and the paths come forward, the labels stay readable
+      paint: { 'raster-saturation': -0.14, 'raster-contrast': 0.14 } as never,
+    },
+  ],
+}
+
+const NATGEO: StyleSpecification = {
+  version: 8,
+  glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+  // this one is a painting and stops at zoom 16, so a park fills the screen
+  // softly rather than sharply. No shading on top: it already has its own
+  sources: { natgeo: esri('NatGeo_World_Map', 16) },
+  layers: [{ id: 'natgeo', type: 'raster', source: 'natgeo' }],
+}
 
 const URLS: Record<string, string> = {
   minimal: 'https://tiles.openfreemap.org/styles/positron',
@@ -48,6 +126,51 @@ const SATELLITE: StyleSpecification = {
 }
 
 const KEY = 'pk-mapstyle'
+const KEY_3D = 'pk-map3d'
+
+/**
+ * 3D is a coat on top of the chosen map rather than a map of its own: raised
+ * ground, shading, extruded buildings and a camera that stays tilted. That way
+ * it composes with every base, imagery and topographic alike, and picking a new
+ * base does not throw the tilt away.
+ */
+export const OVERLAY_3D = {
+  pitch: 52,
+  exaggeration: 1.5,
+  sources: {
+    'dem-3d': DEM,
+    'ofm-3d': {
+      type: 'vector' as const,
+      url: 'https://tiles.openfreemap.org/planet',
+      attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
+    },
+  },
+  /** painted under the app's own layers, so pins and parks stay on top */
+  layers: [
+    { ...hillshade(0.8), id: 'shade-3d', source: 'dem-3d' },
+    {
+      id: 'buildings-3d',
+      type: 'fill-extrusion' as const,
+      source: 'ofm-3d',
+      'source-layer': 'building',
+      minzoom: 14,
+      paint: {
+        'fill-extrusion-color': '#d7dccf',
+        'fill-extrusion-opacity': 0.7,
+        'fill-extrusion-height': ['coalesce', ['get', 'render_height'], ['get', 'height'], 9],
+        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+      } as never,
+    },
+  ],
+}
+
+export function get3D() {
+  return localStorage.getItem(KEY_3D) === 'on'
+}
+
+export function set3D(on: boolean) {
+  localStorage.setItem(KEY_3D, on ? 'on' : 'off')
+}
 
 export function getMapStyle(): MapStyleId {
   const v = localStorage.getItem(KEY) as MapStyleId | null
@@ -62,6 +185,8 @@ export function setMapStyle(id: MapStyleId) {
 export function resolveMapStyle(id: MapStyleId, isDark: boolean): { key: string; spec: string | StyleSpecification } {
   const resolved = id === 'auto' ? (isDark ? 'dark' : 'minimal') : id
   if (resolved === 'satellite') return { key: 'satellite', spec: SATELLITE }
+  if (resolved === 'topo') return { key: 'topo', spec: TOPO }
+  if (resolved === 'natgeo') return { key: 'natgeo', spec: NATGEO }
   return { key: resolved, spec: URLS[resolved] }
 }
 
@@ -119,9 +244,10 @@ export const CINEMATIC: StyleSpecification = {
  *   tiles we already load, so every colour is ours and the trail really pops;
  * - both extrude buildings, because in a flat city the buildings are the relief.
  */
-export type ReplayLook = 'day' | 'night' | 'mono' | 'sepia' | 'relief' | 'graphite' | 'mint'
+export type ReplayLook = 'topo' | 'day' | 'night' | 'mono' | 'sepia' | 'relief' | 'graphite' | 'mint'
 
 export const REPLAY_LOOKS: Array<{ id: ReplayLook; label: string }> = [
+  { id: 'topo', label: 'Topograficzna' },
   { id: 'day', label: 'Satelita' },
   { id: 'night', label: 'Noc' },
   { id: 'mono', label: 'Czarno-biała' },
@@ -162,20 +288,13 @@ const SOURCES = {
     maxzoom: 19,
     attribution: 'Esri, Maxar, Earthstar Geographics',
   },
+  topo: esri('World_Topo_Map', 23),
   ofm: {
     type: 'vector' as const,
     url: 'https://tiles.openfreemap.org/planet',
     attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
   },
-  // free global elevation, no key, and it does send CORS headers
-  dem: {
-    type: 'raster-dem' as const,
-    tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
-    encoding: 'terrarium' as const,
-    tileSize: 256,
-    maxzoom: 15,
-    attribution: 'Elevation: Mapzen, AWS Open Data',
-  },
+  dem: DEM,
 }
 
 export function replayStyle(look: ReplayLook): StyleSpecification {
@@ -183,6 +302,24 @@ export function replayStyle(look: ReplayLook): StyleSpecification {
     version: 8 as const,
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     sources: SOURCES,
+  }
+  if (look === 'topo') {
+    return {
+      ...base,
+      // pushed harder than the imagery look: a topographic map is a drawing of
+      // the ground, so the ground may as well be a model of itself
+      terrain: { source: 'dem', exaggeration: 3 },
+      layers: [
+        {
+          id: 'topo',
+          type: 'raster' as const,
+          source: 'topo',
+          paint: { 'raster-saturation': -0.1, 'raster-contrast': 0.16 } as never,
+        },
+        hillshade(0.7),
+        buildings('#cfc7b2', 0.8),
+      ],
+    }
   }
   if (look === 'day') {
     return { ...base, layers: [sat({}), buildings('#dfe4d8', 0.55)] }
@@ -235,16 +372,7 @@ export function replayStyle(look: ReplayLook): StyleSpecification {
       terrain: { source: 'dem', exaggeration: 2.2 },
       layers: [
         sat({ 'raster-saturation': -0.1 }),
-        {
-          id: 'shade',
-          type: 'hillshade' as const,
-          source: 'dem',
-          paint: {
-            'hillshade-exaggeration': 0.55,
-            'hillshade-shadow-color': '#0b1a10',
-            'hillshade-highlight-color': '#eaf6df',
-          } as never,
-        },
+        hillshade(0.55),
         buildings('#dfe4d8', 0.5),
       ],
     }

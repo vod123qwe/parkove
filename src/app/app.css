@@ -1056,6 +1056,169 @@
   opacity: 0.92;
 }
 
+/*
+ * Switching the look of the map from the map, because comparing two basemaps
+ * from inside a settings screen means never seeing them next to each other.
+ * Sits directly above the locate button and speaks the same shape.
+ */
+.app-look {
+  position: absolute;
+  right: var(--sp-4);
+  bottom: calc(
+    env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4) +
+      var(--control-md) + var(--sp-2)
+  );
+  z-index: 11;
+  display: grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  border: 0;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  color: var(--content-accent);
+  box-shadow: var(--elevation-2);
+  cursor: pointer;
+  opacity: 0.92;
+}
+
+.app-look.-on {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  opacity: 1;
+}
+
+/* a tap anywhere else puts the list away without picking a park by accident */
+.app-looks__catch {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+.app-looks {
+  position: absolute;
+  right: var(--sp-4);
+  bottom: calc(
+    env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4) +
+      var(--control-md) + var(--sp-2) + var(--control-md) + var(--sp-2)
+  );
+  z-index: 13;
+  display: flex;
+  flex-direction: column;
+  min-width: 208px;
+  padding: var(--sp-2);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-3);
+  animation: looks-in 200ms var(--ease-screen);
+  transform-origin: bottom right;
+  /* never as tall as the status bar: on a short screen the list scrolls */
+  max-height: calc(var(--screen-h) - env(safe-area-inset-top, 0px) - 260px);
+  overflow-y: auto;
+}
+
+@keyframes looks-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+}
+
+.app-lookopt {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: none;
+  color: var(--content-primary);
+  font-family: var(--font-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-lookopt.-on {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+/* the 3D switch is a different kind of choice from a base map, so a rule
+   separates it rather than letting it read as another style */
+.app-looks__rule {
+  height: 1px;
+  margin: var(--sp-2) var(--sp-3);
+  background: var(--border-subtle);
+}
+
+.app-lookopt.-toggle {
+  gap: var(--sp-2);
+}
+
+.app-lookopt__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--content-secondary);
+}
+
+.app-lookopt.-toggle.-on .app-lookopt__icon {
+  color: var(--content-on-primary);
+}
+
+/* a small track that fills when the coat is on */
+.app-lookopt__switch {
+  flex: none;
+  position: relative;
+  width: 34px;
+  height: 20px;
+  margin-left: auto;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-sunken);
+  transition: background var(--motion-base) var(--ease-out);
+}
+
+.app-lookopt__switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--content-tertiary);
+  transition: transform var(--motion-base) var(--ease-out), background var(--motion-base);
+}
+
+.app-lookopt.-on .app-lookopt__switch {
+  background: rgb(255 255 255 / 0.22);
+}
+
+.app-lookopt.-on .app-lookopt__switch::after {
+  transform: translateX(14px);
+  background: var(--content-on-primary);
+}
+
+.app-lookopt__swatch {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  corner-shape: var(--corner-smooth);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
 /* ---- one walk photo ---- */
 
 .photosheet {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Camera, CircleUserRound, Compass, Crosshair, Footprints, List as ListIcon, LocateFixed, RefreshCw, Sparkles } from 'lucide-react'
+import { Box, Camera, CircleUserRound, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, RefreshCw, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, Card, List, ListItem, PeekCard, ProgressRing, Toast } from '../ds'
 import { MapView } from './MapView'
 import type { MapFocus } from './MapView'
@@ -31,7 +31,7 @@ import { stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
 import { isDarkNow, onDarkChange } from './theme'
-import { getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
+import { MAP_STYLES, get3D, getMapStyle, resolveMapStyle, set3D, setMapStyle } from './data/mapstyles'
 import type { MapStyleId } from './data/mapstyles'
 import { suggestedParking } from './data/parking'
 import { amenitiesFor, isFood } from './data/amenities'
@@ -82,6 +82,9 @@ export function App() {
   const [stampsOpen, setStampsOpen] = useState(false)
   const [appearanceOpen, setAppearanceOpen] = useState(false)
   const [mapStyleOpen, setMapStyleOpen] = useState(false)
+  /** the quick switch on the map itself, for comparing looks in place */
+  const [looksOpen, setLooksOpen] = useState(false)
+  const [threeD, setThreeDState] = useState(get3D)
   const [celebrate, setCelebrate] = useState<{ id: string; name: string } | null>(null)
   const [amenityKind, setAmenityKind] = useState<'food' | 'playground' | null>(null)
   const [mapStyle, setMapStyleState] = useState<MapStyleId>(getMapStyle)
@@ -92,6 +95,11 @@ export function App() {
   const pickMapStyle = (id: MapStyleId) => {
     setMapStyleState(id)
     setMapStyle(id)
+  }
+
+  const pick3D = (on: boolean) => {
+    setThreeDState(on)
+    set3D(on)
   }
 
   const mapStyleSpec = useMemo(() => resolveMapStyle(mapStyle, isDark), [mapStyle, isDark])
@@ -395,6 +403,7 @@ export function App() {
         followMe={onWalk && followMe}
         onUserPan={() => setFollowMe(false)}
         mapStyle={mapStyleSpec}
+        threeD={threeD}
         stampPins={stampPins}
         onSelectStamp={selectParkFromMap}
         amenityPins={amenityPins}
@@ -446,6 +455,62 @@ export function App() {
           </div>
         )
       )}
+
+      {looksOpen && (
+        <>
+          <button
+            className="app-looks__catch"
+            aria-label="Zamknij wybór mapy"
+            onClick={() => setLooksOpen(false)}
+          />
+          <div className="app-looks" role="radiogroup" aria-label="Styl mapy">
+            {MAP_STYLES.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                role="radio"
+                aria-checked={opt.id === mapStyle}
+                className={`app-lookopt${opt.id === mapStyle ? ' -on' : ''}`}
+                onClick={() => {
+                  pickMapStyle(opt.id)
+                  setLooksOpen(false)
+                }}
+              >
+                <span
+                  className="app-lookopt__swatch"
+                  style={{
+                    background: `linear-gradient(135deg, ${opt.swatch[0]} 45%, ${opt.swatch[1]})`,
+                  }}
+                />
+                {opt.label}
+              </button>
+            ))}
+            <span className="app-looks__rule" />
+            <button
+              type="button"
+              role="switch"
+              aria-checked={threeD}
+              className={`app-lookopt -toggle${threeD ? ' -on' : ''}`}
+              onClick={() => pick3D(!threeD)}
+            >
+              <span className="app-lookopt__icon">
+                <Box size={15} />
+              </span>
+              Widok 3D
+              <span className="app-lookopt__switch" />
+            </button>
+          </div>
+        </>
+      )}
+
+      <button
+        className={`app-look${looksOpen ? ' -on' : ''}`}
+        aria-label="Zmień wygląd mapy"
+        aria-expanded={looksOpen}
+        onClick={() => setLooksOpen((v) => !v)}
+      >
+        <Layers size={18} />
+      </button>
 
       <button
         className="app-locate"
