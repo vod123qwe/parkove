@@ -970,13 +970,19 @@
  * przyciski mapy muszą się nad niego podnieść. Bez tego zasłaniały odległość do
  * następnego punktu i przycisk Punkty.
  */
+/* atrybucja mapy wchodziła w podpis „Punkty": w czasie wyprawy idzie wyżej */
+.app-shell.-walking .maplibregl-ctrl-bottom-right,
+.app-shell.-walking .maplibregl-ctrl-bottom-left {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 252px);
+}
+
 /* HUD wyprawy to karta plus przyciski plus podpisy: około 250 px */
 .app-shell.-walking .app-locate {
   bottom: calc(env(safe-area-inset-bottom, 0px) + 272px);
 }
 
 .app-shell.-walking .app-look {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 272px + var(--control-md) + var(--sp-2));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 272px + 40px + var(--sp-2));
 }
 
 /* przygaszenie pod HUD, żeby białe podpisy przycisków czytały się na trawie */
@@ -999,29 +1005,6 @@
 }
 
 /* pastylka z wysiłkiem: mono, wersaliki, mała, żeby nie walczyła z menu */
-.app-timepill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-4);
-  border-radius: var(--radius-pill);
-  background: var(--bg-surface-raised);
-  box-shadow: var(--elevation-2);
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--content-primary);
-}
-
-.app-timepill__live {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--content-accent);
-  animation: exp-pulse 1.8s var(--ease-in-out) infinite;
-}
-
 /* karta „co dalej" nad przyciskami, klikalna */
 .app-nextstop {
   display: block;
@@ -1107,6 +1090,27 @@
   font-size: 16px;
   letter-spacing: 0.02em;
   color: var(--content-primary);
+}
+
+/* wysiłek i postęp pod kreską: liczby pogrubione, słowa przygaszone */
+.app-nextstop__stats {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-text);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--content-tertiary);
+}
+
+.app-nextstop__stats strong {
+  font-weight: 700;
+  color: var(--content-secondary);
 }
 
 /* jednostka przygaszona: liczba jest treścią, „m" tylko ją tłumaczy */
@@ -1218,7 +1222,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  width: min(calc(100% - 2 * var(--sp-4)), 420px);
+  width: min(calc(100% - 2 * var(--sp-6)), 420px);
 }
 
 /* the camera keeps its own label off: the icon is the whole button */
@@ -1239,6 +1243,10 @@
 
 /* ---- where am I: quiet, always within thumb reach ---- */
 
+/*
+ * Sterowanie mapą ma być pod ręką, ale nie ma konkurować z treścią: ciemne
+ * szkło zamiast białej płytki z cieniem, mniejsze i przepuszczające mapę.
+ */
 .app-locate {
   position: absolute;
   right: var(--sp-4);
@@ -1246,16 +1254,22 @@
   z-index: 11;
   display: grid;
   place-items: center;
-  width: var(--control-md);
-  height: var(--control-md);
-  border: 0;
-  border-radius: var(--radius-btn);
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 14px;
   corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-raised);
-  color: var(--content-accent);
-  box-shadow: var(--elevation-2);
+  background: rgb(16 22 16 / 0.4);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  color: #ffffff;
   cursor: pointer;
-  opacity: 0.92;
+  transition: transform var(--motion-fast) var(--ease-out), background var(--motion-fast);
+}
+
+.app-locate:active {
+  transform: scale(0.9);
+  background: rgb(16 22 16 / 0.6);
 }
 
 /*
@@ -1324,28 +1338,34 @@
   position: absolute;
   right: var(--sp-4);
   bottom: calc(
-    env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4) +
-      var(--control-md) + var(--sp-2)
+    env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--control-lg) + var(--sp-4) + 40px +
+      var(--sp-2)
   );
   z-index: 11;
   display: grid;
   place-items: center;
-  width: var(--control-md);
-  height: var(--control-md);
-  border: 0;
-  border-radius: var(--radius-btn);
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 14px;
   corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-raised);
-  color: var(--content-accent);
-  box-shadow: var(--elevation-2);
+  background: rgb(16 22 16 / 0.4);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  color: #ffffff;
   cursor: pointer;
-  opacity: 0.92;
+  transition: transform var(--motion-fast) var(--ease-out), background var(--motion-fast);
+}
+
+.app-look:active {
+  transform: scale(0.9);
+  background: rgb(16 22 16 / 0.6);
 }
 
 .app-look.-on {
   background: var(--bg-primary);
+  border-color: rgb(255 255 255 / 0.3);
   color: var(--content-on-primary);
-  opacity: 1;
 }
 
 /* a tap anywhere else puts the list away without picking a park by accident */

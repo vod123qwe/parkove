@@ -13,6 +13,13 @@ import { addMark } from './photos'
 /** próg, od którego konkretny punkt zaczyna mieć znaczenie */
 const NEAR_M = 300
 
+function fmtTime(ms: number) {
+  const s = Math.floor(ms / 1000)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  return h > 0 ? `${h}:${String(m).padStart(2, '0')} h` : `${m} min`
+}
+
 /**
  * Cały HUD wyprawy: co dalej i co można zrobić.
  *
@@ -216,6 +223,32 @@ export function ExpeditionBar({
                 {formatDistance(away).replace(/\s*(m|km)$/, '')}
                 <span className="app-nextstop__unit">{formatDistance(away).endsWith('km') ? 'km' : 'm'}</span>
               </span>
+            )}
+          </div>
+
+          {/*
+            Wysiłek i postęp w jednej linii, oddzielone włoskową kreską. Dotąd
+            czas z kilometrami stały w osobnej pastylce u góry ekranu, czyli
+            wyprawa mówiła z dwóch miejsc. Teraz mówi z jednego.
+          */}
+          <div className="app-nextstop__stats">
+            <span>
+              <strong>{fmtTime(Date.now() - expedition.startedAt)}</strong> w trasie
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>
+              <strong>{(expedition.distanceM / 1000).toFixed(1).replace('.', ',')} km</strong>
+            </span>
+            {total > 0 && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>
+                  <strong>
+                    {done} z {total}
+                  </strong>{' '}
+                  {done === 1 ? 'punkt' : 'punktów'}
+                </span>
+              </>
             )}
           </div>
         </button>

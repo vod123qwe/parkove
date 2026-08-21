@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.51.1'
+export const VERSION = '0.52.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.52.0',
+    date: '2026-08-21',
+    title: 'Inter, and one card that says everything',
+    changes: [
+      ['changed', 'The text face is Inter instead of Manrope. Bricolage Grotesque still carries the headlines'],
+      ['changed', 'The walk card now says the whole thing: what comes next, then under a hairline how long you have been walking, how far, and how many points you have. The pill at the top is gone, so a walk speaks from one place instead of two'],
+      ['changed', 'The card breathes wider: 24 points of margin left and right instead of 16'],
+      ['changed', 'The map layer and locate buttons stopped competing with the content. Dark glass instead of white tiles with a shadow, smaller, and they let the map through'],
+      ['fixed', 'The map attribution sat under the Punkty label during a walk. It moves up while one is running'],
+    ],
+  },
   {
     version: '0.51.1',
     date: '2026-08-21',

@@ -18,7 +18,6 @@ import { ProfileModal } from './ProfileModal'
 import { AppearanceModal, MapStyleModal } from './SettingsModals'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
-import { ExpeditionStatus } from './ExpeditionStatus'
 import { MarkSheet } from './MarkSheet'
 import { updateMark, useMarks } from './photos'
 import { RevealSheet } from './RevealSheet'
@@ -508,7 +507,6 @@ export function App() {
           number, not a reason to go outside. Something may earn this corner
           later; until then the map has it */}
       <header className="app-hud">
-        {onWalk && <ExpeditionStatus />}
         <button className="app-profilebtn" aria-label="Menu" onClick={() => setMenuOpen(true)}>
           <Menu strokeWidth={2} />
         </button>

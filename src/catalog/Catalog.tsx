@@ -127,11 +127,11 @@ const TYPE_ROLES: Array<[string, string, string]> = [
   ['t-display', 'Bricolage 800 · 36/42', 'Zdobyty Kraków'],
   ['t-headline', 'Bricolage 700 · 26/32', 'Park Jordana'],
   ['t-title', 'Bricolage 600 · 19/24', 'Staw przy alejce'],
-  ['t-body', 'Manrope 450 · 16/24', 'Najstarszy publiczny park w Krakowie, otwarty w 1889 roku.'],
-  ['t-body-strong', 'Manrope 700 · 16/24', 'Zebrano 3 z 5 punktów wyprawy.'],
-  ['t-body-sm', 'Manrope 450 · 14/20', 'Wejście od ulicy Reymonta, obok stadionu.'],
-  ['t-label', 'Manrope 700 · 14/20', 'Rozpocznij wyprawę'],
-  ['t-caption', 'Manrope 550 · 12/16', 'Krowodrza · 2,4 km od Ciebie'],
+  ['t-body', 'Inter 450 · 16/24', 'Najstarszy publiczny park w Krakowie, otwarty w 1889 roku.'],
+  ['t-body-strong', 'Inter 700 · 16/24', 'Zebrano 3 z 5 punktów wyprawy.'],
+  ['t-body-sm', 'Inter 450 · 14/20', 'Wejście od ulicy Reymonta, obok stadionu.'],
+  ['t-label', 'Inter 700 · 14/20', 'Rozpocznij wyprawę'],
+  ['t-caption', 'Inter 550 · 12/16', 'Krowodrza · 2,4 km od Ciebie'],
 ]
 
 const SPACES: Array<[string, number]> = [
@@ -277,7 +277,7 @@ export function Catalog() {
         <Section
           id="typography"
           title="Typography"
-          lead="Bricolage Grotesque for display, Manrope for text. Roles are named by task; emphasis is a variant, not a new role."
+          lead="Bricolage Grotesque for display, Inter for text. Roles are named by task; emphasis is a variant, not a new role."
         >
           <div className="cat-typelist">
             {TYPE_ROLES.map(([cls, spec, sample]) => (
