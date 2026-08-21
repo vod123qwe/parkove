@@ -126,52 +126,6 @@ const SATELLITE: StyleSpecification = {
 }
 
 const KEY = 'pk-mapstyle'
-const KEY_3D = 'pk-map3d'
-
-/**
- * 3D is a coat on top of the chosen map rather than a map of its own: raised
- * ground, shading, extruded buildings and a camera that stays tilted. That way
- * it composes with every base, imagery and topographic alike, and picking a new
- * base does not throw the tilt away.
- */
-export const OVERLAY_3D = {
-  pitch: 52,
-  exaggeration: 1.5,
-  sources: {
-    'dem-3d': DEM,
-    'ofm-3d': {
-      type: 'vector' as const,
-      url: 'https://tiles.openfreemap.org/planet',
-      attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
-    },
-  },
-  /** painted under the app's own layers, so pins and parks stay on top */
-  layers: [
-    { ...hillshade(0.8), id: 'shade-3d', source: 'dem-3d' },
-    {
-      id: 'buildings-3d',
-      type: 'fill-extrusion' as const,
-      source: 'ofm-3d',
-      'source-layer': 'building',
-      minzoom: 14,
-      paint: {
-        'fill-extrusion-color': '#d7dccf',
-        'fill-extrusion-opacity': 0.7,
-        'fill-extrusion-height': ['coalesce', ['get', 'render_height'], ['get', 'height'], 9],
-        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-      } as never,
-    },
-  ],
-}
-
-export function get3D() {
-  return localStorage.getItem(KEY_3D) === 'on'
-}
-
-export function set3D(on: boolean) {
-  localStorage.setItem(KEY_3D, on ? 'on' : 'off')
-}
-
 export function getMapStyle(): MapStyleId {
   const v = localStorage.getItem(KEY) as MapStyleId | null
   return MAP_STYLES.some((s) => s.id === v) ? (v as MapStyleId) : 'auto'

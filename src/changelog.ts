@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.41.1'
+export const VERSION = '0.42.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.42.0',
+    date: '2026-08-21',
+    title: 'The start screen gets its speed back',
+    changes: [
+      ['changed', 'Widok 3D is gone from the start screen. On a map that runs all day and follows a GPS fix it cost three things at once: elevation tiles, a second set of vector tiles for the buildings, and a perspective recomputed every frame. A replay can afford that for a few minutes, the map you walk with cannot'],
+      ['changed', 'Eight bases stay in the picker, and 3D stays where it earns its keep: in a replay, where Rzezba terenu raises the ground three times over'],
+    ],
+  },
   {
     version: '0.41.1',
     date: '2026-08-21',

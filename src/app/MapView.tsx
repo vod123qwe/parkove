@@ -6,7 +6,6 @@ import parksData from './data/parks.json'
 import { circlePolygon, trackSegments } from './geo'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import { asset } from './assets'
-import { OVERLAY_3D } from './data/mapstyles'
 
 const KRAKOW: [number, number] = [19.9445, 50.0555]
 
@@ -86,8 +85,6 @@ type Props = {
   /** what the current walk left behind, drawn as thumbnails and small pins */
   photoPins: MarkPin[]
   onSelectPhoto: (id: string) => void
-  /** raised ground, buildings and a tilt on top of whatever base is showing */
-  threeD: boolean
   /** while moving a pin, the next tap on the map is its new home */
   placingPhoto: boolean
   onPlacePhoto: (coords: [number, number]) => void
@@ -237,7 +234,6 @@ export function MapView({
   hideStampFor,
   photoPins,
   onSelectPhoto,
-  threeD,
   placingPhoto,
   onPlacePhoto,
 }: Props) {
@@ -257,8 +253,6 @@ export function MapView({
   // the map handler is registered once, so callbacks must be read fresh
   const cbRef = useRef({ onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan, onSelectPhoto, onPlacePhoto })
   cbRef.current = { onSelect, onSelectPoi, onSelectParking, onSelectStamp, onClearSelection, onSelectAmenity, onUserPan, onSelectPhoto, onPlacePhoto }
-  const threeDRef = useRef(threeD)
-  threeDRef.current = threeD
   const initialStyle = useRef(mapStyle)
   const currentStyleKey = useRef(mapStyle.key)
   visitedRef.current = visited
@@ -513,8 +507,6 @@ export function MapView({
       }
       loadedRef.current = true
       syncVisited()
-      // the 3D coat is re-applied here, so a new base style keeps it
-      apply3D(true)
     }
 
     const applyColors = () => {
@@ -536,51 +528,9 @@ export function MapView({
       )
       void addPinImages() // pin badges carry theme colours, so redraw them too
     }
-    /**
-     * The 3D coat. Called from addAppLayers as well as from its own effect, so
-     * switching the base map does not quietly drop it. Buildings and shading go
-     * under the app's first layer; pins belong on top of a city, not inside it.
-     */
-    const apply3D = (moveCamera = false) => {
-      // our own layers are the sign that the base style is usable; isStyleLoaded
-      // still says no while the elevation tiles are on their way
-      if (!map.getLayer('parks-fill')) return
-      const on = threeDRef.current
-      try {
-        if (on) {
-          for (const [id, spec] of Object.entries(OVERLAY_3D.sources)) {
-            if (!map.getSource(id)) map.addSource(id, spec as never)
-          }
-          for (const layer of OVERLAY_3D.layers) {
-            if (!map.getLayer(layer.id)) map.addLayer(layer as never, 'parks-fill')
-          }
-          if (!map.getTerrain()) {
-            map.setTerrain({ source: 'dem-3d', exaggeration: OVERLAY_3D.exaggeration })
-          }
-          // only when asked: an idle must never undo a tilt made by hand
-          if (moveCamera && map.getPitch() < 1) {
-            map.easeTo({ pitch: OVERLAY_3D.pitch, duration: 700 })
-          }
-        } else {
-          map.setTerrain(null)
-          for (const layer of OVERLAY_3D.layers) {
-            if (map.getLayer(layer.id)) map.removeLayer(layer.id)
-          }
-          for (const id of Object.keys(OVERLAY_3D.sources)) {
-            if (map.getSource(id)) map.removeSource(id)
-          }
-          if (moveCamera && map.getPitch() > 1) map.easeTo({ pitch: 0, duration: 500 })
-        }
-      } catch {
-        // the style is being swapped under us; the next idle syncs it
-      }
-    }
-    ;(map as unknown as { __apply3D: (m?: boolean) => void }).__apply3D = apply3D
     ;(map as unknown as { __addAppLayers: () => void }).__addAppLayers = addAppLayers
 
     map.on('load', addAppLayers)
-    // a settled map with the coat missing means the last attempt came too early
-    map.on('idle', () => apply3D())
 
     // a gesture made by hand stops the camera from chasing the walker: without
     // this the map keeps yanking itself back while you try to look around
@@ -661,12 +611,6 @@ export function MapView({
     // map lives for the component's whole life; callbacks reach fresh data via refs
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map) return
-    ;(map as unknown as { __apply3D?: (m?: boolean) => void }).__apply3D?.(true)
-  }, [threeD])
 
   useEffect(() => {
     const map = mapRef.current

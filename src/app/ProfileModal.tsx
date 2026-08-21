@@ -241,7 +241,7 @@ export function ProfileModal({
           <ListItem
             icon={<MapIcon />}
             title="Wygląd mapy"
-            meta="Osiem styli plus widok 3D"
+            meta="Osiem styli, w tym satelita i topografia"
             trailing={<ChevronRight size={18} className="park-parking__chevron" />}
             onClick={onOpenMapStyle}
           />
