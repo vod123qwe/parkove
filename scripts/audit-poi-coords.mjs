@@ -290,6 +290,19 @@ for (const parkId of parkIds) {
   if (fresh) await sleep(4000)
 }
 
+/*
+ * Audyt, który nic nie sprawdził, nie może wyjść z kodem 0. Przebieg
+ * 2026-08-21 padł na każdym parku (Overpass nieosiągalny) i mimo to
+ * zaraportował sukces z zerem znalezisk, co czyta się jak „wszystko dobrze".
+ */
+const checked = report.filter((r) => r.dist != null).length
+if (checked === 0) {
+  console.error('')
+  console.error(`NIC NIE SPRAWDZONE: ${report.length} punktow, zero porownanych z OSM.`)
+  console.error('Overpass byl nieosiagalny albo zwrocil pusta baze. To NIE jest wynik audytu.')
+  process.exit(2)
+}
+
 const far = report.filter((r) => r.verdict === 'DALEKO').sort((a, b) => b.dist - a.dist)
 console.log(`=== DALEKO OD PASUJACEGO OBIEKTU (${far.length}) ===`)
 for (const r of far) {
