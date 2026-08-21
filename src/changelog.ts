@@ -22,6 +22,7 @@ export const CHANGELOG: Release[] = [
       ['added', 'The sketch is an SVG: the park outline, numbered dots matching the rows, and your position when we have it. Deliberately no tiles, because a second map context is a second reason to stutter, and this draws instantly and works offline. Tapping a row lights its dot; the arrow navigates. Two intentions, two taps'],
       ['changed', 'Cafes and playgrounds use the same pattern, with the OpenStreetMap features and opening hours as pills. One pattern for every list of places, because it is the same act: choosing where to go'],
       ['changed', 'A missing amenity no longer takes half the width of the screen to say it is missing. The tile appears only when there is something to show'],
+      ['fixed', 'Pokaz na mapie from a sticker left the collection open on top, so the app flew to a park you could not see. It now closes every layer, not only the one you tapped from, and the same goes for the suggestion in the profile'],
       ['added', 'Stickers in the collection are tappable at last, and the card tells you what the sticker is for: the rule in words, how many points are missing, and, where a place asks for fewer points than it has, that the rest are trivia the sticker does not wait for'],
       ['added', 'Dolina Bedkowska has its sticker'],
       ['added', 'Place row joined the design system with a card in the catalogue'],

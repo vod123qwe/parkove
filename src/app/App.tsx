@@ -269,6 +269,26 @@ export function App() {
     setExpanded(false)
   }, [])
 
+  const selectParkFromMapRef = useRef<((id: string) => void) | null>(null)
+
+  /**
+   * „Pokaż na mapie” z dowolnego ekranu. Zamyka KAŻDĄ warstwę, nie tylko tę, z
+   * której kliknąłeś: kolekcja pieczątek zostawała otwarta i zasłaniała mapę, więc
+   * apka odlatywała do parku, którego nie było widаć.
+   */
+  const showOnMap = useCallback(
+    (id: string) => {
+      setStampParkId(null)
+      setStampsOpen(false)
+      setProfileOpen(false)
+      setMenuOpen(false)
+      setListOpen(false)
+      setJourneyId(null)
+      selectParkFromMapRef.current?.(id)
+    },
+    [],
+  )
+
   // map tap on a park: peek while browsing, the full sheet during a walk
   const selectParkFromMap = useCallback(
     (id: string) => {
@@ -281,6 +301,7 @@ export function App() {
     },
     [flyToPark, onWalk],
   )
+  selectParkFromMapRef.current = selectParkFromMap
 
   const openFromList = (f: ParkFeature) => {
     setAmenitySpotId(null)
@@ -767,11 +788,7 @@ export function App() {
         <StampScreen
           park={stampPark}
           onClose={() => setStampParkId(null)}
-          onGoToPark={(id) => {
-            setStampParkId(null)
-            setProfileOpen(false)
-            selectParkFromMap(id)
-          }}
+          onGoToPark={showOnMap}
         />
       )}
 
@@ -984,10 +1001,7 @@ export function App() {
           clearSelection()
           setJourneyId(id)
         }}
-        onGoToPark={(id) => {
-          setProfileOpen(false)
-          selectParkFromMap(id)
-        }}
+        onGoToPark={showOnMap}
       />
       <AppearanceModal open={appearanceOpen} onClose={() => setAppearanceOpen(false)} />
       <MapStyleModal
