@@ -405,6 +405,13 @@ export function App() {
   }, [walkMarks, activeSpot])
 
   const shownWalkId = expedition?.id ?? null
+  /* auto zapisane w tej wyprawie: dystans liczymy raz i podajemy liście punktów */
+  const carAway = useMemo(() => {
+    const here = expedition?.where?.coords ?? myFix?.coords ?? null
+    if (!here || !expedition) return null
+    const car = walkMarks.find((m) => m.kind === 'car' && m.journeyId === expedition.id && m.coords)
+    return car?.coords ? distanceM(here, car.coords) : null
+  }, [walkMarks, expedition, myFix])
   const photoPins = useMemo(
     () =>
       shownWalkId
@@ -1010,6 +1017,7 @@ export function App() {
           collected={new Set(progress[expeditionQuest.parkId]?.points ?? [])}
           here={expedition?.where?.coords ?? myFix?.coords ?? null}
           targetId={targetPoiId}
+          carAway={carAway}
           onPick={(poiId) => {
             setTargetPoiId(poiId)
             setPointsOpen(false)

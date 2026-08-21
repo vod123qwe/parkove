@@ -17,6 +17,7 @@ const TITLES: Record<WalkMark['kind'], string> = {
   photo: 'Zdjęcie z wyprawy',
   audio: 'Notatka głosowa',
   note: 'Notatka z wyprawy',
+  car: 'Tu stoi auto',
 }
 
 /**

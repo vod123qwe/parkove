@@ -8,7 +8,8 @@
 
 import { useEffect, useState } from 'react'
 
-export type MarkKind = 'photo' | 'audio' | 'note'
+/* 'car' to nie wspomnienie, a notatka praktyczna: gdzie stoi auto */
+export type MarkKind = 'photo' | 'audio' | 'note' | 'car'
 
 export type WalkMark = {
   id: string

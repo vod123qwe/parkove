@@ -1,4 +1,4 @@
-import { Check, ChevronRight, Crosshair } from 'lucide-react'
+import { CarFront, Check, ChevronRight, Crosshair } from 'lucide-react'
 import { BottomSheet, List, ListItem } from '../ds'
 import { distanceM, formatDistance } from './geo'
 import type { Pt } from './geo'
@@ -19,6 +19,7 @@ export function PointsSheet({
   collected,
   here,
   targetId,
+  carAway,
   onPick,
 }: {
   open: boolean
@@ -28,6 +29,8 @@ export function PointsSheet({
   /** twoja pozycja; bez niej lista zostaje w kolejności wyprawy */
   here: Pt | null
   targetId: string | null
+  /** dystans do zapamiętanego auta, gdy w tej wyprawie ktoś je zapisał */
+  carAway?: number | null
   /** wybór punktu jako celu: karta wyprawy przestaje wybierać najbliższy */
   onPick: (poiId: string) => void
 }) {
@@ -45,6 +48,12 @@ export function PointsSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose} title="Punkty wyprawy" modal={false}>
+      {/* auto na gorze listy, bo droga powrotna to też cel, tylko ostatni */}
+      {carAway != null && (
+        <p className="t-body-sm points-car">
+          <CarFront size={16} /> Auto stoi {formatDistance(carAway)} stąd
+        </p>
+      )}
       <p className="t-body-sm parking-lead">
         {here
           ? 'Od najbli\u017cszego. Dotknij punktu, \u017ceby zrobi\u0107 z niego cel: karta wyprawy b\u0119dzie pokazywa\u0107 w\u0142a\u015bnie jego.'

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { List as ListIcon, Mic, Navigation, Plus, Square, StickyNote, X } from 'lucide-react'
+import { CarFront, List as ListIcon, Mic, Navigation, Plus, Square, StickyNote, X } from 'lucide-react'
 import { Button } from '../ds'
 import { useGameState } from './state'
 import { questForPark } from './data/quests'
@@ -9,7 +9,7 @@ import { bearing } from './heading'
 import parksData from './data/parks.json'
 import { PhotoButton } from './PhotoButton'
 import { VoiceRecorder } from './VoiceRecorder'
-import { addMark } from './photos'
+import { addMark, deleteMark, listMarks } from './photos'
 
 /** próg, od którego konkretny punkt zaczyna mieć znaczenie */
 const NEAR_M = 300
@@ -164,6 +164,34 @@ export function ExpeditionBar({
             >
               Nagraj wspomnienie
             </Button>
+            {/*
+              Auto nie jest wspomnieniem, ale mieszka w tym samym menu, bo to
+              też „rzecz zostawiona sobie na później". Jedno auto na wyprawę:
+              nowy wpis zastępuje stary, żeby nie zbierać pięciu miejsc parkowania.
+            */}
+            {here && (
+              <Button
+                className="app-addmenu__item"
+                style={{ '--rise': 3, '--sink': 3 } as CSSProperties}
+                icon={<CarFront size={20} />}
+                onClick={async () => {
+                  shut()
+                  const old = (await listMarks()).find(
+                    (m) => m.kind === 'car' && m.journeyId === expedition.id,
+                  )
+                  if (old) await deleteMark(old.id)
+                  await addMark({
+                    kind: 'car',
+                    parkId: expedition.parkId,
+                    journeyId: expedition.id,
+                    coords: here,
+                    caption: '',
+                  })
+                }}
+              >
+                Tu stoi auto
+              </Button>
+            )}
             <Button
               className="app-addmenu__item"
               style={{ '--rise': 1, '--sink': 1 } as CSSProperties}

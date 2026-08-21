@@ -40,7 +40,7 @@ export type StampPin = { parkId: string; coords: [number, number] }
 /** something you left on a walk: a picture, a voice note or a written one */
 export type MarkPin = {
   id: string
-  kind: 'photo' | 'audio' | 'note'
+  kind: 'photo' | 'audio' | 'note' | 'car'
   coords: [number, number]
   /** the picture, for the thumbnail pin; absent for notes */
   blob?: Blob

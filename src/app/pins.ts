@@ -6,7 +6,7 @@ import type { PoiCategory } from './data/quests'
 
 /** 24x24 viewBox path data, taken from the Lucide icons used across the UI */
 const ICONS: Record<
-  PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note',
+  PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note' | 'car',
   string[]
 > = {
   // eye
@@ -35,6 +35,8 @@ const ICONS: Record<
   playground: ['M10 22V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1z', 'M20 14h-6a1 1 0 0 0-1 1v7h8v-7a1 1 0 0 0-1-1', 'M14 6V3a1 1 0 0 0-1-1h-2'],
   // mic, a voice note left on the way
   audio: ['M12 19v3', 'M19 10v2a7 7 0 0 1-14 0v-2', 'M8 5a4 4 0 0 1 8 0v6a4 4 0 0 1-8 0z'],
+  // car-front: gdzie zostawiłeś auto, żeby nie szukać go po ciemku
+  car: ['M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2', 'M9 17h6', 'M7 17a2 2 0 1 0 0 .01', 'M17 17a2 2 0 1 0 0 .01'],
   // sticky-note, a thought pinned to a place
   note: ['M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z', 'M15 3v6h6'],
   // award, generic
@@ -50,6 +52,7 @@ export type PinVariant =
   | 'playground'
   | 'audio'
   | 'note'
+  | 'car'
   | 'replay'
 
 const SIZE = 96 // rendered at 2x of the on-map size
@@ -124,7 +127,7 @@ async function rasterise(svg: string) {
 export async function buildPinImages(colors: Record<string, string>) {
   const out: Array<[string, ImageData]> = []
   for (const [category, paths] of Object.entries(ICONS)) {
-    const own = ['parking', 'food', 'playground', 'audio', 'note']
+    const own = ['parking', 'food', 'playground', 'audio', 'note', 'car']
     const variants: PinVariant[] = own.includes(category)
       ? [category as PinVariant, 'replay']
       : ['open', 'done', 'active', 'replay']

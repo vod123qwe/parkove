@@ -3275,3 +3275,12 @@
 .poi-legend__text:last-child {
   margin-bottom: 0;
 }
+
+/* auto na górze listy punktów: praktyczna informacja, więc czyta się jak notka */
+.points-car {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--sp-2);
+  color: var(--content-accent);
+}
