@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.42.1'
+export const VERSION = '0.43.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.43.0',
+    date: '2026-08-21',
+    title: 'Three maps: the photograph, the drawing, the model',
+    changes: [
+      ['changed', 'The walking screen keeps three maps and nothing else. Satelita, which it now opens on, Minimal, our grey drawing, and Rzezba terenu, the photograph standing up on raised ground, always seen from an angle. Domyslny, Klasyczna, Zywa, Ciemna, Topograficzna and National Geographic are gone, and anything saved from them lands on the photograph'],
+      ['added', 'Rzezba terenu carries the same name here as in a replay because it is the same thing: real elevation pushed a little, the city extruded, the camera held at an angle. It is the expensive one by nature, which is why it is a choice rather than the default'],
+      ['fixed', 'Terrain written into a style comes out blank when that style is swapped in, and only works when the map is built with it. The raised map now gets its ground once the style can take it, which is why it draws at all'],
+    ],
+  },
   {
     version: '0.42.1',
     date: '2026-08-21',

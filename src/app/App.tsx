@@ -30,7 +30,6 @@ import { WalkSummary } from './WalkSummary'
 import { stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
-import { isDarkNow, onDarkChange } from './theme'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import type { MapStyleId } from './data/mapstyles'
 import { suggestedParking } from './data/parking'
@@ -87,16 +86,13 @@ export function App() {
   const [celebrate, setCelebrate] = useState<{ id: string; name: string } | null>(null)
   const [amenityKind, setAmenityKind] = useState<'food' | 'playground' | null>(null)
   const [mapStyle, setMapStyleState] = useState<MapStyleId>(getMapStyle)
-  const [isDark, setIsDark] = useState(isDarkNow)
-
-  useEffect(() => onDarkChange(() => setIsDark(isDarkNow())), [])
 
   const pickMapStyle = (id: MapStyleId) => {
     setMapStyleState(id)
     setMapStyle(id)
   }
 
-  const mapStyleSpec = useMemo(() => resolveMapStyle(mapStyle, isDark), [mapStyle, isDark])
+  const mapStyleSpec = useMemo(() => resolveMapStyle(mapStyle), [mapStyle])
 
   const visitedIds = useMemo(() => new Set(Object.keys(progress)), [progress])
 

@@ -1,18 +1,9 @@
-// Map style variants, switchable in the profile.
-// 'auto' follows the app theme: Minimal in light, Ciemna in dark.
-// Free hosted styles: OpenFreeMap (no key), Carto dark-matter, Esri imagery (raster).
+// Three maps for the walking screen and nothing else: the photograph, our grey
+// drawing, and the photograph standing up on raised ground. All keyless.
 
 import type { StyleSpecification } from 'maplibre-gl'
 
-export type MapStyleId =
-  | 'auto'
-  | 'minimal'
-  | 'classic'
-  | 'vivid'
-  | 'dark'
-  | 'satellite'
-  | 'topo'
-  | 'natgeo'
+export type MapStyleId = 'satellite' | 'minimal' | 'satellite-3d'
 
 export type MapStyleDef = {
   id: MapStyleId
@@ -22,31 +13,12 @@ export type MapStyleDef = {
 }
 
 export const MAP_STYLES: MapStyleDef[] = [
-  { id: 'auto', label: 'Domyślny', swatch: ['#f4f4f0', '#14181c'] },
-  { id: 'minimal', label: 'Minimal', swatch: ['#f4f4f0', '#d9dcd4'] },
-  { id: 'classic', label: 'Klasyczna', swatch: ['#f6efe6', '#a8d5a2'] },
-  { id: 'vivid', label: 'Żywa', swatch: ['#eaf4e0', '#7cc0f4'] },
-  { id: 'dark', label: 'Ciemna', swatch: ['#14181c', '#3a4148'] },
   { id: 'satellite', label: 'Satelita', swatch: ['#2c4a2f', '#1a2e3f'] },
-  { id: 'topo', label: 'Topograficzna', swatch: ['#eee9dc', '#8a9c74'] },
-  { id: 'natgeo', label: 'National Geographic', swatch: ['#f2e8d5', '#c2a163'] },
+  { id: 'minimal', label: 'Minimal', swatch: ['#f4f4f0', '#d9dcd4'] },
+  // same name as the replay look, because it is the same thing: the photograph
+  // draped over raised ground, seen from an angle
+  { id: 'satellite-3d', label: 'Rzeźba terenu', swatch: ['#43604a', '#243a2a'] },
 ]
-
-/**
- * Esri publishes a handful of basemaps without a key. Only two of them go deep
- * enough for a walk through a park: the imagery and the topographic map. The
- * shaded relief ones stop at zoom 13, which is a whole city in one tile, so
- * they are no use here and the raised ground does that job better anyway.
- */
-const esri = (service: string, maxzoom: number) => ({
-  type: 'raster' as const,
-  tiles: [
-    `https://services.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`,
-  ],
-  tileSize: 256,
-  maxzoom,
-  attribution: 'Esri',
-})
 
 /** free global elevation, no key, and it does send CORS headers */
 const DEM = {
@@ -75,73 +47,101 @@ const hillshade = (strength: number, tone?: { shadow: string; highlight: string 
   } as never,
 })
 
-const TOPO: StyleSpecification = {
-  version: 8,
-  glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
-  sources: { topo: esri('World_Topo_Map', 23) },
-  layers: [
-    {
-      id: 'topo',
-      type: 'raster',
-      source: 'topo',
-      // a touch of the colour taken out and a touch more contrast: the contour
-      // lines and the paths come forward, the labels stay readable
-      paint: { 'raster-saturation': -0.14, 'raster-contrast': 0.14 } as never,
-    },
+const MINIMAL = 'https://tiles.openfreemap.org/styles/positron'
+
+const IMAGERY = {
+  type: 'raster' as const,
+  tiles: [
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   ],
+  tileSize: 256,
+  maxzoom: 19,
+  attribution: 'Esri, Maxar, Earthstar Geographics',
 }
 
-const NATGEO: StyleSpecification = {
-  version: 8,
-  glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
-  // this one is a painting and stops at zoom 16, so a park fills the screen
-  // softly rather than sharply. No shading on top: it already has its own
-  sources: { natgeo: esri('NatGeo_World_Map', 16) },
-  layers: [{ id: 'natgeo', type: 'raster', source: 'natgeo' }],
-}
-
-const URLS: Record<string, string> = {
-  minimal: 'https://tiles.openfreemap.org/styles/positron',
-  classic: 'https://tiles.openfreemap.org/styles/liberty',
-  vivid: 'https://tiles.openfreemap.org/styles/bright',
-  dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-}
+// glyphs so symbol layers (the parking P) render on imagery too
+const GLYPHS = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf'
 
 const SATELLITE: StyleSpecification = {
   version: 8,
-  // glyphs so symbol layers (parking "P") render on imagery too
-  glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+  glyphs: GLYPHS,
+  sources: { sat: IMAGERY },
+  layers: [{ id: 'sat', type: 'raster', source: 'sat' }],
+}
+
+/**
+ * The same photograph, standing up. The elevation is real and pushed a little,
+ * because Kraków is flat enough that true scale reads as nothing, and the
+ * buildings are extruded from the vector tiles so the city has volume too.
+ * This one costs: elevation tiles, a second set of tiles for the buildings and
+ * a perspective recomputed every frame. It is a choice, not the default.
+ */
+const SATELLITE_3D: StyleSpecification = {
+  version: 8,
+  glyphs: GLYPHS,
   sources: {
-    sat: {
-      type: 'raster',
-      tiles: [
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      ],
-      tileSize: 256,
-      maxzoom: 19,
-      attribution: 'Esri, Maxar, Earthstar Geographics',
+    sat: IMAGERY,
+    dem: DEM,
+    ofm: {
+      type: 'vector',
+      url: 'https://tiles.openfreemap.org/planet',
+      attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
     },
   },
-  layers: [{ id: 'sat', type: 'raster', source: 'sat' }],
+  // no terrain here on purpose: declared in a style it comes out blank when the
+  // style is swapped in with setStyle, and only works when the map is built
+  // with it. The replay can do that, this map cannot, so it is set separately
+  layers: [
+    { id: 'sat', type: 'raster', source: 'sat' },
+    {
+      id: 'buildings-3d',
+      type: 'fill-extrusion',
+      source: 'ofm',
+      'source-layer': 'building',
+      minzoom: 14,
+      paint: {
+        'fill-extrusion-color': '#d7dccf',
+        'fill-extrusion-opacity': 0.65,
+        'fill-extrusion-height': ['coalesce', ['get', 'render_height'], ['get', 'height'], 9],
+        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+      } as never,
+    },
+  ],
 }
 
 const KEY = 'pk-mapstyle'
 export function getMapStyle(): MapStyleId {
   const v = localStorage.getItem(KEY) as MapStyleId | null
-  return MAP_STYLES.some((s) => s.id === v) ? (v as MapStyleId) : 'auto'
+  // anything else, including a style we used to have, lands on the photograph
+  return MAP_STYLES.some((s) => s.id === v) ? (v as MapStyleId) : 'satellite'
 }
 
 export function setMapStyle(id: MapStyleId) {
   localStorage.setItem(KEY, id)
 }
 
-/** resolve the chosen style (+ current theme darkness) to a concrete MapLibre style */
-export function resolveMapStyle(id: MapStyleId, isDark: boolean): { key: string; spec: string | StyleSpecification } {
-  const resolved = id === 'auto' ? (isDark ? 'dark' : 'minimal') : id
-  if (resolved === 'satellite') return { key: 'satellite', spec: SATELLITE }
-  if (resolved === 'topo') return { key: 'topo', spec: TOPO }
-  if (resolved === 'natgeo') return { key: 'natgeo', spec: NATGEO }
-  return { key: resolved, spec: URLS[resolved] }
+/**
+ * The chosen style as something MapLibre can take, plus the angle it wants:
+ * the raised one is always seen from the side, the flat ones from above.
+ */
+export type ResolvedStyle = {
+  key: string
+  spec: string | StyleSpecification
+  pitch: number
+  terrain: { source: string; exaggeration: number } | null
+}
+
+export function resolveMapStyle(id: MapStyleId): ResolvedStyle {
+  if (id === 'satellite-3d') {
+    return {
+      key: 'satellite-3d',
+      spec: SATELLITE_3D,
+      pitch: 52,
+      terrain: { source: 'dem', exaggeration: 2.2 },
+    }
+  }
+  if (id === 'minimal') return { key: 'minimal', spec: MINIMAL, pitch: 0, terrain: null }
+  return { key: 'satellite', spec: SATELLITE, pitch: 0, terrain: null }
 }
 
 /**

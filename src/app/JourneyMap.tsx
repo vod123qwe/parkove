@@ -5,7 +5,6 @@ import { trackSegments } from './geo'
 import type { Pt } from './geo'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import { resolveMapStyle, getMapStyle } from './data/mapstyles'
-import { isDarkNow } from './theme'
 import type { WalkMark } from './photos'
 import type { QuestPoi } from './data/quests'
 
@@ -48,7 +47,9 @@ export function JourneyMap({
     if (!holder.current) return
     const map = new MapGL({
       container: holder.current,
-      style: resolveMapStyle(getMapStyle(), isDarkNow()).spec,
+      // a walk in the journal is a still picture: the flat photograph is enough
+      // and the raised version would pull elevation tiles for no gain here
+      style: resolveMapStyle(getMapStyle() === 'satellite-3d' ? 'satellite' : getMapStyle()).spec,
       center: track[0] ?? [19.9445, 50.0555],
       zoom: 14,
       attributionControl: { compact: true },

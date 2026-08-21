@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import type { MapLayerMouseEvent, StyleSpecification } from 'maplibre-gl'
+import type { MapLayerMouseEvent } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import parksData from './data/parks.json'
 import { circlePolygon, trackSegments } from './geo'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import { asset } from './assets'
+import type { ResolvedStyle } from './data/mapstyles'
 
 const KRAKOW: [number, number] = [19.9445, 50.0555]
 
@@ -73,7 +74,7 @@ type Props = {
   /** a pan, zoom or rotate made by hand hands the camera back to the walker */
   onUserPan: () => void
   /** resolved style; key changes re-add the app layers on top of the new style */
-  mapStyle: { key: string; spec: string | StyleSpecification }
+  mapStyle: ResolvedStyle
   /** stamp pins for collected parks, shown when zoomed in */
   stampPins: StampPin[]
   onSelectStamp: (parkId: string) => void
@@ -456,7 +457,7 @@ export function MapView({
         paint: {
           'fill-color': ['case', ['boolean', ['feature-state', 'visited'], false], c.visitedFill, c.unvisitedFill] as never,
           // imagery already shows the greenery: keep fills light there
-          'fill-opacity': currentStyleKey.current === 'satellite' ? 0.28 : 0.55,
+          'fill-opacity': currentStyleKey.current.startsWith('satellite') ? 0.28 : 0.55,
         },
       })
       map.addLayer({
@@ -638,7 +639,12 @@ export function MapView({
     }
     ;(map as unknown as { __addAppLayers: () => void }).__addAppLayers = addAppLayers
 
-    map.on('load', addAppLayers)
+    map.on('load', () => {
+      const first = initialStyle.current
+      if (first.terrain) map.setTerrain(first.terrain)
+      if (first.pitch) map.setPitch(first.pitch)
+      void addAppLayers()
+    })
 
     // a gesture made by hand stops the camera from chasing the walker: without
     // this the map keeps yanking itself back while you try to look around
@@ -726,22 +732,72 @@ export function MapView({
     currentStyleKey.current = mapStyle.key
     loadedRef.current = false
     styleEpoch.current += 1
+    // a style without terrain does not always clear the old one by itself
+    try {
+      map.setTerrain(null)
+    } catch {
+      // no raised ground to put down
+    }
     map.setStyle(mapStyle.spec)
     // 'style.load' does not fire after setStyle in MapLibre 5. styledata can
     // even race the OLD style right after the call, so re-add on every
     // styledata-with-loaded-style AND on idle; addAppLayers is idempotent.
+    /*
+     * NOT gated on isStyleLoaded: that also waits for every tile in view, so on
+     * a heavy base style the parks, the pins and the walk were missing for ten
+     * seconds or more. Adding layers only needs the parsed style, and an
+     * attempt that comes too early cleans up after itself.
+     *
+     * The ladder matters as much as the events: a style can settle without
+     * sending another styledata, and 'idle' only arrives once every tile has
+     * landed, so waiting for it put the walk back seconds late.
+     */
+    /**
+     * The flag addSource itself checks before it throws. It goes true as soon as
+     * the style is parsed, and unlike isStyleLoaded it does not wait for every
+     * tile in view. Measured on the raised map: this is true a full second
+     * before MapLibre's own style.load event. If a future version renames it,
+     * the check falls back to attempting and letting the catch sort it out.
+     */
+    const styleReady = () => {
+      const st = map.style as unknown as { _loaded?: boolean } | undefined
+      return st ? st._loaded !== false : false
+    }
+
+    let attempt = 0
+    let timer = 0
+    let camera = false
     const readd = () => {
-      // NOT gated on isStyleLoaded: that also waits for every tile in view, so
-      // on a heavy base style the parks, the pins and the walk were missing for
-      // ten seconds or more after a switch. Adding layers only needs the parsed
-      // style, and an attempt that comes too early now cleans up after itself
-      ;(map as unknown as { __addAppLayers?: () => void }).__addAppLayers?.()
-      if (map.getLayer('parks-fill')) map.off('styledata', readd)
+      // an attempt before the style is parsed throws, wipes and costs a full
+      // set of image uploads for nothing, so wait rather than thrash
+      if (styleReady()) {
+        if (mapStyle.terrain && !map.getTerrain()) map.setTerrain(mapStyle.terrain)
+        if (!camera) {
+          camera = true
+          // once, and only once: a tilt made by hand afterwards is the walker's
+          if (Math.round(map.getPitch()) !== mapStyle.pitch) {
+            map.easeTo({ pitch: mapStyle.pitch, duration: 600 })
+          }
+        }
+        ;(map as unknown as { __addAppLayers?: () => void }).__addAppLayers?.()
+      }
+      if (map.getLayer('parks-fill')) {
+        map.off('styledata', readd)
+        return
+      }
+      if (attempt < 14) {
+        attempt++
+        timer = window.setTimeout(readd, Math.round(60 * Math.pow(1.35, attempt)))
+      }
     }
     map.on('styledata', readd)
+    map.once('style.load', readd)
     map.once('idle', readd)
+    readd()
     return () => {
+      window.clearTimeout(timer)
       map.off('styledata', readd)
+      map.off('style.load', readd)
       map.off('idle', readd)
     }
   }, [mapStyle])
