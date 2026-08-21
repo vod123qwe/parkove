@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { List as ListIcon, Mic, Plus, Square, StickyNote, X } from 'lucide-react'
+import { List as ListIcon, Mic, Navigation, Plus, Square, StickyNote, X } from 'lucide-react'
 import { Button } from '../ds'
 import { useGameState } from './state'
 import { questForPark } from './data/quests'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
+import { bearing } from './heading'
 import parksData from './data/parks.json'
 import { PhotoButton } from './PhotoButton'
 import { VoiceRecorder } from './VoiceRecorder'
@@ -35,6 +36,8 @@ export function ExpeditionBar({
   onMark,
   onOpenPoints,
   spotCard,
+  targetId,
+  heading,
 }: {
   /** ending is irreversible, so the bar only asks for it */
   onRequestStop: () => void
@@ -46,6 +49,10 @@ export function ExpeditionBar({
   onOpenPoints?: () => void
   /** wybrana kawiarnia albo plac zabaw: zajmuje miejsce karty „co dalej" */
   spotCard?: ReactNode
+  /** mały cel wybrany z listy punktów: wypiera automatyczny „najbliższy" */
+  targetId?: string | null
+  /** kierunek telefonu w stopniach; null, gdy nie ma kompasu albo zgody */
+  heading?: number | null
 }) {
   const { expedition, parks } = useGameState()
   const [open, setOpen] = useState(false)
@@ -80,12 +87,22 @@ export function ExpeditionBar({
   )
   const toPark =
     here && park ? distanceToParkM(here, park.geometry as never) : null
+  /*
+   * Cel wybrany ręcznie wygrywa z najbliższym: to Ty decydujesz, gdzie idziesz.
+   * Zdobycie celu zwalnia miejsce i karta wraca do najbliższego sama.
+   */
+  const picked =
+    targetId && quest && here && !collected.has(targetId)
+      ? quest.pois.find((p) => p.id === targetId)
+      : undefined
   const next =
     quest && here
-      ? quest.pois
-          .filter((p) => !collected.has(p.id))
-          .map((p) => ({ p, d: distanceM(here, p.coords) }))
-          .sort((a, b) => a.d - b.d)[0]
+      ? picked
+        ? { p: picked, d: distanceM(here, picked.coords) }
+        : quest.pois
+            .filter((p) => !collected.has(p.id))
+            .map((p) => ({ p, d: distanceM(here, p.coords) }))
+            .sort((a, b) => a.d - b.d)[0]
       : null
 
   /*
@@ -98,7 +115,9 @@ export function ExpeditionBar({
     : far
       ? 'do parku'
       : next
-        ? 'następny punkt'
+        ? picked
+          ? 'twój cel'
+          : 'następny punkt'
         : total > 0
           ? 'komplet punktów'
           : 'nagrywam spacer'
@@ -112,6 +131,10 @@ export function ExpeditionBar({
           ? 'kończysz kiedy chcesz'
           : 'idź, gdzie chcesz'
   const away = !here ? null : far ? toPark : (next?.d ?? null)
+  /* strzałka pokazuje azymut do celu pomniejszony o to, w którą stronę trzymasz
+     telefon; bez kompasu (heading == null) nie ma strzałki */
+  const arrow =
+    heading != null && here && next && !far ? (bearing(here, next.p.coords) - heading + 360) % 360 : null
 
   return (
     <>
@@ -234,6 +257,15 @@ export function ExpeditionBar({
             )}
             {away != null && (
               <span className="app-nextstop__away">
+                {/* strzałka tylko z prawdziwym kompasem: zgadywany kierunek myli w terenie */}
+                {arrow != null && (
+                  <Navigation
+                    size={15}
+                    className="app-nextstop__arrow"
+                    style={{ transform: `rotate(${arrow}deg)` }}
+                    aria-hidden="true"
+                  />
+                )}
                 {formatDistance(away).replace(/\s*(m|km)$/, '')}
                 <span className="app-nextstop__unit">{formatDistance(away).endsWith('km') ? 'km' : 'm'}</span>
               </span>

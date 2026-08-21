@@ -3219,3 +3219,15 @@
   text-align: center;
   word-spacing: 2px;
 }
+
+/* strzałka do celu w karcie wyprawy: obraca się razem z telefonem */
+.app-nextstop__arrow {
+  margin-right: 4px;
+  vertical-align: -2px;
+  transition: transform 220ms linear;
+}
+
+/* zdobyty punkt na liście: przestał być zadaniem, więc siedzi ciszej */
+.app-pointrow.-done .pk-listitem__title {
+  color: var(--content-secondary);
+}

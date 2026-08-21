@@ -28,6 +28,19 @@ export type PoiCategory =
   | 'climb'
   | 'play'
 
+/** krótka etykieta kategorii, na listy: pin mówi ikoną, lista mówi słowem */
+export const CATEGORY_LABEL: Record<PoiCategory, string> = {
+  view: 'widok',
+  monument: 'pomnik',
+  water: 'woda',
+  nature: 'przyroda',
+  cave: 'jaskinia',
+  history: 'historia',
+  meadow: 'łąka',
+  climb: 'skała',
+  play: 'plac zabaw',
+}
+
 export type QuestPoi = {
   id: string
   name: string

@@ -4,6 +4,7 @@ import { BottomSheet, Button, List, ListItem, PeekCard, ProgressRing, Segmented,
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
 import { SpotCard } from './SpotCard'
+import { PointsSheet } from './PointsSheet'
 import { asset } from './assets'
 import { getName, greeting } from './profile'
 import type { MapFocus } from './MapView'
@@ -25,6 +26,7 @@ import { RevealSheet } from './RevealSheet'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { beginWalk } from './walk'
+import { askHeading, useHeading } from './heading'
 import { EndWalkSheet } from './EndWalkSheet'
 import { JourneyScreen } from './JourneyScreen'
 import { StampScreen } from './StampScreen'
@@ -91,6 +93,10 @@ export function App() {
   const [amenityKind, setAmenityKind] = useState<'food' | 'playground' | null>(null)
   /** wybrana konkretna kawiarnia albo plac zabaw: pin rośnie, mapa centruje */
   const [amenitySpotId, setAmenitySpotId] = useState<string | null>(null)
+  /* małe cele w terenie: lista punktów wyprawy i wybrany z niej cel */
+  const [pointsOpen, setPointsOpen] = useState(false)
+  const [targetPoiId, setTargetPoiId] = useState<string | null>(null)
+  const [wantHeading, setWantHeading] = useState(false)
   const [mapStyle, setMapStyleState] = useState<MapStyleId>(getMapStyle)
 
   const pickMapStyle = (id: MapStyleId) => {
@@ -151,6 +157,9 @@ export function App() {
   )
 
   const expeditionPark = expedition ? FEATURES.find((f) => f.id === expedition.parkId) : null
+  const expeditionQuest = expedition ? questForPark(expedition.parkId) : null
+  /* kompas włączamy dopiero, gdy wybierzesz cel: przedtem nie ma po co słuchać czujnika */
+  const heading = useHeading(wantHeading && !!targetPoiId)
   const onWalk = !!expedition
   const peekOpen = !!selected && !expanded && !onWalk
 
@@ -531,7 +540,9 @@ export function App() {
             onRequestStop={() => setEndingWalk(true)}
             onPhoto={setPhotoAdded}
             onMark={setPhotoId}
-            onOpenPoints={expeditionPark ? () => { selectParkFromMap(expeditionPark.id); setExpanded(true) } : undefined}
+            onOpenPoints={expeditionQuest ? () => setPointsOpen(true) : undefined}
+            targetId={targetPoiId}
+            heading={heading}
             spotCard={
               activeSpot ? (
                 <SpotCard
@@ -988,6 +999,25 @@ export function App() {
           photos={spotPhotos}
           onOpenPhoto={setPhotoId}
           onClose={() => setAmenitySpotId(null)}
+        />
+      )}
+
+      {expeditionQuest && (
+        <PointsSheet
+          open={pointsOpen}
+          onClose={() => setPointsOpen(false)}
+          pois={expeditionQuest.pois}
+          collected={new Set(progress[expeditionQuest.parkId]?.points ?? [])}
+          here={expedition?.where?.coords ?? myFix?.coords ?? null}
+          targetId={targetPoiId}
+          onPick={(poiId) => {
+            setTargetPoiId(poiId)
+            setPointsOpen(false)
+            /* zgoda na kompas tylko przy dotknięciu: iOS nie pozwala inaczej */
+            void askHeading().then((ok) => setWantHeading(ok))
+            const poi = expeditionQuest.pois.find((p) => p.id === poiId)
+            if (poi) setFocus({ center: poi.coords, zoom: 16.6, ts: Date.now() })
+          }}
         />
       )}
 
