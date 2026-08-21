@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { Compass } from 'lucide-react'
 import { IconButton, Modal, PlaceRow } from '../ds'
-import { MiniMap } from './MiniMap'
+import { TileMap } from './TileMap'
 import { KIND_LABEL, amenitiesFor, fmtHours, isFood, walkUrl } from './data/amenities'
 import { detailFor } from './data/amenity-details'
-import type { Pt } from './geo'
 
 /**
  * Kawiarnie albo place zabaw jednego miejsca, ułożone tym samym wzorem co
@@ -18,7 +17,6 @@ export function AmenityModal({
   kind,
   onClose,
   onPick,
-  me,
 }: {
   parkId: string
   parkName: string
@@ -26,7 +24,6 @@ export function AmenityModal({
   onClose: () => void
   /** wybór konkretnego miejsca: mapa jedzie do pinu, pin się zaznacza */
   onPick: (id: string) => void
-  me?: Pt | null
 }) {
   const wantFood = kind === 'food'
   const spots = amenitiesFor(parkId).filter((s) => isFood(s.kind) === wantFood)
@@ -42,19 +39,9 @@ export function AmenityModal({
     >
       <p className="t-body-sm parking-lead">
         {wantFood ? 'Jedzenie i kawa' : 'Place zabaw'} w okolicy: <strong>{parkName}</strong>.
-        Numery na szkicu odpowiadają wierszom. Dane z OpenStreetMap, więc godziny warto sprawdzić
-        na miejscu.
+        Każdy kafel ma swój kadr mapy. Dane z OpenStreetMap, więc godziny warto sprawdzić na
+        miejscu.
       </p>
-      <MiniMap
-        parkId={parkId}
-        points={spots.map((s) => ({ id: s.id, coords: s.coords }))}
-        selected={picked}
-        me={me ?? null}
-        onPick={(id) => {
-          setPicked(id)
-          onPick(id)
-        }}
-      />
       <div className="app-placelist">
         {spots.map((s, i) => {
           const d = detailFor(parkId, s.id)
@@ -68,6 +55,7 @@ export function AmenityModal({
             <PlaceRow
               key={s.id}
               index={i + 1}
+              map={<TileMap parkId={parkId} point={s.coords} />}
               title={s.name}
               pills={pills}
               selected={picked === s.id}

@@ -13,6 +13,8 @@ export type PlaceRowProps = {
   note?: string
   /** akcja po prawej: jedna, ikonowa, o innej intencji niż dotknięcie wiersza */
   action?: ReactNode
+  /** kadr mapy w tym kaflu: każde miejsce pokazuje swoje własne dojście */
+  map?: ReactNode
   selected?: boolean
   onClick?: () => void
   className?: string
@@ -34,6 +36,7 @@ export function PlaceRow({
   pills,
   note,
   action,
+  map,
   selected,
   onClick,
   className,
@@ -45,6 +48,7 @@ export function PlaceRow({
       onClick={onClick}
       type={onClick ? 'button' : undefined}
     >
+      {map != null && <span className="pk-placerow__map">{map}</span>}
       <span className="pk-placerow__lead">{index != null ? index : icon}</span>
       <span className="pk-placerow__body">
         <span className="pk-placerow__title">{title}</span>

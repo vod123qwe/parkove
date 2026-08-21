@@ -91,3 +91,13 @@
   flex: 0 0 auto;
   align-self: center;
 }
+
+/* kafel z mapą: mapa pełną szerokością na górze, pod nią numer, nazwa i opis */
+.pk-placerow:has(.pk-placerow__map) {
+  flex-wrap: wrap;
+}
+
+.pk-placerow__map {
+  flex: 0 0 100%;
+  display: block;
+}

@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Navigation } from 'lucide-react'
 import { IconButton, Modal, PlaceRow } from '../ds'
-import { MiniMap } from './MiniMap'
+import { TileMap } from './TileMap'
 import { OCCUPANCY_LABEL, PARKING } from './data/parking'
-import type { Pt } from './geo'
 
 const navigateTo = ([lng, lat]: [number, number]) => {
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank')
@@ -24,34 +23,26 @@ export function ParkingModal({
   parkName,
   open,
   onClose,
-  me,
 }: {
   parkId: string
   parkName: string
   open: boolean
   onClose: () => void
-  me?: Pt | null
 }) {
   const spots = PARKING[parkId] ?? []
   const [picked, setPicked] = useState<string | null>(null)
   return (
     <Modal open={open} onClose={onClose} title="Parking" action="back" presentation="push">
       <p className="t-body-sm parking-lead">
-        Sugerowane miejsca przy: <strong>{parkName}</strong>. Numery na szkicu odpowiadają
-        wierszom, a strzałka prowadzi nawigacją.
+        Sugerowane miejsca przy: <strong>{parkName}</strong>. Każdy kafel ma swój kadr mapy z
+        dojściem do granicy parku, a strzałka prowadzi nawigacją.
       </p>
-      <MiniMap
-        parkId={parkId}
-        points={spots.map((s) => ({ id: s.id, coords: s.coords }))}
-        selected={picked}
-        me={me ?? null}
-        onPick={setPicked}
-      />
       <div className="app-placelist">
         {spots.map((s, i) => (
           <PlaceRow
             key={s.id}
             index={i + 1}
+            map={<TileMap parkId={parkId} point={s.coords} />}
             title={s.name}
             pills={[s.fee, s.occupancy ? OCCUPANCY_LABEL[s.occupancy] : null].filter(Boolean) as string[]}
             note={s.hint}

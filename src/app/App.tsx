@@ -1045,7 +1045,6 @@ export function App() {
 
       {selected && (
         <AmenityModal
-          me={expedition?.where?.coords ?? myFix?.coords ?? null}
           parkId={selected.id}
           parkName={selected.properties.name}
           kind={amenityKind}
