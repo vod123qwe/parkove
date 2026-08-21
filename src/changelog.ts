@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.53.0'
+export const VERSION = '0.54.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,22 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.54.0',
+    date: '2026-08-21',
+    title: 'What kind of place is this, and a title that stopped sitting on the photograph',
+    changes: [
+      ['added', 'Cafes and playgrounds say what they are. Pulled from OpenStreetMap and translated into two or three words you can read at a glance: woodchips, fenced, pizza, garden seating, step-free. Opening hours come in Polish, so "Mo-Su 12:00-23:30" reads as "codziennie 12-23:30"'],
+      ['added', 'A place card carries two links out: photographs and reviews in Google Maps, and the venue website when OpenStreetMap knows it. We do not host those photographs. Places API needs a billed key, which in a static app is a public key, and the licence forbids keeping copies'],
+      ['added', 'Photo slider in the design system: one photograph fills the container width, rounded, and the strip snaps to the next. Credit and dots below the frame'],
+      ['changed', 'A park detail card puts its name above the photographs instead of on them. The name needed a scrim that swallowed the top of every picture, and it still fought with the grass. Below the name comes the slider, then the rest'],
+      ['fixed', 'The place card looked crooked because its paragraphs carried default browser margins: 16 points above the name, 12 below the caption, so a two-line block measured 84 points and the icons floated in the middle of nothing'],
+      ['fixed', 'A list row put its caption and its hours side by side, so the text squeezed into a ragged column. The caption keeps one line now and the hours take their own'],
+      ['fixed', 'Photo credits fit one line. Author and licence stay, which is what the licence asks for; the platform name went, which is what wrapped every caption'],
+      ['fixed', 'The two amenity tiles align their chevrons at the bottom, so a two-line title no longer pushes one lower than the other'],
+      ['changed', 'The three memory pills fall the way they rise: they lift a little before they drop, in the same cascade'],
+    ],
+  },
   {
     version: '0.53.0',
     date: '2026-08-21',

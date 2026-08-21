@@ -16,7 +16,7 @@ import {
   Button,
   Carousel,
   Collapsible,
-  MediaHero,
+  PhotoSlider,
   ProgressRing,
   Stamp,
 } from '../ds'
@@ -56,6 +56,13 @@ type Status =
   | { s: 'error'; message: string }
 
 const CHECKIN_BUFFER_M = 100
+
+/*
+ * Podpis pod zdjęciem: autor i licencja, bez nazwy serwisu. CC wymaga
+ * autorstwa i licencji, a „· Wikimedia Commons" na końcu zawijało każdy
+ * podpis na dwie linie szarego tekstu pod każdym zdjęciem.
+ */
+const shortCredit = (c?: string) => c?.replace(/\s*·\s*Wikimedia Commons\s*$/, '')
 
 export function ParkSheet({
   park,
@@ -162,25 +169,28 @@ export function ParkSheet({
       onClose={onClose}
       title={park.properties.name}
       modal={false}
-      hero={
-        <div className="park-heroslot">
-          <MediaHero
-            images={gallery.map((p) => ({ src: asset(p.src), credit: p.credit }))}
-            title={park.properties.name}
-            meta={heroMeta}
-            fallback={<Trees strokeWidth={1.5} />}
-          />
-          <Stamp
-            parkId={park.id}
-            name={park.properties.name}
-            earned={visited}
-            size="md"
-            fallback={<Trees />}
-            className={`park-herostamp${visited ? '' : ' -locked'}`}
-          />
-        </div>
-      }
     >
+      {/*
+        Tytuł mieszka w nagłówku arkusza, NAD zdjęciami. Na zdjęciu potrzebował
+        scrimu, który połykał górną część kadru, a nazwa i tak walczyła z trawaą.
+        Zdjęcia dostały własny slider w marginesach strony, jedno na ekran.
+      */}
+      <p className="t-body-sm park-herometa">{heroMeta}</p>
+      <div className="park-gallery">
+        <PhotoSlider
+          images={gallery.map((p) => ({ src: asset(p.src), credit: shortCredit(p.credit) }))}
+          fallback={<Trees strokeWidth={1.5} />}
+          aria-label={`Zdjęcia: ${park.properties.name}`}
+        />
+        <Stamp
+          parkId={park.id}
+          name={park.properties.name}
+          earned={visited}
+          size="md"
+          fallback={<Trees />}
+          className={`park-herostamp${visited ? '' : ' -locked'}`}
+        />
+      </div>
       <div className="park-progress">
         <ProgressRing value={(earned / total) * 100} size="lg" label={`${earned}/${total}`} />
         <div className="park-progress__text">

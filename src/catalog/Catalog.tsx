@@ -31,6 +31,7 @@ import {
   List,
   ListItem,
   MediaHero,
+  PhotoSlider,
   Modal,
   NavBar,
   ParkBadge,
@@ -71,6 +72,7 @@ const NAV = [
   ['cards', 'Cards'],
   ['lists', 'List items'],
   ['hero', 'Media hero'],
+  ['slider', 'Photo slider'],
   ['collapsible', 'Collapsible'],
   ['carousel', 'Carousel'],
   ['sheet', 'Bottom sheet'],
@@ -527,6 +529,23 @@ export function Catalog() {
               meta="Kopiec · 1,8 ha · quest: 4 punktów"
             />
             <MediaHero images={[]} title="Park bez zdjęcia" meta="Park · 7,2 ha" fallback={<Trees />} />
+          </div>
+        </Section>
+
+        <Section
+          id="slider"
+          title="Photo slider"
+          lead="Inset gallery that sits under a title. One photo fills the container width, rounded, and the strip snaps to the next. Credit and dots live below the frame, because nobody reads white text on grass."
+        >
+          <div className="cat-spec cat-sliderdemo">
+            <PhotoSlider
+              images={[
+                { src: '/photos/krakus-szczyt.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0' },
+                { src: '/photos/krakus-rekawka.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0' },
+              ]}
+              aria-label="Zdjęcia: Kopiec Krakusa"
+            />
+            <PhotoSlider images={[]} ratio="16:9" fallback={<Trees />} />
           </div>
         </Section>
 

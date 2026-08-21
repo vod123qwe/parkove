@@ -1,0 +1,83 @@
+.pk-slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.pk-slider__strip {
+  display: flex;
+  gap: var(--sp-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.pk-slider__strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* jeden kadr = cała szerokość kontenera; marginesy strony robią resztę */
+.pk-slider__slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  aspect-ratio: var(--pk-slider-ratio, 4 / 3);
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  overflow: hidden;
+  background: var(--bg-surface-sunken);
+}
+
+.pk-slider__slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pk-slider__slide.-empty {
+  display: grid;
+  place-items: center;
+  color: var(--content-tertiary);
+}
+
+.pk-slider__slide.-empty svg {
+  width: 44px;
+  height: 44px;
+}
+
+.pk-slider__foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.pk-slider__dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* aktywna kropka rozciąga się w kreskę: widać, gdzie jesteś, bez liczenia */
+.pk-slider__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-default);
+  transition:
+    width 180ms var(--ease-screen),
+    background 180ms linear;
+}
+
+.pk-slider__dot.-active {
+  width: 16px;
+  background: var(--content-accent);
+}
+
+.pk-slider__credit {
+  margin: 0;
+  text-align: center;
+  color: var(--content-tertiary);
+}

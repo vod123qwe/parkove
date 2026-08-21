@@ -327,6 +327,16 @@
   overflow: hidden;
 }
 
+/* slider pokazujemy w szerokości telefonu, bo o szerokość kontenera tu chodzi */
+.cat-sliderdemo {
+  gap: var(--sp-6);
+  align-items: flex-start;
+}
+
+.cat-sliderdemo .pk-slider {
+  width: 327px;
+}
+
 .cat-collapsedemo {
   max-width: 520px;
 }

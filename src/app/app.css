@@ -615,16 +615,24 @@
 }
 
 /* stamp on the park hero, like a passport mark */
-.park-heroslot {
-  position: relative;
+/* podpis parku pod tytułem, nad zdjęciami: rodzaj, hektary, liczba punktów */
+.park-herometa {
+  margin: 0 0 var(--sp-4);
+  color: var(--content-tertiary);
 }
 
+.park-gallery {
+  position: relative;
+  margin-bottom: var(--sp-6);
+}
+
+/* pieczątka zostaje na zdjęciu, bo to nalepka na pocztówce, nie tytuł */
 .park-herostamp {
   position: absolute;
   right: var(--sp-4);
-  top: var(--sp-5);
+  top: var(--sp-4);
   z-index: 2;
-  width: 66px;
+  width: 58px;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
   pointer-events: none;
 }
