@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.55.0'
+export const VERSION = '0.56.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,20 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.56.0',
+    date: '2026-08-22',
+    title: 'Small goals on a walk, a spotlight on one park, and the valley that earns the drive',
+    changes: [
+      ['added', 'The Punkty button on a walk opens the list of points, nearest first, collected ones last and quieter. Tapping one makes it your target: the walk card stops picking the nearest and shows the one you chose, with an arrow if the phone will give a compass. No arrow without one, because a guessed direction in the field is worse than none'],
+      ['added', 'Choosing a park lights a spotlight: one polygon over the whole world with a hole exactly the shape of the park, so the dimming stops at its boundary and the satellite picture inside stays clean. The park loses its fill and gains the thickest line, because the boundary is all it has left. Other parks and their stickers dim with the map; everything belonging to the chosen park stays sharp'],
+      ['added', 'Points can carry a longer read behind Czytaj dalej, and a legend in its own block and its own handwriting. Folklore never pretends to be fact'],
+      ['added', 'Sokolica joined Dolina Bedkowska and it is the valley icon we were missing: a hundred metres above the valley floor, the highest climbing wall in Poland outside the Tatras, and on its summit the ramparts of a ninth-century stronghold. The rock itself was built by cyanobacteria and sponges on the floor of a Jurassic sea'],
+      ['changed', 'Jaskinia Nietoperzowa got the long version it deserves: over a kilometre of passages, a travertine waterfall inside that matches the one outside, sediment mined as fertiliser in the 1870s that destroyed the original deposits and turned up four thousand cave bear canines, and a mammoth hunters camp from forty thousand years ago'],
+      ['fixed', 'Two rock names in Dolina Bedkowska could not be verified anywhere, so they are gone. In their place the real neighbours of Dupa Slonia from OpenStreetMap: Dupeczka, Babka, Czarcia Gran, Czarcie Wrota, Hades and Forteca'],
+      ['fixed', 'Parks on the map are stronger at a distance: a 2.2 point boundary instead of 1.6 and a 36 percent fill instead of 28 on satellite'],
+    ],
+  },
   {
     version: '0.55.0',
     date: '2026-08-21',

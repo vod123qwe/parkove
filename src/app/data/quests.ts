@@ -50,6 +50,17 @@ export type QuestPoi = {
   teaser: string
   /** public: the full story that invites the visit, paragraphs */
   description: string[]
+  /**
+   * Wersja rozwinięta, za przyciskiem „Czytaj dalej". Krótka zostaje domyślną,
+   * żeby chodzenie po parku nie zamieniło się w czytanie. Tylko dla miejsc, których
+   * historii nie da się domknąć trzema akapitami.
+   */
+  long?: string[]
+  /**
+   * Podanie, legenda, opowieść ludowa. Świadomie OSOBNE pole, bo w apce ma leżeć
+   * pod własnym nagłówkiem i w innym kroju: podanie nigdy nie ma udawać faktu.
+   */
+  legend?: string[]
   /** public: how to find the spot */
   findHint?: string
   /** hidden: the punchline, unlocked on site */

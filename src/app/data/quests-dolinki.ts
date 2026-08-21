@@ -346,6 +346,45 @@ export const DOLINKI_QUESTS: Quest[] = [
         radius: 40,
       },
       {
+        id: 'sokolica',
+        category: 'view',
+        name: 'Sokolica',
+        teaser: 'Najwyższa ściana Jury, a na jej szczycie gród z dziewiątego wieku.',
+        description: [
+          'Sokolica wznosi się sto metrów nad dnem doliny i ma najwyższą ścianę w całej Jurze. To jedna z niewielu skał w Polsce poza Tatrami, na której wytyczono drogi wielowyciągowe, czyli takie, na których wspinacz zatrzymuje się w połowie ściany i zaczyna od nowa.',
+          'Dawniej nazywano ją Grodziskiem i nie bez powodu: na szczycie odkryto resztki dużego grodu z ósmego albo dziewiątego wieku. Wały wciąż są widoczne. Wykopaliska pokazały też ślady osadnictwa z neolitu i kultury łużyckiej, czyli ludzie wybierali to miejsce przez tysiące lat.',
+          'U jej podnóża stoi Brandysówka: schronisko, pole namiotowe i baza polskich wspinaczy skałkowych. W pogodny weekend jest tu więcej lin niż ludzi na szlaku.',
+        ],
+        long: [
+          'Sam kamień też ma historię i jest starsza od wszystkiego innego w tej dolinie. Tablica Małopolskiego Szlaku Geoturystycznego, opracowana przez geologów z AGH, mówi, że Sokolica jest budowlą mikrobialno-gąbkową: powstała ze struktur rafopodobnych w płytkim morzu szelfowym, które w górnej jurze zalewało ten teren.',
+          'Znaczy to, że tę skałę zbudowały żywe organizmy: cyjanobakterie i gąbki, których szkielety wciąż można znaleźć w jej strukturze. Wspinacz łapie chwyty w czymś, co sto pięćdziesiąt milionów lat temu było dnem ciepłego morza.',
+          'W Sokolicy są też dwie jaskinie: Jaskinia w Sokolicy i Komin w Sokolicy. Żadna nie jest udostępniona, ale ich otwory widać z dołu, jeśli wiesz, gdzie patrzyć.',
+        ],
+        findHint:
+          'Środkowa część doliny, naprzeciw wylotu wąwozu Precówki, w miejscu gdzie Bedkówka zakręca w lewo. Nad Brandysówką, nie da się przegapić.',
+        reveal:
+          'To najwyższa ściana wspinaczkowa Jury i najwyższa w Polsce poza Tatrami. A na jej szczycie stał gród, więc ktoś tysiąc lat temu doszedł do tego samego wniosku co wspinacze: to najlepszy punkt w całej dolinie.',
+        dilemma: {
+          question:
+            'Na szczycie Sokolicy leżą wały grodu z dziewiątego wieku, a jej ścianą codziennie wchodzą wspinacze. Wpuścić ich tam, gdzie leży stanowisko archeologiczne?',
+          options: [
+            'Tak, wspinaczka nie rusza wałów',
+            'Nie, stanowisko jest ważniejsze',
+            'Tak, ale bez wychodzenia na szczyt',
+          ],
+          counterpoint:
+            'Wspinacze trzymają się ściany, a wały leżą na wierzchu, więc konflikt jest mniejszy, niż brzmi. Ale każdy szlak na szczyt to wydeptana ścieżka, a wydeptana ścieżka na grodzisku to warstwy, których nikt już nie odczyta. Archeolodzy nie boją się lin, boją się butów.',
+        },
+        sources: [
+          'https://pl.wikipedia.org/wiki/Sokolica_(Dolina_Będkowska)',
+          'https://zpkwm.pl/park/park-krajobrazowy-dolinki-krakowskie/turystyka/propozycje-wycieczek/bedkowska/',
+        ],
+        photo: '/photos/bedkowska-sokolica.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 3.0 · Wikimedia Commons',
+        coords: [19.741829, 50.171904],
+        radius: 60,
+      },
+      {
         id: 'nietoperzowa',
         category: 'cave',
         name: 'Jaskinia Nietoperzowa',
@@ -355,9 +394,26 @@ export const DOLINKI_QUESTS: Quest[] = [
           'Nazwa nie jest przesadzona. Znaleziono tu bogate szczątki kopalnych nietoperzy i wciąż mieszkają tu gatunki żywe. Jaskinia jest jednym z tych miejsc, gdzie zwierzęta były wcześniej niż ludzie i zostały dłużej.',
           'Wejście jest udostępnione do zwiedzania, więc to jedyny punkt w naszych dolinach, do którego wchodzi się z przewodnikiem i biletem.',
         ],
+        long: [
+          'Korytarzy jest tu ponad kilometr, dokładnie 1047 metrów, a wejście ma pięć na pięć. Sale i duże korytarze powstały pod zwierciadłem wód podziemnych, więc to woda wypłukała je od środka, a nie żaden zawal.',
+          'W początkowej części jest wodospad naciekowy, czyli ta sama martwica wapienna, która zrobiła próg Szumu na dworze. Dolina buduje wodospady z kamienia po obu stronach skały: jeden na słońcu, drugi w ciemności.',
+          'W dziewiętnastym wieku namulisko jaskini wybierano na nawóz, a przemysłową eksploatację prowadzono w latach 1872 do 1879. Zniszczyło to pierwotne osady, ale przy okazji natrafiono na cztery tysiące kłów niedźwiedzi jaskiniowych. Systematyczne badania przeprowadził dopiero Waldemar Chmielewski w latach 1956 do 1963.',
+          'Archeologicznie to stanowisko górnego paleolitu: obóz łowców mamutów sprzed blisko czterdziestu tysięcy lat. Filmowcy też ją znaleźli: kręcono tu między innymi zdjęcia do Ogniem i mieczem.',
+        ],
         findHint: 'Górna część doliny, po stronie Jerzmanowic. Przy jaskini tablica i wejście dla zwiedzających.',
         reveal:
-          'To największa jaskinia Wyżyny Krakowsko-Częstochowskiej. Nazwę wzięła od nietoperzy: i tych kopalnych, i tych, które nadal tu zimują.',
+          'To największa jaskinia Wyżyny Krakowsko-Częstochowskiej: ponad kilometr korytarzy. Nazwę wzięła od nietoperzy, i tych kopalnych, i tych, które nadal tu zimują, a w dziewiętnastym wieku znaleziono w niej cztery tysiące kłów niedźwiedzi jaskiniowych.',
+        dilemma: {
+          question:
+            'Namulisko tej jaskini wybrano na nawóz, zanim ktokolwiek je zbadał. Czy z miejscami, których wartości jeszcze nie znamy, trzeba obchodzić się jak z zabytkiem?',
+          options: [
+            'Tak, bo drugiego razu nie ma',
+            'Nie, ludzie też muszą z czegoś żyć',
+            'Tak, ale ktoś musi za tę ostrożność zapłacić',
+          ],
+          counterpoint:
+            'Warstwy w jaskini czyta się jak strony: raz przemieszane, nie złożą się z powrotem, a razem z nimi znika czterdzieści tysięcy lat zapisów. Ale w 1872 roku nikt nie wiedział, że to zapis, a nawóz był potrzebny od zaraz. Dzisiejsza ostrożność jest tania dla nas, bo nie my musimy z niej rezygnować.',
+        },
         sources: ['https://pl.wikipedia.org/wiki/Jaskinia_Nietoperzowa'],
         photo: '/photos/poi-dolina-bedkowska-nietoperzowa.jpg',
         photoCredit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons',
@@ -375,7 +431,7 @@ export const DOLINKI_QUESTS: Quest[] = [
         ],
         findHint: 'Skała nad Brandysową Polaną, zaraz przy wodospadzie Szum.',
         reveal:
-          'Nazwy skał w Dolinie Będkowskiej wymyślali wspinacze i to widać: obok Dupy Słonia znajdziesz Stumilowy Kras i Żabajowe Plecy.',
+          'Nazwy skał w tej dolinie wymyślali wspinacze i to widać: obok Dupy Słonia stoją Dupeczka i Babka, a dalej Czarcia Grań, Czarcie Wrota, Czarci Korytarz, Hades i Forteca. Cały diabelski kąt w jednej dolinie.',
         photo: '/photos/poi-dolina-bedkowska-dupa-slonia.jpg',
         photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.743373, 50.175866],

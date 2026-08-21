@@ -1,5 +1,5 @@
-import { Lock, MapPin, Sparkles } from 'lucide-react'
-import { Modal } from '../ds'
+import { BookOpen, Lock, MapPin, Sparkles } from 'lucide-react'
+import { Collapsible, Modal } from '../ds'
 import { Dilemma } from './Dilemma'
 import type { QuestPoi } from './data/quests'
 import { asset } from './assets'
@@ -31,6 +31,32 @@ export function PoiModal({
               {p}
             </p>
           ))}
+          {/* rozwinięcie tylko tam, gdzie historia na to zasługuje: krótka wersja
+              zostaje domyślna, żeby czytanie nie zastąpiło chodzenia */}
+          {poi.long && poi.long.length > 0 && (
+            <div className="poi-long">
+              <Collapsible lines={0} moreLabel="Czytaj dalej" lessLabel="Zwiń">
+                {poi.long.map((p, i) => (
+                  <p key={i} className="t-body poi-para">
+                    {p}
+                  </p>
+                ))}
+              </Collapsible>
+            </div>
+          )}
+          {/* podanie pod własnym nagłówkiem i innym krojem: fakt to fakt, legenda to legenda */}
+          {poi.legend && poi.legend.length > 0 && (
+            <section className="poi-legend">
+              <p className="t-label poi-legend__label">
+                <BookOpen size={14} /> Legenda
+              </p>
+              {poi.legend.map((p, i) => (
+                <p key={i} className="poi-legend__text">
+                  {p}
+                </p>
+              ))}
+            </section>
+          )}
           {poi.findHint && (
             <div className="poi-hint">
               <MapPin size={16} />

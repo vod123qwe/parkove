@@ -3231,3 +3231,45 @@
 .app-pointrow.-done .pk-listitem__title {
   color: var(--content-secondary);
 }
+
+/* rozwinięta wersja opowieści: zwinięta do zera, więc widać tylko przycisk */
+.poi-long {
+  margin: calc(-1 * var(--sp-2)) 0 var(--sp-4);
+}
+
+.poi-long .pk-collapsible__body.-clamped {
+  opacity: 0;
+}
+
+/*
+ * Legenda ma własny krój (Kalam, ten sam co w pieczątkach) i lekkie tło, żeby
+ * nie dało się jej pomylić z faktem. To nie ozdoba, to uczciwość: park opowiada
+ * i podanie, i to, co wiadomo, ale nigdy w jednym akapicie.
+ */
+.poi-legend {
+  margin: var(--sp-5) 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-mint);
+}
+
+.poi-legend__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--sp-2);
+  color: var(--content-accent);
+}
+
+.poi-legend__text {
+  margin: 0 0 var(--sp-2);
+  font-family: 'Kalam', var(--font-text);
+  font-size: 17px;
+  line-height: 26px;
+  color: var(--content-primary);
+}
+
+.poi-legend__text:last-child {
+  margin-bottom: 0;
+}

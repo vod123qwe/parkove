@@ -818,7 +818,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     ],
     description: [
       "Najdłuższa z Dolinek Krakowskich: siedem do ośmiu kilometrów doliny potoku Będkówka, od drogi z Krakowa do Olkusza aż do przysiółka Łączki. Jedna z najdłuższych dolin całej Wyżyny Krakowsko-Częstochowskiej.",
-      "Tu są dwa rekordy naraz. Wodospad Szum jest najwyższym wodospadem Jury, a Jaskinia Nietoperzowa jej największą jaskinią. Między nimi kilkadziesiąt skał wspinaczkowych i cała dolina do przejścia.",
+      "Tu są trzy rekordy naraz. Wodospad Szum jest najwyższym wodospadem Jury, Jaskinia Nietoperzowa jej największą jaskinią, a Sokolica ma najwyższą ścianę wspinaczkową w Polsce poza Tatrami. Na szczycie Sokolicy leżą jeszcze wały grodu z dziewiątego wieku.",
       "Ośmiu kilometrów nie robi się w jedno popołudnie i nie trzeba: pieczątka przychodzi po trzech punktach. Najwygodniej zwiedzać ją od Będkowic.",
     ],
     amenities: {
