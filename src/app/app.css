@@ -628,40 +628,6 @@
   margin-bottom: var(--sp-6);
 }
 
-/* komórka pieczątki: nalepka, tytuł, powod. Linie nad i pod, żeby czytało się
-   jak własna sekcja, a nie jak kolejny akapit opisu */
-.park-stampcell {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  margin: var(--sp-6) 0;
-  padding: var(--sp-4) 0;
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.park-stampcell__art {
-  flex: 0 0 auto;
-  width: 56px;
-  pointer-events: none;
-}
-
-.park-stampcell__art.-locked {
-  opacity: 0.8;
-}
-
-.park-stampcell__text {
-  flex: 1;
-  min-width: 0;
-}
-
-.park-stampcell__text p {
-  margin: 0;
-}
-
-.park-stampcell__text p + p {
-  margin-top: 2px;
-}
 
 .park-herostamp.-locked {
   opacity: 0.85;
@@ -3204,4 +3170,31 @@
 
 .app-spotcard__body p + p {
   margin-top: 2px;
+}
+
+/* liczba punktów w narożniku zdobytej pieczątki: „2/3" mówi, że pieczątka jest,
+   ale park ma jeszcze coś do oddania. Pełny komplet dostaje złoto */
+.park-progress__stamp {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.park-progress__badge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  min-width: 36px;
+  padding: 2px var(--sp-2);
+  border: 1px solid var(--border-mint);
+  border-radius: var(--radius-pill);
+  background: var(--bg-mint);
+  color: var(--content-accent);
+  font-weight: 650;
+  text-align: center;
+}
+
+.park-progress__badge.-full {
+  border-color: var(--bg-gold);
+  background: var(--bg-gold);
+  color: var(--content-on-gold);
 }

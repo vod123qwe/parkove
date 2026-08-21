@@ -18,7 +18,6 @@ import {
   Carousel,
   Collapsible,
   PhotoSlider,
-  ProgressRing,
   Stamp,
 } from '../ds'
 import { KIND_META } from './kinds'
@@ -206,24 +205,45 @@ export function ParkSheet({
           aria-label={`Zdjęcia: ${park.properties.name}`}
         />
       </div>
+      {/*
+        Jedna sekcja, nie dwie. Pieczątka STOI w miejscu pierścienia 0/3, bo mówiły
+        to samo dwa razy: wyszarzona, dopóki nie zdobyta, w kolorze i z liczbą
+        punktów w narożniku, kiedy już jest.
+      */}
       <div className="park-progress">
-        <ProgressRing value={(earned / total) * 100} size="lg" label={`${earned}/${total}`} />
+        <div className="park-progress__stamp">
+          <Stamp
+            parkId={park.id}
+            name={park.properties.name}
+            earned={hasStamp}
+            size="lg"
+            fallback={<Trees />}
+          />
+          {hasStamp && total > 0 && (
+            <span className={`park-progress__badge t-caption${earned >= total ? ' -full' : ''}`}>
+              {earned}/{total}
+            </span>
+          )}
+        </div>
         <div className="park-progress__text">
-          {earned >= total ? (
+          {hasStamp && earned >= total ? (
             <>
               <p className="t-body-strong">Zahaczony w całości!</p>
               <p className="t-body-sm park-muted">
-                {progress!.visits === 1 ? '1 wizyta' : `${progress!.visits} wizyt`} · złota odznaka
+                {progress!.visits === 1 ? '1 wizyta' : `${progress!.visits} wizyt`} · pieczątka zdobyta
+              </p>
+            </>
+          ) : hasStamp ? (
+            <>
+              <p className="t-body-strong">Pieczątka zdobyta</p>
+              <p className="t-body-sm park-muted">
+                Zebrane {earned} z {total} {plPoints(total)}. Reszta czeka na kolejny raz.
               </p>
             </>
           ) : visited ? (
             <>
               <p className="t-body-strong">Odwiedzony</p>
-              <p className="t-body-sm park-muted">
-                {quest
-                  ? `Zebrano ${earned} z ${total} punktów wyprawy.`
-                  : `${progress!.visits === 1 ? '1 wizyta' : `${progress!.visits} wizyt`} · ostatnia ${new Date(progress!.lastAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' })}`}
-              </p>
+              <p className="t-body-sm park-muted">{stampNote}</p>
             </>
           ) : (
             <>
@@ -398,26 +418,6 @@ export function ParkSheet({
         className="park-secondbtn"
         variant="ghost"
       />
-
-      {/*
-        Pieczątka dostaje własną komórkę między liniami: nalepka po lewej, po prawej
-        za co jest i czy już jest. Na zdjęciu ginieła, a nad zdjęciami udawała
-        część nagłówka, którym nie jest.
-      */}
-      <div className="park-stampcell">
-        <Stamp
-          parkId={park.id}
-          name={park.properties.name}
-          earned={hasStamp}
-          size="md"
-          fallback={<Trees />}
-          className={`park-stampcell__art${hasStamp ? '' : ' -locked'}`}
-        />
-        <div className="park-stampcell__text">
-          <p className="t-body-strong">Pieczątka miejsca</p>
-          <p className="t-caption park-muted">{stampNote}</p>
-        </div>
-      </div>
 
       {creditLine && <p className="t-caption park-credits">Zdjęcia: {creditLine}</p>}
 

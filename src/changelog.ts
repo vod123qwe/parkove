@@ -28,7 +28,7 @@ export const CHANGELOG: Release[] = [
       ['fixed', 'The two amenity tiles align their chevrons at the bottom, so a two-line title no longer pushes one lower than the other'],
       ['changed', 'The three memory pills fall the way they rise: they lift a little before they drop, in the same cascade'],
       ['changed', 'Photographs in a park card are shorter, 16 by 9, and carry no caption of their own. Attribution stays, collected into one line at the end of the card, which is what the licence asks for'],
-      ['changed', 'The stamp moved into its own cell between two rules: sticker on the left, and on the right what it is for and how far off it is. On a photograph it simply vanished'],
+      ['changed', 'The stamp took the place of the 0 of 3 ring, because the two said the same thing twice. Grey until you earn it, full colour with the point count in its corner once you do: mint for a stamp with points still owed, gold for the full set'],
       ['changed', 'Start wyprawy sits in a bar stuck to the bottom of the card, one decision per card. Checking in and taking a photograph stay in the body as second-rank actions'],
       ['changed', 'Both bars are glass now, not plates: a gradient and three bands of blur instead of a solid fill with a hairline. The sheet title gets the same treatment, so content slides under it softly'],
       ['fixed', 'The action bar landed below the screen on a half-open sheet, because the panel is taller than the view and pushed down. The sheet now reports how far it hangs and the bar sits on the bottom of what you can see'],
