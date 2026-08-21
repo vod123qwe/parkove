@@ -259,7 +259,7 @@ trafienia, 128 z tagami) i przetłumaczone na etykiety: `surface=woodchips` →
 „ogródek". Godziny z `opening_hours` tłumaczy `fmtHours`: „Mo-Su 12:00-23:30"
 czyta się jako „codziennie 12–23:30".
 
-Trę decyzje warte zapamiętania:
+Trzy decyzje warte zapamiętania:
 
 1. **Tłumaczenie w skrypcie, nie w aplikacji.** `scripts/build-amenity-details.mjs`
    generuje `src/app/data/amenity-details.ts`. To decyzja redakcyjna, więc ma

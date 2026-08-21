@@ -223,11 +223,14 @@
    jaśniejszy od tła pudełka, w dolnym prawym narożniku */
 .park-amenity__go {
   align-self: flex-end;
-  margin-top: var(--sp-3);
+  /* auto, nie stały odstęp: jeden kafel ma tytuł w dwóch liniach, a chevrony
+     mają stać równo na dole obu, nie tam, gdzie skończył się tekst */
+  margin-top: auto;
   display: grid;
   place-items: center;
   width: 28px;
   height: 28px;
+  min-height: 28px;
   border-radius: 10px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface);
@@ -3097,10 +3100,14 @@
   color: var(--content-secondary);
 }
 
+/* godziny idą własną, pełną linijką pod podpisem: obok tekstu robiły z wiersza
+   dwie poszarpane kolumny i to od tego lista wyglądała krzywo */
 .park-amenity__hours {
-  display: inline-flex;
+  flex: 0 0 100%;
+  display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  margin-top: 1px;
   color: var(--content-tertiary);
 }
 

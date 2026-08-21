@@ -43,7 +43,8 @@ export function AmenityModal({
           /* nie powtarzamy nazwy w podpisie: bezimienny plac nazywa sie
              wlasnie "Plac zabaw", wiec podpis ma dodac cechy, nie echo */
           const label = s.name === KIND_LABEL[s.kind] ? [] : [KIND_LABEL[s.kind]]
-          const bits = [...label, ...(d?.chips ?? [])]
+          /* w liście dwie cechy, nie trzy: trzecia zawijała podpis na dwie linie */
+          const bits = [...label, ...(d?.chips ?? []).slice(0, 2)]
           return (
             <ListItem
               key={s.id}

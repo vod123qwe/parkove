@@ -93,8 +93,10 @@ button.pk-listitem:hover {
 }
 
 .pk-listitem__meta {
-  /* metadane mogą nieść ikonki, więc układają się w rzędzie */
+  /* metadane mogą nieść ikonki, więc układają się w rzędzie; zawijanie po to,
+     żeby dłuższy dopisek mógł zejść do własnej linii, a nie ściskać tekstu */
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-2);
   font-weight: 500;
