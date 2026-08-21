@@ -1,50 +1,74 @@
-import { CircleParking, Navigation } from 'lucide-react'
-import { IconButton, List, ListItem, Modal } from '../ds'
+import { useState } from 'react'
+import { Navigation } from 'lucide-react'
+import { IconButton, Modal, PlaceRow } from '../ds'
+import { MiniMap } from './MiniMap'
 import { OCCUPANCY_LABEL, PARKING } from './data/parking'
+import type { Pt } from './geo'
 
 const navigateTo = ([lng, lat]: [number, number]) => {
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank')
 }
 
+/**
+ * Parkingi przy jednym miejscu.
+ *
+ * Przebudowane po uwadze Jarka: wcześniej nazwy ucinały się w wąskiej komórce,
+ * a opisy leżały pod listą osobnym blokiem, więc czytając opis nie wiedziałeś
+ * już, o którym parkingu mowa. Teraz każdy wiersz ma pełną nazwę, opłatę jako
+ * znacznik i swoje dwa zdania, a nad listą jest szkic pokazujący, który jest z
+ * której strony. Dotknięcie wiersza zaznacza pin, strzałka prowadzi w Google:
+ * dwie różne intencje, dwa różne dotknięcia.
+ */
 export function ParkingModal({
   parkId,
   parkName,
   open,
   onClose,
+  me,
 }: {
   parkId: string
   parkName: string
   open: boolean
   onClose: () => void
+  me?: Pt | null
 }) {
   const spots = PARKING[parkId] ?? []
+  const [picked, setPicked] = useState<string | null>(null)
   return (
     <Modal open={open} onClose={onClose} title="Parking" action="back" presentation="push">
       <p className="t-body-sm parking-lead">
-        Sugerowane miejsca parkingowe przy: <strong>{parkName}</strong>. Pierwsze na liście
-        pokazujemy na mapie.
+        Sugerowane miejsca przy: <strong>{parkName}</strong>. Numery na szkicu odpowiadają
+        wierszom, a strzałka prowadzi nawigacją.
       </p>
-      <List className="parking-list">
+      <MiniMap
+        parkId={parkId}
+        points={spots.map((s) => ({ id: s.id, coords: s.coords }))}
+        selected={picked}
+        me={me ?? null}
+        onPick={setPicked}
+      />
+      <div className="app-placelist">
         {spots.map((s, i) => (
-          <ListItem
+          <PlaceRow
             key={s.id}
-            icon={<CircleParking />}
-            leadTone={i === 0 ? 'accent' : 'neutral'}
+            index={i + 1}
             title={s.name}
-            meta={`${s.fee}${s.occupancy ? ` · ${OCCUPANCY_LABEL[s.occupancy]}` : ''}`}
-            trailing={
-              <IconButton aria-label={`Prowadź: ${s.name}`} variant="tonal" onClick={() => navigateTo(s.coords)}>
+            pills={[s.fee, s.occupancy ? OCCUPANCY_LABEL[s.occupancy] : null].filter(Boolean) as string[]}
+            note={s.hint}
+            selected={picked === s.id}
+            onClick={() => setPicked(picked === s.id ? null : s.id)}
+            action={
+              <IconButton
+                aria-label={`Prowadź: ${s.name}`}
+                variant="tonal"
+                onClick={() => navigateTo(s.coords)}
+              >
                 <Navigation size={18} />
               </IconButton>
             }
           />
         ))}
-      </List>
-      {spots.map((s) => (
-        <p key={s.id} className="t-caption parking-hint">
-          <strong>{s.name}:</strong> {s.hint}
-        </p>
-      ))}
+      </div>
     </Modal>
   )
 }

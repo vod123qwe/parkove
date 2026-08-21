@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.56.0'
+export const VERSION = '0.57.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,20 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.57.0',
+    date: '2026-08-22',
+    title: 'One cell per place, a sketch above the list, and every sticker says what it is for',
+    changes: [
+      ['changed', 'The parking screen is rebuilt. Names were truncated in a narrow cell and the descriptions sat below the list as a separate block, so while reading a description you no longer knew which row it belonged to. Now each row carries the full name, the fee as a pill and its own two sentences, and a sketch above the list shows which parking is on which side'],
+      ['added', 'The sketch is an SVG: the park outline, numbered dots matching the rows, and your position when we have it. Deliberately no tiles, because a second map context is a second reason to stutter, and this draws instantly and works offline. Tapping a row lights its dot; the arrow navigates. Two intentions, two taps'],
+      ['changed', 'Cafes and playgrounds use the same pattern, with the OpenStreetMap features and opening hours as pills. One pattern for every list of places, because it is the same act: choosing where to go'],
+      ['changed', 'A missing amenity no longer takes half the width of the screen to say it is missing. The tile appears only when there is something to show'],
+      ['added', 'Stickers in the collection are tappable at last, and the card tells you what the sticker is for: the rule in words, how many points are missing, and, where a place asks for fewer points than it has, that the rest are trivia the sticker does not wait for'],
+      ['added', 'Dolina Bedkowska has its sticker'],
+      ['added', 'Place row joined the design system with a card in the catalogue'],
+    ],
+  },
   {
     version: '0.56.0',
     date: '2026-08-22',

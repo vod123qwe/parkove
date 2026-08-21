@@ -433,3 +433,11 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
 }
+
+/* wiersze miejsc pokazujemy w szerokości telefonu, bo o komórkę tu chodzi */
+.cat-placerowdemo {
+  flex-direction: column;
+  gap: var(--sp-3);
+  align-items: stretch;
+  max-width: 340px;
+}

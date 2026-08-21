@@ -1031,6 +1031,7 @@ export function App() {
 
       {selected && (
         <AmenityModal
+          me={expedition?.where?.coords ?? myFix?.coords ?? null}
           parkId={selected.id}
           parkName={selected.properties.name}
           kind={amenityKind}
@@ -1038,7 +1039,12 @@ export function App() {
           onPick={pickAmenity}
         />
       )}
-      <StampsModal open={stampsOpen} onClose={() => setStampsOpen(false)} />
+      <StampsModal
+        open={stampsOpen}
+        onClose={() => setStampsOpen(false)}
+        /* z kolekcji wchodzimy w kartę pieczątki: to tam jest napisane, za co jest */
+        onPick={(id) => setStampParkId(id)}
+      />
       <StampCelebration
         parkId={celebrate?.id ?? null}
         parkName={celebrate?.name ?? ''}

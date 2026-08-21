@@ -35,6 +35,7 @@ import {
   Modal,
   NavBar,
   ParkBadge,
+  PlaceRow,
   ParkCard,
   ProgressRing,
   Segmented,
@@ -71,6 +72,7 @@ const NAV = [
   ['progress', 'Progress'],
   ['cards', 'Cards'],
   ['lists', 'List items'],
+  ['placerow', 'Place row'],
   ['hero', 'Media hero'],
   ['slider', 'Photo slider'],
   ['collapsible', 'Collapsible'],
@@ -511,6 +513,35 @@ export function Catalog() {
                 meta="Najbliższe kawiarnie w Podgórzu, przy Rynku Podgórskim."
               />
             </List>
+          </div>
+        </Section>
+
+        <Section
+          id="placerow"
+          title="Place row"
+          lead="A row for a place you can choose: a parking, a cafe, a playground. Everything sits in one cell, because a description under the list stops telling you which row it belongs to. The number matches a pin on the sketch above the list; the action on the right has a different intention than the row itself."
+        >
+          <div className="cat-spec cat-placerowdemo">
+            <PlaceRow
+              index={1}
+              title="Brandysówka, środek doliny"
+              pills={['Płatny', 'gruntowy']}
+              note="Najbliżej tego, po co się tu jedzie: 148 m do Sokolicy, 292 m do wodospadu Szum."
+              action={
+                <IconButton aria-label="Prowadź" variant="tonal">
+                  <MapPin size={18} />
+                </IconButton>
+              }
+              onClick={() => {}}
+            />
+            <PlaceRow
+              index={2}
+              selected
+              title="Przy Jaskini Nietoperzowej"
+              pills={['Bezpłatny', 'żwirowy']}
+              note="Osobny wypad, górny koniec doliny: 124 m od wejścia do jaskini."
+              onClick={() => {}}
+            />
           </div>
         </Section>
 

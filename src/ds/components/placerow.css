@@ -1,0 +1,93 @@
+.pk-placerow {
+  display: flex;
+  width: 100%;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-4);
+  border: 0;
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 140ms linear,
+    transform 140ms var(--ease-out);
+}
+
+.pk-placerow:active {
+  transform: scale(0.99);
+}
+
+/* wybrany wiersz: ten sam wiersz, który świeci się na mini mapie */
+.pk-placerow.-selected {
+  background: var(--bg-mint);
+  box-shadow: inset 0 0 0 1.5px var(--border-mint);
+}
+
+.pk-placerow__lead {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--content-accent);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.pk-placerow__lead svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pk-placerow__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* pełna nazwa, nawet w dwóch liniach: ucięta nazwa parkingu nie mówi nic */
+.pk-placerow__title {
+  font-family: var(--font-text);
+  font-weight: 650;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--content-primary);
+}
+
+.pk-placerow__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pk-placerow__pill {
+  padding: 2px var(--sp-2);
+  border-radius: 8px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface);
+  color: var(--content-secondary);
+  font-family: var(--font-text);
+  font-weight: 550;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.pk-placerow__note {
+  font-family: var(--font-text);
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--content-tertiary);
+}
+
+.pk-placerow__action {
+  flex: 0 0 auto;
+  align-self: center;
+}

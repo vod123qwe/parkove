@@ -8,7 +8,16 @@ import type { ParkFeature } from './ParkSheet'
 const FEATURES = parksData.features as unknown as ParkFeature[]
 
 /** the collection: every park sticker, pale until collected */
-export function StampsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function StampsModal({
+  open,
+  onClose,
+  onPick,
+}: {
+  open: boolean
+  onClose: () => void
+  /** dotknięcie pieczątki: ekran, który mówi za co jest i ile brakuje */
+  onPick?: (parkId: string) => void
+}) {
   const { parks } = useGameState()
   const earned = FEATURES.filter((f) => isParkComplete(f.id, parks)).length
   const sorted = [...FEATURES].sort((a, b) => {
@@ -21,8 +30,9 @@ export function StampsModal({ open, onClose }: { open: boolean; onClose: () => v
   return (
     <Modal open={open} onClose={onClose} title="Pieczątki" action="back" presentation="push">
       <p className="t-body-sm stamps-lead">
-        Zdobyte: <strong>{earned}</strong> z {FEATURES.length}. Pieczątkę dostajesz za komplet
-        punktów w parku, po zamknięciu wyprawy.
+        Zdobyte: <strong>{earned}</strong> z {FEATURES.length}. Większość dostajesz za punkty
+        wyprawy, część miejsc ma próg niższy niż komplet. Dotknij pieczątki, żeby zobaczyć,
+        za co dokładnie jest ta jedna.
       </p>
       <div className="stamps-grid">
         {sorted.map((f) => (
@@ -34,6 +44,7 @@ export function StampsModal({ open, onClose }: { open: boolean; onClose: () => v
             size="md"
             showName
             fallback={<Trees />}
+            onClick={onPick ? () => onPick(f.id) : undefined}
           />
         ))}
       </div>

@@ -3284,3 +3284,86 @@
   margin: 0 0 var(--sp-2);
   color: var(--content-accent);
 }
+
+/* ── Mini mapa: obrys parku i numerowane punkty ────────────────────────────
+ * Bez kafli, bo drugi kontekst GL to drugi powód do zacinania. Schemat mówi
+ * dokładnie tyle, ile trzeba: co jest z której strony parku.
+ */
+.app-minimap {
+  display: block;
+  width: 100%;
+  height: 190px;
+  margin: 0 0 var(--sp-4);
+  border-radius: 18px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+}
+
+.app-minimap__park {
+  fill: var(--map-visited-fill);
+  fill-opacity: 0.55;
+  stroke: var(--map-visited-stroke);
+  stroke-width: 2;
+}
+
+.app-minimap__me {
+  fill: var(--content-accent);
+  fill-opacity: 0.35;
+}
+
+.app-minimap__pin circle {
+  fill: var(--bg-surface);
+  stroke: var(--content-accent);
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.app-minimap__pin text {
+  fill: var(--content-accent);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.app-minimap__pin.-on circle {
+  fill: var(--content-accent);
+  stroke: var(--bg-surface);
+}
+
+.app-minimap__pin.-on text {
+  fill: var(--bg-surface);
+}
+
+/* lista miejsc: wiersze oddzielone odstępem, nie kreską, bo każdy jest kartą */
+.app-placelist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+/* „za co jest" na ekranie pieczątki: reguła wprost, nie zgadywanie z liczników */
+.stampscreen__rule {
+  margin: var(--sp-5) 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+}
+
+.stampscreen__rule-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--sp-2);
+  color: var(--content-accent);
+}
+
+.stampscreen__rule-text {
+  margin: 0;
+}
+
+.stampscreen__rule-extra {
+  margin: var(--sp-2) 0 0;
+}
