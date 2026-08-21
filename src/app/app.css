@@ -3385,3 +3385,14 @@
   font-size: 11px;
   line-height: 15px;
 }
+
+/* prawdziwa trasa pieszo: ciągła linia, bo to droga, nie kierunek */
+.app-tilemap__route {
+  fill: none;
+  stroke: var(--bg-lime);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  paint-order: stroke;
+  filter: drop-shadow(0 0 2px rgb(6 12 6 / 0.8));
+}

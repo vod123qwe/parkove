@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import parksData from './data/parks.json'
 import { distanceM, formatDistance } from './geo'
 import type { Pt } from './geo'
+import type { WalkRoute } from './data/walk-routes'
 
 /**
  * Mały kadr prawdziwej mapy, składany z kafli satelitarnych bez drugiej
@@ -29,11 +30,18 @@ const worldY = (lat: number, z: number) => {
 export function TileMap({
   parkId,
   point,
+  route,
   height = 132,
 }: {
   parkId: string
   /** miejsce, do którego prowadzimy: parking, kawiarnia, plac zabaw */
   point: Pt
+  /**
+   * Prawdziwa trasa pieszo, policzona routerem OSM i zapisana w danych. Gdy jest,
+   * rysujemy ją zamiast linii prostej, bo tylko ona odpowiada na pytanie „czy tam
+   * dojdę”. Bez niej zostaje kierunek i wyraźnie to piszemy.
+   */
+  route?: WalkRoute | null
   height?: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -67,8 +75,9 @@ export function TileMap({
 
   /* dobierz przybliżenie tak, żeby oba końce linii zmieściły się w kadrze */
   const pad = 26
-  const lons = [point[0], near.c[0]]
-  const lats = [point[1], near.c[1]]
+  const path: Pt[] = route?.line?.length ? (route.line as Pt[]) : [point, near.c]
+  const lons = path.map((c) => c[0])
+  const lats = path.map((c) => c[1])
   let z = 17
   for (; z > 11; z--) {
     const dx = Math.abs(worldX(Math.max(...lons), z) - worldX(Math.min(...lons), z))
@@ -109,10 +118,21 @@ export function TileMap({
             points={ring.map((c) => px([c[0], c[1]]).map((n) => n.toFixed(1)).join(',')).join(' ')}
           />
         ))}
-        <line className="app-tilemap__walk" x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} />
+        {route?.line?.length ? (
+          <polyline
+            className="app-tilemap__route"
+            points={route.line.map((c) => px(c as Pt).map((n) => n.toFixed(1)).join(',')).join(' ')}
+          />
+        ) : (
+          <line className="app-tilemap__walk" x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} />
+        )}
         <circle className="app-tilemap__spot" cx={a[0]} cy={a[1]} r={7} />
       </svg>
-      <span className="app-tilemap__label">{formatDistance(near.d)} do granicy, w linii prostej</span>
+      <span className="app-tilemap__label">
+        {route
+          ? `${formatDistance(route.m)} ścieżkami, około ${route.min} min`
+          : `${formatDistance(near.d)} do granicy, w linii prostej`}
+      </span>
     </div>
   )
 }

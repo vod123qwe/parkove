@@ -18,6 +18,7 @@ export const CHANGELOG: Release[] = [
     date: '2026-08-22',
     title: 'Every photograph looked at, twenty two of them thrown out',
     changes: [
+      ['added', 'The line from a parking is a real walking route now, not a straight line. Computed once with the OpenStreetMap foot router and stored, so the app needs no network in the field, and the label says the walking distance and time. This answers the question that matters: whether you can actually get there. Some answers are alarming. Zakrzowek is 391 metres in a straight line and 1.6 kilometres on paths, twenty one minutes, because a flooded quarry has cliffs. Brandysowka is 148 metres straight and 500 on paths. Dolina Raclawki turns 700 metres into three kilometres and forty minutes'],
       ['changed', 'Every place row carries its own frame of the map now, not one shared sketch above the list: satellite tiles, the park boundary, the spot itself and a dashed line to the nearest edge of the park with the distance. The line is straight and says so, because a real walking route cannot be computed offline; that is what the navigation arrow is for'],
       ['fixed', 'All eighty five point photographs reviewed on contact sheets, one by one, and twenty two of them showed something else than the point. Name matching cannot catch this: a file titled Park Jordana can perfectly well show the pond instead of the monument, which is exactly what happened'],
       ['fixed', 'The Jordan monument and the alley of busts had each other photographs. Swapped'],

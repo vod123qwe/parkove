@@ -3,6 +3,7 @@ import { Navigation } from 'lucide-react'
 import { IconButton, Modal, PlaceRow } from '../ds'
 import { TileMap } from './TileMap'
 import { OCCUPANCY_LABEL, PARKING } from './data/parking'
+import { walkRoute } from './data/walk-routes'
 
 const navigateTo = ([lng, lat]: [number, number]) => {
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank')
@@ -42,7 +43,7 @@ export function ParkingModal({
           <PlaceRow
             key={s.id}
             index={i + 1}
-            map={<TileMap parkId={parkId} point={s.coords} />}
+            map={<TileMap parkId={parkId} point={s.coords} route={walkRoute(parkId, s.id)} />}
             title={s.name}
             pills={[s.fee, s.occupancy ? OCCUPANCY_LABEL[s.occupancy] : null].filter(Boolean) as string[]}
             note={s.hint}
