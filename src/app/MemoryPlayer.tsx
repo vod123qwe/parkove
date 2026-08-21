@@ -99,6 +99,12 @@ export function MemoryPlayer({
   /** whatever the memory was opened into: the full screen version of it */
   const [openMark, setOpenMark] = useState<string | null>(null)
   const [openPoi, setOpenPoi] = useState<QuestPoi | null>(null)
+  /** a tap that closed an overlay must not carry on to the button underneath */
+  const closedAt = useRef(0)
+  const shut = (fn: () => void) => {
+    closedAt.current = performance.now()
+    fn()
+  }
 
   const timeline = (lineRef.current ??= buildTimeline(journey, points))
   const track = journey.track
@@ -160,13 +166,14 @@ export function MemoryPlayer({
       ;(window as unknown as { __pkReplay?: MapGL }).__pkReplay = map
     }
     // the bottom third carries the memory, so the walker rides above centre
-    map.setPadding({ top: 0, left: 0, right: 0, bottom: Math.round(window.innerHeight * 0.34) })
+    map.setPadding({ top: 0, left: 0, right: 0, bottom: Math.round(window.innerHeight * 0.44) })
 
     const paintOnce = async () => {
       const colors = pinColors()
       const trail = {
         line: colors.trailEdge,
         fill: colors.trailFill,
+        me: colors.trailMe,
       }
       for (const [id, img] of await buildPinImages(colors)) {
         if (!map.hasImage(id)) map.addImage(id, img)
@@ -273,9 +280,10 @@ export function MemoryPlayer({
         source: 'mem-me',
         paint: {
           'circle-radius': 9,
-          'circle-color': trail.line,
+          // the classic blue puck: the stops are green, so I am not
+          'circle-color': trail.me,
           'circle-stroke-width': 3,
-          'circle-stroke-color': trail.fill,
+          'circle-stroke-color': '#ffffff',
         },
       })
 
@@ -557,7 +565,14 @@ export function MemoryPlayer({
         <span style={{ '--b': '12px', '--from': '70%', '--to': '100%' } as CSSProperties} />
       </div>
 
-      <button className="memplay__back" aria-label="Wyjdź ze wspomnień" onClick={onClose}>
+      <button
+        className="memplay__back"
+        aria-label="Wyjdź ze wspomnień"
+        onClick={() => {
+          if (performance.now() - closedAt.current < 500) return
+          onClose()
+        }}
+      >
         <ChevronLeft size={20} />
       </button>
 
@@ -740,7 +755,7 @@ export function MemoryPlayer({
           <MemoryViewer
             marks={marks}
             startId={openMark}
-            onClose={() => setOpenMark(null)}
+            onClose={() => shut(() => setOpenMark(null))}
           />
         )}
 
@@ -748,7 +763,7 @@ export function MemoryPlayer({
           poi={openPoi}
           parkId={journey.parkId}
           collected
-          onClose={() => setOpenPoi(null)}
+          onClose={() => shut(() => setOpenPoi(null))}
         />
       </div>
     </div>

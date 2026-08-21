@@ -60,7 +60,13 @@ export async function addMark(input: {
   coords?: [number, number]
 }) {
   const db = await open()
-  const mark: WalkMark = { id: `m-${Date.now()}`, at: Date.now(), ...input }
+  // two marks made in the same millisecond would share an id, and then one of
+  // them could never be edited or deleted again
+  const mark: WalkMark = {
+    id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    at: Date.now(),
+    ...input,
+  }
   await new Promise((res, rej) => {
     const tx = db.transaction(STORE, 'readwrite')
     tx.objectStore(STORE).put(mark)

@@ -177,6 +177,7 @@ export function pinColors() {
     trailFill: v('--trail-fill'),
     trailEdge: v('--trail-edge'),
     trailIcon: v('--trail-icon'),
+    trailMe: v('--trail-me'),
     onPrimary: v('--content-on-primary'),
     paper: v('--bg-surface'),
     ink: v('--content-primary'),

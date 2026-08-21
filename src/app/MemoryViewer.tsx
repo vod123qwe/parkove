@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Move, StickyNote, Trash2, X } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Move, Trash2, X } from 'lucide-react'
 import { deleteMark, updateMark } from './photos'
 import { noteType } from './memory'
 import { WavePlayer } from './WavePlayer'
@@ -69,7 +70,7 @@ export function MemoryViewer({
     }
   }
 
-  return (
+  return createPortal(
     <div className="memview">
       <div className="memview__top">
         <button className="memview__close" aria-label="Zamknij" onClick={onClose}>
@@ -101,9 +102,6 @@ export function MemoryViewer({
             )}
             {m.kind === 'note' && (
               <div className="memview__note">
-                <span className="memview__kind">
-                  <StickyNote size={16} /> Notatka
-                </span>
                 {editing === m.id ? (
                   <textarea
                     className="memview__notefield"
@@ -181,6 +179,7 @@ export function MemoryViewer({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

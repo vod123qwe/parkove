@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.40.0'
+export const VERSION = '0.41.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,20 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.41.0',
+    date: '2026-08-21',
+    title: 'Three looks, a blue walker, and a memory that closes properly',
+    changes: [
+      ['changed', 'A replay offers three looks now and nothing else: Rzezba terenu, which it opens on, the same relief graded for night, and Grafit 3D. The imagery, the sepia and the rest are gone from here'],
+      ['changed', 'The walker is the classic blue puck with a white ring. In green it read as one more stop on the route'],
+      ['changed', 'The camera holds the walker higher up the screen, so a photo or a note arriving from below no longer lands on top of it'],
+      ['changed', 'The dial and the time above it sit 24 points lower'],
+      ['fixed', 'Closing a photo, note or recording opened during a replay used to close the replay with it and drop you on the walk screen. Both close buttons live in the same corner, so one tap could reach the second one as the first disappeared'],
+      ['fixed', 'Two memories saved in the same millisecond shared an id, and then one of them could never be edited or deleted'],
+      ['fixed', 'No more Notatka label above a note in the viewer'],
+    ],
+  },
   {
     version: '0.40.0',
     date: '2026-08-21',
