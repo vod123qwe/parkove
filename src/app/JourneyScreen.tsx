@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  Camera,
   Check,
   ChevronRight,
   Clock,
@@ -66,6 +65,7 @@ export function JourneyScreen({
   onClose: () => void
 }) {
   const { parks } = useGameState()
+  const [writing, setWriting] = useState(false)
   const marks = useMarks().filter((m) => m.journeyId === journey.id)
   const photos = marks.filter((m) => m.kind === 'photo' && m.url)
   const notes = marks.filter((m) => m.kind !== 'photo')
@@ -174,6 +174,8 @@ export function JourneyScreen({
             </Button>
           )}
 
+          {/* only what this screen does not already show below: the points, the
+              photos and the notes are all listed a few centimetres down */}
           <StatGrid className="journey__stats">
             <Stat
               icon={<Clock />}
@@ -185,67 +187,67 @@ export function JourneyScreen({
               value={`${(journey.distanceM / 1000).toFixed(1).replace('.', ',')} km`}
               label="dystans"
             />
-            {points.length > 0 && (
-              <Stat
-                icon={<MapPin />}
-                value={`${journey.points.length}/${points.length}`}
-                label="punkty"
-              />
-            )}
-            {photos.length > 0 && (
-              <Stat icon={<Camera />} value={String(photos.length)} label="zdjęcia" />
-            )}
-            {notes.length > 0 && (
-              <Stat icon={<StickyNote />} value={String(notes.length)} label="notatki" />
-            )}
           </StatGrid>
 
-          <h3 className="t-title journey__section">Notatka</h3>
-          <textarea
-            className="journey__note"
-            value={note}
-            rows={3}
-            placeholder="Jak było? Co zapamiętać z tego spaceru?"
-            onChange={(e) => setNote(e.target.value)}
-            onBlur={() => {
-              if (note !== (journey.note ?? '')) updateJourney(journey.id, { note: note.trim() })
-            }}
-          />
+          {note || writing ? (
+            <>
+              <h3 className="t-title journey__section">Notatka</h3>
+              <textarea
+                className="journey__note"
+                value={note}
+                rows={3}
+                autoFocus={writing && !note}
+                placeholder="Jak było? Co zapamiętać z tego spaceru?"
+                onChange={(e) => setNote(e.target.value)}
+                onBlur={() => {
+                  setWriting(false)
+                  if (note !== (journey.note ?? '')) updateJourney(journey.id, { note: note.trim() })
+                }}
+              />
+            </>
+          ) : (
+            <Button
+              full
+              variant="tonal"
+              icon={<StickyNote size={18} />}
+              className="journey__addnote"
+              onClick={() => setWriting(true)}
+            >
+              Dodaj notatkę
+            </Button>
+          )}
 
-          <h3 className="t-title journey__section">Zdjęcia</h3>
-          {photos.length > 0 && (
-            <PhotoDeck photos={photos} onOpen={setMarkId} />
+          {/* one section for everything the walk left behind, in the order it
+              happened, because a photo and a voice note are the same kind of
+              thing: something you stopped for */}
+          {marks.length > 0 && <h3 className="t-title journey__section">Co zostało po drodze</h3>}
+          {photos.length > 0 && <PhotoDeck photos={photos} onOpen={setMarkId} />}
+          {notes.length > 0 && (
+            <List>
+              {notes.map((m) => (
+                <ListItem
+                  key={m.id}
+                  icon={m.kind === 'audio' ? <Mic /> : <StickyNote />}
+                  leadTone="gold"
+                  title={
+                    m.caption || (m.kind === 'audio' ? 'Nagranie bez podpisu' : 'Pusta notatka')
+                  }
+                  meta={fmtClock(m.at)}
+                  className="-stacked"
+                  onClick={() => setMarkId(m.id)}
+                  trailing={<ChevronRight size={18} className="park-parking__chevron" />}
+                />
+              ))}
+            </List>
           )}
           <PhotoButton
             parkId={journey.parkId}
             journeyId={journey.id}
             coords={journey.track[journey.track.length - 1]}
-            label={photos.length ? 'Dodaj kolejne zdjęcie' : 'Dodaj zdjęcie do tej wyprawy'}
+            label={marks.length ? 'Dodaj kolejne zdjęcie' : 'Dodaj zdjęcie do tej wyprawy'}
             variant="tonal"
             onSaved={setMarkId}
           />
-
-          {notes.length > 0 && (
-            <>
-              <h3 className="t-title journey__section">Notatki i nagrania</h3>
-              <List>
-                {notes.map((m) => (
-                  <ListItem
-                    key={m.id}
-                    icon={m.kind === 'audio' ? <Mic /> : <StickyNote />}
-                    leadTone="gold"
-                    title={
-                      m.caption || (m.kind === 'audio' ? 'Nagranie bez podpisu' : 'Pusta notatka')
-                    }
-                    meta={fmtClock(m.at)}
-                    className="-stacked"
-                    onClick={() => setMarkId(m.id)}
-                    trailing={<ChevronRight size={18} className="park-parking__chevron" />}
-                  />
-                ))}
-              </List>
-            </>
-          )}
 
           {points.length > 0 && (
             <>

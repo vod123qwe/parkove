@@ -6,6 +6,7 @@ import { usePhotos } from './photos'
 import { getName, greeting, initials, setName as saveName } from './profile'
 import { KIND_META } from './kinds'
 import { questForPark } from './data/quests'
+import { isParkComplete } from './progress'
 import { VERSION } from '../changelog'
 import type { ParkFeature } from './ParkSheet'
 
@@ -54,11 +55,15 @@ export function ProfileModal({
     [journeys],
   )
 
-  // recently earned stamps first, so the carousel shows the newest win
+  /*
+   * A stamp is a finished place, the same rule the ceremony after a walk uses.
+   * Visiting is a different, lower bar: that one shows up as a filled square on
+   * the board above and as the colour on the map.
+   */
   const earned = useMemo(
     () =>
       parks
-        .filter((p) => progress[p.id])
+        .filter((p) => isParkComplete(p.id, progress))
         .sort((a, b) => (progress[b.id]?.firstAt ?? '').localeCompare(progress[a.id]?.firstAt ?? '')),
     [parks, progress],
   )
@@ -121,7 +126,7 @@ export function ProfileModal({
         </div>
 
         <StatGrid cols={3} className="prof-stats">
-          <Stat icon={<Award />} value={String(visitedCount)} label="pieczątki" />
+          <Stat icon={<Award />} value={String(earned.length)} label="pieczątki" />
           <Stat icon={<Footprints />} value={String(journeys.length)} label="wyprawy" />
           <Stat icon={<Route />} value={km.toFixed(1).replace('.', ',')} label="kilometry" />
         </StatGrid>
@@ -151,7 +156,7 @@ export function ProfileModal({
           </Carousel>
         ) : (
           <p className="t-body-sm park-muted prof-empty">
-            Pierwszą pieczątkę dostaniesz przy pierwszej wizycie w parku.
+            Pieczątkę dostaniesz za przejście miejsca, nie za samo wejście.
           </p>
         )}
       </section>

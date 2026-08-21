@@ -50,7 +50,17 @@ export type QuestPoi = {
   radius: number
 }
 
-export type Quest = { parkId: string; pois: QuestPoi[] }
+export type Quest = {
+  parkId: string
+  pois: QuestPoi[]
+  /**
+   * How many points earn the stamp. Missing means all of them, which is right
+   * for a park you can finish in an afternoon. A place too big for one visit,
+   * like a valley in the Jura, sets a lower bar and keeps the rest of the
+   * points as a reason to come back.
+   */
+  stampAt?: number
+}
 
 export const QUESTS: Quest[] = [
   {

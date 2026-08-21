@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.44.0'
+export const VERSION = '0.45.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.45.0',
+    date: '2026-08-21',
+    title: 'Less on the walk card, one meaning for a stamp',
+    changes: [
+      ['changed', 'The walk card lost three of its five counters. Points, photos and notes were all listed a few centimetres further down the same screen, so only the time and the distance stayed'],
+      ['changed', 'The empty note field no longer sits on every walk. There is a quiet Dodaj notatke instead, and the field appears when there is something to say'],
+      ['changed', 'Photos, notes and recordings share one section, Co zostalo po drodze, in the order they happened. A photo and a voice note are the same kind of thing: something you stopped for'],
+      ['fixed', 'A stamp meant two different things. The profile handed one out for showing up, while the ceremony after a walk only gave it for finishing a place. Now there is one rule, and a place may ask for fewer than all of its points, which is what a valley in the Jura will need'],
+    ],
+  },
   {
     version: '0.44.0',
     date: '2026-08-21',
