@@ -5,8 +5,18 @@
   right: 0;
   bottom: 0;
   min-height: var(--screen-h);
-  /* no clipping here on purpose: the map is allowed to spill past the bottom */
+  /*
+   * `clip`, nie `hidden`, i to jest cała przyczyna białego paska na telefonie.
+   * W CSS `overflow-x: hidden` z `overflow-y: visible` daje WYLICZONE
+   * `overflow-y: auto`: powłoka stawała się kontenerem przewijania i obcinała
+   * wylewkę mapy w pas za wskaźnikiem domu, więc świeciło tam tło dokumentu.
+   * `overflow-x: clip` zachowuje `overflow-y: visible`, sprawdzone na wyliczonych
+   * wartościach. Na komputerze env(safe-area-inset-bottom) to zero, dlatego błąd
+   * był niewidoczny w podglądzie i widać go było tylko na telefonie.
+   * `hidden` zostaje jako zapas dla Safari starszego niż 16.
+   */
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /*

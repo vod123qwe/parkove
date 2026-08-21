@@ -358,6 +358,17 @@ const KRAKOW_QUESTS: Quest[] = [
         findHint: 'Środek parku, największe drzewo przy głównej alei.',
         reveal:
           'Dąb ma tabliczkę pomnika przyrody, czyli status prawny silniejszy niż większość budynków w mieście. Drzewo można obalić tylko za zgodą urzędu, a budynek obok wyburzy się szybciej.',
+        dilemma: {
+          question:
+            'Stare drzewo w centrum z czasem zaczyna przeszkadzać: gałęzie nad alejką, korzenie pod chodnikiem. Ciąć czy przebudować to, co wokół?',
+          options: [
+            'Przebudować otoczenie, dąb był tu pierwszy',
+            'Ciąć, bezpieczeństwo ludzi jest ważniejsze',
+            'Dopiero po ekspertyzie dendrologa',
+          ],
+          counterpoint:
+            'Stustuletniego dębu nie odtworzysz w ciągu życia: nowe drzewo daje ten sam cień po trzydziestu latach. Ale spadająca gałąź to realne ryzyko, a odszkodowanie płaci miasto. Dendrolog zwykle potrafi uratować drzewo cięciem i przesunięciem alejki, tylko to droższe od piły, i dlatego drzewa padają.',
+        },
         sources: ['https://www.nawycieczke.pl/pl/atrakcja/park-miejski-w-skawinie'],
         coords: [19.82162, 49.97394],
         radius: 40,
@@ -2760,6 +2771,17 @@ const KRAKOW_QUESTS: Quest[] = [
           'Północny koniec sierpa, między zagajnikiem a rzeką: po jednej stronie woda stoi, po drugiej płynie.',
         reveal:
           'Meander odcina się sam: rzeka podmywa zewnętrzny brzeg zakrętu, aż przerwie szyję pętli i pójdzie na skróty. Tutaj skrót jest świeży na tyle, że stoisz między starym i nowym korytem naraz.',
+        dilemma: {
+          question:
+            'Starorzecze to woda stojąca: komary, szuwary, bałagan. Zostawić dzikie, czy przerobić na zadbany staw z pomostem?',
+          options: [
+            'Zostawić dzikie, to ostatni taki fragment',
+            'Przerobić, ludzie chcą tam siedzieć',
+            'Podzielić: pomost z jednej strony, dzicz z drugiej',
+          ],
+          counterpoint:
+            'Dzikie starorzecze trzyma gatunki, które z zadbanego stawu znikają w jednym sezonie, i przyjmuje wodę przy wysokim stanie rzeki. Ale miejsce, z którego nikt nie korzysta, traci obrońców przy cięciu budżetu: zadbany staw ma swoich ludzi, dzicz ma tylko przyrodników.',
+        },
         sources: ['https://pl.wikipedia.org/wiki/Skawina'],
         /*
          * Punkt stał wcześniej na środku obiektu `water=oxbow` z OSM i to był błąd,
