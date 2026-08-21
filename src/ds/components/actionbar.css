@@ -34,26 +34,29 @@
 
 .pk-actionbar__glass span {
   position: absolute;
-  inset: 0;
+  /* to samo co w nagłówku, tylko w górę: pasmo wystaje 28 px NAD pasek, a maska
+     gasi rozmycie do zera na jego górnej krawędzi, równo z alfa 0 gradientu */
+  inset: -28px 0 0;
   backdrop-filter: blur(var(--b));
   -webkit-backdrop-filter: blur(var(--b));
   mask-image: linear-gradient(
     to top,
-    #000 var(--from),
-    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
-    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
-    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
-    transparent var(--to)
+    #000 0,
+    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
+    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
+    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
+    transparent calc((100% - 28px) * var(--k))
   );
   -webkit-mask-image: linear-gradient(
     to top,
-    #000 var(--from),
-    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
-    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
-    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
-    transparent var(--to)
+    #000 0,
+    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
+    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
+    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
+    transparent calc((100% - 28px) * var(--k))
   );
 }
+
 
 .pk-actionbar__row {
   display: flex;

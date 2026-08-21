@@ -20,9 +20,10 @@ export function ActionBar({ children, className }: ActionBarProps) {
   return (
     <div className={cx('pk-actionbar', className)}>
       <div className="pk-actionbar__glass" aria-hidden="true">
-        <span style={{ '--b': '3px', '--from': '0%', '--to': '46%' } as CSSProperties} />
-        <span style={{ '--b': '9px', '--from': '22%', '--to': '72%' } as CSSProperties} />
-        <span style={{ '--b': '18px', '--from': '48%', '--to': '100%' } as CSSProperties} />
+        {/* najmocniejsze rozmycie najbliżej krawędzi, najsłabsze sięga najdalej */}
+        <span style={{ '--b': '18px', '--k': 0.46 } as CSSProperties} />
+        <span style={{ '--b': '9px', '--k': 0.72 } as CSSProperties} />
+        <span style={{ '--b': '3px', '--k': 1 } as CSSProperties} />
       </div>
       <div className="pk-actionbar__row">{children}</div>
     </div>

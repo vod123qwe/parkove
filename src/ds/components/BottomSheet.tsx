@@ -260,9 +260,10 @@ export function BottomSheet({
             przy dolnej krawędzi żaden, więc treść nie wchodzi pod szybę skokiem.
           */}
           <div className="pk-sheet__glass" aria-hidden="true">
-            <span style={{ '--b': '18px', '--from': '0%', '--to': '46%' } as CSSProperties} />
-            <span style={{ '--b': '9px', '--from': '0%', '--to': '72%' } as CSSProperties} />
-            <span style={{ '--b': '3px', '--from': '0%', '--to': '100%' } as CSSProperties} />
+            {/* --k: jak głęboko w strefę wygaszania sięga to pasmo (1 = do samego końca) */}
+            <span style={{ '--b': '18px', '--k': 0.46 } as CSSProperties} />
+            <span style={{ '--b': '9px', '--k': 0.72 } as CSSProperties} />
+            <span style={{ '--b': '3px', '--k': 1 } as CSSProperties} />
           </div>
           {handle && (
             <div className="pk-sheet__grab">

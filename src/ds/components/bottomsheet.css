@@ -73,28 +73,40 @@
 
 .pk-sheet__glass span {
   position: absolute;
-  inset: 0;
+  /*
+   * Pasmo wystaje 28 px PONIŻEJ nagłówka i to jest sedno miękkiego przejścia.
+   * backdrop-filter jest obcinany do własnego pudełka, a taki obcięty brzeg sam
+   * rysuje krawędź, nawet jeśli maska jest tam już przy zerze. Maska gasi więc
+   * rozmycie do zera na wysokości calc(100% - 28px), czyli dokładnie na dolnej
+   * krawędzi nagłówka i dokładnie tam, gdzie gradient tła ma alfa 0. Obcięcie
+   * wypada 28 px niżej, gdzie nie ma juz czego obcinać.
+   */
+  inset: 0 0 -28px;
   backdrop-filter: blur(var(--b));
   -webkit-backdrop-filter: blur(var(--b));
-  /* maska też wielostopniowa: dwa przystanki dają prostą, a prosta kończy się
-     widocznym progiem tam, gdzie rozmycie nagle mija */
   mask-image: linear-gradient(
     to bottom,
-    #000 var(--from),
-    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
-    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
-    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
-    transparent var(--to)
+    #000 0,
+    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
+    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
+    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
+    transparent calc((100% - 28px) * var(--k))
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
-    #000 var(--from),
-    rgb(0 0 0 / 0.72) calc(var(--from) + (var(--to) - var(--from)) * 0.45),
-    rgb(0 0 0 / 0.34) calc(var(--from) + (var(--to) - var(--from)) * 0.72),
-    rgb(0 0 0 / 0.1) calc(var(--from) + (var(--to) - var(--from)) * 0.88),
-    transparent var(--to)
+    #000 0,
+    rgb(0 0 0 / 0.72) calc((100% - 28px) * var(--k) * 0.45),
+    rgb(0 0 0 / 0.34) calc((100% - 28px) * var(--k) * 0.72),
+    rgb(0 0 0 / 0.1) calc((100% - 28px) * var(--k) * 0.88),
+    transparent calc((100% - 28px) * var(--k))
   );
 }
+
+/* pudelko szyby moze wystawac: samo nic nie rysuje */
+.pk-sheet__glass {
+  overflow: visible;
+}
+
 
 /*
  * Tło nagłówka gasło wcześniej na ostatnich 28 px, więc oko łapało linię tam,
