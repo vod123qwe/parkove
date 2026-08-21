@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.46.0'
+export const VERSION = '0.47.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.47.0',
+    date: '2026-08-21',
+    title: 'All the valleys, and photographs of them',
+    changes: [
+      ['added', 'Four more valleys: Bedkowska with the highest waterfall in the Jura and its largest cave, Raclawki with a numbered nature trail across 474 hectares, Eliaszowki where the Carmelites named the springs after saints, and Szklarki with its tors. Seven valleys, 32 points'],
+      ['added', 'Photographs. Every valley has a hero picture and seven points carry their own, all from Wikimedia Commons with the author and licence in the data. One arrived from a weir in a different region entirely and was thrown out'],
+      ['changed', 'Szklarki asks for two points out of three, because only three things in it are catalogued by name'],
+    ],
+  },
   {
     version: '0.46.0',
     date: '2026-08-21',

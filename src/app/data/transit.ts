@@ -71,6 +71,31 @@ export const TRANSIT: Record<string, TransitInfo> = {
     verified: false,
   },
 
+  'dolina-bedkowska': {
+    stop: 'Będkowice',
+    mode: 'bus',
+    note: 'Autobusy aglomeracyjne w stronę Bębła i Jerzmanowic. Będkowice to najwygodniejszy punkt startowy, bo stąd wchodzi się w środek doliny.',
+    verified: false,
+  },
+  'dolina-raclawki': {
+    stop: 'Dubie lub Krzeszowice',
+    mode: 'both',
+    note: 'Koleją do Krzeszowic, dalej autobusem albo kilka kilometrów spacerem do Dubia, gdzie zaczyna się dolina. Najdalsza z Dolinek, więc samochód mocno pomaga.',
+    verified: false,
+  },
+  'dolina-eliaszowki': {
+    stop: 'Czerna, klasztor',
+    mode: 'both',
+    note: 'Koleją do Krzeszowic, potem autobusem do Czernej. Od klasztoru wchodzi się prosto w dolinę.',
+    verified: false,
+  },
+  'dolina-szklarki': {
+    stop: 'Szklary',
+    mode: 'bus',
+    note: 'Autobusy w stronę Jerzmanowic i Olkusza. Dnem doliny biegnie droga, więc dojazd jest łatwy, a spacer mniej dziki niż w pozostałych dolinach.',
+    verified: false,
+  },
+
 }
 
 export const MODE_LABEL: Record<TransitInfo['mode'], string> = {

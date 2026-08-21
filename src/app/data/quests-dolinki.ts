@@ -31,6 +31,8 @@ export const DOLINKI_QUESTS: Quest[] = [
           'Od Bolechowic idź na północ około 800 metrów. Bramy nie da się przegapić: droga wchodzi dokładnie między dwie skały.',
         reveal:
           'Nazwy filarom nadali wspinacze jeszcze przed drugą wojną światową i tak zostało do dziś. Cała brama leży w rezerwacie przyrody Wąwóz Bolechowicki.',
+        photo: '/photos/dolina-bolechowicka.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         sources: ['https://pl.wikipedia.org/wiki/Brama_Bolechowicka'],
         coords: [19.78474, 50.15271],
         radius: 60,
@@ -55,6 +57,8 @@ export const DOLINKI_QUESTS: Quest[] = [
           counterpoint:
             'Wspinacze byli tu przed rezerwatem: nazwy filarów są starsze niż ochrona. Z drugiej strony ściana obwieszona ludźmi to nie jest miejsce, w którym cokolwiek wysiaduje jaja. Dzisiejsza zasada jest próbą pogodzenia jednego z drugim, a nie zwycięstwem którejkolwiek strony.',
         },
+        photo: '/photos/bolechowicka-mur.jpg',
+        photoCredit: 'Fot. Wikipedysta Artur · CC BY 2.5 PL · Wikimedia Commons',
         sources: ['https://pl.wikipedia.org/wiki/Brama_Bolechowicka'],
         coords: [19.784335, 50.152757],
         radius: 40,
@@ -73,6 +77,8 @@ export const DOLINKI_QUESTS: Quest[] = [
           'Idź dnem doliny w głąb, za bramę. Wodospad jest przy potoku, słychać go przed zobaczeniem.',
         reveal:
           'Wodospady na Jurze są rzadkie, bo wapień przecieka: woda woli zniknąć w szczelinie niż spaść z progu. Ten się utrzymał.',
+        photo: '/photos/bolechowicka-wodospad.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 3.0 · Wikimedia Commons',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Bolechowicka'],
         coords: [19.783778, 50.156439],
         radius: 40,
@@ -127,6 +133,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Idąc od wejścia z Kobylan, skała stoi tuż nad ścieżką.',
         reveal:
           'Dolina Kobylańska nosi też nazwy Dolina Karniowska i Jar Kobylański. Trzy nazwy na jedną dolinę, bo sąsiednie wsie nazywały ją każda po swojemu.',
+        photo: '/photos/dolina-kobylanska.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Kobyla%C5%84ska'],
         coords: [19.756272, 50.155951],
         radius: 40,
@@ -240,6 +248,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Wschodnie zbocze, ścieżka w górę od dna doliny. Skały stoją nad drogą do Zelkowa.',
         reveal:
           'Dolina Kluczwody nazywana jest też Doliną Wierzchówki. Płynący jej dnem potok Kluczwoda kończy bieg w Rudawie.',
+        photo: '/photos/kluczwody-maczne.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Kluczwody'],
         coords: [19.818716, 50.164246],
         radius: 60,
@@ -272,6 +282,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         findHint: 'Wschodnie zbocze w dolnej części rezerwatu. Skały widać z dna doliny.',
         reveal:
           'Nazwy skał w tych dolinach mają dwie warstwy: starszą od okolicznych wsi, mówiącą o zamkach i strażnicach, i młodszą od wspinaczy, mówiącą o filarach i turniach.',
+        photo: '/photos/kluczwody-zamkowa.jpg',
+        photoCredit: 'Fot. Januszk Krzyżek · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.829182, 50.160463],
         radius: 45,
       },
@@ -289,6 +301,313 @@ export const DOLINKI_QUESTS: Quest[] = [
           'Skały tej doliny są przewiercone szczelinami na wylot. To one prowadzą wodę, która przez miliony lat zrobiła z płaskowyżu dolinę.',
         coords: [19.819667, 50.154667],
         radius: 30,
+      },
+    ],
+  },
+  {
+    parkId: 'dolina-bedkowska',
+    // 8 km doliny, więc pieczątka po trzech punktach, resztę zbierasz kiedyś potem
+    stampAt: 3,
+    pois: [
+      {
+        id: 'szum',
+        category: 'water',
+        name: 'Wodospad Szum',
+        teaser: 'Najwyższy wodospad Jury, na progu, który zbudował mech.',
+        description: [
+          'Szum, zwany też Wodospadem Szerokim, jest jednym z niewielu i zarazem najwyższym wodospadem na Wyżynie Krakowsko-Częstochowskiej. Woda Będkówki spada tu z progu wysokiego na cztery metry.',
+          'Ten próg nie jest zwykłą skałą. To martwica wapienna, czyli wapień, który osadził się na mchach i wątrobowcach: rośliny obrastały wodę, woda odkładała na nich wapń, a po nich został kamień w kształcie roślin.',
+          'Progi w tej dolinie tworzyły się między ośmioma a sześcioma tysiącami lat temu, w cieplejszym okresie zwanym optimum atlantyckim. Stoisz przed czymś, co wyhodowała woda razem z mchem.',
+        ],
+        findHint: 'Dno doliny między schroniskiem Brandysówka a Brandysową Polaną. Słychać go, zanim się go zobaczy.',
+        reveal:
+          'Próg wodospadu jest zbudowany z martwicy wapiennej, którą osadziły mchy i wątrobowce od ośmiu tysięcy lat. Wodospad nie wyżarł tej skały, tylko na niej wyrósł.',
+        dilemma: {
+          question:
+            'Ten próg powstał przez sześć tysięcy lat, warstwa po warstwie, na żywym mchu. Wystarczy chodzić po nim butami, żeby przestał rosnąć. Czy najciekawsze miejsca powinny być otwarte dla wszystkich?',
+          options: ['Otwarte, ludzie to zrozumieją', 'Z barierką i ścieżką', 'Zamknięte, jeśli krucha'],
+          counterpoint:
+            'Miejsce, którego nikt nie widzi, nie ma nikogo, kto by go bronił. Ale rzecz, która rośnie milimetr na dekadę, nie odbuduje się przez to, że ktoś obiecał uważać. Ścieżka i barierka są nudnym kompromisem, który zwykle działa.',
+        },
+        sources: ['https://pl.wikipedia.org/wiki/Szum_(wodospad)'],
+        coords: [19.743411, 50.174809],
+        radius: 40,
+      },
+      {
+        id: 'nietoperzowa',
+        category: 'cave',
+        name: 'Jaskinia Nietoperzowa',
+        teaser: 'Największa jaskinia Jury, nazwana od nietoperzy, których kości w niej znaleziono.',
+        description: [
+          'Jaskinia Nietoperzowa, zwana też Jaskinią Zygmunta, leży w górnej części Doliny Będkowskiej i jest największą jaskinią całej Wyżyny Krakowsko-Częstochowskiej.',
+          'Nazwa nie jest przesadzona. Znaleziono tu bogate szczątki kopalnych nietoperzy i wciąż mieszkają tu gatunki żywe. Jaskinia jest jednym z tych miejsc, gdzie zwierzęta były wcześniej niż ludzie i zostały dłużej.',
+          'Wejście jest udostępnione do zwiedzania, więc to jedyny punkt w naszych dolinach, do którego wchodzi się z przewodnikiem i biletem.',
+        ],
+        findHint: 'Górna część doliny, po stronie Jerzmanowic. Przy jaskini tablica i wejście dla zwiedzających.',
+        reveal:
+          'To największa jaskinia Wyżyny Krakowsko-Częstochowskiej. Nazwę wzięła od nietoperzy: i tych kopalnych, i tych, które nadal tu zimują.',
+        sources: ['https://pl.wikipedia.org/wiki/Jaskinia_Nietoperzowa'],
+        coords: [19.774532, 50.19395],
+        radius: 45,
+      },
+      {
+        id: 'dupa-slonia',
+        category: 'climb',
+        name: 'Dupa Słonia',
+        teaser: 'Skała wspinaczkowa z nazwą, której nikt nie zapomina.',
+        description: [
+          'Nad Brandysową Polaną, kilkadziesiąt metrów od wodospadu, stoi skała o nazwie, która mówi wszystko o tym, jak wspinacze nazywają rzeczy: opisowo i bez ceremonii.',
+          'Cała ta część doliny jest rejonem wspinaczkowym, a polana pod skałami służy jako baza. W pogodny weekend jest tu więcej lin niż ludzi na szlaku.',
+        ],
+        findHint: 'Skała nad Brandysową Polaną, zaraz przy wodospadzie Szum.',
+        reveal:
+          'Nazwy skał w Dolinie Będkowskiej wymyślali wspinacze i to widać: obok Dupy Słonia znajdziesz Stumilowy Kras i Żabajowe Plecy.',
+        coords: [19.743373, 50.175866],
+        radius: 35,
+      },
+      {
+        id: 'zrodlo-bedkowki',
+        category: 'water',
+        name: 'Źródło Będkówki',
+        teaser: 'Miejsce, w którym zaczyna się potok, który wyżłobił całą dolinę.',
+        description: [
+          'Będkówka spływa z Wyżyny Olkuskiej do Rowu Krzeszowickiego i to ona zrobiła tę dolinę: siedem do ośmiu kilometrów, jedną z najdłuższych na Wyżynie Krakowsko-Częstochowskiej.',
+          'Źródło jest zwykle niepozorne. Cała robota jest niewidoczna: dzieje się pod ziemią, w wapieniu, i trwa dłużej niż wszystko, co ma imię.',
+        ],
+        findHint: 'Dno doliny, powyżej Będkowic. Woda wychodzi przy ścieżce.',
+        reveal:
+          'Dolina Będkowska ciągnie się od obniżenia przy drodze krajowej z Krakowa do Olkusza aż do przysiółka Łączki. Wszystko to jest dzieło jednego potoku.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_B%C4%99dkowska'],
+        coords: [19.753531, 50.181715],
+        radius: 35,
+      },
+      {
+        id: 'laczki',
+        category: 'cave',
+        name: 'Schroniska w Łączkach',
+        teaser: 'Trzy skalne schroniska przy dolnym wylocie doliny.',
+        description: [
+          'Dolina kończy się w przysiółku Łączki, a przy jej wylocie, w skałach, otwierają się trzy niewielkie schroniska, oznaczone po prostu numerami.',
+          'Takie schronisko to nie jaskinia z korytarzami, a wnęka wygryziona przez wodę w wapieniu. Dawniej pod nimi koczowano, bo dawały dach bez budowania go.',
+        ],
+        findHint: 'Dolny wylot doliny, po stronie Łączek. Otwory w skale kilka metrów nad ścieżką.',
+        reveal:
+          'W Dolinie Będkowskiej takich schronisk i jaskiń jest kilkadziesiąt. Nazwane są tylko te, które ktoś zmierzył i opisał.',
+        coords: [19.738284, 50.14893],
+        radius: 40,
+      },
+    ],
+  },
+  {
+    parkId: 'dolina-raclawki',
+    // 9 km i 474 ha, czyli najwieksze miejsce w calej apce
+    stampAt: 3,
+    pois: [
+      {
+        id: 'zamczysko',
+        category: 'view',
+        name: 'Zamczysko',
+        teaser: 'Wzniesienie nad doliną, na którym coś stało, choć nie wiadomo dokładnie co.',
+        description: [
+          'W zboczach Doliny Racławki wznosi się kilka wzniesień: Komarówka, Widoma i Zamczysko. To ostatnie ma w nazwie zamek, a niedaleko leżą ruiny, które ludzie nazywają tak samo.',
+          'Dolina jest tu krótka na spojrzenie i długa na nogi: ma dziewięć kilometrów krętego przebiegu i opada z północy na południe. Z Zamczyska widać, jak się wije.',
+        ],
+        findHint: 'Zbocze w środkowej części doliny, ścieżka w górę od dna.',
+        reveal:
+          'Wylot Doliny Racławki spotyka się w Dubiu z wylotem Doliny Szklarki, na wysokości około 275 metrów. Dwie doliny kończą się w jednym miejscu.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Rac%C5%82awki'],
+        coords: [19.683741, 50.163543],
+        radius: 50,
+      },
+      {
+        id: 'jaskinia-zarska',
+        category: 'cave',
+        name: 'Jaskinia Żarska',
+        teaser: 'Zimna Grota Żarska w Wąwozie Żarskim, na końcu ścieżki edukacyjnej.',
+        description: [
+          'Jaskinia Żarska, zwana też Schroniskiem Żarskim Dużym albo Zimną Grotą Żarską, leży w Wąwozie Żarskim, jednym z kilku wąwozów wcinających się w zbocza Racławki.',
+          'Prowadzi do niej ścieżka edukacyjna, więc to jedno z niewielu miejsc w naszych dolinach, gdzie ktoś przygotował drogę i opisał, co się po niej mija.',
+          'Nazwa Zimna Grota nie jest poetycka. W jaskini trzyma się temperatura, która w lecie wydaje się lodowata.',
+        ],
+        findHint: 'Wąwóz Żarski, po wschodniej stronie doliny. Ścieżka edukacyjna prowadzi pod samo wejście.',
+        reveal:
+          'Do jaskini prowadzi ścieżka edukacyjna z numerowanymi przystankami. Ten wąwóz jest jej drugim przystankiem.',
+        sources: ['https://pl.wikipedia.org/wiki/Jaskinia_%C5%BBarska'],
+        coords: [19.70363, 50.164977],
+        radius: 40,
+      },
+      {
+        id: 'lom-pisarski',
+        category: 'history',
+        name: 'Łom Pisarski',
+        teaser: 'Stary kamieniołom, w którym widać cztery epoki geologiczne naraz.',
+        description: [
+          'Łom Pisarski to dawny kamieniołom i jeden z przystanków ścieżki edukacyjnej. Odsłonił coś, czego nie zobaczyłbyś w nietkniętym zboczu: warstwy skał ułożone jedna na drugiej.',
+          'Dolina Racławki ma skomplikowaną budowę: wyżłobiona jest w wapieniach z dewonu, karbonu i górnej jury, a między nimi leżą pokłady piaskowców. To rzadkość, żeby na dziewięciu kilometrach spotkać tak różne epoki.',
+          'Kamieniołom, który zwykle jest raną w krajobrazie, tutaj pełni rolę podręcznika.',
+        ],
+        findHint: 'Zachodnia strona doliny, przy ścieżce edukacyjnej. Przystanek numer 5.',
+        reveal:
+          'Skały tej doliny pochodzą z dewonu, karbonu i górnej jury, czyli z przedziału ponad trzystu milionów lat. W jednym kamieniołomie widać kilka z nich.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Rac%C5%82awki'],
+        coords: [19.685259, 50.164414],
+        radius: 40,
+      },
+      {
+        id: 'martwica',
+        category: 'nature',
+        name: 'Martwica wapienna',
+        teaser: 'Skała, którą zrobiły rośliny. Przystanek ścieżki edukacyjnej.',
+        description: [
+          'Martwica wapienna powstaje tam, gdzie woda bogata w wapń przepływa po mchach i wątrobowcach. Rośliny obrastają nurt, woda odkłada na nich wapń, a po roślinach zostaje kamień w ich kształcie.',
+          'To ta sama skała, z której zbudowany jest próg wodospadu Szum w Dolinie Będkowskiej. Ten sam mechanizm, dwie doliny obok siebie.',
+        ],
+        findHint: 'Przystanek numer 5 ścieżki edukacyjnej w dolnej części doliny.',
+        reveal:
+          'Martwica rośnie milimetry na dekadę i zapisuje w sobie kształt roślin, na których się osadziła. To skała, która była kiedyś mchem.',
+        coords: [19.684894, 50.168251],
+        radius: 35,
+      },
+      {
+        id: 'zrodlo-bazana',
+        category: 'water',
+        name: 'Źródło Bażana',
+        teaser: 'Przystanek dziesiąty: woda wychodząca u wylotu Wąwozu Stradlina.',
+        description: [
+          'Źródło Bażana leży w górnej części doliny, przy wylocie Wąwozu Stradlina. Ścieżka edukacyjna traktuje je jako osobny przystanek, bo źródła w wapieniu są tu regułą, a nie wyjątkiem.',
+          'Górna, bezleśna część doliny wygląda inaczej niż dolna: więcej nieba, mniej cienia i widać, skąd bierze się woda, która niżej rzeźbi wąwozy.',
+        ],
+        findHint: 'Górna część doliny, przy wylocie Wąwozu Stradlina. Przystanek numer 10.',
+        reveal:
+          'W zbocza Racławki wcina się kilka wąwozów: Stradlina, Żółtczany Dół, Żarnówczany Dół, Wąwóz Żarski i Zbrza. Każdy ma swoje źródła.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Rac%C5%82awki'],
+        coords: [19.675727, 50.174174],
+        radius: 40,
+      },
+    ],
+  },
+  {
+    parkId: 'dolina-eliaszowki',
+    stampAt: 3,
+    pois: [
+      {
+        id: 'zrodlo-eliasza',
+        category: 'water',
+        name: 'Źródło świętego Eliasza',
+        teaser: 'Źródło z imieniem proroka, w dolinie karmelitów.',
+        description: [
+          'Dolina Eliaszówki ciągnie się między Czerną a Paczółtowicami, a u jej wylotu stoi klasztor karmelitów bosych. To karmelici nazwali tutejsze źródła: świętego Eliasza, świętego Elizeusza, świętego Józefa.',
+          'Eliasz jest dla karmelitów postacią założycielską, prorokiem z góry Karmel. Dolina nosi jego imię i to samo imię nosi płynący nią potok.',
+          'Woda w wapieniu jest tu wszędzie, ale tylko tutaj każde źródło ma patrona.',
+        ],
+        findHint: 'Wschodnia część doliny, przy ścieżce. Obok tablica rezerwatu.',
+        reveal:
+          'Klasztor w Czernej jest podwójnym sanktuarium: Matki Bożej Szkaplerznej i świętego Rafała Kalinowskiego. Doliną chodzili pustelnicy, stąd nazwy źródeł.',
+        sources: ['https://pl.wikipedia.org/wiki/Klasztor_Karmelit%C3%B3w_Bosych_w_Czernej'],
+        coords: [19.639918, 50.172953],
+        radius: 35,
+      },
+      {
+        id: 'sw-antoni',
+        category: 'monument',
+        name: 'Kapliczka świętego Antoniego',
+        teaser: 'Jedna z kapliczek, które wyznaczają drogę doliną.',
+        description: [
+          'W dolinie stoi kilka kapliczek, między innymi świętego Antoniego i świętego Eliasza Proroka Karmelu. Nie są ozdobą krajobrazu, a jego znakami drogowymi: mówią, gdzie się zatrzymać.',
+          'Ta dolina jest z tego zrobiona. Klasztor u wylotu, pustelnie w zboczach, źródła z patronami i kapliczki po drodze. Krajobraz, który został urządzony przez modlitwę, a nie przez turystykę.',
+        ],
+        findHint: 'Przy ścieżce w górnej części doliny.',
+        reveal:
+          'Nazwy w tej dolinie nadał zakon, nie wspinacze. To jedyna z Dolinek Krakowskich, w której skały nie mają śmiesznych imion.',
+        coords: [19.639304, 50.174179],
+        radius: 30,
+      },
+      {
+        id: 'sknercza',
+        category: 'cave',
+        name: 'Jaskinia Sknercza',
+        teaser: 'Niewielka jaskinia w zboczu, z nazwą, która brzmi jak zarzut.',
+        description: [
+          'Sknercza jest jedną z jaskiń tej doliny. Wapień jest tu przewiercony na wylot: część otworów ma nazwy, większość nie ma nic.',
+          'Karmelici mieszkali w tych zboczach jako pustelnicy. Nie w tej konkretnej jaskini, ale w takim właśnie krajobrazie: skała, woda, cisza i klasztor na dole.',
+        ],
+        findHint: 'Zbocze w środkowej części doliny, otwór nad ścieżką.',
+        reveal:
+          'Dolina Eliaszówki jest najbardziej zabytkową z Dolinek: w promieniu kilkuset metrów mieszczą się ruiny mostów, dawna furta klasztorna i kilkadziesiąt obiektów historycznych.',
+        coords: [19.633557, 50.170645],
+        radius: 30,
+      },
+      {
+        id: 'siedem-progow',
+        category: 'cave',
+        name: 'Jaskinia za Siedmioma Progami',
+        teaser: 'Nazwa jak z bajki, a chodzi o siedem skalnych stopni.',
+        description: [
+          'Jaskinia za Siedmioma Progami leży w górnej części doliny. Nazwa jest opisem drogi: żeby do niej dojść, mija się kolejne skalne stopnie w dnie wąwozu.',
+          'Progi w tych dolinach to zwykle martwica wapienna, ta sama skała, którą osadziły mchy nad wodą. Idziesz więc po stopniach, które wyhodowała roślina.',
+        ],
+        findHint: 'Górna część doliny, powyżej kapliczek. Trzeba iść wąwozem w górę.',
+        reveal:
+          'Progi w dnie tych dolin nie są wykute ani ułożone. To osad, który woda odłożyła na mchach i wątrobowcach przez tysiące lat.',
+        coords: [19.636159, 50.175],
+        radius: 35,
+      },
+    ],
+  },
+  {
+    parkId: 'dolina-szklarki',
+    // trzy punkty na dziewieciokilometrowej dolinie, wiec dwa wystarcza na pieczatke
+    stampAt: 2,
+    pois: [
+      {
+        id: 'brodlo',
+        category: 'climb',
+        name: 'Brodło',
+        teaser: 'Największy ostaniec doliny, widoczny z drogi.',
+        description: [
+          'Brodło jest największym z ostańców wierzchowinowych Doliny Szklarki. Ostaniec to skała, która została, gdy wszystko wokół niej zostało rozpuszczone i zabrane przez wodę.',
+          'W tej dolinie takich skał jest więcej: Witkowe Skały, Łyse Skały, Chochołowe Skały, Cisówki, Kozłowe Skały. Na części z nich wspinają się wspinacze.',
+          'Uczciwie: dnem tej doliny biegnie asfaltowa droga i jest ona częściowo zabudowana. To najbardziej oswojona z naszych dolin, ale zbocza i skały nadrabiają.',
+        ],
+        findHint: 'Skała widoczna z drogi biegnącej dnem doliny, w jej dolnej części.',
+        reveal:
+          'Dolina Szklarki ma około dziewięciu kilometrów i ciągnie się od Jerzmanowic przez Szklary do Dubia, gdzie jej wylot spotyka się z wylotem Doliny Racławki.',
+        photo: '/photos/dolina-szklarki.jpg',
+        photoCredit: 'Fot. marek7400 · CC BY 3.0 · Wikimedia Commons',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Szklarki'],
+        coords: [19.717043, 50.17755],
+        radius: 45,
+      },
+      {
+        id: 'bukowe-skaly',
+        category: 'nature',
+        name: 'Bukowe Skały',
+        teaser: 'Wapienne skałki w zboczu, w cieniu buczyny.',
+        description: [
+          'Zbocza Doliny Szklarki są zalesione i pełne wapiennych skałek. Bukowe Skały noszą nazwę od tego, co je otacza, a nie od tego, jak wyglądają.',
+          'Dolina jest fragmentem Parku Krajobrazowego Dolinki Krakowskie i mimo asfaltu w dnie ma wszystko, co reszta: potok w wapieniu, skały w zboczach i ciszę kilka metrów od drogi.',
+        ],
+        findHint: 'Zbocze doliny, ścieżka w górę spod drogi.',
+        reveal:
+          'Potok Szklarka uchodzi do Racławki. Te dwie doliny są parą: kończą się w tym samym miejscu, w Dubiu.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Szklarki'],
+        coords: [19.721486, 50.195163],
+        radius: 40,
+      },
+      {
+        id: 'zrodlo-pioro',
+        category: 'water',
+        name: 'Źródło Pióro',
+        teaser: 'Woda wychodząca z wapienia w górnej części doliny.',
+        description: [
+          'Źródło Pióro leży w górnym odcinku doliny, po stronie Jerzmanowic. Nazwa jest stara i nikt już nie wie, od czego dokładnie pochodzi.',
+          'Źródła są tu głównym bohaterem, choć najmniej efektownym. To one, kropla po kropli, zrobiły w płaskiej wyżynie dziewięć kilometrów doliny.',
+        ],
+        findHint: 'Górna część doliny, przy ścieżce w dnie.',
+        reveal:
+          'Dolinki Krakowskie to osiem dolin i wszystkie mają ten sam mechanizm: woda plus wapień plus czas. Różnią się tym, co po drodze zdążył postawić człowiek.',
+        coords: [19.729485, 50.197518],
+        radius: 35,
       },
     ],
   },

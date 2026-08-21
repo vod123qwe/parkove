@@ -92,3 +92,43 @@ chcemy przerzedzić.
 - Cztery dalsze doliny: Będkowska (8,1 km, więc raczej dwa miejsca), Szklarki,
   Racławki, Eliaszówki (727 odcinków ścieżek i 42 obiekty historyczne).
 - Numery linii autobusowych do sprawdzenia w terenie (`verified: false`).
+
+## Runda druga (v0.47.0): pozostałe cztery doliny i zdjęcia
+
+Siedem dolin z ośmiu wchodzących w skład Parku Krajobrazowego Dolinki
+Krakowskie. Brakuje Doliny Czubrówki, która jest kontynuacją Racławki i nie ma
+własnego rezerwatu ani osobnego zestawu nazwanych obiektów.
+
+| Dolina | Obszar | Skąd granica | Punkty | Pieczątka |
+|---|---|---|---|---|
+| Kluczwody | 34,9 ha | rezerwat (OSM) | 5 | 3 |
+| Bolechowicka | 21,3 ha | rezerwat (OSM) | 5 | 3 |
+| Kobylańska | 72,7 ha | otoczka obiektów w jarze | 5 | 3 |
+| Będkowska | 268,8 ha | korytarz 170 m wokół osi doliny | 5 | 3 |
+| Racławki | 473,9 ha | rezerwat (OSM) | 5 | 3 |
+| Eliaszówki | 109,2 ha | rezerwat (OSM) | 4 | 3 |
+| Szklarki | 169,4 ha | korytarz 200 m wokół potoku | 3 | 2 |
+
+Wieloboki uproszczone algorytmem Douglasa-Peuckera z tolerancją 0,00012 stopnia
+(ok. 13 m): Racławki 445 → 174 punkty, Będkowska 338 → 190. `parks.json` waży
+68 KB. **Gotcha:** DP na zamkniętym pierścieniu zwija go do jednego punktu, bo
+pierwszy punkt równa się ostatniemu i wszystkie odległości wychodzą zerowe.
+Trzeba ciąć pierścień na dwie połówki i upraszczać każdą osobno.
+
+### Zdjęcia
+
+`scripts/fetch-photos-dolinki.mjs`, 15 zdjęć z Wikimedia Commons, wszystkie z
+podpisem i licencją w danych. Każde miejsce ma hero, siedem punktów ma własne
+zdjęcie. Odrzucone: „Jaz górecko kościelne" przyszedł na zapytanie o wodospad
+Szum i był z zupełnie innego regionu, więc wyleciał. Commons rate-limituje
+serie, przy większej liczbie zapytań trzeba 9 sekund przerwy.
+
+### Czego nadal nie ma
+
+- Wodospad **Szum** i **Sokolica** bez własnych zdjęć (Sokolica jest w galerii
+  Będkowskiej, ale nie jako punkt).
+- **Kopiec Bzowskich** (50,1639 / 19,7549) leży poza wszystkimi wielobokami,
+  ma zdjęcie i mocną historię. Kandydat na osobne miejsce przy Będkowicach.
+- **Diabelski Most** i **klasztor w Czernej** leżą poza rezerwatem Eliaszówki,
+  więc są tylko w opisie i w galerii.
+- Numery linii autobusowych: wszystkie wpisy `verified: false`.

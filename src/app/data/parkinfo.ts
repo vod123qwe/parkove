@@ -719,6 +719,11 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     },
   },
   'dolina-bolechowicka': {
+    photos: [
+      { src: '/photos/dolina-bolechowicka.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/bolechowicka-wodospad.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 3.0 · Wikimedia Commons' },
+      { src: '/photos/bolechowicka-mur.jpg', credit: 'Fot. Wikipedysta Artur · CC BY 2.5 PL · Wikimedia Commons' },
+    ],
     description: [
       "Rezerwat Wąwóz Bolechowicki, jedna z ośmiu dolin Parku Krajobrazowego Dolinki Krakowskie, około 15 km od Rynku. Wejście zamyka Brama Bolechowicka: dwie wapienne skały wysokie na 25 metrów, widoczne z daleka.",
       "To najkrótsza z podkrakowskich dolinek, około 1,5 kilometra, i najbardziej efektowna na wejściu. Dnem płynie potok Bolechówka, a kilkaset metrów za bramą jest dwustopniowy wodospad, rzadkość na Jurze.",
@@ -731,6 +736,9 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     },
   },
   'dolina-kobylanska': {
+    photos: [
+      { src: '/photos/dolina-kobylanska.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+    ],
     description: [
       "Jar Kobylański, zwany też Doliną Karniowską, około 16 km od Rynku. Najbardziej wspinaczkowa z trzech dolin: kilkadziesiąt wapiennych skał po obu stronach, z nazwami wymyślonymi przez wspinaczy.",
       "Dno doliny jest łagodne i szerokie, więc idzie się wygodnie, a skały ma się nad głową po obu stronach. Po drodze źródło, mała jaskinia i miejsca na piknik.",
@@ -743,6 +751,11 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     },
   },
   'dolina-kluczwody': {
+    photos: [
+      { src: '/photos/dolina-kluczwody.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/kluczwody-maczne.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/kluczwody-zamkowa.jpg', credit: 'Fot. Januszk Krzyżek · CC BY-SA 4.0 · Wikimedia Commons' },
+    ],
     description: [
       "Rezerwat Dolina Kluczwody, nazywanej też Doliną Wierzchówki, około 14 km od Rynku, czyli najbliżej z całych Dolinek. Dolina ma około sześciu kilometrów, rezerwat obejmuje jej najciekawszy odcinek.",
       "Tu jest najwięcej historii: zrekonstruowane słupy graniczne z czasów rozbiorów, skały o nazwach Zamkowa Skała i Zamkowa Strażnica, i jaskinie w Mącznej Skale. Górny odcinek doliny, koło Wierzchowia, ma największe jaskinie całej Jury.",
@@ -751,6 +764,69 @@ export const PARK_INFO: Record<string, ParkInfo> = {
     amenities: {
       playground: { has: false, note: "Placu zabaw nie ma." },
       food: { has: false, note: "Nic w dolinie. Sklep w Białym Kościele albo w Wierzchowiu." },
+      verified: false,
+    },
+  },
+
+  'dolina-bedkowska': {
+    photos: [
+      { src: '/photos/dolina-bedkowska.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/bedkowska-sokolica.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 3.0 · Wikimedia Commons' },
+    ],
+    description: [
+      "Najdłuższa z Dolinek Krakowskich: siedem do ośmiu kilometrów doliny potoku Będkówka, od drogi z Krakowa do Olkusza aż do przysiółka Łączki. Jedna z najdłuższych dolin całej Wyżyny Krakowsko-Częstochowskiej.",
+      "Tu są dwa rekordy naraz. Wodospad Szum jest najwyższym wodospadem Jury, a Jaskinia Nietoperzowa jej największą jaskinią. Między nimi kilkadziesiąt skał wspinaczkowych i cała dolina do przejścia.",
+      "Ośmiu kilometrów nie robi się w jedno popołudnie i nie trzeba: pieczątka przychodzi po trzech punktach. Najwygodniej zwiedzać ją od Będkowic.",
+    ],
+    amenities: {
+      playground: { has: false, note: "Placu zabaw nie ma, ale polany nad potokiem robią swoje." },
+      food: { has: true, note: "Schronisko Brandysówka w dnie doliny, blisko wodospadu Szum." },
+      verified: false,
+    },
+  },
+  'dolina-raclawki': {
+    photos: [
+      { src: '/photos/dolina-raclawki.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 3.0 · Wikimedia Commons' },
+    ],
+    description: [
+      "Największe miejsce w całej apce: rezerwat o powierzchni prawie 474 hektarów, dolina długa na dziewięć kilometrów, między Racławicami a Dubiem. Najdalsza z naszych dolin, około 22 km od Rynku.",
+      "To dolina do czytania. Biegnie nią ścieżka edukacyjna z numerowanymi przystankami: budowa geologiczna, łęg olszowy, martwica wapienna, buczyna karpacka, chronione gatunki. Ktoś włożył w to pracę i widać ją na miejscu.",
+      "Geologicznie jest tu najciekawiej z całej Jury: wapienie z dewonu, karbonu i górnej jury plus pokłady piaskowców, a w zboczach kilka wąwozów z własnymi nazwami i źródłami.",
+    ],
+    amenities: {
+      playground: { has: false, note: "Bez placu zabaw. To rezerwat, nie park." },
+      food: { has: false, note: "Nic w dolinie. Najbliżej w Dubiu albo Krzeszowicach." },
+      verified: false,
+    },
+  },
+  'dolina-eliaszowki': {
+    photos: [
+      { src: '/photos/dolina-eliaszowki.jpg', credit: 'Fot. Kgbo · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/eliaszowki-czerna.jpg', credit: 'Fot. Cancre · CC BY-SA 4.0 · Wikimedia Commons' },
+    ],
+    description: [
+      "Dolina między Czerną a Paczółtowicami, około 25 km od Rynku, z klasztorem karmelitów bosych u wylotu. Najbardziej zabytkowa z Dolinek i jedyna, w której nazwy nadał zakon, a nie wspinacze.",
+      "Źródła mają tu patronów: świętego Eliasza, świętego Elizeusza, świętego Józefa. W zboczach jaskinie, po drodze kapliczki, a niżej ruiny mostów i dawnej furty klasztornej.",
+      "Klasztor w Czernej jest podwójnym sanktuarium: Matki Bożej Szkaplerznej i świętego Rafała Kalinowskiego. Warto go dołożyć do wyprawy, choć leży już poza rezerwatem.",
+    ],
+    amenities: {
+      playground: { has: false, note: "Placu zabaw nie ma." },
+      food: { has: false, note: "W dolinie nic. Zaplecze przy klasztorze w Czernej." },
+      verified: false,
+    },
+  },
+  'dolina-szklarki': {
+    photos: [
+      { src: '/photos/dolina-szklarki.jpg', credit: 'Fot. marek7400 · CC BY 3.0 · Wikimedia Commons' },
+    ],
+    description: [
+      "Dolina potoku Szklarka, dziewięć kilometrów od Jerzmanowic przez Szklary do Dubia, gdzie jej wylot spotyka się z wylotem Doliny Racławki. Około 21 km od Rynku.",
+      "Uczciwie: dnem biegnie asfaltowa droga i dolina jest częściowo zabudowana. To najbardziej oswojona z Dolinek. Ratują ją zalesione zbocza pełne wapiennych skałek i ostańców.",
+      "Największe z nich to Brodło, Witkowe Skały, Łyse Skały, Chochołowe Skały, Cisówki i Kozłowe Skały. Na części z nich wspinają się wspinacze.",
+    ],
+    amenities: {
+      playground: { has: false, note: "Placu zabaw nie ma." },
+      food: { has: false, note: "Wsie w dnie doliny, więc sklep bywa po drodze." },
       verified: false,
     },
   },
