@@ -38,3 +38,23 @@ Kopiec Wandy, Jaskinia Nietoperzowa, Brama Bolechowicka.
 108 punktów w 46 miejscach. Każdy ma opis, puentę i dylemat. Źródła zapisane
 przy 39, czyli przy dolinkach i Skawinie: starsze parki krakowskie pisaliśmy
 przed wprowadzeniem pola `sources` i to jedyna dziura w tej warstwie.
+
+## Decyzje z grilla o mapie i o liście punktów (2026-08-22)
+
+**Reflektor na mapie (zbudowane).** Wybór parku przyciemnia całą mapę poza jego
+granicą: jeden wielokąt na świat z dziurą w kształcie parku. Park w reflektorze
+traci wypełnienie i dostaje najgrubszą linię, bo chodzi o to, żeby zobaczyć, co
+jest w środku. Zasłona idzie nad pinami pieczątek (cudze parki gasną razem z
+mapą) i pod wszystkim, co dotyczy wybranego parku: jego punkty, udogodnienia,
+twój ślad i twoja kropka zostają czyste. Bez wyboru parki są mocniejsze niż
+dotąd: linia 2,2 px zamiast 1,6 i wypełnienie 36 procent zamiast 28 na satelicie.
+Rozmycia mapy nie da się zrobić: MapLibre nie ma blura w paincie, a filtr CSS
+rozmyłby całą kanwę razem z parkiem.
+
+**Lista punktów w trakcie wyprawy (do zbudowania).** Otwiera ją przycisk Punkty.
+Wiersze po dystansie, najbliższy nieodkryty na górze, zdobyte na końcu, wyszarzone.
+Dotknięcie punktu **ustawia cel**: karta live przestaje wybierać najbliższy i
+pokazuje ten wskazany. Przy celu ma być **strzałka kierunku** (Jarek zmienił tu
+wcześniejszą decyzję o braku kompasu), więc potrzebny jest kompas telefonu:
+`DeviceOrientationEvent.requestPermission()` po dotknięciu, a gdy nie ma zgody
+albo czujnika, zostaje sam dystans. Bez udawania strzałki.

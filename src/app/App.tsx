@@ -505,6 +505,7 @@ export function App() {
           else setAmenityKind(kind)
         }}
         hideStampFor={overlayParkId}
+        focusId={selectedId}
         photoPins={photoPins}
         onSelectPhoto={setPhotoId}
         placingPhoto={!!movingPhotoId}

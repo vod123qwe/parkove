@@ -85,6 +85,8 @@ type Props = {
   activeAmenityId: string | null
   /** stamp of this park steps aside so its quest pins stay readable */
   hideStampFor: string | null
+  /** park w reflektorze: reszta mapy dostaje ciemną zasłonę z dziurą w jego kształcie */
+  focusId?: string | null
   /** what the current walk left behind, drawn as thumbnails and small pins */
   photoPins: MarkPin[]
   onSelectPhoto: (id: string) => void
@@ -218,6 +220,42 @@ const photoFC = (pins: MarkPin[]) => ({
 
 const zoomForArea = (ha: number) => (ha > 150 ? 12.4 : ha > 40 ? 13.2 : ha > 8 ? 14 : 14.8)
 
+/**
+ * Zasłona reflektora: jeden wielokąt na cały świat z dziurą w kształcie
+ * wybranego parku. Dzięki temu przyciemnienie jest dokładnie po granicy parku,
+ * a środek zostaje w naturalnych kolorach zdjęcia satelitarnego. Bez parku
+ * zwraca pustą kolekcję, czyli zasłony nie ma.
+ */
+function focusFC(parkId: string | null) {
+  const empty = { type: 'FeatureCollection' as const, features: [] as never[] }
+  if (!parkId) return empty
+  const f = (parksData as { features: Array<{ id: string; geometry: { type: string; coordinates: unknown } }> }).features.find(
+    (x) => x.id === parkId,
+  )
+  if (!f) return empty
+  const world = [
+    [-180, -85],
+    [180, -85],
+    [180, 85],
+    [-180, 85],
+    [-180, -85],
+  ]
+  const holes =
+    f.geometry.type === 'Polygon'
+      ? (f.geometry.coordinates as number[][][])
+      : (f.geometry.coordinates as number[][][][]).flat()
+  return {
+    type: 'FeatureCollection' as const,
+    features: [
+      {
+        type: 'Feature' as const,
+        properties: {},
+        geometry: { type: 'Polygon' as const, coordinates: [world, ...holes] },
+      },
+    ],
+  }
+}
+
 export function MapView({
   visited,
   onSelect,
@@ -238,6 +276,7 @@ export function MapView({
   onSelectAmenity,
   activeAmenityId,
   hideStampFor,
+  focusId,
   photoPins,
   onSelectPhoto,
   placingPhoto,
@@ -253,6 +292,7 @@ export function MapView({
   const followRef = useRef(followMe)
   const parkingRef = useRef(parking)
   const stampPinsRef = useRef(stampPins)
+  const focusRef = useRef(focusId ?? null)
   const amenityPinsRef = useRef(amenityPins)
   const photoPinsRef = useRef(photoPins)
   const placingRef = useRef(placingPhoto)
@@ -270,6 +310,7 @@ export function MapView({
   followRef.current = followMe
   parkingRef.current = parking
   stampPinsRef.current = stampPins
+  focusRef.current = focusId ?? null
   amenityPinsRef.current = amenityPins
   photoPinsRef.current = photoPins
   placingRef.current = placingPhoto
@@ -396,6 +437,7 @@ export function MapView({
       'walk-photo-pins',
       'stamp-pin-hit',
       'stamp-pins-layer',
+      'focus-scrim',
       'amenity-pins',
       'parking-pin',
       'quest-poi-dots',
@@ -413,6 +455,7 @@ export function MapView({
       'amenities',
       'walk-photos',
       'stamp-pins',
+      'focus',
     ]
     const wipeAppLayers = () => {
       for (const id of APP_LAYERS) {
@@ -462,7 +505,8 @@ export function MapView({
         paint: {
           'fill-color': ['case', ['boolean', ['feature-state', 'visited'], false], c.visitedFill, c.unvisitedFill] as never,
           // imagery already shows the greenery: keep fills light there
-          'fill-opacity': currentStyleKey.current.startsWith('satellite') ? 0.28 : 0.55,
+          // podbite z 0.28: parki mają być widoczne z daleka, zdjęcie nadal przebija
+          'fill-opacity': currentStyleKey.current.startsWith('satellite') ? 0.36 : 0.6,
         },
       })
       map.addLayer({
@@ -471,7 +515,9 @@ export function MapView({
         source: 'parks',
         paint: {
           'line-color': ['case', ['boolean', ['feature-state', 'visited'], false], c.visitedStroke, c.unvisitedStroke] as never,
-          'line-width': 1.6,
+          // grubiej niż 1.6, a park w reflektorze dostaje najgrubszą linię, bo to
+          // ona jedna zostaje po zdjęciu wypełnienia
+          'line-width': 2.2,
         },
       })
       map.addSource('track', { type: 'geojson', data: trackFC(trackRef.current) as never })
@@ -641,12 +687,45 @@ export function MapView({
           'icon-offset': [0, -8],
         },
       })
-      // pins must never disappear behind a sticker
-      for (const layer of ['amenity-halo', 'amenity-pins', 'parking-pin', 'quest-poi-dots']) {
+      /*
+       * Zasłona reflektora idzie NAD piny pieczątek, żeby cudze parki też gasły,
+       * i POD wszystko, co dotyczy parku w reflektorze: jego punkty, udogodnienia,
+       * twój ślad i twoja kropka zostają czyste. Kolejność robi pétla niżej.
+       */
+      map.addSource('focus', { type: 'geojson', data: focusFC(focusRef.current) as never })
+      map.addLayer({
+        id: 'focus-scrim',
+        type: 'fill',
+        source: 'focus',
+        paint: { 'fill-color': '#05100a', 'fill-opacity': 0.46 },
+      })
+
+      // pins must never disappear behind a sticker, nor behind the scrim
+      for (const layer of [
+        'track-line',
+        'track-gap',
+        'me-halo-fill',
+        'me-dot',
+        'amenity-halo',
+        'amenity-pins',
+        'parking-pin',
+        'quest-poi-dots',
+        'walk-photo-pins',
+      ]) {
         if (map.getLayer(layer)) map.moveLayer(layer)
       }
-      for (const layer of ['amenity-hit', 'parking-hit', 'quest-poi-hit']) {
+      for (const layer of ['amenity-hit', 'parking-hit', 'quest-poi-hit', 'walk-photo-hit']) {
         if (map.getLayer(layer)) map.moveLayer(layer)
+      }
+      // po przebudowie warstw reflektor musi wrócić tam, gdzie był
+      if (focusRef.current) {
+        map.setFilter('parks-fill', ['!=', ['id'], focusRef.current] as never)
+        map.setPaintProperty('parks-line', 'line-width', [
+          'case',
+          ['==', ['id'], focusRef.current],
+          3.4,
+          2.2,
+        ] as never)
       }
       loadedRef.current = true
       syncVisited()
@@ -911,6 +990,26 @@ export function MapView({
     map.setFilter('stamp-pins-layer', filter as never)
     map.setFilter('stamp-pin-hit', filter as never)
   }, [hideStampFor])
+
+  /*
+   * Reflektor: zasłona bierze kształt dziury z wybranego parku, park traci
+   * wypełnienie (chodzi o to, żeby zobaczyć, co jest w środku) i dostaje
+   * najgrubszą linię, bo po zdjęciu wypełnienia zostaje mu tylko granica.
+   */
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !loadedRef.current || !map.getSource('focus')) return
+    ;(map.getSource('focus') as unknown as { setData: (d: unknown) => void }).setData(
+      focusFC(focusId ?? null),
+    )
+    if (!map.getLayer('parks-fill')) return
+    map.setFilter('parks-fill', focusId ? (['!=', ['id'], focusId] as never) : null)
+    map.setPaintProperty(
+      'parks-line',
+      'line-width',
+      focusId ? (['case', ['==', ['id'], focusId], 3.4, 2.2] as never) : 2.2,
+    )
+  }, [focusId])
 
   useEffect(() => {
     const map = mapRef.current
