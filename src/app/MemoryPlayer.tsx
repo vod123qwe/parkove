@@ -93,7 +93,7 @@ export function MemoryPlayer({
 
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
-  const [look, setLook] = useState<ReplayLook>('topo')
+  const [look, setLook] = useState<ReplayLook>('relief')
   useDarkChrome()
   const [looksOpen, setLooksOpen] = useState(false)
   /** whatever the memory was opened into: the full screen version of it */
@@ -144,7 +144,7 @@ export function MemoryPlayer({
     if (!holder.current || track.length === 0) return
     const map = new MapGL({
       container: holder.current,
-      style: replayStyle('topo'),
+      style: replayStyle('relief'),
       center: track[0],
       zoom: 16.6,
       pitch: 58,
@@ -297,6 +297,16 @@ export function MemoryPlayer({
      * swapped mid-paint and an add throws: without the finally, one failed
      * paint locked the map out of ever drawing the route again.
      */
+    /** everything the replay puts on the map, so a failed attempt can be undone */
+    const OURS = {
+      layers: ['mem-ahead-line', 'mem-done-line', 'mem-stop-hit', 'mem-stop-pins', 'mem-me-dot'],
+      sources: ['mem-track', 'mem-ahead', 'mem-done', 'mem-stops', 'mem-me'],
+    }
+    const wipe = () => {
+      for (const id of OURS.layers) if (map.getLayer(id)) map.removeLayer(id)
+      for (const id of OURS.sources) if (map.getSource(id)) map.removeSource(id)
+    }
+
     let painting = false
     /** a broken style must not be retried forever; reset on every new style */
     let tries = 0
@@ -306,8 +316,14 @@ export function MemoryPlayer({
       tries++
       try {
         await paintOnce()
+        readyRef.current = true
       } catch {
-        // the style changed under us; the next styledata will call again
+        // half a route is worse than none: clear it so the retry starts clean
+        try {
+          wipe()
+        } catch {
+          // the style went away entirely; nothing of ours is left on it
+        }
       } finally {
         painting = false
       }
@@ -318,7 +334,10 @@ export function MemoryPlayer({
     // setStyle wipes our layers, and 'style.load' is unreliable in v5
     map.on('styledata', () => {
       tries = 0
-      if (map.isStyleLoaded() && !map.getSource('mem-track')) void paint()
+      // isStyleLoaded also waits for every tile in view, which on the heavy
+      // looks is ten seconds of a walk with no route on it. Adding sources only
+      // needs the style itself, and a failed attempt now cleans up after itself
+      if (!map.getSource('mem-track')) void paint()
     })
     /*
      * A heavy look (raised ground, a whole vector city) is still settling when

@@ -201,18 +201,18 @@ export function resolveMapStyle(id: MapStyleId, isDark: boolean): { key: string;
  *   tiles we already load, so every colour is ours and the trail really pops;
  * - both extrude buildings, because in a flat city the buildings are the relief.
  */
-export type ReplayLook = 'topo' | 'topo-night' | 'graphite'
+export type ReplayLook = 'relief' | 'relief-night' | 'graphite'
 
 export const REPLAY_LOOKS: Array<{ id: ReplayLook; label: string }> = [
-  { id: 'topo', label: 'Rzeźba terenu' },
-  { id: 'topo-night', label: 'Rzeźba terenu w nocy' },
+  { id: 'relief', label: 'Rzeźba terenu' },
+  { id: 'relief-night', label: 'Rzeźba terenu w nocy' },
   { id: 'graphite', label: 'Grafit 3D' },
 ]
 
 const raster = (extra: Record<string, unknown>) => ({
-  id: 'topo',
+  id: 'sat',
   type: 'raster' as const,
-  source: 'topo',
+  source: 'sat',
   paint: extra as never,
 })
 
@@ -231,7 +231,15 @@ const buildings = (color: string, opacity: number) => ({
 })
 
 const SOURCES = {
-  topo: esri('World_Topo_Map', 23),
+  sat: {
+    type: 'raster' as const,
+    tiles: [
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    ],
+    tileSize: 256,
+    maxzoom: 19,
+    attribution: 'Esri, Maxar, Earthstar Geographics',
+  },
   ofm: {
     type: 'vector' as const,
     url: 'https://tiles.openfreemap.org/planet',
@@ -246,33 +254,33 @@ export function replayStyle(look: ReplayLook): StyleSpecification {
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
     sources: SOURCES,
   }
-  if (look === 'topo') {
+  if (look === 'relief') {
     return {
       ...base,
-      // a topographic map is a drawing of the ground, so the ground may as well
-      // be a model of itself: pushed to three times its height
+      // the ground at three times its height: in a flat city that is the only
+      // way the mounds, the quarry and the river valley read at all
       terrain: { source: 'dem', exaggeration: 3 },
-      layers: [
-        raster({ 'raster-saturation': -0.1, 'raster-contrast': 0.16 }),
-        hillshade(0.7),
-        buildings('#cfc7b2', 0.8),
-      ],
+      // no synthetic shading here on purpose: the imagery already carries the
+      // sun it was photographed under, and a second light fights the first
+      layers: [raster({ 'raster-saturation': -0.05, 'raster-contrast': 0.06 }), buildings('#dfe4d8', 0.55)],
     }
   }
-  if (look === 'topo-night') {
+  if (look === 'relief-night') {
     return {
       ...base,
       terrain: { source: 'dem', exaggeration: 3 },
       layers: [
-        // the same drawing, graded for night: cold, dark, almost a blueprint
+        // graded like film: cooler, darker, most of the colour taken out
         raster({
-          'raster-saturation': -0.4,
-          'raster-contrast': 0.22,
-          'raster-brightness-max': 0.42,
-          'raster-hue-rotate': 205,
+          'raster-saturation': -0.55,
+          'raster-contrast': 0.12,
+          'raster-brightness-max': 0.5,
+          'raster-hue-rotate': 200,
         }),
-        hillshade(0.85, { shadow: 'rgba(4, 10, 20, 0.7)', highlight: 'rgba(150, 190, 235, 0.35)' }),
-        buildings('#1d2a3a', 0.78),
+        // once the picture is this dark its own shadows stop describing the
+        // ground, so a cold synthetic light takes over
+        hillshade(0.8, { shadow: 'rgba(4, 10, 20, 0.72)', highlight: 'rgba(150, 190, 235, 0.34)' }),
+        buildings('#1d2a3a', 0.7),
       ],
     }
   }

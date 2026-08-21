@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.41.0'
+export const VERSION = '0.41.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.41.1',
+    date: '2026-08-21',
+    title: 'Relief means the photograph on raised ground',
+    changes: [
+      ['changed', 'Rzezba terenu is the satellite picture draped over ground at three times its height, and its night twin is the same picture graded cold. The topographic drawing stays available as a base on the start screen'],
+      ['fixed', 'Switching a look left the walk without its route, marker and pins for ten seconds or more. The route was waiting for every last tile in view, when all it needed was the style itself'],
+    ],
+  },
   {
     version: '0.41.0',
     date: '2026-08-21',
