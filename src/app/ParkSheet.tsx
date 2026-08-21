@@ -175,13 +175,9 @@ export function ParkSheet({
         scrimu, który połykał górną część kadru, a nazwa i tak walczyła z trawaą.
         Zdjęcia dostały własny slider w marginesach strony, jedno na ekran.
       */}
-      <p className="t-body-sm park-herometa">{heroMeta}</p>
-      <div className="park-gallery">
-        <PhotoSlider
-          images={gallery.map((p) => ({ src: asset(p.src), credit: shortCredit(p.credit) }))}
-          fallback={<Trees strokeWidth={1.5} />}
-          aria-label={`Zdjęcia: ${park.properties.name}`}
-        />
+      {/* pieczątka obok podpisu, nie na kadrze: na jaśniejszym zdjęciu znikała */}
+      <div className="park-titlerow">
+        <p className="t-body-sm park-herometa">{heroMeta}</p>
         <Stamp
           parkId={park.id}
           name={park.properties.name}
@@ -189,6 +185,13 @@ export function ParkSheet({
           size="md"
           fallback={<Trees />}
           className={`park-herostamp${visited ? '' : ' -locked'}`}
+        />
+      </div>
+      <div className="park-gallery">
+        <PhotoSlider
+          images={gallery.map((p) => ({ src: asset(p.src), credit: shortCredit(p.credit) }))}
+          fallback={<Trees strokeWidth={1.5} />}
+          aria-label={`Zdjęcia: ${park.properties.name}`}
         />
       </div>
       <div className="park-progress">
