@@ -61,11 +61,18 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'skawina-blonia': {
     /*
-     * Bez własnego zdjęcia i to jest świadome. Kartę prowadził pomnik Kazimierza
-     * Wielkiego, który stoi obok Sokoła w parku miejskim, nie tutaj: zdjęcie
-     * wróciło do swojego parku. Commons nie ma żadnej fotografii Błoń, więc
-     * pierwsze prawdziwe zdjęcie tego miejsca zrobisz sam, w trakcie wyprawy.
+     * Zdjęcie nie jest z Commons: Wikimedia nie ma ani jednej fotografii Błoń.
+     * To kadr Jarosława Karasińskiego z dobrefotografie.pl, wskazany przez Jarka,
+     * użyty z widocznym podpisem, ale BEZ wolnej licencji. Do wymiany, gdy
+     * będzie własne zdjęcie z wyprawy albo pisemna zgoda autora.
+     * źródło: https://dobrefotografie.pl (Skawina, ścieżka rekreacyjna, 2020-09-16)
      */
+    photos: [
+      {
+        src: '/photos/park-skawina-blonia-1.jpg',
+        credit: 'Fot. Jarosław Karasiński · dobrefotografie.pl',
+      },
+    ],
     description: [
       "Błonia Skawińskie to zielona przestrzeń na skraju miasta, blisko starorzecza Skawinki. Sześć hektarów łąk i alejek, które lokalnie pełnią rolę i parku, i terenu rekreacyjnego.",
       "Największy atut to otwarta przestrzeń i widok na dolinę rzeki, rzadki w gęsto zabudowanej Skawinie. Wiosną łąki się zielenią, a nad wodą pojawiają się ptaki.",

@@ -60,8 +60,14 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   const themed: Record<string, [string, string, string]> = {
     // parking mówi niebieskim, ale tym samym kształtem: ciemny krążek, biała obwódka
     parking: [colors.parkingFill, colors.paper, colors.parkingIcon],
-    food: [colors.foodSubtle, colors.foodBorder, colors.food],
-    playground: [colors.playSubtle, colors.playBorder, colors.play],
+    /*
+     * Jedzenie i place zabaw dostały ten sam układ co parking. Wcześniej niosły
+     * pastele z kart (jasne tło, kolorowa obwódka), które na zdjęciu satelitarnym
+     * robiły się białymi plamkami bez tożsamości. Teraz krążek jest ciemny w swoim
+     * odcieniu, obwódka biała, znak jasny: amber dla jedzenia, magenta dla placów.
+     */
+    food: [colors.mapFoodFill, colors.paper, colors.mapFoodIcon],
+    playground: [colors.mapPlayFill, colors.paper, colors.mapPlayIcon],
     // things you left yourself, told apart from the game and from the collection:
     // gold now belongs to the collection alone
     audio: [colors.accentStrong, colors.accentStrong, colors.lime],
@@ -195,5 +201,9 @@ export function pinColors() {
     playSubtle: v('--bg-play-subtle'),
     play: v('--content-play'),
     playBorder: v('--border-play'),
+    mapFoodFill: v('--map-food-fill'),
+    mapFoodIcon: v('--map-food-icon'),
+    mapPlayFill: v('--map-play-fill'),
+    mapPlayIcon: v('--map-play-icon'),
   }
 }

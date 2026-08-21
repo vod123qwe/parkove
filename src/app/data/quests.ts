@@ -2739,18 +2739,27 @@ const KRAKOW_QUESTS: Quest[] = [
       {
         id: 'starorzecze-blon',
         category: 'water',
-        name: 'Starorzecze na Błoniach',
-        teaser: 'Woda, która została po zakręcie rzeki.',
+        name: 'Stare koryto i nowe',
+        teaser: 'Sierp stojącej wody, a obok czynne koryto Skawinki.',
         description: [
-          'Ten zbiornik nie jest stawem: to fragment dawnego biegu Skawinki, odcięty od rzeki, kiedy ta zmieniła kurs. Starorzecza żyją inaczej niż rzeka, mają stojącą wodę, więcej roślin i własne ptaki.',
+          'Dwie wody kilkadziesiąt metrów od siebie i to jest cała atrakcja. Sierp stojącej wody to dawny bieg Skawinki, a rzeka płynie dziś prosto przez środek tej pętli, którą sama porzuciła.',
           'Nazwa rzeki mówi dokładnie o tym, co tu widzisz. W staropolszczyźnie „skać” znaczyło kręcić się, toczyć się, a Skawinka wije się meandrami przez cały swój bieg. Rzeka nazwana od kręcenia zostawiła po sobie zakręt.',
+          'Starorzecze żyje inaczej niż rzeka: woda stoi, roślin jest więcej, ptaki inne. Za kilkadziesiąt lat zarośnie całkiem i zostanie z niego wilgotna łąka.',
         ],
-        findHint: 'Zachodni skraj Błoń, woda za pasem drzew.',
+        findHint:
+          'Północny koniec sierpa, między zagajnikiem a rzeką: po jednej stronie woda stoi, po drugiej płynie.',
         reveal:
-          'Meander odcina się sam: rzeka podmywa zewnętrzny brzeg zakrętu, aż przerwie szyję pętli i pójdzie prosto. To, co zostaje z boku, nazywa się starorzeczem i zarasta w kilkadziesiąt lat.',
+          'Meander odcina się sam: rzeka podmywa zewnętrzny brzeg zakrętu, aż przerwie szyję pętli i pójdzie na skróty. Tutaj skrót jest świeży na tyle, że stoisz między starym i nowym korytem naraz.',
         sources: ['https://pl.wikipedia.org/wiki/Skawina'],
-        coords: [19.8165, 49.97133],
-        radius: 50,
+        /*
+         * Punkt stał wcześniej na środku obiektu `water=oxbow` z OSM i to był błąd,
+         * który Jarek wyłapał: starorzecze jest wygiętym sierpem, więc środek jego
+         * obwódki wypadał na CZYNNYM korycie, 17 m od rzeki i 51 m od właściwej
+         * wody. Teraz punkt stoi na północnym brzegu sierpa: 6 m od starorzecza,
+         * 27 m od rzeki, czyli tam, gdzie widzisz oba koryta.
+         */
+        coords: [19.8172, 49.97202],
+        radius: 45,
       },
       {
         id: 'miasta-partnerskie',

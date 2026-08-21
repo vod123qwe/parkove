@@ -83,11 +83,21 @@ const roles = {
   'bg-food-subtle': [t('F', 95), t('F', 22)],
   'content-food': [t('F', 38), t('F', 82)],
   'border-food': [t('F', 50), t('F', 65)],
+  /*
+   * Piny na mapie mówią innym rejestrem niż karty: ciemny krążek, biała
+   * obwódka, jasny znak. Pastelowe tło z karty ginęło na zdjęciu satelitarnym,
+   * więc jedzenie i place zabaw dostają ten sam układ co parking, tylko w swoim
+   * odcieniu: ciepły amber i magenta zamiast błękitu.
+   */
+  'map-food-fill': [t('F', 30), t('F', 26)],
+  'map-food-icon': [t('F', 88), t('F', 84)],
 
   // playgrounds
   'bg-play-subtle': [t('Y', 95), t('Y', 22)],
   'content-play': [t('Y', 42), t('Y', 84)],
   'border-play': [t('Y', 55), t('Y', 68)],
+  'map-play-fill': [t('Y', 32), t('Y', 26)],
+  'map-play-icon': [t('Y', 88), t('Y', 84)],
 }
 
 // Not tonal: overlays.
