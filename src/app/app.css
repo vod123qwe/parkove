@@ -970,12 +970,13 @@
  * przyciski mapy muszą się nad niego podnieść. Bez tego zasłaniały odległość do
  * następnego punktu i przycisk Punkty.
  */
+/* HUD wyprawy to karta plus przyciski plus podpisy: około 250 px */
 .app-shell.-walking .app-locate {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 210px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 272px);
 }
 
 .app-shell.-walking .app-look {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 210px + var(--control-md) + var(--sp-2));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 272px + var(--control-md) + var(--sp-2));
 }
 
 /* przygaszenie pod HUD, żeby białe podpisy przycisków czytały się na trawie */
@@ -1021,27 +1022,47 @@
   animation: exp-pulse 1.8s var(--ease-in-out) infinite;
 }
 
-/* karta „co dalej" nad przyciskami */
+/* karta „co dalej" nad przyciskami, klikalna */
 .app-nextstop {
-  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+  display: block;
+  width: 100%;
+  padding: var(--sp-4) var(--sp-5);
+  border: 0;
   border-radius: 26px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface-raised);
   box-shadow: var(--elevation-3);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    background var(--motion-fast) var(--ease-out);
+}
+
+.app-nextstop:active:not(:disabled) {
+  transform: scale(0.985);
+  background: var(--bg-surface-sunken);
+}
+
+.app-nextstop:disabled {
+  cursor: default;
 }
 
 /* postęp kreskami: jedna na punkt, zapalają się po kolei */
 .app-nextstop__dashes {
   display: flex;
-  gap: 3px;
-  margin-bottom: var(--sp-3);
+  gap: 4px;
+  margin-bottom: var(--sp-4);
 }
 
 .app-nextstop__dashes span {
   flex: 1;
-  height: 3px;
-  border-radius: 2px;
+  height: 4px;
+  border-radius: var(--radius-pill);
   background: var(--border-subtle);
+  /* zapalenie się kreski po zaliczeniu punktu ma być widoczne, a nie skokowe */
+  transition: background var(--motion-slow) var(--ease-out);
 }
 
 .app-nextstop__dashes span.is-on {
@@ -1078,17 +1099,31 @@
 
 .app-nextstop__away {
   flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  color: var(--content-secondary);
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  color: var(--content-primary);
+}
+
+/* jednostka przygaszona: liczba jest treścią, „m" tylko ją tłumaczy */
+.app-nextstop__unit {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--content-tertiary);
 }
 
 /* trzy okrągłe przyciski pod kartą, z podpisami */
+/* dna przycisków w jednej linii, więc i podpisy: większy środkowy wystaje
+   w górę, dokładnie jak w inspiracji */
 .app-expactions {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-around;
   gap: var(--sp-4);
   margin-top: var(--sp-6);
@@ -1121,8 +1156,17 @@
   transition: transform var(--motion-fast) var(--ease-out);
 }
 
-.app-expaction__btn:active {
-  transform: scale(0.94);
+/* dotknięcie: przycisk się ugina i szkło na moment jaśnieje */
+.app-expaction__btn:active:not(:disabled) {
+  transform: scale(0.9);
+  background: rgb(16 22 16 / 0.68);
+  border-color: rgb(255 255 255 / 0.34);
+}
+
+.app-expaction__btn.-primary:active {
+  transform: scale(0.92);
+  background: var(--bg-lime);
+  box-shadow: 0 0 0 10px rgb(201 242 77 / 0.22);
 }
 
 .app-expaction__btn:disabled {
@@ -1139,6 +1183,18 @@
   -webkit-backdrop-filter: none;
   color: var(--content-on-lime);
   box-shadow: 0 0 0 5px rgb(201 242 77 / 0.16);
+  /* oddech: pierścień żyje, dopóki trwa wyprawa */
+  animation: exp-ring 3.2s var(--ease-in-out) infinite;
+}
+
+@keyframes exp-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 5px rgb(201 242 77 / 0.16);
+  }
+  50% {
+    box-shadow: 0 0 0 9px rgb(201 242 77 / 0.08);
+  }
 }
 
 .app-expaction__btn.-open {
@@ -1158,7 +1214,7 @@
 .app-expbar {
   position: absolute;
   isolation: isolate;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-5));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -1659,7 +1715,8 @@
   min-height: 62px;
   padding: var(--sp-4) var(--sp-6);
   border: 1px solid rgb(255 255 255 / 0.22);
-  border-radius: 28px;
+  /* w pełni owalna, jak w inspiracji: promień większy niż połowa wysokości */
+  border-radius: var(--radius-pill);
   corner-shape: var(--corner-smooth);
   background: rgb(16 22 16 / 0.42);
   backdrop-filter: blur(18px) saturate(1.1);
@@ -1668,6 +1725,12 @@
   box-shadow: none;
   animation: add-rise 260ms var(--ease-out) both;
   animation-delay: calc(var(--rise, 0) * 55ms);
+}
+
+.app-addmenu .app-addmenu__item.pk-btn:active {
+  transform: scale(0.975);
+  background: rgb(16 22 16 / 0.62);
+  border-color: rgb(255 255 255 / 0.34);
 }
 
 .app-addmenu.-out .app-addmenu__item.pk-btn {
@@ -1716,6 +1779,11 @@
   color: var(--content-primary);
   box-shadow: var(--elevation-3);
   cursor: pointer;
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.app-addmenu__x:active {
+  transform: scale(0.92);
 }
 
 .app-addmenu__catch {

@@ -182,8 +182,17 @@ export function ExpeditionBar({
       )}
 
       <div className="app-expbar">
-        {/* co dalej: postęp kreskami, potem nazwa i odległość, bez strzałki */}
-        <div className="app-nextstop">
+        {/*
+          Karta jest przyciskiem: dotknięcie otwiera to, o czym mówi. Blisko to
+          historia następnego punktu, daleko karta miejsca. Bez tego była jedyną
+          rzeczą na ekranie, która wygląda jak kafelek i nic nie robi.
+        */}
+        <button
+          className="app-nextstop"
+          onClick={onOpenPoints}
+          disabled={!onOpenPoints}
+          aria-label={`${label}: ${name}`}
+        >
           {total > 0 && (
             <div className="app-nextstop__dashes" aria-label={`Zebrane ${done} z ${total}`}>
               {Array.from({ length: total }, (_, i) => (
@@ -196,9 +205,20 @@ export function ExpeditionBar({
               <span className="app-nextstop__label">{label}</span>
               <span className="t-body-strong app-nextstop__name">{name}</span>
             </div>
-            {away != null && <span className="app-nextstop__away">{formatDistance(away)}</span>}
+            {away == null && total > 0 && (
+              <span className="app-nextstop__away">
+                {done}
+                <span className="app-nextstop__unit">z {total}</span>
+              </span>
+            )}
+            {away != null && (
+              <span className="app-nextstop__away">
+                {formatDistance(away).replace(/\s*(m|km)$/, '')}
+                <span className="app-nextstop__unit">{formatDistance(away).endsWith('km') ? 'km' : 'm'}</span>
+              </span>
+            )}
           </div>
-        </div>
+        </button>
 
         <div className="app-expactions">
           <div className="app-expaction">

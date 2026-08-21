@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.51.0'
+export const VERSION = '0.51.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.51.1',
+    date: '2026-08-21',
+    title: 'The walking HUD, gone over detail by detail',
+    changes: [
+      ['fixed', 'The three labels under the buttons sat at different heights, because the bigger middle button pushed its own label down. The buttons now share a baseline and the lime one rises above it'],
+      ['fixed', 'The layers and locate buttons still overlapped the card, hiding the distance. They now sit above the whole HUD'],
+      ['changed', 'The card is a button: touching it opens what it is talking about, the story of the next point when close and the place when far. It used to be the only tile on screen that looked tappable and did nothing'],
+      ['changed', 'Press states everywhere: buttons sink and their glass brightens for a moment, the card sinks and tints, the lime one flares its ring. The lime ring also breathes slowly while a walk is running'],
+      ['changed', 'The distance carries two weights, a bold number and a muted unit, the dashes are inset from the card edge and thicker with rounded ends, and the menu pills are fully oval'],
+    ],
+  },
   {
     version: '0.51.0',
     date: '2026-08-21',
