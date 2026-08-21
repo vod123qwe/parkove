@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Camera, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, RefreshCw, Sparkles, ToyBrick, X } from 'lucide-react'
+import { Award, Camera, ChevronRight, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, Map as MapIcon, Menu, Palette, RefreshCw, Sparkles, ToyBrick, X } from 'lucide-react'
 import { BottomSheet, Button, IconButton, List, ListItem, PeekCard, ProgressRing, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
 import { asset } from './assets'
+import { getName, greeting } from './profile'
 import type { MapFocus } from './MapView'
 import { ParkSheet } from './ParkSheet'
 import type { ParkFeature } from './ParkSheet'
@@ -79,6 +80,7 @@ export function App() {
   /** one sticker opened up close */
   const [stampParkId, setStampParkId] = useState<string | null>(null)
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
   const [appearanceOpen, setAppearanceOpen] = useState(false)
@@ -494,8 +496,8 @@ export function App() {
           later; until then the map has it */}
       <header className="app-hud">
         {onWalk && <ExpeditionStatus />}
-        <button className="app-profilebtn" aria-label="Profil" onClick={() => setProfileOpen(true)}>
-          <CircleUserRound strokeWidth={1.75} />
+        <button className="app-profilebtn" aria-label="Menu" onClick={() => setMenuOpen(true)}>
+          <Menu strokeWidth={2} />
         </button>
       </header>
 
@@ -853,6 +855,67 @@ export function App() {
         collected={poiCard ? (progress[poiCard.parkId]?.points ?? []).includes(poiCard.poi.id) : false}
         onClose={() => setPoiCard(null)}
       />
+      {/*
+        Menu zamiast ikonki profilu: rzeczy, które dotąd trzeba było szukać w
+        środku profilu, stoją teraz na jednym poziomie. Profil jest jedną z
+        pozycji, a nie workiem na wszystko.
+      */}
+      <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
+        <List className="app-menu">
+          <ListItem
+            icon={<CircleUserRound />}
+            leadTone="accent"
+            title={greeting(getName())}
+            meta="Pieczątki, wyprawy, zdjęcia"
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setProfileOpen(true)
+            }}
+          />
+          <ListItem
+            icon={<ListIcon />}
+            title="Miejsca do odkrycia"
+            meta={`${FEATURES.length - 1} miejsc, ${completedIds.size} zdobytych`}
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setListOpen(true)
+            }}
+          />
+          <ListItem
+            icon={<Award />}
+            title="Pieczątki"
+            meta="Twoja kolekcja"
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setStampsOpen(true)
+            }}
+          />
+          <ListItem
+            icon={<MapIcon />}
+            title="Wygląd mapy"
+            meta="Satelita, Minimal albo rzeźba terenu"
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setMapStyleOpen(true)
+            }}
+          />
+          <ListItem
+            icon={<Palette />}
+            title="Wygląd aplikacji"
+            meta="Motyw jasny, ciemny albo auto"
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setAppearanceOpen(true)
+            }}
+          />
+        </List>
+      </BottomSheet>
+
       <ProfileModal
         open={profileOpen}
         onClose={() => setProfileOpen(false)}

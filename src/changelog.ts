@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.48.1'
+export const VERSION = '0.49.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.49.0',
+    date: '2026-08-21',
+    title: 'A list you can decide from, and a menu',
+    changes: [
+      ['changed', 'The places list sorts by how far it is from you instead of by the alphabet, groups into started, untouched and stamped, and carries a photograph of each place. Hectares are gone; the playground and coffee icons stay'],
+      ['changed', 'Tapping a cafe or a playground now selects that one place: the map centres on it, the pin grows and gets a ring, and a card names it. It used to open a list and send you to Google'],
+      ['changed', 'The profile icon at the top is a menu. Everything that used to be buried inside the profile now sits on one level, and the profile is one entry among them'],
+    ],
+  },
   {
     version: '0.48.1',
     date: '2026-08-21',
