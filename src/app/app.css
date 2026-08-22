@@ -3650,6 +3650,16 @@
   }
 }
 
+/* zwinieta atrybucja w odtwarzaniu: obecna, ale nie w kadrze */
+.memplay .maplibregl-ctrl-attrib-button {
+  opacity: 0.45;
+}
+
+.memplay .maplibregl-ctrl-bottom-right {
+  /* nad wlosem postepu, zeby sie nie nakladaly */
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 4px);
+}
+
 .memplay__map {
   position: absolute;
   top: 0;
@@ -3676,6 +3686,16 @@
   -webkit-backdrop-filter: blur(10px);
   color: #ffffff;
   cursor: pointer;
+  transition:
+    opacity 260ms var(--ease-out),
+    transform 260ms var(--ease-out);
+}
+
+/* wyglad gruntu ustawiasz raz, wiec moze sie schowac z reszta sterowania */
+.memplay__look.-off {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
 }
 
 .memplay__looks {
@@ -3715,12 +3735,17 @@
   color: var(--trail-icon);
 }
 
-/* the only thing at the top is the way out */
+/*
+ * Wyjscie zostaje widoczne zawsze, bo bez niego jestes tu uwieziony, ale
+ * przygasa razem ze schowanym sterowaniem. Bylo pelnym bialym kwadratem z
+ * cieniem, czyli po dialu najglosniejsza rzecza na ekranie: teraz szklo, takie
+ * jak przycisk warstw obok.
+ */
 .memplay__back {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + var(--sp-3));
   left: var(--sp-4);
-  z-index: 3;
+  z-index: 4;
   flex: none;
   display: grid;
   place-items: center;
@@ -3729,14 +3754,28 @@
   border: 0;
   border-radius: var(--radius-btn);
   corner-shape: var(--corner-smooth);
-  background: #ffffff;
-  color: var(--content-primary);
-  box-shadow: var(--elevation-2);
+  background: rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
   cursor: pointer;
+  transition: opacity 260ms var(--ease-out);
+}
+
+.memplay__back.-dim {
+  opacity: 0.5;
 }
 
 /* ---- the bottom: the map dissolves into darkness, then memory, clock, dial ---- */
 
+/*
+ * Ciemnosc jest zdarzeniem, nie meblem.
+ *
+ * Wczesniej rozmycie i czern wisialy na stale, bo karta wspomnienia raz
+ * pokazana nie schodzila z ekranu do konca seansu (setMemory nie bylo nigdzie
+ * czyszczone). Stad wrazenie kokpitu. Teraz jedno i drugie wjezdza razem z
+ * karta i schodzi razem z nia, a w spoczynku zostaje sam cichy cien na dole.
+ */
 .memplay__floor {
   position: absolute;
   left: 0;
@@ -3745,6 +3784,50 @@
   height: 60%;
   z-index: 1;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 420ms var(--ease-out);
+}
+
+.memplay__floor.-on {
+  opacity: 1;
+}
+
+.memplay__veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 420ms var(--ease-out);
+  /* the darkness reaches a little higher and lets go more slowly */
+  background: linear-gradient(
+    to top,
+    rgb(4 9 5 / 0.97) 0%,
+    rgb(4 9 5 / 0.95) 42%,
+    rgb(4 9 5 / 0.78) 66%,
+    rgb(4 9 5 / 0.42) 84%,
+    rgb(4 9 5 / 0.14) 94%,
+    transparent 100%
+  );
+}
+
+.memplay__veil.-on {
+  opacity: 1;
+}
+
+/* zawsze, zeby wlos postepu i dial mialy na czym stac na jasnym polu */
+.memplay__hem {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to top, rgb(4 9 5 / 0.5) 0%, rgb(4 9 5 / 0.18) 46%, transparent 100%);
 }
 
 .memplay__floor span {
@@ -3756,6 +3839,11 @@
   -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
 }
 
+/*
+ * Dol jest teraz przezroczysty i wysoki na tyle, ile tresc, a nie na 37 procent
+ * ekranu. Nie lapie dotkniec: pod nim lezy mapa, a dotkniecie mapy to pauza,
+ * wiec pusta przestrzen musi przepuszczac. Tresc lapie sama.
+ */
 .memplay__bottom {
   position: absolute;
   left: 0;
@@ -3766,20 +3854,56 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sp-4);
-  padding: var(--sp-20) var(--sp-5)
-    max(4px, calc(env(safe-area-inset-bottom, 0px) + var(--sp-3) - 24px));
+  padding: 0 var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
   color: #ffffff;
   text-align: center;
-  /* the darkness reaches a little higher and lets go more slowly */
-  background: linear-gradient(
-    to top,
-    rgb(4 9 5 / 0.97) 0%,
-    rgb(4 9 5 / 0.95) 42%,
-    rgb(4 9 5 / 0.78) 66%,
-    rgb(4 9 5 / 0.42) 84%,
-    rgb(4 9 5 / 0.14) 94%,
-    transparent 100%
-  );
+  pointer-events: none;
+}
+
+.memplay__memory,
+.memplay__hud {
+  pointer-events: auto;
+}
+
+/*
+ * Sterowanie schowane. Gasnie, gdy cos jedzie, i zostaje, gdy stoisz. Zjezdza
+ * przy tym o 12 px, bo samo zniknienie krycia wyglada jak zgubiona klatka.
+ */
+.memplay__hud {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  transition:
+    opacity 260ms var(--ease-out),
+    transform 260ms var(--ease-out);
+}
+
+.memplay__hud.-off {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+
+/* gdzie jestes w wyprawie: wlos na krawedzi, tylko do czytania */
+.memplay__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 3;
+  height: 2px;
+  background: rgb(255 255 255 / 0.14);
+  pointer-events: none;
+}
+
+.memplay__barfill {
+  display: block;
+  height: 100%;
+  transform-origin: left center;
+  background: var(--trail-edge);
+  opacity: 0.85;
 }
 
 .memplay__memory {
@@ -3937,11 +4061,20 @@
 
 /* ---- the dial: an arc of rounded ticks with a handle riding it ---- */
 
+/*
+ * Dial jest mniejszy o dobrych 38 procent powierzchni: 260 na 100 zamiast 330
+ * na 128. Byl najwiekszym obiektem na ekranie, a jest chromem, wiec konkurowal
+ * o uwage ze zdjeciem ze wspomnienia. Do tego zjechal nizej, bo znad niego
+ * zniknal osobny przycisk pauzy: teraz pauza to dotkniecie mapy.
+ *
+ * Skok palca (DIAL_THROW) zszedl razem z szerokoscia, ze 130 na 110 px, zeby
+ * raczka nadal jechala pod palcem jeden do jednego.
+ */
 .memplay__dial {
   position: relative;
-  width: min(330px, 100%);
+  width: min(260px, 76%);
   aspect-ratio: 300 / 116;
-  margin: var(--sp-2) auto 0;
+  margin: 0 auto;
   touch-action: none;
   cursor: grab;
 }
@@ -3977,26 +4110,6 @@
 
 .memplay__handlelayer {
   filter: drop-shadow(0 6px 14px rgb(0 0 0 / 0.55));
-}
-
-/* pause sits under the arc: it brings the handle back to the middle */
-.memplay__pause {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  margin: calc(-1 * var(--sp-6)) auto 0;
-  border: 0;
-  border-radius: 20px;
-  corner-shape: var(--corner-smooth);
-  background: rgb(255 255 255 / 0.12);
-  color: #ffffff;
-  cursor: pointer;
-  transition: background var(--motion-fast) var(--ease-out);
-}
-
-.memplay__pause:active {
-  background: rgb(255 255 255 / 0.2);
 }
 
 /* ---- a voice note drawn as its own waveform ---- */

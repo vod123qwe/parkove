@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.79.1'
+export const VERSION = '0.80.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,21 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.80.0',
+    date: '2026-08-22',
+    title: 'A memory is a film again, not a cockpit',
+    changes: [
+      ['changed', 'The replay plays by itself, at a pace that puts an hour and a half of walking into about two minutes, and the controls hide after two and a half seconds. At rest the screen is the map and nothing else: one dimmed way out and a hairline of progress along the bottom edge'],
+      ['changed', 'The walker stands at 67 percent down the screen instead of 28. With the camera behind and above, everything below the dot is ground already crossed and everything above it is the road ahead, so the old framing made the frame a rear view mirror. A racing game puts the car low for the same reason'],
+      ['fixed', 'The darkness is now an event rather than furniture. The real cause was that a memory card was never cleared once shown: there was no setMemory(null) anywhere in the file, so the first memory stayed for the rest of the replay and the darkness had to be permanent to be ready for it. A memory now leaves after a hundred and forty metres of further walking, or on a swipe down, and stays as long as you like while you are stopped'],
+      ['added', 'When a memory arrives the camera pulls back and the world sinks, then returns when you walk on. The whole frame changes register: I walk, I stop, I look'],
+      ['changed', 'Tapping the map stops and starts the walk, and the separate pause button is gone. There was a hidden conflict here, since tap to reveal the controls and tap to pause are the same gesture, so they do one thing: the tap stops the walk and shows you the handle springing back to the middle'],
+      ['changed', 'The dial is 38 percent smaller and sits at the very bottom. It was the largest object on the screen and it is a control, so it was competing with the photograph it was meant to sit under'],
+      ['added', 'A hairline at the bottom edge showing how far into the walk you are. There was no way to tell before'],
+      ['fixed', 'A negative frame delta could send a negative camera padding, MapLibre throws on that, and a throw inside a requestAnimationFrame callback kills the whole loop. The screen froze with the clock on zero and nothing to show why. The frame delta is now clamped to a sane range, which also stops a walk teleporting half a valley after the phone comes back from sleep'],
+    ],
+  },
   {
     version: '0.79.1',
     date: '2026-08-22',

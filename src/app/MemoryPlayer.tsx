@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import { ChevronLeft, Layers, Pause } from 'lucide-react'
+import { ChevronLeft, Layers } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
 import { MemoryViewer } from './MemoryViewer'
@@ -26,7 +26,12 @@ const SLOW_M = 30
 /** and it never drops below a third of the speed you asked for */
 const SLOW_FLOOR = 0.35
 /** and it stands still this long when the memory lands */
-const DWELL_MS = 1100
+/*
+ * Chwila nieruchomosci na dojsciu. Wydluzona z 1100, bo teraz w tym samym
+ * momencie kamera odjezdza, a odjazd potrzebuje jakichs 700 ms: ma sie zmiescic
+ * w ciszy, a nie zaczynac po niej.
+ */
+const DWELL_MS = 1400
 /** the camera aims at a point this far up the route, so it turns before you do */
 const LOOKAHEAD_M = 28
 /**
@@ -43,13 +48,50 @@ const ZOOM_SPAN = 1.5
 /** how long the camera takes to settle on a new heading, in ms */
 const TURN_TAU = 420
 /**
- * At the top the dial should skim a whole walk in under a minute, but the
- * bottom half has to stay usable, so the throttle is squared: half travel is
- * a tenth of the top speed.
+ * Predkosc, i czemu wlasnie tyle.
+ *
+ * Odpowiedz jest liczona od tego, ile ma trwac seans: poltoragodzinny marsz w
+ * domyslnym tempie ma zmiescic sie w okolo dwoch minutach. 5400 s przez 120 s to
+ * 45 razy szybciej, a przepustnica jest kwadratowa, wiec polowa skoku daje
+ * czwarta czesc maksimum. Stad 180.
+ *
+ * Domyslne tempo siedzi w POLOWIE skoku, nie na koncu, i to jest cala rzecz:
+ * raczka w spoczynku stoi tak, ze widac, ze mozna i szybciej, i wolniej.
  */
-const MAX_RATE = 90
+const MAX_RATE = 180
+/** gdzie parkuje raczka, gdy wyprawa jedzie sama */
+const CRUISE = 0.5
 /** travel of the handle, in pixels, from the middle to either end */
-const DIAL_THROW = 130
+const DIAL_THROW = 110
+/** po tylu ms bez dotkniecia sterowanie gasnie, jesli cos sie dzieje */
+const IDLE_HIDE_MS = 2500
+/**
+ * Karta wspomnienia schodzi po przejsciu tylu metrow dalszej drogi, a nie po
+ * ilu sekundach: predkosc jest zmienna, wiec sekundy dawalyby raz mrugniecie,
+ * raz wiecznosc. Minimum czasowe jest po to, zeby na pelnym gazie nie migala.
+ *
+ * Liczby wzialem z pomiaru, nie z powietrza. W domyslnym tempie wyprawa idzie
+ * jakies 40 m na sekunde ekranu, wiec 140 m to 3,5 s, a podloga 4,5 s daje na
+ * kazde wspomnienie tyle, ile trzeba na jedno spojrzenie. Przy pierwszej probie
+ * bylo 60 m i 2,5 s, i karta uciekala, zanim dalo sie przeczytac nazwe.
+ *
+ * Gdy stoisz, karta zostaje: metry przestaja rosnac, wiec warunek nie zachodzi.
+ */
+const CARD_CLEAR_M = 140
+const CARD_MIN_MS = 4500
+/**
+ * Gdzie w kadrze stoi chodzacy, jako czesc wysokosci ekranu.
+ *
+ * Padding od gory podnosi punkt zainteresowania: przy 0.34 chodzacy siedzi na
+ * 67 procentach wysokosci, czyli nisko, i wtedy kadr jest droga przed toba, a
+ * nie lusterkiem. Przy wspomnieniu przechodzimy na padding od dolu i chodzacy
+ * wedruje na 29 procent: kamera odjezdza, swiat opada, robi sie miejsce na
+ * karte. To ta sama zmiana rejestru, co "ide, staje, patrze".
+ */
+const WALK_PAD = 0.34
+const READ_PAD = 0.42
+/** jak szybko kadr przechodzi miedzy chodzeniem i czytaniem, w ms */
+const PAD_TAU = 260
 /** how long the walk takes to reach the speed you asked for: it spins up */
 const RATE_TAU = 480
 /** how far the arc opens to each side, in degrees */
@@ -108,6 +150,34 @@ export function MemoryPlayer({
 
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
+  /**
+   * Czy sterowanie jest widoczne. W spoczynku ekran jest sama mapa: dial i
+   * zegar wjezdzaja po dotknieciu i gasna po IDLE_HIDE_MS. Gdy stoisz, zostaja,
+   * bo skoro zatrzymales, to pewnie czytasz.
+   */
+  const [chrome, setChrome] = useState(true)
+  const chromeTimer = useRef(0)
+  /** gdzie na trasie pojawila sie karta i od kiedy wisi: stad wie, kiedy zejsc */
+  const memAt = useRef(0)
+  const memSince = useRef(0)
+  /** to samo, co stan `memory`, ale czytane z petli, ktora ma puste zaleznosci */
+  const memRef = useRef<Memory | null>(null)
+  /**
+   * Ile jest "czytania" w kadrze: 0 to chodzenie, 1 to wspomnienie na ekranie.
+   * Wygladzane co klatke i wysylane razem z reszta kamery, bo easeTo na padding
+   * przegralby z jumpTo, ktore i tak lata w kazdej klatce.
+   */
+  const padNow = useRef(0)
+  const padWant = useRef(0)
+  /** dotkniecie mapy: zatrzymuje albo wznawia, i zawsze pokazuje sterowanie */
+  const tapRef = useRef<() => void>(() => {})
+  /** odsloniecie sterowania wolane z petli, gdy trasa dobiega konca */
+  const showChromeRef = useRef<() => void>(() => {})
+  /** wlaczenie jazdy z zewnatrz petli, bez martwienia sie o kolejnosc deklaracji */
+  const cruiseRef = useRef<() => void>(() => {})
+  /** czy wyprawa juz sama ruszyla, i kiedy ma ruszyc */
+  const startedRef = useRef(false)
+  const startAt = useRef(0)
   const [look, setLook] = useState<ReplayLook>('relief')
   useDarkChrome()
   const [looksOpen, setLooksOpen] = useState(false)
@@ -185,6 +255,30 @@ export function MemoryPlayer({
     map.touchZoomRotate.disableRotation()
 
     /*
+     * Atrybucja startuje zwinieta do samego "i".
+     *
+     * Dotad lezala pod ciemnym dolem i nikt jej nie widzial. Gdy ciemnosc stala
+     * sie zdarzeniem, wyszla na wierzch i zajmowala dwie linie na dole kadru.
+     * Zwijamy ja raz, ale nie odbieramy jej: gdy dotkniesz "i", zostaje otwarta,
+     * bo od tego momentu `opened` jest wlaczone i nic jej nie zamknie.
+     */
+    let opened = false
+    const tuck = () => {
+      const box = map.getContainer().querySelector('.maplibregl-ctrl-attrib')
+      if (!box) return
+      const btn = box.querySelector('.maplibregl-ctrl-attrib-button')
+      if (btn && !btn.hasAttribute('data-pk-watch')) {
+        btn.setAttribute('data-pk-watch', '1')
+        btn.addEventListener('click', () => {
+          opened = true
+        })
+      }
+      if (!opened) box.classList.remove('maplibregl-compact-show')
+    }
+    map.on('idle', tuck)
+    map.on('styledata', tuck)
+
+    /*
      * Kamera przestawia kadr co klatke przez jumpTo, wiec bez tego szczypta
      * cofalaby sie natychmiast po kazdym palcu. Dwie rzeczy zalatwiaja sprawe.
      *
@@ -215,8 +309,8 @@ export function MemoryPlayer({
       // a debug handle, the same as the main map has
       ;(window as unknown as { __pkReplay?: MapGL }).__pkReplay = map
     }
-    // the bottom third carries the memory, so the walker rides above centre
-    map.setPadding({ top: 0, left: 0, right: 0, bottom: Math.round(window.innerHeight * 0.44) })
+    // pierwszy kadr od razu w ramie chodzenia; dalej padding jedzie z draw()
+    map.setPadding({ top: Math.round(window.innerHeight * WALK_PAD), left: 0, right: 0, bottom: 0 })
 
     const paintOnce = async () => {
       const colors = pinColors()
@@ -399,12 +493,19 @@ export function MemoryPlayer({
       if (!map.getSource('mem-track')) void paint()
     })
 
-    // tapping a pin walks you there: the marker travels, then stops and speaks
+    /*
+     * Dotkniecie pinu prowadzi cie do niego: marker idzie, staje i mowi.
+     * Dotkniecie samej mapy zatrzymuje albo wznawia marsz, i to jest jedyny
+     * przycisk pauzy, jaki tu jest. Wczesniej stal osobny, 56 na 56, na stale.
+     */
     map.on('click', (e) => {
       if (!map.getLayer('mem-stop-hit')) return
       const hit = map.queryRenderedFeatures(e.point, { layers: ['mem-stop-hit'] })[0]
       const id = hit?.properties?.markId
-      if (!id) return
+      if (!id) {
+        tapRef.current()
+        return
+      }
       const stop = stops.current.find((x) => x.id === String(id))
       if (stop) travelTo(stop)
     })
@@ -417,6 +518,28 @@ export function MemoryPlayer({
     // built once: a replay shows one finished walk that cannot change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  /**
+   * Wspomnienie wchodzi na ekran, a razem z nim ciemnosc i odjazd kamery.
+   *
+   * Wczesniej `setMemory` nie bylo nigdzie czyszczone: gdy mineles pierwsze
+   * wspomnienie, karta zostawala do konca seansu, tylko podmieniana przez
+   * nastepna. Dlatego ciemnosc musiala byc stala, i dlatego ten ekran czul sie
+   * jak kokpit, a nie jak film. Teraz ciemnosc jest zdarzeniem: wjezdza z karta
+   * i schodzi razem z nia.
+   */
+  const showMemory = (body: Memory, metres: number) => {
+    memAt.current = metres
+    memSince.current = performance.now()
+    padWant.current = 1
+    memRef.current = body
+    setMemory(body)
+  }
+  const hideMemory = () => {
+    padWant.current = 0
+    memRef.current = null
+    setMemory(null)
+  }
 
   // ---- moving through the walk ----
   const draw = (ms: number, dt = 0) => {
@@ -450,7 +573,29 @@ export function MemoryPlayer({
       properties: {},
       geometry: { type: 'LineString', coordinates: walkedSoFar(track, timeline.dist, metres) },
     } as never)
-    if (!pinching.current) map.jumpTo({ center: at, bearing, zoom: zoomRef.current, pitch: 58 })
+    if (!pinching.current) {
+      const h = window.innerHeight
+      const v = padNow.current
+      map.jumpTo({
+        center: at,
+        bearing,
+        zoom: zoomRef.current,
+        pitch: 58,
+        // jeden suwak miedzy dwiema ramami: chodzenie w gorze, czytanie w dole
+        /*
+         * Zaciskane do zera z premedytacja. MapLibre rzuca wyjatkiem na ujemnym
+         * paddingu, a wyjatek w petli klatek zabija cala petle: ekran zamiera i
+         * nie ma po czym poznac, co sie stalo. Kamera nie jest miejscem na
+         * ambicje, wiec woli sie przyciac niz wywrocic.
+         */
+        padding: {
+          top: Math.max(0, Math.round((1 - v) * WALK_PAD * h)),
+          left: 0,
+          right: 0,
+          bottom: Math.max(0, Math.round(v * READ_PAD * h)),
+        },
+      })
+    }
 
     // a memory shows up when we reach where it was left
     const hit = stops.current.find(
@@ -458,7 +603,7 @@ export function MemoryPlayer({
     )
     if (hit) {
       seenRef.current.add(hit.id)
-      setMemory(hit.body)
+      showMemory(hit.body, metres)
       navigator.vibrate?.(25)
       // a beat of stillness, so arriving somewhere actually feels like arriving
       dwellUntil.current = performance.now() + DWELL_MS
@@ -485,15 +630,65 @@ export function MemoryPlayer({
       dur: Math.max(600, Math.min(1600, 600 + gap / 60)),
       stop: stop.id,
     }
-    setMemory(stop.body)
+    showMemory(stop.body, stop.metres)
   }
 
   useEffect(() => {
     let raf = 0
     let last = performance.now()
     const step = (now: number) => {
-      const dt = now - last
+      /*
+       * dt przyciete z obu stron, i to nie jest ostroznosc na zapas.
+       *
+       * Znak minus jest realny: pierwsza klatka po commicie Reacta dostaje
+       * czasem znacznik POCZATKU tej samej klatki, w ktorej effect sie wykonal,
+       * czyli chwile wczesniejszy niz `performance.now()` z linijki powyzej.
+       * Zmierzone minus 53 ms. Przy wygladzaniu wykladniczym ujemne dt daje
+       * wspolczynnik ponizej zera, czyli krok w zla strone: padding wyszedl na
+       * minus, MapLibre rzucil wyjatkiem, wyjatek zabil petle klatek i cale
+       * odtwarzanie stalo z zegarem na zerze.
+       *
+       * Gora jest po to, zeby powrot z tla nie teleportowal wyprawy o pol
+       * doliny: 64 ms to jakies cztery klatki i tyle wolno nadgonic naraz.
+       */
+      const dt = Math.min(64, Math.max(0, now - last))
       last = now
+
+      /*
+       * Wyprawa rusza sama, chwile po tym, jak mapa sie odmaluje. Ta chwila jest
+       * po to, zeby zobaczyc, skad zaczynasz, zanim swiat pojedzie.
+       */
+      if (!startedRef.current && readyRef.current) {
+        startedRef.current = true
+        startAt.current = now + 600
+      }
+      if (startAt.current && now >= startAt.current) {
+        startAt.current = 0
+        cruiseRef.current()
+      }
+
+      // kadr dojezdza do swojej ramy niezaleznie od tego, czy cos sie rusza
+      const padGap = padWant.current - padNow.current
+      let settling = false
+      if (Math.abs(padGap) > 0.0015) {
+        padNow.current += padGap * (1 - Math.exp(-dt / PAD_TAU))
+        settling = true
+      } else if (padNow.current !== padWant.current) {
+        padNow.current = padWant.current
+        settling = true
+      }
+
+      /*
+       * Karta schodzi sama, gdy poszedles dalej: liczone w metrach, bo predkosc
+       * jest zmienna. Cofanie tez ja zdejmuje, bo wtedy wracasz przed miejsce,
+       * w ktorym cos zostawiles.
+       */
+      if (memRef.current) {
+        const walked = metresAt(timeline, elapsedRef.current) - memAt.current
+        if (now - memSince.current > CARD_MIN_MS && (walked > CARD_CLEAR_M || walked < -8)) {
+          hideMemory()
+        }
+      }
 
       // a walk does not jump to a speed: it gathers it, and it coasts down
       const target = targetRef.current
@@ -558,7 +753,13 @@ export function MemoryPlayer({
           setPos(0)
           targetRef.current = 0
           rateRef.current = 0
+          // koniec albo poczatek trasy: pokaz sterowanie, zeby bylo widac, ze
+          // mozna zawrocic. Bez tego staniesz przed pustym ekranem
+          showChromeRef.current()
         }
+      } else if (settling) {
+        // stoisz, ale kamera jeszcze jedzie do swojej ramy: to trzeba domalowac
+        draw(elapsedRef.current, dt)
       }
       raf = requestAnimationFrame(step)
     }
@@ -581,6 +782,7 @@ export function MemoryPlayer({
   }
 
   const onDialDown = (e: React.PointerEvent) => {
+    showChromeRef.current()
     cancelAnimationFrame(tween.current)
     trip.current = null
     try {
@@ -599,6 +801,7 @@ export function MemoryPlayer({
   }
   const onDialUp = () => {
     dragFrom.current = null
+    showChromeRef.current()
   }
 
   /**
@@ -623,11 +826,56 @@ export function MemoryPlayer({
     tween.current = requestAnimationFrame(step)
   }
 
+  /**
+   * Odsloniecie sterowania. Jedna zasada: gdy cos jedzie, gasnie po chwili, a
+   * gdy stoisz, zostaje, bo skoro zatrzymales, to pewnie czytasz. Sprawdzenie
+   * jest w samym timerze, nie przy zakladaniu, bo `centre()` sprowadza raczke
+   * do zera przez 360 ms i w momencie dotkniecia jeszcze nie stoi.
+   */
+  const showChrome = () => {
+    window.clearTimeout(chromeTimer.current)
+    setChrome(true)
+    chromeTimer.current = window.setTimeout(() => {
+      if (posRef.current !== 0) setChrome(false)
+    }, IDLE_HIDE_MS)
+  }
+  showChromeRef.current = showChrome
+  cruiseRef.current = () => {
+    applyPos(CRUISE)
+    showChrome()
+  }
+  /*
+   * Dotkniecie mapy. Tu byl ukryty konflikt: "dotknij, zeby pokazac sterowanie"
+   * i "dotknij, zeby zatrzymac" to ten sam gest. Robia wiec jedno: dotkniecie
+   * zatrzymuje albo wznawia I pokazuje dial, na ktorym widzisz, jak raczka
+   * wraca na srodek. Kontrolka pokazuje ci, co sie wlasnie stalo.
+   */
+  tapRef.current = () => {
+    if (posRef.current === 0) applyPos(CRUISE)
+    else centre()
+    showChrome()
+  }
+
+  useEffect(() => () => window.clearTimeout(chromeTimer.current), [])
+
+  /** swipe w dol na karcie zdejmuje wspomnienie od razu */
+  const cardFrom = useRef<number | null>(null)
+
+  const progress = timeline.totalMs > 0 ? elapsed / timeline.totalMs : 0
+
   return (
     <div className="memplay">
       <div ref={holder} className="memplay__map" />
 
-      <div className="memplay__floor" aria-hidden="true">
+      {/*
+        Cichy cien na samym dole, zawsze. Nie zero, bo wlos postepu i wjezdzajacy
+        dial musza miec na czym stac, gdy pod nimi trafi sie jasne pole.
+      */}
+      <div className="memplay__hem" aria-hidden="true" />
+
+      {/* ciemnosc i rozmycie sa zdarzeniem: przychodza z karta, schodza z nia */}
+      <div className={`memplay__veil${memory ? ' -on' : ''}`} aria-hidden="true" />
+      <div className={`memplay__floor${memory ? ' -on' : ''}`} aria-hidden="true">
         <span style={{ '--b': '1px', '--from': '0%', '--to': '38%' } as CSSProperties} />
         <span style={{ '--b': '3px', '--from': '24%', '--to': '66%' } as CSSProperties} />
         <span style={{ '--b': '7px', '--from': '48%', '--to': '88%' } as CSSProperties} />
@@ -635,7 +883,7 @@ export function MemoryPlayer({
       </div>
 
       <button
-        className="memplay__back"
+        className={`memplay__back${chrome ? '' : ' -dim'}`}
         aria-label="Wyjdź ze wspomnień"
         onClick={() => {
           if (performance.now() - closedAt.current < 500) return
@@ -646,7 +894,7 @@ export function MemoryPlayer({
       </button>
 
       <button
-        className="memplay__look"
+        className={`memplay__look${chrome ? '' : ' -off'}`}
         aria-label="Zmień wygląd mapy"
         onClick={() => setLooksOpen((v) => !v)}
       >
@@ -685,6 +933,22 @@ export function MemoryPlayer({
         {memory && (
           <button
             className="memplay__memory"
+            onPointerDown={(e) => {
+              cardFrom.current = e.clientY
+            }}
+            onPointerMove={(e) => {
+              if (cardFrom.current === null) return
+              if (e.clientY - cardFrom.current > 60) {
+                cardFrom.current = null
+                hideMemory()
+              }
+            }}
+            onPointerUp={() => {
+              cardFrom.current = null
+            }}
+            onPointerCancel={() => {
+              cardFrom.current = null
+            }}
             onClick={() => {
               // stop where we are: reading is not walking
               targetRef.current = 0
@@ -724,6 +988,7 @@ export function MemoryPlayer({
           </button>
         )}
 
+        <div className={`memplay__hud${chrome ? '' : ' -off'}`}>
         <div className="memplay__clock">
           <span className="memplay__time">{fmtClock(elapsed).replace(':', ' : ')}</span>
           <span className="memplay__clocklabel">czas wyprawy</span>
@@ -815,10 +1080,15 @@ export function MemoryPlayer({
           </svg>
 
         </div>
+        </div>
 
-        <button className="memplay__pause" aria-label="Zatrzymaj przewijanie" onClick={centre}>
-          <Pause size={20} />
-        </button>
+        {/* gdzie jestes w wyprawie: tego dotad nie bylo nigdzie */}
+        <div className="memplay__bar" aria-hidden="true">
+          <span
+            className="memplay__barfill"
+            style={{ transform: `scaleX(${Math.max(0, Math.min(1, progress))})` }}
+          />
+        </div>
 
         {openMark && (
           <MemoryViewer
