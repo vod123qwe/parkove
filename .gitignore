@@ -14,6 +14,7 @@ assets-in/stamps/*.png
 # przeliczenie nie zjadalo reszty danych. Wynik (src/app/data/trails.ts) jest w gicie
 scripts/.trails-log.txt
 scripts/.trails-log2.txt
+scripts/.trails-log3.txt
 scripts/.trails-cache.json
 
 # katalog roboczy wranglera: build Workera powstaje na miejscu przy kazdym deployu
