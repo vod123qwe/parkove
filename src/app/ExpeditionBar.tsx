@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { CarFront, Leaf, Mic, Navigation, Plus, Sparkles, Square, StickyNote, X } from 'lucide-react'
+import { CarFront, Leaf, List as ListIcon, Mic, Navigation, Plus, Square, StickyNote, X } from 'lucide-react'
 import { Button } from '../ds'
 import { useGameState } from './state'
 import { questForPark } from './data/quests'
@@ -40,7 +40,6 @@ export function ExpeditionBar({
   onPhoto,
   onMark,
   onOpenPoints,
-  onOpenGuide,
   onCheckPlant,
   spotCard,
   targetId,
@@ -54,8 +53,6 @@ export function ExpeditionBar({
   onMark?: (markId: string) => void
   /** karta miejsca z listą punktów */
   onOpenPoints?: () => void
-  /** rozmowa z przewodnikiem; zajęła miejsce listy punktów w pasku */
-  onOpenGuide?: () => void
   /** pełnoekranowa kamera do sprawdzania roślin */
   onCheckPlant?: () => void
   /** wybrana kawiarnia albo plac zabaw: zajmuje miejsce karty „co dalej" */
@@ -456,21 +453,16 @@ export function ExpeditionBar({
             </button>
             <span className="app-expaction__label">Wspomnienie</span>
           </div>
-          {/*
-            Przewodnik zamiast listy punktów (decyzja Jarka 2026-08-22): listę i
-            tak otwiera dotknięcie białej karty wyżej, więc trzeci przycisk paska
-            powtarzał to samo. Rozmowa nie ma innego wejścia w terenie.
-          */}
           <div className="app-expaction">
             <button
               className="app-expaction__btn"
-              aria-label="Przewodnik"
-              onClick={onOpenGuide}
-              disabled={!onOpenGuide}
+              aria-label="Punkty tego miejsca"
+              onClick={onOpenPoints}
+              disabled={!onOpenPoints}
             >
-              <Sparkles size={18} />
+              <ListIcon size={18} />
             </button>
-            <span className="app-expaction__label">Przewodnik</span>
+            <span className="app-expaction__label">Punkty</span>
           </div>
         </div>
       </div>

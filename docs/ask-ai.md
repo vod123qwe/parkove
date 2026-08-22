@@ -1,7 +1,28 @@
-# Przewodnik (AI)
+# Przewodnik (AI) — WYCOFANE
 
-Stan: **działa** (wersja 0.70.0). Worker stoi, oba klucze są po stronie
-Cloudflare, adres siedzi w `src/app/proxy.ts`.
+**Stan: usunięte z aplikacji 2026-08-22 (wersja 0.74.0).** Jarek: „nie dodawaj
+takiego asystenta jednak". Przycisk „Punkty" wrócił na swoje miejsce w pasku
+wyprawy.
+
+Ten dokument zostaje jako zapis decyzji i tego, co zbudowaliśmy, bo pomysł może
+wrócić w innej formie. Co zostało w repozytorium:
+
+- **Worker ma nadal ścieżkę `/ask`** (workers/plant-proxy). Nic jej nie woła, nie
+  kosztuje nic, gdy leży odłogiem, a klucz Gemini siedzi w Cloudflare.
+- **`src/app/data/nearby.json`** (2250 punktów: 296 toalet, 1700 placów zabaw,
+  152 lodziarnie, 102 poidełka, z przewijakami i opłatami) plus generator
+  `npm run nearby`. Nic tego nie importuje, więc nie waży w aplikacji. To gotowy
+  materiał na „toalety na mapie" albo na filtr, gdyby kiedyś się przydał.
+- Usunięte: `GuideSheet.tsx`, `guideContext.ts`, `AskBox.tsx`, `ask.ts` i ich
+  style oraz wszystkie wejścia w interfejsie.
+
+**Co zostaje działające:** rozpoznawanie roślin (Pl@ntNet), bo to osobny serwis i
+osobna funkcja, patrz [plant-id.md](plant-id.md).
+
+Czego nauczyła nas ta próba, na wypadek powrotu, jest niżej.
+
+---
+
 
 ## Po co, i czym to NIE jest
 

@@ -125,7 +125,13 @@ Zasady odpowiedzi:
 - Odległości i nazwy podawaj DOKŁADNIE takie, jakie są w kontekście. Nie zaokrąglaj w drugą stronę i nie zamieniaj miejsc.
 - Legendę zawsze nazywaj legendą, nigdy faktem.
 - Nie doradzaj jedzenia roślin ani grzybów i nie oceniaj bezpieczeństwa jaskiń, skał czy kąpieli: odeślij do oznaczeń na miejscu. To jedyne tematy, w których wolno ci odmówić konkretu.
-- Pamiętaj, że użytkownik czyta to stojąc w terenie, często z dzieckiem: liczy się to, co da się zrobić w najbliższej godzinie.`
+- Pamiętaj, że użytkownik czyta to stojąc w terenie, często z dzieckiem: liczy się to, co da się zrobić w najbliższej godzinie.
+
+Możesz ROZWIJAĆ to, co jest w kontekście, własną wiedzą ogólną (geologia, historia, przyroda), ale wtedy mów, że to wiedza ogólna, a nie dane z aplikacji. Nigdy nie dopisuj w ten sposób lokalnych faktów: nazw skał, wysokości, dat, godzin otwarcia.
+
+Bądź pomocny z własnej inicjatywy. Jeśli z pytania wynika prawdziwa potrzeba (dziecko musi do toalety, ktoś jest głodny, kończy się woda, robi się nudno), i masz w kontekście coś, co ją rozwiązuje, podaj to od razu z nazwą i odległością, nawet jeśli nie zostało o to zapytane wprost. Jeśli w wybranym miejscu czegoś nie ma, powiedz to i wskaż najbliższe miejsce poza nim.
+
+Masz narzędzie do szukania w internecie. Używaj go TYLKO wtedy, gdy pytanie dotyczy rzeczy zmiennych, których nie ma w kontekście: godzin otwarcia, cen, biletów, zamknięć, remontów, pogody spoza dzisiejszej prognozy. Do pytań o miejsca, punkty i odległości nie szukaj, bo odpowiedź masz podaną. Gdy skorzystasz z sieci, powiedz w odpowiedzi, że sprawdziłeś w internecie.`
 
 async function ask(request, env, origin) {
   if (!env.GEMINI_KEY) return json({ error: 'Brak klucza Gemini w Workerze' }, 500, origin)
@@ -175,12 +181,18 @@ async function ask(request, env, origin) {
    */
   const models = [
     env.GEMINI_MODEL,
+    /*
+     * Tylko modele, ktore istnieja. gemini-2.5-flash i 2.0-flash Google wylaczyl
+     * dla nowych kont (sprawdzone 2026-08-22: odpowiadaja 404 z podpowiedzia
+     * przejscia na 3.6), wiec trzymanie ich w lancuchu tylko marnowalo probe.
+     */
     'gemini-3.7-flash',
+    'gemini-3.6-flash',
     'gemini-3-flash-preview',
-    'gemini-2.5-flash',
-    'gemini-2.0-flash',
   ].filter((m, i, all) => m && all.indexOf(m) === i)
 
+  /* slad prob: bez niego "404" nie mowi, czy winna jest nazwa modelu, czy limit */
+  const tried = []
   let res = null
   let usedModel = null
   for (const model of models) {
@@ -192,6 +204,13 @@ async function ask(request, env, origin) {
           model,
           input,
           system_instruction: RULES,
+          /*
+           * Szukanie w sieci jako NARZEDZIE, nie jako tryb. Model sam decyduje,
+           * czy go uzyc, wiec placimy za wyszukiwanie tylko przy pytaniach, ktore
+           * naprawde go potrzebuja (godziny otwarcia, ceny, zamkniecia), a nie
+           * przy "co tu ciekawego", na ktore odpowiada z kontekstu.
+           */
+          tools: [{ type: 'google_search' }],
           generation_config: { temperature: 0.4, thinking_level: 'low' },
         }),
       })
@@ -199,19 +218,24 @@ async function ask(request, env, origin) {
       continue
     }
     usedModel = model
+    tried.push(`${model}:${res.status}`)
     if (res.status !== 429 && res.status !== 404) break
   }
   if (!res) return json({ error: 'Model nie odpowiada' }, 502, origin)
 
   if (res.status === 429)
     return json(
-      { error: 'Limit modelu wyczerpany na wszystkich, wroc za chwile albo jutro' },
+      { error: 'Limit modelu wyczerpany na wszystkich, wroc za chwile albo jutro', tried },
       429,
       origin,
     )
   if (!res.ok) {
     const detail = await res.text()
-    return json({ error: `Model odpowiedział ${res.status}`, detail: detail.slice(0, 200) }, 502, origin)
+    return json(
+      { error: `Model odpowiedział ${res.status}`, detail: detail.slice(0, 300), tried },
+      502,
+      origin,
+    )
   }
 
   const data = await res.json()
@@ -235,8 +259,28 @@ async function ask(request, env, origin) {
     .trim()
   const text = fromSteps || fromCandidates || String(data.output_text ?? '').trim()
 
+  /*
+   * Zrodla z sieci. Kazdy blok tekstu moze miec annotations z obiektami
+   * url_citation (url + title). Zbieramy je bez powtorzen, zeby aplikacja mogla
+   * oznaczyc odpowiedz jako "z internetu" i pokazac, skad.
+   */
+  const web = []
+  const seen = new Set()
+  for (const step of data.steps ?? [])
+    for (const block of step.content ?? [])
+      for (const ann of block.annotations ?? []) {
+        const url = ann.url ?? ann.url_citation?.url
+        const title = ann.title ?? ann.url_citation?.title ?? ''
+        if (!url || seen.has(url)) continue
+        seen.add(url)
+        web.push({ url, title: String(title).slice(0, 90) })
+      }
+  const searched = (data.steps ?? []).some(
+    (s) => s.type === 'google_search_call' || s.type === 'google_search_result',
+  )
+
   if (!text) return json({ error: 'Model nic nie odpowiedział' }, 502, origin)
-  return json({ text, model: usedModel }, 200, origin)
+  return json({ text, model: usedModel, web: web.slice(0, 4), searched }, 200, origin)
 }
 
 export default {

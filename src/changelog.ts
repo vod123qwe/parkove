@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.73.0'
+export const VERSION = '0.74.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.74.0',
+    date: '2026-08-22',
+    title: 'The assistant is gone, Points is back, and the memory menu moves properly',
+    changes: [
+      ['changed', 'The AI guide is removed, at Jarek request, and the Points button is back in its place in the walk bar. Plant identification stays: different service, different feature, and it works'],
+      ['changed', 'What stayed in the repository, unused, in case it comes back in another shape: the ask route on the proxy, and a file of 2250 practical points from OpenStreetMap, 296 toilets with changing tables and fees, 1700 playgrounds, 152 ice cream places and 102 drinking fountains. Nothing imports it, so it does not weigh anything in the app'],
+      ['fixed', 'The memory menu moves properly. It looked stepped because the whole overlay, blur layers and all, was faded through the parent opacity, which makes a phone recompute the blur every frame. The backdrop now fades on its own, the pills rise on a softer curve with a tighter cascade, and the exit no longer jerks upward before falling: that change of direction was the jump you could see'],
+    ],
+  },
   {
     version: '0.73.0',
     date: '2026-08-22',

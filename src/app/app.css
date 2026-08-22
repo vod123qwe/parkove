@@ -171,22 +171,6 @@
 }
 
 /* list trigger, bottom center */
-/* przewodnik obok listy miejsc: ta sama wysokosc, wiec to samo pietro decyzji */
-.app-guidebtn {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border: 0;
-  border-radius: var(--radius-btn);
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-raised);
-  color: var(--content-accent);
-  box-shadow: var(--elevation-1);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
 .app-fab {
   position: absolute;
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
@@ -1610,344 +1594,6 @@
   display: none;
 }
 
-/* ---- przewodnik ---- */
-
-.guide__lead {
-  margin: 0 0 var(--sp-4);
-  color: var(--content-secondary);
-}
-
-/* brak pozycji: jedno zdanie i jeden przycisk, bez zgadywania */
-.guide__locate {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  width: 100%;
-  margin: 0 0 var(--sp-4);
-  padding: var(--sp-3) var(--sp-4);
-  border: 1px solid var(--border-info);
-  border-radius: 14px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-info-subtle);
-  color: var(--content-primary);
-  font-family: var(--font-text);
-  font-size: 13px;
-  line-height: 18px;
-  text-align: left;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.guide__locate svg {
-  flex: none;
-  margin-top: 1px;
-  color: var(--content-info);
-}
-
-/* pytania na start: puste pole to najgorsze, co można dać komuś w terenie */
-.guide__starters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  margin: 0 0 var(--sp-4);
-}
-
-.guide__starter {
-  min-height: 40px;
-  padding: 0 var(--sp-4);
-  border: 1px solid var(--border-mint);
-  border-radius: 999px;
-  background: var(--bg-mint);
-  color: var(--content-primary);
-  font-family: var(--font-text);
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.guide__starter:disabled {
-  opacity: 0.5;
-}
-
-/*
- * Rozmowa jak rozmowa: pastylki, twoje po prawej, przewodnika po lewej.
- * Kształt niesie autorstwo, więc nie podpisujemy każdej linii słowem „ty".
- * Zaokrąglenie i squircle te same, co w reszcie aplikacji, tylko jeden narożnik
- * przy „ogonie" jest ciaśniejszy, bo to właśnie czyta się jako dymek.
- */
-.guide__turn {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  margin: 0 0 var(--sp-4);
-}
-
-.guide__bubble {
-  max-width: 86%;
-  margin: 0;
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: 20px;
-  corner-shape: var(--corner-smooth);
-  font-family: var(--font-text);
-  font-size: 15px;
-  line-height: 22px;
-}
-
-/* twoje: cieplejsze, po prawej, dociągnięte do krawędzi rozmowy */
-.guide__bubble.-me {
-  align-self: flex-end;
-  border-bottom-right-radius: 7px;
-  background: var(--bg-mint);
-  color: var(--content-primary);
-  font-weight: 600;
-}
-
-/*
- * Przewodnika: chłodne tło, bo to jedyne miejsce w aplikacji z treścią
- * niesprawdzoną. Ta sama logika, co legendy w innym kroju.
- */
-.guide__bubble.-guide {
-  align-self: flex-start;
-  border-bottom-left-radius: 7px;
-  background: var(--bg-info-subtle);
-  color: var(--content-secondary);
-  box-shadow: inset 0 0 0 1px var(--border-info);
-}
-
-/* trzy kropki zamiast słowa „myślę": mniej hałasu w rozmowie */
-.guide__bubble.-thinking {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: var(--sp-4) var(--sp-4);
-  margin: 0 0 var(--sp-4);
-}
-
-.guide__bubble.-thinking span {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--content-info);
-  opacity: 0.35;
-  animation: guide-dots 1s ease-in-out infinite;
-}
-
-.guide__bubble.-thinking span:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.guide__bubble.-thinking span:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-@keyframes guide-dots {
-  40% {
-    opacity: 1;
-    transform: translateY(-3px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .guide__bubble.-thinking span {
-    animation: none;
-    opacity: 0.6;
-  }
-}
-
-/*
- * Pole zostaje na dole rozmowy i lgnie do krawędzi arkusza, żeby przy pełnej
- * wysokości nie trzeba było przewijać do niego po każdej odpowiedzi.
- */
-.guide__field {
-  position: sticky;
-  bottom: 0;
-  display: flex;
-  gap: var(--sp-2);
-  align-items: center;
-  margin: var(--sp-2) 0 0;
-  padding: var(--sp-3) 0;
-  background: var(--bg-surface);
-}
-
-.guide__input {
-  flex: 1;
-  min-width: 0;
-  min-height: 48px;
-  padding: 0 var(--sp-4);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface);
-  color: var(--content-primary);
-  font-family: var(--font-text);
-  font-size: 15px;
-}
-
-.guide__input:focus {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 1px;
-}
-
-.guide__send {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border: 0;
-  border-radius: 14px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-primary);
-  color: var(--content-on-primary);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.guide__send:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.guide__note {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: var(--sp-3) 0 0;
-  color: var(--content-tertiary);
-}
-
-.guide__note.-bad {
-  color: var(--content-info);
-  font-weight: 600;
-}
-
-/*
- * Pytanie o punkt. Pudełko jest wyraźnie inne od reszty karty, bo odpowiedź
- * modelu nie może wyglądać jak treść, którą sprawdziliśmy: przerywana ramka,
- * chłodne tło i etykieta wprost. Ta sama logika, co przy legendach w innym kroju.
- */
-/* wejscie do przewodnika z karty punktu: jedno dotkniecie, nie osobna rozmowa */
-.poi-ask {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  width: 100%;
-  margin: var(--sp-5) 0 var(--sp-4);
-  padding: var(--sp-4);
-  border: 1.5px dashed var(--border-info);
-  border-radius: 18px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-info-subtle);
-  text-align: left;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.poi-ask__icon {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: var(--bg-surface);
-  color: var(--content-info);
-}
-
-.poi-ask__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.poi-ask__title {
-  color: var(--content-primary);
-}
-
-.poi-ask__sub {
-  color: var(--content-tertiary);
-}
-
-.poi-ask__label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 var(--sp-3);
-  color: var(--content-info);
-}
-
-.poi-ask__row {
-  margin: 0 0 var(--sp-3);
-}
-
-.poi-ask__q {
-  margin: 0 0 4px;
-  font-weight: 700;
-  color: var(--content-primary);
-}
-
-.poi-ask__a {
-  margin: 0;
-  color: var(--content-secondary);
-}
-
-.poi-ask__field {
-  display: flex;
-  gap: var(--sp-2);
-  align-items: center;
-}
-
-.poi-ask__input {
-  flex: 1;
-  min-width: 0;
-  min-height: 44px;
-  padding: 0 var(--sp-3);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface);
-  color: var(--content-primary);
-  font-family: var(--font-text);
-  font-size: 15px;
-}
-
-.poi-ask__input:focus {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 1px;
-}
-
-.poi-ask__send {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 12px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-primary);
-  color: var(--content-on-primary);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.poi-ask__send:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.poi-ask__note {
-  margin: var(--sp-2) 0 0;
-  color: var(--content-tertiary);
-}
-
-.poi-ask__note.-bad {
-  color: var(--content-info);
-  font-weight: 600;
-}
-
 .poi-sources {
   color: var(--content-tertiary);
   margin: 0;
@@ -2767,6 +2413,15 @@
  * progressive bluru plus przygaszenie od dołu, tak jak w odtwarzaczu wspomnień,
  * więc miejsce, w którym stoisz, jest nadal widoczne, tylko cofnięte o krok.
  */
+/*
+ * Wejście i zejście menu wspomnień.
+ *
+ * Jarek: „teraz jest jakby po klatce". Powód jest techniczny: nad mapą wisi tu
+ * kilka warstw z backdrop-filter i maskami, a animowanie ich przez opacity
+ * rodzica każe telefonowi przeliczać rozmycie w każdej klatce. Stąd trzy zmiany:
+ * tło i pigułki mają OSOBNE animacje (nie jedna na rodzicu), curve jest miękka i
+ * dłuższa, a will-change mówi przeglądarce z wyprzedzeniem, co się rusza.
+ */
 .app-addmenu {
   position: fixed;
   inset: 0;
@@ -2775,30 +2430,58 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 0 var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
-  animation: add-fade 220ms var(--ease-out) both;
 }
 
-.app-addmenu.-out {
-  animation: add-fade 260ms var(--ease-out) reverse both;
+/* krzyżyk wchodzi na końcu kaskady i wychodzi pierwszy: to on zamyka */
+.app-addmenu__close {
+  will-change: transform, opacity;
+  animation: add-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 140ms;
 }
 
 .app-addmenu.-out .app-addmenu__close {
-  animation: add-sink 240ms var(--ease-screen) both;
-  animation-delay: 120ms;
+  animation: add-sink 220ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation-delay: 0ms;
 }
 
-@keyframes add-fade {
-  from {
-    opacity: 0;
+/* jedna animacja dla warstw rozmycia: bez niej blur pojawiał się skokiem */
+.app-addmenu__glass span {
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-addmenu__glass,
+  .app-addmenu.-out .app-addmenu__glass,
+  .app-addmenu .app-addmenu__item.pk-btn,
+  .app-addmenu.-out .app-addmenu__item.pk-btn,
+  .app-addmenu.-out .app-addmenu__close {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
   }
 }
 
+/* tło wychodzi samo, płynnie: 300 ms miękkiej krzywej, bez skoku na starcie */
 .app-addmenu__glass {
   position: absolute;
   inset: 0;
   z-index: -1;
   background: linear-gradient(to top, rgb(8 14 8 / 0.62), rgb(8 14 8 / 0.24) 62%, transparent);
   pointer-events: none;
+  will-change: opacity;
+  animation: add-veil 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.app-addmenu.-out .app-addmenu__glass {
+  animation: add-veil 240ms cubic-bezier(0.4, 0, 1, 1) reverse both;
+}
+
+@keyframes add-veil {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .app-addmenu__glass span {
@@ -2838,8 +2521,10 @@
   -webkit-backdrop-filter: blur(28px) saturate(1.15);
   color: #ffffff;
   box-shadow: none;
-  animation: add-rise 260ms var(--ease-out) both;
-  animation-delay: calc(var(--rise, 0) * 55ms);
+  will-change: transform, opacity;
+  /* dłużej i miękko, kaskada gęstsza: 40 ms zamiast 55, żeby nie czekać na ostatnią */
+  animation: add-rise 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--rise, 0) * 40ms);
 }
 
 .app-addmenu .app-addmenu__item.pk-btn:active {
@@ -2849,14 +2534,14 @@
 }
 
 .app-addmenu.-out .app-addmenu__item.pk-btn {
-  animation: add-sink 280ms var(--ease-screen) both;
-  animation-delay: calc(var(--sink, 0) * 50ms);
+  animation: add-sink 240ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation-delay: calc(var(--sink, 0) * 32ms);
 }
 
 @keyframes add-rise {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -2865,22 +2550,18 @@
 }
 
 /*
- * Zejście ma tę samą energię co wejście: pigułka najpierw drgnie w górę, potem
- * zapada się w stronę plusa. Kaskada idzie od góry, więc czyta się to jak
- * wciąganie ich z powrotem do przycisku, a nie jak zgaszenie światła.
+ * Zejście bez przystanku. Wcześniej pigułka najpierw drgała w górę (klatka na
+ * 22 procentach), a potem spadała, i właśnie ta zmiana kierunku czytała się jak
+ * przeskok. Teraz jedna droga: w dół, w stronę plusa, i gaśnie.
  */
 @keyframes add-sink {
-  0% {
+  from {
     opacity: 1;
     transform: none;
   }
-  22% {
-    opacity: 1;
-    transform: translateY(-5px) scale(1.025);
-  }
-  100% {
+  to {
     opacity: 0;
-    transform: translateY(26px) scale(0.9);
+    transform: translateY(14px) scale(0.95);
   }
 }
 

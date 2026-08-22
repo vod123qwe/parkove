@@ -2,7 +2,6 @@ import { BookOpen, Lock, MapPin, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { Modal, Segmented } from '../ds'
 import { Dilemma } from './Dilemma'
-import { AskBox } from './AskBox'
 import type { QuestPoi } from './data/quests'
 import { asset } from './assets'
 
@@ -23,14 +22,11 @@ export function PoiModal({
   parkId,
   collected,
   onClose,
-  onAskGuide,
 }: {
   poi: QuestPoi | null
   parkId: string | null
   collected: boolean
   onClose: () => void
-  /** otwiera przewodnika z kontekstem tego punktu */
-  onAskGuide?: (poi: QuestPoi) => void
 }) {
   /* nawyk czytania trzymamy w pamięci przeglądarki: kto raz wybrał całość, dostaje
      całość przy następnym punkcie, bez klikania za każdym razem */
@@ -127,12 +123,6 @@ export function PoiModal({
               </p>
             </div>
           )}
-          {/*
-            Pytanie na końcu, po całej sprawdzonej treści i po dylemacie: dopiero
-            wtedy wiesz, czego jeszcze nie wiesz. Wcześniej rozpraszałoby czytanie.
-          */}
-          {onAskGuide && <AskBox pointName={poi.name} onAsk={() => onAskGuide(poi)} />}
-
           {poi.sources && poi.sources.length > 0 && (
             <p className="t-caption poi-sources">
               Źródła:{' '}
