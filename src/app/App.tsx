@@ -27,6 +27,7 @@ import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
+import { useWakeLock } from './wakelock'
 import { REFRESH_FROM } from './refresh'
 import { VERSION } from '../changelog'
 import { EndWalkSheet } from './EndWalkSheet'
@@ -192,6 +193,8 @@ export function App() {
   const expeditionQuest = expedition ? questForPark(expedition.parkId) : null
   /* kompas włączamy dopiero, gdy wybierzesz cel: przedtem nie ma po co słuchać czujnika */
   const heading = useHeading(wantHeading && !!targetPoiId)
+  /* ekran nie gaśnie w trakcie wyprawy: inaczej ślad urywa się w kieszeni */
+  useWakeLock(!!expedition)
   const onWalk = !!expedition
   const peekOpen = !!selected && !expanded && !onWalk
 

@@ -19,9 +19,12 @@ body {
      whole thing slides under a strip at the bottom */
   overflow: hidden;
   overscroll-behavior: none;
-  /* the strip behind the home indicator belongs to the document, so it carries
-     the app background instead of the browser default white */
-  background: var(--bg-page);
+  /*
+   * Podłoże dokumentu jest CIEMNE, nie w kolorze strony. To ten pas za
+   * wskaźnikiem domu: jeśli przy jakiejś geometrii ekranu warstwa go nie dosięgnie,
+   * lepiej żeby prześwitywało ciemne tło pod ciemną mapą niż biały pasek.
+   */
+  background: #0b1207;
 }
 
 /* nailed to the window, so there is nothing left for the document to scroll
@@ -61,7 +64,9 @@ html[data-pk-ground='debug'] body {
 }
 
 body {
-  background: var(--bg-page);
+  /* to samo ciemne podłoże co na html: ekrany malują swoje tła same, a body jest
+     tylko tym, co widać w szparze, jeśli szpara się gdziekolwiek zdarzy */
+  background: #0b1207;
   color: var(--content-primary);
   font-family: var(--font-text);
   font-size: 16px;

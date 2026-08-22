@@ -18,6 +18,8 @@ export const CHANGELOG: Release[] = [
     date: '2026-08-22',
     title: 'Three intentions in a row, and the app finally tells you what it just loaded',
     changes: [
+      ['added', 'The screen stays awake for the whole walk. On iOS a web app gets no location in the background at all: lock the screen or pocket the phone and JavaScript is suspended, so the track breaks. There is no way around that in a browser, only a way to stop the screen from going dark, which is what the Screen Wake Lock does. It costs battery and that is a deliberate trade: a walk with a hole in the track is worse than a walk with an hour less battery'],
+      ['changed', 'The ground under the document is dark green instead of near white. If some screen geometry ever leaves a strip uncovered, a dark band under a dark map is far less wrong than a white one'],
       ['added', 'Refresh version in the profile now reports what happened: a green notice with the new number, or a plain one saying you already had the newest. The version you left is compared with the one that loaded, so the answer is a fact, not a guess'],
       ['changed', 'A place row has three separate things to tap: the map frame opens the approach at sixty percent of the screen, the row selects the place, and the arrow goes straight to navigation. They used to be one button with another button inside it, which is invalid HTML and unreliable on a phone'],
       ['added', 'Parkings carry a link to Google reviews and photographs, the same pill the cafes have'],
