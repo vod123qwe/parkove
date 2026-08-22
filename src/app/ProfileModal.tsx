@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Award, ChevronRight, Component, Footprints, Map as MapIcon, Palette, Pencil, Route, Sparkles, Trees } from 'lucide-react'
+import { Award, ChevronRight, Component, Footprints, Map as MapIcon, Palette, Pencil, RefreshCw, Route, Sparkles, Trees } from 'lucide-react'
 import { Button, Carousel, List, ListItem, Modal, Polaroid, Stamp, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
 import { usePhotos } from './photos'
@@ -9,6 +9,7 @@ import { questForPark } from './data/quests'
 import { isParkComplete } from './progress'
 import { VERSION } from '../changelog'
 import { screenReport, toggleGroundDebug } from './screen'
+import { refreshVersion } from './refresh'
 import type { ParkFeature } from './ParkSheet'
 
 const fmtDate = (ms: number) =>
@@ -46,6 +47,7 @@ export function ProfileModal({
 }) {
   const taps = useRef(0)
   const [diag, setDiag] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   const { parks: progress, journeys } = useGameState()
   const photos = usePhotos().filter((m) => m.kind === 'photo' && m.url)
@@ -262,6 +264,23 @@ export function ProfileModal({
           />
         </List>
       </section>
+
+      {/*
+        Odświeżenie wersji: jeden subtelny wiersz, bo to czynność rzadka, ale gdy
+        jest potrzebna, to bardzo. Service worker podaje pliki z pamięci, więc bez
+        tego pierwsze otwarcie po wdrożeniu pokazuje starą wersję.
+      */}
+      <button
+        className="profile-refresh"
+        onClick={() => {
+          setRefreshing(true)
+          void refreshVersion()
+        }}
+        disabled={refreshing}
+      >
+        <RefreshCw size={14} className={refreshing ? 'is-spinning' : undefined} />
+        {refreshing ? 'Odświeżam…' : 'Odśwież wersję'}
+      </button>
 
       {/* trzy dotknięcia wersji: diagnostyka dolnej krawędzi (patrz screen.ts) */}
       <p
