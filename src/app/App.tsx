@@ -239,6 +239,28 @@ export function App() {
 
   // the start CTA only makes sense when the park is within reach, so the peek
   // asks the phone where we are: once per minute, reusing the cached reading
+  /*
+   * Pytanie telefonu o pozycje. Bylo zaszyte w efekcie karty podgladu, wiec
+   * przewodnik otwierany z ekranu glownego nie wiedzial nic o tym, gdzie stoisz.
+   * Teraz to jedna funkcja: wola ja i podglad, i przewodnik, i przycisk
+   * "udostepnij lokalizacje" w rozmowie.
+   */
+  const askWhereIAm = useCallback(() => {
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        setMyFix({
+          coords: [pos.coords.longitude, pos.coords.latitude],
+          accuracy: pos.coords.accuracy ?? 30,
+          at: Date.now(),
+        }),
+      () => {
+        // brak zgody albo brak sygnalu: przewodnik powie o tym wprost
+      },
+      { maximumAge: 60_000, timeout: 8000 },
+    )
+  }, [])
+
   useEffect(() => {
     if (!peekOpen || !navigator.geolocation) return
     if (myFix && Date.now() - myFix.at < 60_000) return
@@ -344,6 +366,14 @@ export function App() {
    * wiec przy otwartej karcie miejsca to zwykle zero zapytan.
    */
   const guideParkId = expedition?.parkId ?? selectedId
+  /* przewodnik pyta o pozycje przy kazdym otwarciu, o ile nie jest swieza */
+  useEffect(() => {
+    if (!guideOpen) return
+    if (myFix && Date.now() - myFix.at < 60_000) return
+    askWhereIAm()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guideOpen, askWhereIAm])
+
   useEffect(() => {
     if (!guideOpen || !guideParkId) return
     const f = FEATURES.find((x) => x.id === guideParkId)
@@ -985,6 +1015,7 @@ export function App() {
         onClose={() => setGuideOpen(false)}
         thread={guideThread}
         onThread={setGuideThread}
+        onLocate={askWhereIAm}
         input={{
           parkId: guideParkId,
           parkName: FEATURES.find((f) => f.id === guideParkId)?.properties.name ?? null,

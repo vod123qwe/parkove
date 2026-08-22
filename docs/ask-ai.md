@@ -29,13 +29,24 @@ przeżyć.
 `src/app/guideContext.ts` buduje kontekst jako zwykły tekst, nie JSON, bo model
 czyta go lepiej, a w logu Workera widać dokładnie to, co dostał:
 
-1. **gdzie stoisz**: dystans do granicy miejsca i trzy najbliższe punkty z
-   odległościami,
+1. **gdzie stoisz**: dystans do granicy wybranego miejsca, trzy najbliższe
+   punkty z odległościami **oraz sześć najbliższych miejsc z całej aplikacji**,
+   licząc do granicy, nie do środka (do dużej doliny wchodzi się bokiem, a
+   dystans do środka kłamałby o kilometr). To ostatnie jest odpowiedzią na
+   pytanie „co jest dookoła mnie", którego wcześniej nie dało się zadać, bo
+   kontekst znał tylko punkty jednego parku,
 2. **postęp**: ile punktów zdobytych, ile do pieczątki, które zostały,
 3. **pogoda**: teraz i najlepsze okno dnia (to samo, co widać w karcie),
 4. **treść punktów tego miejsca**: nazwy i jednozdaniowe zaczepki, a dla punktu,
    o który pytasz wprost, cały opis wraz z legendą, wyraźnie oznaczoną jako
    podanie.
+
+**Skąd pozycja.** Pytanie telefonu o lokalizację było zaszyte w efekcie karty
+podglądu, więc przewodnik otwierany z ekranu głównego nie wiedział nic o tym,
+gdzie stoisz. Teraz o pozycję pyta jedna funkcja, wołana przez podgląd, przez
+przewodnika przy każdym otwarciu (o ile odczyt nie jest świeższy niż minuta) i
+przez przycisk **„Udostępnij lokalizację"** w samej rozmowie. Bez pozycji
+przewodnik mówi to wprost, zamiast udawać, że wie.
 
 Kontekst jest przycięty do 5800 znaków. Bez tego rósł do kilkunastu tysięcy i
 model gubił pytanie.

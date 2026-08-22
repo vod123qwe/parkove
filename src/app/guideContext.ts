@@ -11,6 +11,7 @@
  * okazji widać w logu Workera dokładnie to, co dostał.
  */
 
+import parksData from './data/parks.json'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { questForPark } from './data/quests'
@@ -38,30 +39,61 @@ export type GuideInput = {
 const line = (p: QuestPoi, got: boolean) =>
   `- ${p.name}${got ? ' (już zdobyty)' : ''}: ${p.teaser}`
 
+/* obrys i nazwa: tyle nam trzeba z parks.json */
+type Feature = { properties: { name: string }; geometry: unknown }
+
+/**
+ * Najbliższe miejsca wokół Ciebie, licząc do granicy, nie do środka.
+ *
+ * To odpowiedź na pytanie „co jest dookoła mnie", którego wcześniej nie dało się
+ * zadać: kontekst znał tylko punkty jednego wybranego parku. Liczymy do granicy,
+ * bo do dużej doliny wchodzi się bokiem, a nie przez środek, i dystans do środka
+ * kłamałby o kilometr.
+ */
+function nearbyPlaces(here: Pt, limit = 6) {
+  return (parksData as unknown as { features: Feature[] }).features
+    .map((f) => ({
+      name: f.properties.name,
+      m: distanceToParkM(here, f.geometry as never),
+    }))
+    .sort((a, b) => a.m - b.m)
+    .slice(0, limit)
+}
+
 export function buildGuideContext(input: GuideInput): { place: string; point: string; story: string } {
   const { parkId, parkName, here, collected, weather, focus } = input
   const quest = parkId ? questForPark(parkId) : null
   const bits: string[] = []
 
-  /* 1. gdzie stoisz i co jest najbliżej */
-  if (here && quest) {
-    const near = quest.pois
-      .map((p) => ({ p, d: distanceM(here, p.coords) }))
-      .sort((a, b) => a.d - b.d)
-      .slice(0, 3)
-    const away =
-      input.parkGeometry != null ? distanceToParkM(here, input.parkGeometry as never) : null
-    bits.push(
-      [
-        'GDZIE JESTEM',
-        away != null && away > 200
-          ? `Jeszcze nie w miejscu: ${formatDistance(away)} do granicy.`
-          : 'Jestem na miejscu.',
-        ...near.map((n) => `Najbliżej: ${n.p.name}, ${formatDistance(n.d)}.`),
-      ].join('\n'),
+  /* 1. gdzie stoisz: pozycja liczy się także bez wybranego miejsca */
+  if (here) {
+    const rows = ['GDZIE JESTEM']
+    if (input.parkGeometry != null) {
+      const away = distanceToParkM(here, input.parkGeometry as never)
+      rows.push(
+        away > 200
+          ? `Do ${parkName ?? 'tego miejsca'}: ${formatDistance(away)} do granicy, jeszcze nie jestem w środku.`
+          : `Jestem w środku: ${parkName ?? 'to miejsce'}.`,
+      )
+    }
+    if (quest) {
+      const near = quest.pois
+        .map((p) => ({ p, d: distanceM(here, p.coords) }))
+        .sort((a, b) => a.d - b.d)
+        .slice(0, 3)
+      rows.push(...near.map((n) => `Najbliższy punkt: ${n.p.name}, ${formatDistance(n.d)}.`))
+    }
+    /*
+     * Co jest dookoła, zawsze. Bez tego na pytanie „co mam blisko" model mógł
+     * tylko zgadywać, bo znał wyłącznie punkty jednego wybranego parku.
+     */
+    rows.push(
+      'Najbliższe miejsca z aplikacji (licząc do granicy):',
+      ...nearbyPlaces(here).map((n) => `- ${n.name}: ${formatDistance(n.m)}`),
     )
-  } else if (!here) {
-    bits.push('GDZIE JESTEM\nBrak pozycji, pytam z domu albo bez sygnału.')
+    bits.push(rows.join('\n'))
+  } else {
+    bits.push('GDZIE JESTEM\nNie znam pozycji: pytam z domu albo bez zgody na lokalizację.')
   }
 
   /* 2. postęp: co zebrane, ile do pieczątki */

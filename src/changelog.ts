@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.71.0'
+export const VERSION = '0.72.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.72.0',
+    date: '2026-08-22',
+    title: 'The guide knows where you are, if you let it',
+    changes: [
+      ['fixed', 'Asking the phone for a position was buried inside the peek card, so a guide opened from the main screen knew nothing about where you stood. One function now does it, called by the peek, by the guide on every opening, and by a Share location button inside the conversation itself'],
+      ['added', 'The guide gets the six nearest places from the whole app with distances, measured to the boundary rather than to the middle, because you enter a big valley from the side and the distance to its centre would lie by a kilometre. That is the answer to what is around me, a question that previously could not be asked because the context only knew the points of one selected place'],
+      ['added', 'Without a position the guide says so plainly and offers one button, instead of pretending it knows. Tested from Ruczaj: it answered Park Macka i Doroty at 1.6 kilometres, Solvay at 2.1 and Zakrzowek at 2.4'],
+    ],
+  },
   {
     version: '0.71.0',
     date: '2026-08-22',

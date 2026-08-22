@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { CornerDownLeft, Sparkle } from 'lucide-react'
+import { CornerDownLeft, LocateFixed, Sparkle } from 'lucide-react'
 import { BottomSheet } from '../ds'
 import { askAbout, askedToday } from './ask'
 import { buildGuideContext } from './guideContext'
@@ -36,12 +36,15 @@ export function GuideSheet({
   input,
   thread,
   onThread,
+  onLocate,
 }: {
   open: boolean
   onClose: () => void
   input: GuideInput
   thread: GuideTurn[]
   onThread: (next: GuideTurn[]) => void
+  /** dopytanie telefonu o pozycję, gdy jej jeszcze nie mamy */
+  onLocate?: () => void
 }) {
   const [q, setQ] = useState('')
   const [busy, setBusy] = useState(false)
@@ -82,6 +85,20 @@ export function GuideSheet({
           'Pytaj o miejsca, trasy i pogodę. Gdy wybierzesz miejsce, będę wiedział też, gdzie stoisz.'
         )}
       </p>
+
+      {/*
+        Bez pozycji przewodnik jest tylko wyszukiwarką, więc mówimy o tym wprost i
+        dajemy jeden przycisk, zamiast czekać, aż ktoś domyśli się sam.
+      */}
+      {!input.here && onLocate && (
+        <button className="guide__locate" onClick={onLocate}>
+          <LocateFixed size={16} />
+          <span>
+            <strong>Nie wiem, gdzie jesteś.</strong> Udostępnij lokalizację, a powiem, co masz
+            dookoła i jak daleko.
+          </span>
+        </button>
+      )}
 
       {thread.length === 0 && (
         <div className="guide__starters">

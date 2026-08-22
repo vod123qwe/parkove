@@ -1617,6 +1617,33 @@
   color: var(--content-secondary);
 }
 
+/* brak pozycji: jedno zdanie i jeden przycisk, bez zgadywania */
+.guide__locate {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  width: 100%;
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border-info);
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-info-subtle);
+  color: var(--content-primary);
+  font-family: var(--font-text);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.guide__locate svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--content-info);
+}
+
 /* pytania na start: puste pole to najgorsze, co można dać komuś w terenie */
 .guide__starters {
   display: flex;
