@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.79.0'
+export const VERSION = '0.79.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.79.1',
+    date: '2026-08-22',
+    title: 'The walk detail track is the lime from a memory',
+    changes: [
+      ['changed', 'The track on the walk detail screen takes the lime the replay uses for the same thing, and drops the white casing. Lime is brighter than anything it can lie on, so it needs no backing, and the screen is one layer cleaner for it. On the main map that colour belongs to the trail, so the track has to differ there, but this screen has no trail on it: one line, and that line is the road you walked'],
+    ],
+  },
   {
     version: '0.79.0',
     date: '2026-08-22',

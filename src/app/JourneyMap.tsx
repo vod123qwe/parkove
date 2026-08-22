@@ -94,27 +94,24 @@ export function JourneyMap({
         } as never,
       })
       /*
-       * Biała obwódka pod śladem, tak samo jak na mapie głównej.
+       * Ślad w limonce ze wspomnienia (--trail-edge), bez obwódki.
        *
-       * Sam ślad jest w kolorze --content-accent, czyli w tym samym ciemnym
-       * zielonym, co tło przycisku, i na ortofotomapie lasu ginął: ciemna linia
-       * na ciemnym tle. Jasna otoczka czyta się na każdym podłożu, a kolor śladu
-       * zostaje, więc nie mieszamy go z limonkowym szlakiem, który jest
-       * podpowiedzią, nie zapisem.
+       * Był w --content-accent, czyli w tym samym ciemnym zielonym, co tło
+       * przycisku, i na ortofotomapie lasu ginął. Pierwszą próbą była biała
+       * otoczka, jak na mapie głównej, ale Jarek wolał sam kolor, i ma rację:
+       * limonka jest jaśniejsza od wszystkiego, na czym może leżeć, więc nie
+       * potrzebuje podkładki, a ekran jest wtedy o jedną warstwę czystszy.
+       *
+       * Na mapie głównej ten kolor należy do szlaku, więc ślad musi się tam od
+       * niego różnić. Tutaj żadnego szlaku nie ma, jest jedna linia i to jest
+       * przebyta droga, dokładnie jak we wspomnieniu.
        */
-      map.addLayer({
-        id: 'j-track-casing',
-        type: 'line',
-        source: 'j-track',
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': '#ffffff', 'line-width': 7, 'line-opacity': 0.72 },
-      })
       map.addLayer({
         id: 'j-track-line',
         type: 'line',
         source: 'j-track',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': colors.accentStrong, 'line-width': 4, 'line-opacity': 0.9 },
+        paint: { 'line-color': colors.trailEdge, 'line-width': 4, 'line-opacity': 1 },
       })
 
       /*
@@ -142,7 +139,7 @@ export function JourneyMap({
           paint: {
             'circle-radius': 5,
             'circle-color': colors.gold,
-            'circle-stroke-width': 2.5,
+            'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff',
           },
         })

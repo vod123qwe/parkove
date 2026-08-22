@@ -147,11 +147,16 @@ pamięć telefonu.
 
 ## Ślad na szczegółach wyprawy
 
-Ten sam problem, co na mapie głównej: ślad jest w `--content-accent`, czyli w
-tym samym ciemnym zielonym, co tło przycisku, i na ortofotomapie lasu ginął.
-Rozwiązanie też to samo, żeby oba ekrany mówiły jednym językiem: **biała
-obwódka** pod śladem (7 px, krycie 0.72), a kolor śladu zostaje, więc nie miesza
-się z limonkowym szlakiem, który jest podpowiedzią, nie zapisem.
+Ten sam problem, co na mapie głównej: ślad był w `--content-accent`, czyli w tym
+samym ciemnym zielonym, co tło przycisku, i na ortofotomapie lasu ginął.
+
+Pierwszą próbą była biała obwódka, jak na mapie głównej, ale Jarek wolał
+**limonkę ze wspomnienia** (`--trail-edge`, `#7ce93f`) i bez obwódki. Ma rację z
+dwóch powodów. Limonka jest jaśniejsza od wszystkiego, na czym może leżeć, więc
+nie potrzebuje podkładki, a ekran jest o jedną warstwę czystszy. I ten ekran nie
+ma szlaku: na mapie głównej limonka należy do szlaku, więc ślad musi się tam od
+niego różnić, ale tutaj jest jedna linia i to jest przebyta droga, dokładnie jak
+we wspomnieniu.
 
 Do tego **złota kropka na starcie**, tym samym językiem, co miniatura na liście
 wypraw. Mety nie ma i to jest decyzja: większość tych wypraw to pętle, więc
