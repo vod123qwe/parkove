@@ -240,11 +240,6 @@ export function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [peekOpen, selectedId])
 
-  /** walking distance where starting a walk is a real option */
-  const NEAR_PARK_M = 300
-  const nearSelected =
-    !!selected && !!myFix && distanceToParkM(myFix.coords, selected.geometry) <= NEAR_PARK_M
-
   // swipeable peek pages: park -> quest points -> parking
   const peekPages = useMemo<PeekPage[]>(() => {
     if (!selected) return []
@@ -768,6 +763,12 @@ export function App() {
           if (selected) flyToPark(selected, Math.round(window.innerHeight * 0.42))
         }}
         action={
+          /*
+           * Dwa przyciski zawsze, start jako CTA po prawej. Wcześniej start
+           * pokazywał się tylko blisko parku, więc z domu widziałeś jeden przycisk
+           * i nie dało się zacząć wyprawy przed dojazdem. Karta wyprawy radzi
+           * sobie z odległością sama: mówi „do parku" i podaje dystans.
+           */
           <div className="app-peekactions">
             <Button
               full
@@ -777,21 +778,19 @@ export function App() {
                 if (selected) flyToPark(selected, Math.round(window.innerHeight * 0.42))
               }}
             >
-              {nearSelected ? 'Szczegóły' : 'Zobacz szczegóły miejsca'}
+              Szczegóły
             </Button>
-            {nearSelected && (
-              <Button
-                full
-                icon={<Compass size={18} />}
-                onClick={() => {
-                  if (!selected) return
-                  beginWalk(selected.id, selected.properties.name)
-                  clearSelection()
-                }}
-              >
-                Zacznij wyprawę
-              </Button>
-            )}
+            <Button
+              full
+              icon={<Compass size={18} />}
+              onClick={() => {
+                if (!selected) return
+                beginWalk(selected.id, selected.properties.name)
+                clearSelection()
+              }}
+            >
+              Rozpocznij
+            </Button>
           </div>
         }
       >

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.67.1'
+export const VERSION = '0.68.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.68.0',
+    date: '2026-08-22',
+    title: 'Two buttons on the peek card, and start is the one on the right',
+    changes: [
+      ['changed', 'The peek card always offers both: details on the left, start the walk as the call to action on the right. Start used to appear only within three hundred metres of the place, so from home there was one button and no way to begin a walk before driving out. The walk card handles distance by itself: it says to the park and gives the number'],
+    ],
+  },
   {
     version: '0.67.1',
     date: '2026-08-22',
