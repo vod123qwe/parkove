@@ -7,7 +7,7 @@ import { MemoryViewer } from './MemoryViewer'
 import { PoiModal } from './PoiSheet'
 import { REPLAY_LOOKS, replayStyle } from './data/mapstyles'
 import type { ReplayLook } from './data/mapstyles'
-import { buildTimeline, metresAt, msAtMetres, noteType, pointAt, walkedSoFar } from './memory'
+import { buildTimeline, metresAt, msAtMetres, pointAt, walkedSoFar } from './memory'
 import type { Timeline } from './memory'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import type { Journey } from './state'
@@ -61,8 +61,15 @@ const TURN_TAU = 420
 const MAX_RATE = 180
 /** gdzie parkuje raczka, gdy wyprawa jedzie sama */
 const CRUISE = 0.5
-/** travel of the handle, in pixels, from the middle to either end */
-const DIAL_THROW = 110
+/**
+ * Przepustnica stoi teraz pionowo na prawej krawedzi, a nie lukiem na dole.
+ * Powod jest o miejsce: dol nalezy do tresci, a suwak na krawedzi zajmuje pasek
+ * szerokosci kciuka. Skok 118 px w kazda strone to zasieg kciuka bez
+ * przekladania telefonu; srodek toru i podzialka licza sie w jednostkach SVG.
+ */
+const DIAL_THROW = 118
+const THR_MID = 120
+const THR_TRAVEL = 96
 /** po tylu ms bez dotkniecia sterowanie gasnie, jesli cos sie dzieje */
 const IDLE_HIDE_MS = 2500
 /**
@@ -92,14 +99,33 @@ const WALK_PAD = 0.34
 const READ_PAD = 0.42
 /** jak szybko kadr przechodzi miedzy chodzeniem i czytaniem, w ms */
 const PAD_TAU = 260
+/**
+ * Rozejrzenie sie, palcem po mapie, w granicach.
+ *
+ * Powod jest praktyczny, nie estetyczny: Jarek pisze, ze "czasem gdzies postac
+ * wychodzi za gore i nie widac". Kamera jedzie po kursie trasy, a w dolinie z
+ * pitchem 58 grzbiet potrafi ja zaslonic. Poziomo obracasz sie wokol chodzacego,
+ * pionowo podnosisz i opuszczasz kamere, i to drugie rozwiazuje zaslonienie
+ * skuteczniej, bo z gory nie zaslania nic.
+ *
+ * Kazdy gest wybiera swoja os na pierwszym ruchu i przy niej zostaje: dwie osie
+ * naraz w jednym przeciagnieciu robia sie papkowate.
+ */
+const SPIN_MAX = 60
+const SPIN_PER_PX = 0.3
+const TILT_BASE = 58
+const TILT_MIN = 40
+/*
+ * Gora to 60, bo tyle daje MapLibre bez podnoszenia maxPitch, i nie ma o co
+ * walczyc: przed zaslonieniem ratuje kierunek W DOL, czyli bardziej z gory.
+ * Wyzszy kat to wiekszy dramatyzm i wiekszy koszt, a nie lepsza widocznosc.
+ */
+const TILT_MAX = 60
+const TILT_PER_PX = 0.1
+/** przeciagniecie ponizej tylu pikseli to jeszcze dotkniecie, nie obrot */
+const DRAG_SLOP = 10
 /** how long the walk takes to reach the speed you asked for: it spins up */
 const RATE_TAU = 480
-/** how far the arc opens to each side, in degrees */
-const DIAL_SWEEP = 52
-/** the circle everything on the dial is drawn around, in viewBox units */
-const DIAL_CX = 150
-const DIAL_CY = 210
-const DIAL_R = 176
 
 /** a walk is usually minutes, so read it as mm:ss until it passes an hour */
 const fmtClock = (ms: number) => {
@@ -147,6 +173,24 @@ export function MemoryPlayer({
   const zoomRef = useRef(BASE_ZOOM)
   /** czy palce sa wlasnie na mapie: wtedy kamera nie wtraca sie do kadru */
   const pinching = useRef(false)
+  /** rozejrzenie sie: przesuniecie kursu i kat kamery, oba trzymane recznie */
+  const spin = useRef(0)
+  const tilt = useRef(TILT_BASE)
+  const drag = useRef<{
+    id: number
+    x: number
+    y: number
+    spin: number
+    tilt: number
+    axis: '' | 'x' | 'y'
+  } | null>(null)
+  /** czy to przeciagniecie bylo obrotem: wtedy nie liczy sie jako pauza */
+  const moved = useRef(false)
+  /**
+   * Prosba o jedno domalowanie kadru. Kamera odswieza sie tylko wtedy, gdy cos
+   * jedzie, wiec rozejrzenie sie na stojaco nie mialoby jak wejsc na ekran.
+   */
+  const poke = useRef(false)
 
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
@@ -578,9 +622,10 @@ export function MemoryPlayer({
       const v = padNow.current
       map.jumpTo({
         center: at,
-        bearing,
+        // kurs trasy plus to, o ile sam sie rozejrzales
+        bearing: bearing + spin.current,
         zoom: zoomRef.current,
-        pitch: 58,
+        pitch: tilt.current,
         // jeden suwak miedzy dwiema ramami: chodzenie w gorze, czytanie w dole
         /*
          * Zaciskane do zera z premedytacja. MapLibre rzuca wyjatkiem na ujemnym
@@ -757,8 +802,9 @@ export function MemoryPlayer({
           // mozna zawrocic. Bez tego staniesz przed pustym ekranem
           showChromeRef.current()
         }
-      } else if (settling) {
-        // stoisz, ale kamera jeszcze jedzie do swojej ramy: to trzeba domalowac
+      } else if (settling || poke.current) {
+        // stoisz, a kadr sie zmienia: rama dojezdza albo wlasnie sie rozgladasz
+        poke.current = false
         draw(elapsedRef.current, dt)
       }
       raf = requestAnimationFrame(step)
@@ -771,7 +817,7 @@ export function MemoryPlayer({
   // ---- the dial: a throttle that stays where you leave it ----
   const posRef = useRef(0)
   const [pos, setPos] = useState(0)
-  const dragFrom = useRef<{ x: number; pos: number } | null>(null)
+  const dragFrom = useRef<{ y: number; pos: number } | null>(null)
 
   /** the handle rides the arc; the speed it asks for rises as its square */
   const applyPos = (next: number) => {
@@ -791,13 +837,13 @@ export function MemoryPlayer({
     } catch {
       // some engines refuse: the drag still works through this element
     }
-    dragFrom.current = { x: e.clientX, pos: posRef.current }
+    dragFrom.current = { y: e.clientY, pos: posRef.current }
   }
   const onDialMove = (e: React.PointerEvent) => {
     const from = dragFrom.current
     if (!from) return
-    // sideways along the arc: right walks on, left walks back
-    applyPos(from.pos + (e.clientX - from.x) / DIAL_THROW)
+    // w gore idziesz dalej, w dol wracasz: tak, jak mowi o tym metafora
+    applyPos(from.pos - (e.clientY - from.y) / DIAL_THROW)
   }
   const onDialUp = () => {
     dragFrom.current = null
@@ -851,6 +897,9 @@ export function MemoryPlayer({
    * wraca na srodek. Kontrolka pokazuje ci, co sie wlasnie stalo.
    */
   tapRef.current = () => {
+    // przeciagniecie konczy sie takim samym `click`, bo mapa nie przechwytuje
+    // przesuwania; bez tego kazde rozejrzenie sie zatrzymywaloby wyprawe
+    if (moved.current) return
     if (posRef.current === 0) applyPos(CRUISE)
     else centre()
     showChrome()
@@ -861,11 +910,69 @@ export function MemoryPlayer({
   /** swipe w dol na karcie zdejmuje wspomnienie od razu */
   const cardFrom = useRef<number | null>(null)
 
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
+
+  /*
+   * Rozejrzenie sie po mapie jednym palcem. Mapa ma wylaczone przesuwanie i
+   * obracanie, wiec nic nam tego gestu nie zabiera i mozemy go wziac na siebie.
+   *
+   * Kierunek jest jak w kazdej mapie: grunt idzie za palcem. Przeciagasz w
+   * prawo, swiat jedzie w prawo, czyli kamera obchodzi chodzacego z lewej.
+   */
+  const onMapDown = (e: React.PointerEvent) => {
+    if (!e.isPrimary || pinching.current) return
+    drag.current = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      spin: spin.current,
+      tilt: tilt.current,
+      axis: '',
+    }
+    moved.current = false
+  }
+  const onMapMove = (e: React.PointerEvent) => {
+    const d = drag.current
+    if (!d || e.pointerId !== d.id) return
+    if (pinching.current) {
+      drag.current = null
+      return
+    }
+    const dx = e.clientX - d.x
+    const dy = e.clientY - d.y
+    if (!d.axis) {
+      if (Math.abs(dx) < DRAG_SLOP && Math.abs(dy) < DRAG_SLOP) return
+      d.axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y'
+      moved.current = true
+      showChromeRef.current()
+    }
+    if (d.axis === 'x') {
+      const next = clamp(d.spin - dx * SPIN_PER_PX, -SPIN_MAX, SPIN_MAX)
+      // blisko zera wraca na os trasy, zeby kadr dal sie wyprostowac
+      spin.current = Math.abs(next) < 4 ? 0 : next
+    } else {
+      const next = clamp(d.tilt + dy * TILT_PER_PX, TILT_MIN, TILT_MAX)
+      // tak samo jak kurs: blisko wartosci wyjsciowej wraca do niej samo
+      tilt.current = Math.abs(next - TILT_BASE) < 2.5 ? TILT_BASE : next
+    }
+    poke.current = true
+  }
+  const onMapUp = () => {
+    drag.current = null
+  }
+
   const progress = timeline.totalMs > 0 ? elapsed / timeline.totalMs : 0
 
   return (
     <div className="memplay">
-      <div ref={holder} className="memplay__map" />
+      <div
+        ref={holder}
+        className="memplay__map"
+        onPointerDown={onMapDown}
+        onPointerMove={onMapMove}
+        onPointerUp={onMapUp}
+        onPointerCancel={onMapUp}
+      />
 
       {/*
         Cichy cien na samym dole, zawsze. Nie zero, bo wlos postepu i wjezdzajacy
@@ -929,146 +1036,180 @@ export function MemoryPlayer({
         </div>
       )}
 
+      {/*
+        Dol nalezy do tresci i tylko do tresci. Sterowanie przenioslo sie na
+        prawa krawedz (pomysl Jarka: "moze kontrolka predkosci powinna sie
+        pojawiac po prawej jak suwak na srodku, wtedy byloby wiecej miejsca na
+        content"), wiec nie trzymamy tu zapasu na kontrolke i wspomnienie moze
+        zjechac az do wlosa postepu.
+      */}
       <div className="memplay__bottom">
-        {memory && (
-          <button
-            className="memplay__memory"
-            onPointerDown={(e) => {
-              cardFrom.current = e.clientY
-            }}
-            onPointerMove={(e) => {
-              if (cardFrom.current === null) return
-              if (e.clientY - cardFrom.current > 60) {
-                cardFrom.current = null
-                hideMemory()
-              }
-            }}
-            onPointerUp={() => {
-              cardFrom.current = null
-            }}
-            onPointerCancel={() => {
-              cardFrom.current = null
-            }}
-            onClick={() => {
-              // stop where we are: reading is not walking
-              targetRef.current = 0
-              rateRef.current = 0
-              posRef.current = 0
-              setPos(0)
-              if (memory.kind === 'mark') setOpenMark(memory.id)
-              else setOpenPoi(memory.poi)
-            }}
-          >
-            {memory.kind === 'mark' ? (
-              memory.mark.kind === 'photo' && memory.mark.url ? (
-                <>
-                  <img className="memplay__snap" src={memory.mark.url} alt={memory.mark.caption} />
-                  {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
-                </>
-              ) : memory.mark.kind === 'audio' && memory.mark.url ? (
-                <>
-                  <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
-                  {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
-                </>
-              ) : (
-                <p
-                  className="memplay__postit"
-                  style={noteType(memory.mark.caption || 'Pusta notatka')}
-                >
-                  {memory.mark.caption || 'Pusta notatka'}
-                </p>
-              )
-            ) : (
-              <>
-                <p className="t-body-strong memplay__poiname">{memory.poi.name}</p>
-                <p className="t-body-sm memplay__teaser">{memory.poi.teaser}</p>
-                <span className="memplay__more">czytaj więcej</span>
-              </>
-            )}
-          </button>
-        )}
+        {memory &&
+          (() => {
+            /*
+             * Otwiera sie tylko to, co ma co pokazac wiecej: zdjecie ma pelny
+             * ekran, punkt ma opis, legende i dylemat. Notatka i nagranie sa tu
+             * juz cale, wiec nie udaja, ze gdzies prowadza, i nie sa wtedy
+             * przyciskiem (decyzja Jarka: "jezeli jest audio lub notatka
+             * tekstowa, to niech to nie otwiera sie w nowym oknie").
+             */
+            const openable = memory.kind === 'poi' || memory.mark.kind === 'photo'
+            const Tag = (openable ? 'button' : 'div') as 'button'
+            return (
+              <Tag
+                className={`memplay__memory${openable ? '' : ' -flat'}`}
+                onPointerDown={(e: React.PointerEvent) => {
+                  cardFrom.current = e.clientY
+                }}
+                onPointerMove={(e: React.PointerEvent) => {
+                  if (cardFrom.current === null) return
+                  if (e.clientY - cardFrom.current > 60) {
+                    cardFrom.current = null
+                    hideMemory()
+                  }
+                }}
+                onPointerUp={() => {
+                  cardFrom.current = null
+                }}
+                onPointerCancel={() => {
+                  cardFrom.current = null
+                }}
+                onClick={
+                  openable
+                    ? () => {
+                        // stop where we are: reading is not walking
+                        targetRef.current = 0
+                        rateRef.current = 0
+                        posRef.current = 0
+                        setPos(0)
+                        if (memory.kind === 'mark') setOpenMark(memory.id)
+                        else setOpenPoi(memory.poi)
+                      }
+                    : undefined
+                }
+              >
+                {memory.kind === 'mark' ? (
+                  memory.mark.kind === 'photo' && memory.mark.url ? (
+                    <>
+                      <img
+                        className="memplay__snap"
+                        src={memory.mark.url}
+                        alt={memory.mark.caption}
+                      />
+                      {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
+                    </>
+                  ) : memory.mark.kind === 'audio' && memory.mark.url ? (
+                    <>
+                      <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
+                      {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
+                    </>
+                  ) : (
+                    /*
+                     * Notatka jest cytatem, nie karteczka. Zolty posit byl
+                     * najglosniejszym obiektem w calym kadrze i zabieral pol
+                     * ekranu czemus, co jest jednym zdaniem. Zostaje reka, ktora
+                     * to napisala, i znak cytatu u gory.
+                     */
+                    <p className="memplay__quote">
+                      <span className="memplay__quotemark" aria-hidden="true">
+                        &#8220;
+                      </span>
+                      {memory.mark.caption || 'Pusta notatka'}
+                    </p>
+                  )
+                ) : (
+                  <>
+                    {/*
+                      Punkt dostaje swoje zdjecie, gdy je ma, i to jest ta zmiana
+                      formy, o ktora pytal Jarek. Punkt byl jedyna forma bez
+                      zadnego przedmiotu: sam akapit na czerni. A w repozytorium
+                      leza 45 zdjec punktow, z ktorych ten ekran nie korzystal.
+                      Prosto, bez przekrzywienia: to nie Twoja fotka, to miejsce.
+                    */}
+                    {memory.poi.photo && (
+                      <img className="memplay__place" src={memory.poi.photo} alt={memory.poi.name} />
+                    )}
+                    <p className="t-body-strong memplay__poiname">{memory.poi.name}</p>
+                    <p className="t-body-sm memplay__teaser">{memory.poi.teaser}</p>
+                    <span className="memplay__more">czytaj wiecej</span>
+                  </>
+                )}
+              </Tag>
+            )
+          })()}
+      </div>
 
-        <div className={`memplay__hud${chrome ? '' : ' -off'}`}>
-        <div className="memplay__clock">
-          <span className="memplay__time">{fmtClock(elapsed).replace(':', ' : ')}</span>
-          <span className="memplay__clocklabel">czas wyprawy</span>
-        </div>
-
+      {/*
+        Przepustnica na prawej krawedzi, w pionie, na srodku wysokosci. Pion jest
+        przy okazji uczciwszy wobec metafory: komentarz w tym pliku od zawsze
+        mowil "push it up and your past self starts moving", a luk byl poziomy.
+      */}
+      <div className={`memplay__hud${chrome ? '' : ' -off'}`}>
         <div
-          className="memplay__dial"
+          className="memplay__throttle"
           onPointerDown={onDialDown}
           onPointerMove={onDialMove}
           onPointerUp={onDialUp}
           onPointerCancel={onDialUp}
         >
-          {/* ticks and the arc live under a shadow that eats their ends */}
-          <div className="memplay__arcwrap">
-            <svg className="memplay__arc" viewBox="0 0 300 110" aria-hidden="true">
-              {/*
-                * The fade lives here rather than in a CSS mask: a gradient in
-                * user space around the same centre the ticks radiate from
-                * dissolves every tick along its own length, at exactly the
-                * right radius, whatever size the dial ends up.
-                */}
-              <defs>
-                <radialGradient
-                  id="pk-tick-fade"
-                  gradientUnits="userSpaceOnUse"
-                  cx={DIAL_CX}
-                  cy={DIAL_CY}
-                  r={DIAL_R + 35}
-                >
-                  <stop offset="0.84" stopColor="#ffffff" stopOpacity="0" />
-                  <stop offset="0.9" stopColor="#ffffff" stopOpacity="0.18" />
-                  <stop offset="0.95" stopColor="#ffffff" stopOpacity="0.55" />
-                  <stop offset="1" stopColor="#ffffff" stopOpacity="0.95" />
-                </radialGradient>
-              </defs>
-              <path
-                d="M 11.3 101.6 A 176 176 0 0 1 288.7 101.6"
-                fill="none"
-                stroke="rgba(255,255,255,0.1)"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-              />
-              {Array.from({ length: 61 }, (_, i) => {
-                const at = (i / 60) * 2 - 1
-                const a = at * DIAL_SWEEP * (Math.PI / 180)
-                return (
-                  <line
-                    key={i}
-                    x1={DIAL_CX + Math.sin(a) * (DIAL_R + 1)}
-                    y1={DIAL_CY - Math.cos(a) * (DIAL_R + 1)}
-                    x2={DIAL_CX + Math.sin(a) * (DIAL_R + 35)}
-                    y2={DIAL_CY - Math.cos(a) * (DIAL_R + 35)}
-                    stroke="url(#pk-tick-fade)"
-                    strokeWidth="1.1"
-                    strokeLinecap="round"
-                  />
-                )
-              })}
-            </svg>
-          </div>
+          <svg viewBox="0 0 56 240" className="memplay__ladder" aria-hidden="true">
+            {/*
+              Poswiata idzie za raczka, a nie stoi w srodku toru: to ona robi z
+              drabinki przepustnice, a nie rzad kresek. Gradient w jednostkach
+              uzytkownika, wiec kazda kreska gasnie na swojej dlugosci.
+            */}
+            <defs>
+              <linearGradient
+                id="pk-lad-fade"
+                gradientUnits="userSpaceOnUse"
+                x1="0"
+                y1={THR_MID - pos * THR_TRAVEL - 78}
+                x2="0"
+                y2={THR_MID - pos * THR_TRAVEL + 78}
+              >
+                <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
+                <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.9" />
+                <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {Array.from({ length: 41 }, (_, i) => {
+              const y = THR_MID - THR_TRAVEL + (i / 40) * THR_TRAVEL * 2
+              const mid = i === 20
+              return (
+                <line
+                  key={i}
+                  x1={mid ? 24 : 31}
+                  y1={y}
+                  x2="52"
+                  y2={y}
+                  stroke={mid ? 'var(--trail-edge)' : 'url(#pk-lad-fade)'}
+                  strokeOpacity={mid ? 0.55 : 1}
+                  strokeWidth={mid ? 1.6 : 1.1}
+                  strokeLinecap="round"
+                />
+              )
+            })}
+          </svg>
 
-          {/* the handle sits above that shadow, so it never dims */}
-          <svg className="memplay__handlelayer" viewBox="0 0 300 110" aria-hidden="true">
-            <g transform={`rotate(${pos * DIAL_SWEEP} ${DIAL_CX} ${DIAL_CY})`}>
+          {/* raczka nad poswiata, wiec nigdy nie gasnie razem z kreskami */}
+          <svg viewBox="0 0 56 240" className="memplay__grip" aria-hidden="true">
+            <g transform={`translate(0 ${(-pos * THR_TRAVEL).toFixed(2)})`}>
               <rect
-                x={DIAL_CX - 34}
-                y={DIAL_CY - DIAL_R - 19}
-                width="68"
-                height="38"
-                rx="19"
+                x="6"
+                y={THR_MID - 15}
+                width="44"
+                height="30"
+                rx="15"
                 fill="var(--trail-fill)"
                 stroke="var(--trail-edge)"
-                strokeWidth="3"
+                strokeWidth="2.6"
               />
               {[-3.5, 3.5].map((dx) =>
                 [-3.5, 3.5].map((dy) => (
                   <rect
                     key={`${dx}${dy}`}
-                    x={DIAL_CX + dx - 1.5}
-                    y={DIAL_CY - DIAL_R + dy - 1.5}
+                    x={28 + dx - 1.5}
+                    y={THR_MID + dy - 1.5}
                     width="3"
                     height="3"
                     rx="0.8"
@@ -1078,33 +1219,36 @@ export function MemoryPlayer({
               )}
             </g>
           </svg>
-
-        </div>
         </div>
 
-        {/* gdzie jestes w wyprawie: tego dotad nie bylo nigdzie */}
-        <div className="memplay__bar" aria-hidden="true">
-          <span
-            className="memplay__barfill"
-            style={{ transform: `scaleX(${Math.max(0, Math.min(1, progress))})` }}
-          />
+        <div className="memplay__clock">
+          <span className="memplay__time">{fmtClock(elapsed).replace(':', ' : ')}</span>
+          <span className="memplay__clocklabel">czas wyprawy</span>
         </div>
+      </div>
 
-        {openMark && (
-          <MemoryViewer
-            marks={marks}
-            startId={openMark}
-            onClose={() => shut(() => setOpenMark(null))}
-          />
-        )}
-
-        <PoiModal
-          poi={openPoi}
-          parkId={journey.parkId}
-          collected
-          onClose={() => shut(() => setOpenPoi(null))}
+      {/* gdzie jestes w wyprawie: tego dotad nie bylo nigdzie */}
+      <div className="memplay__bar" aria-hidden="true">
+        <span
+          className="memplay__barfill"
+          style={{ transform: `scaleX(${Math.max(0, Math.min(1, progress))})` }}
         />
       </div>
+
+      {openMark && (
+        <MemoryViewer
+          marks={marks}
+          startId={openMark}
+          onClose={() => shut(() => setOpenMark(null))}
+        />
+      )}
+
+      <PoiModal
+        poi={openPoi}
+        parkId={journey.parkId}
+        collected
+        onClose={() => shut(() => setOpenPoi(null))}
+      />
     </div>
   )
 }

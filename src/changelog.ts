@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.80.0'
+export const VERSION = '0.81.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,20 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.81.0',
+    date: '2026-08-22',
+    title: 'The throttle moves to the edge, and a memory becomes a thing you look at',
+    changes: [
+      ['changed', 'The speed control stands vertically on the right edge, in a strip the width of a thumb, instead of lying across the bottom. The bottom now belongs entirely to what you came to see, so it holds no reserve for a control and a memory can sit right down against the progress hairline. Vertical is also more honest about the metaphor: the comment in this file always said push it up and your past self starts moving, while the arc was horizontal'],
+      ['added', 'A quest point shows its own photograph. It was the only form with no object at all, just a paragraph on black, while your own photo had a polaroid and a note had a sticker. Meanwhile 45 photographs of these places were sitting in the repository unused. Plain, no white border, because that is what tells it apart from your snapshot: this is not your picture, this is the place'],
+      ['changed', 'A note is a quotation now rather than a sticky note. The yellow sticker was the loudest object in the frame and it took half the screen for something that is one sentence. What stays is the hand that wrote it and a quote mark above'],
+      ['changed', 'Notes and recordings no longer open a full screen of their own. They are already whole where they are, a sentence and a recording that plays in place, so they stopped being buttons and stopped pretending to lead somewhere. Only a photograph and a point open, because only they have more to show'],
+      ['added', 'One finger on the map looks around: sideways orbits the walker up to sixty degrees each way, up and down raises and lowers the camera between forty and sixty. Lowering is what actually solves a walker hidden behind a ridge, because from above nothing blocks the view. Each drag picks its axis on the first movement and keeps it, and both offsets snap back to straight when you get close'],
+      ['changed', 'The clock moved to the top, on the axis. It first landed bottom left and sat straight on top of read more'],
+      ['changed', 'The photograph in a memory is larger, 72 percent of the width instead of 57, now that nothing below it is competing'],
+    ],
+  },
   {
     version: '0.80.0',
     date: '2026-08-22',

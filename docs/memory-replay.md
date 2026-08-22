@@ -127,3 +127,97 @@ Mapa działa jak dotąd, i to było wprost w prośbie: to samo prowadzenie, to s
 patrzenie w przód (`LOOKAHEAD_M`), to samo wygładzanie kursu (`TURN_TAU`), ten
 sam pitch 58, ta sama ortofotomapa o poziom głębiej, ta sama szczypta z
 limitami. Zmieniło się tylko, gdzie w kadrze siedzisz i co wokół tego wisi.
+
+## Krok drugi: przepustnica na krawędź, treść w dół
+
+Po pierwszym podejściu dial siedział na dole i to nadal kosztowało miejsce.
+Jarek: „może kontrolka prędkości powinna się pojawiać po prawej jak suwak na
+środku, a nie na dole, wtedy byłoby więcej miejsca na content" i „nie
+musielibyśmy zostawiać spacingu na ewentualną kontrolkę na dole, więc cały
+content poszedłby w dół".
+
+**Przepustnica stoi pionowo na prawej krawędzi**, na środku wysokości, w pasku
+szerokości kciuka. Trzy rzeczy na tym zyskaliśmy:
+
+- dół należy w całości do treści i nie trzyma zapasu na kontrolkę, więc
+  wspomnienie zjeżdża aż do włosa postępu,
+- pion jest **uczciwszy wobec metafory**: komentarz w tym pliku od zawsze mówił
+  „push it up and your past self starts moving", a łuk był poziomy,
+- zdjęcie może być większe: 72% szerokości zamiast 57%.
+
+Łuk zamieniliśmy na drabinkę kresek z pastylką jeżdżącą po niej. Poświata idzie
+**za rączką**, a nie stoi w środku toru: to ona robi z drabinki przepustnicę, a
+nie rząd kresek. Dłuższa kreska w środku znaczy stop.
+
+**Zegar poszedł na górę, na oś.** Najpierw wylądował w lewym dolnym narożniku i
+wchodził wprost na „czytaj więcej": dół jest teraz treścią, a góra była i tak
+pusta.
+
+## Formy wspomnień
+
+Jarek: „pomyślałbym, czy też nie zmienić formy wyświetlania tych informacji,
+zdjęć, notatek, audio".
+
+Punkt był **jedyną formą bez żadnego przedmiotu**: sam akapit na czerni, podczas
+gdy zdjęcie miało polaroida, a notatka karteczkę. A w repozytorium leży 45 zdjęć
+punktów, z których ten ekran nie korzystał ani razu.
+
+| Forma | Jak wygląda | Otwiera się? |
+| --- | --- | --- |
+| punkt ze zdjęciem | zdjęcie miejsca, prosto, bez ramki, pod nim nazwa i zajawka | tak, pełny opis |
+| punkt bez zdjęcia | nazwa i zajawka | tak, pełny opis |
+| Twoje zdjęcie | polaroid, przekrzywiony, podpis kursywą kroju wyświetlanego | tak, pełny ekran |
+| notatka | cytat: ręczny krój i znak cytatu u góry | **nie** |
+| nagranie | przycisk odtwarzania i własna fala, podpis pod nią | **nie** |
+
+Zdjęcie punktu jest **proste i bez białej ramki**, i tym różni się od Twojego
+polaroida: to nie Twoja fotka, to jest to miejsce.
+
+**Notatka przestała być karteczką.** Żółty posit był najgłośniejszym obiektem w
+całym kadrze i zabierał pół ekranu czemuś, co jest jednym zdaniem. Zostaje ręka,
+która to napisała, i znak cytatu u góry. Ręczny krój, a nie kursywa kroju
+wyświetlanego, bo kursywa należy do podpisów pod zdjęciem i nagraniem, a notatkę
+pisałeś Ty.
+
+**Notatka i nagranie nie otwierają nowego okna** (decyzja Jarka). Są tu już całe:
+notatka to jedno zdanie, nagranie gra na miejscu. Dlatego przestały być
+przyciskiem, żeby nie udawały, że gdzieś prowadzą. Otwiera się tylko to, co ma co
+pokazać więcej: zdjęcie ma pełny ekran, punkt ma opis, legendę i dylemat.
+
+## Rozejrzenie się
+
+Jarek: „myślę, żeby mieć możliwość lekko obracania, pod jakim kątem widzę z tyłu
+punkt, bo czasem gdzieś postać wychodzi za górę i nie widać".
+
+Jednym palcem po mapie, bo mapa ma wyłączone przesuwanie i obracanie, więc nic
+nam tego gestu nie zabiera:
+
+- **poziomo** obracasz się wokół chodzącego, do 60 stopni w każdą stronę,
+- **pionowo** podnosisz i opuszczasz kamerę, od 40 do 60 stopni.
+
+To drugie rozwiązuje zasłonięcie skuteczniej, bo z góry nie zasłania nic. Górna
+granica to 60, bo tyle daje MapLibre bez podnoszenia `maxPitch`, i nie ma o co
+walczyć: wyższy kąt to większy dramatyzm i większy koszt, a nie lepsza
+widoczność.
+
+Trzy rzeczy, które trzeba było rozwiązać:
+
+- **każdy gest wybiera swoją oś na pierwszym ruchu** i przy niej zostaje. Dwie
+  osie naraz w jednym przeciągnięciu robią się papkowate,
+- **przeciągnięcie nie może liczyć się jako dotknięcie**, bo mapa nie
+  przechwytuje przesuwania i po każdym obrocie leci normalny `click`. Bez tego
+  każde rozejrzenie się zatrzymywałoby wyprawę,
+- **kamera odświeża się tylko wtedy, gdy coś jedzie**, więc rozejrzenie się na
+  stojąco nie miałoby jak wejść na ekran. Stąd jednorazowa prośba o domalowanie
+  kadru.
+
+Oba przesunięcia zostają, dopóki ich nie odkręcisz, bo dolina ma ten sam kształt
+przez całą drogę. Blisko wartości wyjściowej wracają do niej same, żeby kadr dał
+się wyprostować bez celowania.
+
+## Co zostało sprawdzone na żywo
+
+Wszystkie pięć form, każda z osobna, na zasianej wyprawie w Dolinie Będkowskiej:
+punkt ze zdjęciem, punkt bez zdjęcia, polaroid z podpisem, notatka jako cytat i
+nagranie z falą. Do tego obie osie rozejrzenia się (kurs 3 → 51 → −40 stopni,
+kąt 58 → 44 → 60) i to, że karta zostaje na postoju.
