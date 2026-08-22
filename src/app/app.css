@@ -1353,6 +1353,98 @@
   margin: 0;
 }
 
+/*
+ * Pytanie o punkt. Pudełko jest wyraźnie inne od reszty karty, bo odpowiedź
+ * modelu nie może wyglądać jak treść, którą sprawdziliśmy: przerywana ramka,
+ * chłodne tło i etykieta wprost. Ta sama logika, co przy legendach w innym kroju.
+ */
+.poi-ask {
+  margin: var(--sp-5) 0 var(--sp-4);
+  padding: var(--sp-4);
+  border: 1.5px dashed var(--border-info);
+  border-radius: 18px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-info-subtle);
+}
+
+.poi-ask__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--sp-3);
+  color: var(--content-info);
+}
+
+.poi-ask__row {
+  margin: 0 0 var(--sp-3);
+}
+
+.poi-ask__q {
+  margin: 0 0 4px;
+  font-weight: 700;
+  color: var(--content-primary);
+}
+
+.poi-ask__a {
+  margin: 0;
+  color: var(--content-secondary);
+}
+
+.poi-ask__field {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.poi-ask__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface);
+  color: var(--content-primary);
+  font-family: var(--font-text);
+  font-size: 15px;
+}
+
+.poi-ask__input:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.poi-ask__send {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.poi-ask__send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.poi-ask__note {
+  margin: var(--sp-2) 0 0;
+  color: var(--content-tertiary);
+}
+
+.poi-ask__note.-bad {
+  color: var(--content-info);
+  font-weight: 600;
+}
+
 .poi-sources {
   color: var(--content-tertiary);
   margin: 0;

@@ -17,15 +17,17 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const args = process.argv.slice(2)
 
 const fromCode = () => {
-  const src = readFileSync(resolve(root, 'src/app/plant.ts'), 'utf8')
-  return src.match(/export const PLANT_PROXY = '([^']*)'/)?.[1] ?? ''
+  const src = readFileSync(resolve(root, 'src/app/proxy.ts'), 'utf8')
+  const base = src.match(/export const PROXY: string = '([^']*)'/)?.[1] ?? ''
+  return base ? base.replace(/\/$/, '') + '/plant' : ''
 }
 
-const url = args.find((a) => a.startsWith('http')) ?? fromCode()
+const arg = args.find((a) => a.startsWith('http'))
+const url = arg ? (arg.endsWith('/plant') ? arg : arg.replace(/\/$/, '') + '/plant') : fromCode()
 const photo = args.find((a) => !a.startsWith('http')) ?? 'public/photos/dolina-kobylanska.jpg'
 
 if (!url) {
-  console.error('Nie ma adresu Workera. Wklej go do PLANT_PROXY w src/app/plant.ts')
+  console.error('Nie ma adresu Workera. Wklej go do PROXY w src/app/proxy.ts')
   console.error('albo podaj tutaj: npm run plant:test -- https://parkove-plant.xxx.workers.dev')
   process.exit(1)
 }

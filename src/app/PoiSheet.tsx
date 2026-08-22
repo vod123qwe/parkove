@@ -2,10 +2,18 @@ import { BookOpen, Lock, MapPin, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { Modal, Segmented } from '../ds'
 import { Dilemma } from './Dilemma'
+import { AskBox } from './AskBox'
 import type { QuestPoi } from './data/quests'
 import { asset } from './assets'
+import parksData from './data/parks.json'
 
 const MODE_KEY = 'pk-story-mode'
+
+/** ładna nazwa miejsca: model ma dostać „Dolina Będkowska", nie „dolina-bedkowska" */
+const placeName = (id: string | null) =>
+  (parksData as { features: Array<{ id: string; properties: { name: string } }> }).features.find(
+    (f) => f.id === id,
+  )?.properties.name ?? ''
 
 /** nazwa hosta, gdy źródło jest adresem; null, gdy to zwykły opis */
 function urlHost(s: string) {
@@ -123,6 +131,16 @@ export function PoiModal({
               </p>
             </div>
           )}
+          {/*
+            Pytanie na końcu, po całej sprawdzonej treści i po dylemacie: dopiero
+            wtedy wiesz, czego jeszcze nie wiesz. Wcześniej rozpraszałoby czytanie.
+          */}
+          <AskBox
+            place={placeName(parkId)}
+            point={poi.name}
+            story={[poi.teaser, ...poi.description, ...(poi.long ?? [])].join(' ')}
+          />
+
           {poi.sources && poi.sources.length > 0 && (
             <p className="t-caption poi-sources">
               Źródła:{' '}

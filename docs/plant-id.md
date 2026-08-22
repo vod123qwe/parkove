@@ -56,9 +56,16 @@ npm run plant:test -- https://parkove-plant.TWOJ-LOGIN.workers.dev
 - `plant:test` pyta Workera prawdziwym zdjęciem, pomijając aplikację, więc od
   razu wiadomo, czy działa Worker, czy trzeba szukać w interfejsie.
 
-Adres z `plant:deploy` wklejasz do `PLANT_PROXY` w
-[src/app/plant.ts](../src/app/plant.ts). Dopóki stała jest pusta, przycisk w
-aplikacji w ogóle się nie pokazuje.
+Adres z `plant:deploy` wklejasz do `PROXY` w
+[src/app/proxy.ts](../src/app/proxy.ts). Jedna stała na całą aplikację, bo ten
+sam Worker obsługuje też pytania o punkt (patrz [ask-ai.md](ask-ai.md)) i
+stawiasz go raz. Dopóki stała jest pusta, przyciski w ogóle się nie pokazują.
+
+Jeśli chcesz od razu włączyć pytania o punkt, dorzuć drugi sekret:
+
+```bash
+npm run ask:key
+```
 
 Klucz bierze się z darmowego konta na my.plantnet.org: **500 identyfikacji na
 dobę**, ponad 50 tysięcy gatunków. Po zalogowaniu klucz leży w ustawieniach

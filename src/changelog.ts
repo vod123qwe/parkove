@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.66.0'
+export const VERSION = '0.67.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.67.0',
+    date: '2026-08-22',
+    title: 'A place you can ask about, in a box that admits what it is',
+    changes: [
+      ['added', 'The point card ends with a question box. You type what the card did not answer and a model replies, with the card content as its context. Waiting for one address to be pasted in, like plant identification, and it goes through the same proxy, so the whole setup happens once'],
+      ['added', 'The rules for the model live in the proxy, not in the page: answer in Polish in a few sentences, keep to the place, never invent dates or names, say you do not know, always call a legend a legend, refuse to judge whether a cave or a rock is safe and point at the markings on site. Kept server side because rules in a static page can be swapped by anyone holding the key'],
+      ['changed', 'The box looks deliberately unlike the rest of the card: dashed border, cool background, and a line saying the answer comes from a language model and may be wrong while the rest of the card is checked. The app is built on never faking knowledge, so the one place where knowledge is uncertain has to be visible from a metre away'],
+      ['added', 'A daily cap on the proxy side, sixty questions, plus a local counter showing how many you asked today. Google no longer publishes the free tier numbers and reports put Flash at around twenty requests a day, so the cap answers with a refusal rather than a bill'],
+    ],
+  },
   {
     version: '0.66.0',
     date: '2026-08-22',

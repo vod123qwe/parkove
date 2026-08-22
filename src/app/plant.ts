@@ -16,13 +16,13 @@
  * udajemy, że telefon rozpoznaje rośliny sam.
  */
 
-/**
- * Adres Workera. Wklej po `wrangler deploy`, na przykład
- * 'https://parkove-plant.twoj-login.workers.dev'. Pusty = funkcja wyłączona.
- */
-export const PLANT_PROXY = ''
+import { proxyReady, proxyUrl } from './proxy'
 
-export const plantEnabled = () => PLANT_PROXY.length > 0
+/*
+ * Adres pośrednika jest jeden dla całej aplikacji (src/app/proxy.ts), bo ten sam
+ * Worker obsługuje rośliny i pytania o punkt. Wklejasz go raz.
+ */
+export const plantEnabled = () => proxyReady()
 
 export type PlantGuess = {
   /** 0 do 1, jak pewny jest model */
@@ -79,7 +79,7 @@ export async function identifyPlant(blob: Blob, organ: Organ = 'auto'): Promise<
 
   let res: Response
   try {
-    res = await fetch(PLANT_PROXY, { method: 'POST', body: form })
+    res = await fetch(proxyUrl('plant'), { method: 'POST', body: form })
   } catch {
     return { guesses: [], left: null, note: 'Nie udało się połączyć' }
   }
