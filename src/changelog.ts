@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.61.0'
+export const VERSION = '0.62.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.62.0',
+    date: '2026-08-22',
+    title: 'Weather where the choice is made',
+    changes: [
+      ['added', 'Every row in the list of places carries the sky, the temperature and the chance of rain, the last one only when it passes fifty percent in the next six hours. Choosing between five valleys on a Sunday morning is a question about where it will not be raining at two, and it should be one glance, not five cards opened one after another. All fifty six places come from a single request, because Open-Meteo takes many coordinates at once, and the answer is kept for half an hour'],
+      ['changed', 'The progress ring left the list rows. Same reason as in the peek card: the progress is already there in words, and an empty circle said nothing about the place. Degrees say something'],
+      ['changed', 'The hour strip in the place card breathes: wider columns, more space between them and inside them. The rain percentage row is always there, even empty, because otherwise the columns had different heights and the strip lost its rhythm'],
+    ],
+  },
   {
     version: '0.61.0',
     date: '2026-08-22',

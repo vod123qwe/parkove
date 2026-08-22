@@ -1,19 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import {
-  Cloud,
-  CloudDrizzle,
-  CloudFog,
-  CloudLightning,
-  CloudRain,
-  CloudRainWind,
-  CloudSnow,
-  CloudSun,
-  Sun,
-  Umbrella,
-  Wind,
-} from 'lucide-react'
+import { Umbrella, Wind } from 'lucide-react'
 import { getWeather, sky } from './weather'
-import type { Sky, Weather } from './weather'
+import type { Weather } from './weather'
+import { SKY_ICONS } from './skyIcons'
 
 /**
  * Pogoda w karcie miejsca: co jest teraz i jak to się zmieni do wieczora.
@@ -26,19 +15,6 @@ import type { Sky, Weather } from './weather'
  * Godziny, które już minęły, zostają na pasie wyszarzone. Wiedzieć, że rano
  * lało, też jest informacją: kałuże w dolinie zostają na pół dnia.
  */
-
-const ICONS: Record<Sky, React.ReactNode> = {
-  clear: <Sun />,
-  'mostly-clear': <CloudSun />,
-  cloudy: <CloudSun />,
-  overcast: <Cloud />,
-  fog: <CloudFog />,
-  drizzle: <CloudDrizzle />,
-  rain: <CloudRain />,
-  downpour: <CloudRainWind />,
-  snow: <CloudSnow />,
-  storm: <CloudLightning />,
-}
 
 const fmtAt = (at: number) =>
   new Date(at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
@@ -89,7 +65,7 @@ export function WeatherStrip({
     <section className="park-weather" aria-label="Pogoda">
       <div className="park-weather__now">
         <span className={`park-weather__icon -${nowSky.sky}`} aria-hidden="true">
-          {ICONS[nowSky.sky]}
+          {SKY_ICONS[nowSky.sky]}
         </span>
         <span className="park-weather__temp">
           {w.now.temp}
@@ -119,16 +95,22 @@ export function WeatherStrip({
                 {h.h === hourNow ? 'teraz' : `${h.h}`}
               </span>
               <span className={`park-weather__hicon -${s.sky}`} aria-label={s.label}>
-                {ICONS[s.sky]}
+                {SKY_ICONS[s.sky]}
               </span>
               <span className="park-weather__htemp">{h.temp}°</span>
-              {/* szansa opadu tylko od 20 procent: niżej to szum, nie prognoza */}
-              {h.rain >= 20 && (
-                <span className="t-caption park-weather__rain">
-                  <Umbrella size={11} aria-hidden="true" />
-                  {h.rain}%
-                </span>
-              )}
+              {/*
+                Szansa opadu tylko od 20 procent: niżej to szum, nie prognoza.
+                Wiersz jest jednak zawsze, tylko pusty, bo inaczej kolumny mają
+                różne wysokości i pas traci rytm.
+              */}
+              <span className="t-caption park-weather__rain">
+                {h.rain >= 20 && (
+                  <>
+                    <Umbrella size={11} aria-hidden="true" />
+                    {h.rain}%
+                  </>
+                )}
+              </span>
             </div>
           )
         })}

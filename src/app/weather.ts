@@ -106,6 +106,81 @@ export async function getWeather(
   }
 }
 
+/* ---------- jedno spojrzenie dla całej listy miejsc ---------- */
+
+const LIST_KEY = 'pk-weather-list'
+
+/** tyle, ile potrzebuje wiersz listy: ile stopni, jakie niebo, czy zmoknę */
+export type Glance = {
+  temp: number
+  code: number
+  /** największa szansa opadu w najbliższych sześciu godzinach, w procentach */
+  rain: number
+}
+
+/**
+ * Pogoda dla wszystkich miejsc naraz.
+ *
+ * Open-Meteo przyjmuje wiele współrzędnych w jednym zapytaniu i odpowiada
+ * tablicą w tej samej kolejności. Pięćdziesiąt sześć miejsc to jedno zapytanie,
+ * nie pięćdziesiąt sześć: wybierając w niedzielę rano między dolinkami chcesz
+ * zobaczyć, gdzie o czternastej nie leje, a nie otwierać pięciu kart po kolei.
+ */
+export async function getGlances(
+  places: Array<{ id: string; coords: [number, number] }>,
+): Promise<Record<string, Glance>> {
+  try {
+    const raw = localStorage.getItem(LIST_KEY)
+    if (raw) {
+      const box = JSON.parse(raw) as { at: number; data: Record<string, Glance> }
+      if (Date.now() - box.at < TTL_MS) return box.data
+    }
+  } catch {
+    /* zepsuty zapis: pytamy od nowa */
+  }
+
+  const lat = places.map((p) => p.coords[1].toFixed(3)).join(',')
+  const lon = places.map((p) => p.coords[0].toFixed(3)).join(',')
+  const url =
+    'https://api.open-meteo.com/v1/forecast' +
+    `?latitude=${lat}&longitude=${lon}` +
+    '&current=temperature_2m,weather_code&hourly=precipitation_probability' +
+    '&timezone=Europe%2FWarsaw&forecast_days=1'
+
+  try {
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(String(res.status))
+    const body = (await res.json()) as unknown
+    const list = (Array.isArray(body) ? body : [body]) as Array<{
+      current?: { temperature_2m: number; weather_code: number }
+      hourly?: { precipitation_probability: number[] }
+    }>
+    const hour = new Date().getHours()
+    const data: Record<string, Glance> = {}
+    list.forEach((x, i) => {
+      const place = places[i]
+      if (!place || !x.current) return
+      const probs = x.hourly?.precipitation_probability ?? []
+      data[place.id] = {
+        temp: Math.round(x.current.temperature_2m),
+        code: x.current.weather_code,
+        rain: Math.max(0, ...probs.slice(hour, hour + 6)),
+      }
+    })
+    localStorage.setItem(LIST_KEY, JSON.stringify({ at: Date.now(), data }))
+    return data
+  } catch {
+    // bez sieci lepiej pokazać stare stopnie niż nic; wiersz i tak jest skrótem
+    try {
+      const raw = localStorage.getItem(LIST_KEY)
+      if (raw) return (JSON.parse(raw) as { data: Record<string, Glance> }).data
+    } catch {
+      /* nic nie mamy */
+    }
+    return {}
+  }
+}
+
 /**
  * Kody WMO na słowa i grupy ikon. Grupa, nie ikona: komponent dobiera ikonę z
  * lucide, a tutaj trzymamy sam sens, żeby dane nie zależały od biblioteki.

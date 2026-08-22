@@ -61,7 +61,26 @@ pierwsza, która decyduje, czy w ogóle.
 - Godziny, które minęły, zostają wyszarzone i dostępne po przewinięciu w lewo.
   Poranne lanie znaczy kałuże po południu, więc to informacja, nie balast.
 - Szansa opadu pokazuje się od 20 procent. Niżej to szum, nie prognoza.
+- Odstępy w pasie godzin podbite po uwadze Jarka („ciasno"): przerwa między
+  kolumnami z 4 na 8 px, wewnątrz kolumny z 3 na 6, wysokość z 8 na 12, kolumna
+  56 px szeroka. Wiersz z procentem opadu **jest zawsze**, choćby pusty, bo
+  inaczej kolumny mają różne wysokości i pas traci rytm.
 - Każda odpowiedź siedzi w `localStorage` per miejsce (30 minut świeżości). Bez
   zasięgu pokazujemy ostatnią znaną prognozę i mówimy, z której godziny jest.
   Stara prognoza jest w dolinie warta więcej niż puste pole, ale tylko wtedy,
   gdy widać, że jest stara.
+
+## Pogoda w liście miejsc
+
+Wybierając w niedzielę rano między pięcioma dolinkami chcesz zobaczyć, gdzie o
+czternastej nie leje, a nie otwierać pięciu kart po kolei. Dlatego każdy wiersz
+listy ma po prawej **ikonę nieba, stopnie i procent opadu**, ten ostatni tylko
+od 50 procent w najbliższych sześciu godzinach.
+
+- **Jedno zapytanie na wszystkie miejsca.** Open-Meteo przyjmuje wiele
+  współrzędnych naraz i odpowiada tablicą w tej samej kolejności, więc 56 miejsc
+  to jedno zapytanie, nie 56. Płacimy za nie tylko wtedy, gdy lista jest otwarta,
+  a wynik trzyma się 30 minut.
+- **Pierścień postępu zniknął z wiersza.** Ten sam powód, co przy karcie
+  podglądu: postęp stoi w tym samym wierszu słowami („2 z 5 punktów"), a pusty
+  pierścień nie mówił nic o miejscu. Stopnie mówią.

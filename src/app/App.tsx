@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Award, Camera, ChevronRight, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, Map as MapIcon, Menu, Palette, RefreshCw, Sparkles, ToyBrick } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, PeekCard, ProgressRing, Segmented, Toast } from '../ds'
+import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
 import { SpotCard } from './SpotCard'
@@ -14,6 +14,9 @@ import { PoiModal } from './PoiSheet'
 import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
 import { MapFilters } from './MapFilters'
+import { getGlances, sky } from './weather'
+import type { Glance } from './weather'
+import { SKY_ICONS } from './skyIcons'
 import { TRAIL_INK, trailById, trailsFor } from './data/trails'
 import { AmenityModal } from './AmenityModal'
 import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekContents'
@@ -66,6 +69,12 @@ export function App() {
   const [listOpen, setListOpen] = useState(false)
   /** which collection the list shows: everything, the day trips, or the city */
   const [listTab, setListTab] = useState<'all' | 'dolinki' | 'parki'>('all')
+  /*
+   * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
+   * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
+   * celu jest jednym spojrzeniem, a nie otwieraniem pieciu kart po kolei.
+   */
+  const [glances, setGlances] = useState<Record<string, Glance>>({})
   const [focus, setFocus] = useState<MapFocus | null>(null)
   const [reveal, setReveal] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   /** heads-up that a point is within sight, and the arrival notice with a story */
@@ -308,6 +317,13 @@ export function App() {
         : [],
     [overlayParkId, filters.parking, activeParkingId],
   )
+
+  useEffect(() => {
+    if (!listOpen) return
+    void getGlances(FEATURES.map((f) => ({ id: f.id, coords: f.properties.center }))).then(
+      setGlances,
+    )
+  }, [listOpen])
 
   const flyToPark = useCallback((f: ParkFeature, bottomPx: number) => {
     setFocus({
@@ -832,7 +848,28 @@ export function App() {
                         </>
                       ) : undefined
                     }
-                    trailing={<ProgressRing value={(earned / total) * 100} size="sm" />}
+                    /*
+                     * Pogoda zamiast pierscienia postepu. Ten sam powod, co przy
+                     * karcie podgladu: postep stoi obok slowami („2 z 5 punktow"),
+                     * a pusty pierscien nie mowil nic o miejscu. Stopnie i niebo
+                     * odpowiadaja na pytanie, ktore w niedziele rano decyduje.
+                     */
+                    trailing={(() => {
+                      const g = glances[f.id]
+                      if (!g) return undefined
+                      const s = sky(g.code)
+                      return (
+                        <span className="app-wchip" title={s.label}>
+                          <span className={`app-wchip__icon -${s.sky}`} aria-hidden="true">
+                            {SKY_ICONS[s.sky]}
+                          </span>
+                          <span className="app-wchip__temp">{g.temp}°</span>
+                          {g.rain >= 50 && (
+                            <span className="app-wchip__rain">{g.rain}%</span>
+                          )}
+                        </span>
+                      )
+                    })()}
                     onClick={() => openFromList(f)}
                   />
                 ))}

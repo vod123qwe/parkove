@@ -752,14 +752,72 @@
 }
 
 /*
+ * Pogoda w wierszu listy: ikona, stopnie i procent tylko wtedy, gdy naprawdę
+ * grozi. Zajęła miejsce pierścienia postępu, bo postęp stoi w tym samym wierszu
+ * słowami, a pusty pierścień nie mówił nic o miejscu.
+ */
+.app-wchip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 38px;
+}
+
+.app-wchip__icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.app-wchip__temp {
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--content-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-wchip__rain {
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--content-info);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-wchip__icon.-clear,
+.app-wchip__icon.-mostly-clear {
+  color: #c98a10;
+}
+
+.app-wchip__icon.-rain,
+.app-wchip__icon.-drizzle,
+.app-wchip__icon.-downpour {
+  color: var(--content-info);
+}
+
+.app-wchip__icon.-storm {
+  color: #7d4bb5;
+}
+
+.app-wchip__icon.-cloudy,
+.app-wchip__icon.-overcast,
+.app-wchip__icon.-fog,
+.app-wchip__icon.-snow {
+  color: var(--content-tertiary);
+}
+
+/*
  * Pogoda w karcie miejsca. Duża liczba i ikona odpowiadają na pytanie „czy
  * wychodzić", pas godzin na pytanie „o której". Pas przewija się poziomo, bo
  * dwadzieścia cztery godziny nie zmieszczą się na szerokość telefonu, a
  * ściśnięcie ich do nieczytelnych słupków byłoby udawaniem wykresu.
  */
 .park-weather {
-  margin: var(--sp-2) 0 var(--sp-4);
-  padding: var(--sp-4) 0 var(--sp-2);
+  margin: var(--sp-3) 0 var(--sp-5);
+  padding: var(--sp-5) 0 var(--sp-2);
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -854,8 +912,8 @@
 
 .park-weather__hours {
   display: flex;
-  gap: var(--sp-1);
-  margin: var(--sp-3) calc(-1 * var(--sp-5)) 0;
+  gap: var(--sp-2);
+  margin: var(--sp-4) calc(-1 * var(--sp-5)) 0;
   padding: 0 var(--sp-5);
   overflow-x: auto;
   scroll-snap-type: x proximity;
@@ -866,15 +924,20 @@
   display: none;
 }
 
+/*
+ * Godzina jako kolumna. Odstępy podbite (Jarek: „ciasno"): przerwa między
+ * kolumnami z 4 na 8, wewnątrz z 3 na 6, wysokość z 8 na 12. Kolumna ma 56 px
+ * szerokości, więc na telefonie widać sześć godzin naraz i każda ma powietrze.
+ */
 .park-weather__hour {
   flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  min-width: 46px;
-  padding: var(--sp-2) 4px;
-  border-radius: 14px;
+  gap: 6px;
+  min-width: 56px;
+  padding: var(--sp-3) 6px;
+  border-radius: 16px;
   corner-shape: var(--corner-smooth);
   scroll-snap-align: start;
 }
@@ -900,15 +963,15 @@
 }
 
 .park-weather__hicon svg {
-  width: 18px;
-  height: 18px;
+  width: 21px;
+  height: 21px;
 }
 
 .park-weather__htemp {
   font-family: var(--font-text);
   font-weight: 600;
-  font-size: 13px;
-  line-height: 17px;
+  font-size: 14px;
+  line-height: 18px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -916,6 +979,8 @@
   display: flex;
   align-items: center;
   gap: 2px;
+  /* miejsce trzymane nawet bez deszczu: równa wysokość kolumn w całym pasie */
+  min-height: 15px;
   color: var(--content-info);
   font-variant-numeric: tabular-nums;
 }
