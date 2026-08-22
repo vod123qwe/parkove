@@ -16,7 +16,12 @@
     "test-park:remove": "node scripts/remove-test-park.mjs",
     "icons": "node scripts/make-icons.mjs",
     "trails": "node scripts/build-trails.mjs",
-    "borders": "node scripts/build-borders.mjs"
+    "borders": "node scripts/build-borders.mjs",
+    "plant:login": "wrangler login",
+    "plant:key": "wrangler secret put PLANTNET_KEY -c workers/plant-proxy/wrangler.toml",
+    "plant:deploy": "wrangler deploy -c workers/plant-proxy/wrangler.toml",
+    "plant:log": "wrangler tail -c workers/plant-proxy/wrangler.toml",
+    "plant:test": "node scripts/test-plant.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.33.0",
@@ -33,6 +38,7 @@
     "@vitejs/plugin-react": "^6.0.5",
     "sharp": "^0.35.3",
     "typescript": "^7.0.2",
-    "vite": "^8.2.1"
+    "vite": "^8.2.1",
+    "wrangler": "^4.125.0"
   }
 }

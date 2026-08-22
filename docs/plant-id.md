@@ -27,17 +27,42 @@ nigdy nie opuszcza Workera i to jest tu najważniejsze.
 
 ## Włączenie, raz
 
+Wrangler (narzędzie Cloudflare) jest już w projekcie jako zależność
+deweloperska, więc nie trzeba nic instalować globalnie. Cztery komendy, każda
+osobno:
+
 ```bash
-npm i -g wrangler
+npm run plant:login
 ```
 
 ```bash
-cd workers/plant-proxy && wrangler login && wrangler secret put PLANTNET_KEY && wrangler deploy
+npm run plant:key
 ```
 
-Klucz bierze się z konta na my.plantnet.org. Adres, który wypisze `wrangler`,
-wklejasz do `PLANT_PROXY` w [src/app/plant.ts](../src/app/plant.ts). Dopóki
-stała jest pusta, przycisk w ogóle się nie pokazuje.
+```bash
+npm run plant:deploy
+```
+
+```bash
+npm run plant:test -- https://parkove-plant.TWOJ-LOGIN.workers.dev
+```
+
+- `plant:login` otwiera przeglądarkę i łączy terminal z kontem Cloudflare.
+- `plant:key` pyta o klucz Pl@ntNet i zapisuje go **po stronie Cloudflare**.
+  Klucz nie trafia do repozytorium ani do niczyich rąk.
+- `plant:deploy` wypuszcza Workera i wypisuje jego adres.
+- `plant:test` pyta Workera prawdziwym zdjęciem, pomijając aplikację, więc od
+  razu wiadomo, czy działa Worker, czy trzeba szukać w interfejsie.
+
+Adres z `plant:deploy` wklejasz do `PLANT_PROXY` w
+[src/app/plant.ts](../src/app/plant.ts). Dopóki stała jest pusta, przycisk w
+aplikacji w ogóle się nie pokazuje.
+
+Klucz bierze się z darmowego konta na my.plantnet.org: **500 identyfikacji na
+dobę**, ponad 50 tysięcy gatunków. Po zalogowaniu klucz leży w ustawieniach
+konta.
+
+Gdy coś nie działa, `npm run plant:log` pokazuje na żywo, co Worker odpowiada.
 
 ## Jak to działa w aplikacji
 
