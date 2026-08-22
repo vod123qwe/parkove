@@ -631,7 +631,14 @@ export function App() {
           else setAmenityKind(kind)
         }}
         hideStampFor={overlayParkId}
-        focusId={selectedId}
+        /*
+         * Reflektor swieci tez sam z siebie w trakcie wyprawy. Dotad wlaczal sie
+         * tylko po wybraniu miejsca, wiec po starcie wyprawy mapa wracala do
+         * stanu "wszystkie parki rowne", a przez cala wyprawe interesuje cie
+         * jedno miejsce: to, po ktorym chodzisz. Wybor recznie zrobiony wygrywa,
+         * bo wtedy sam poprosiles o co innego.
+         */
+        focusId={selectedId ?? expedition?.parkId ?? null}
         photoPins={photoPins}
         onSelectPhoto={setPhotoId}
         placingPhoto={!!movingPhotoId}

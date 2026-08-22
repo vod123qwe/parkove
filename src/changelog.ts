@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.65.1'
+export const VERSION = '0.66.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.66.0',
+    date: '2026-08-22',
+    title: 'A walk keeps the spotlight on',
+    changes: [
+      ['changed', 'While a walk is running the map stays in focus mode by itself: the place you are walking keeps its imagery untouched with only its border drawn, everything else dims. It used to light up only after you selected a place, so starting a walk returned the map to all places equal, when for the whole walk exactly one of them matters. Selecting something by hand still wins, because then you asked for something else'],
+    ],
+  },
   {
     version: '0.65.1',
     date: '2026-08-22',
