@@ -73,7 +73,13 @@ export function App() {
   const [peekIndex, setPeekIndex] = useState(0)
   const [expanded, setExpanded] = useState(false)
   const [parkingOpen, setParkingOpen] = useState(false)
-  const [listOpen, setListOpen] = useState(false)
+  /*
+   * Arkusz miejsc zaczyna otwarty i nie da sie go zamknac do zera: `minHeight`
+   * w DS sprawia, ze zamiast odjechac, osiada na wystawaniu. `listOpen` zostaje,
+   * bo menu nadal go otwiera, gdy dol byl zajety przez karte miejsca.
+   */
+  const [listOpen, setListOpen] = useState(true)
+  const [listDetent, setListDetent] = useState<'min' | 'auto' | 'full'>('min')
   /** which collection the list shows: everything, the day trips, or the city */
   const [listTab, setListTab] = useState<'all' | 'dolinki' | 'parki'>('all')
   /*
@@ -755,15 +761,7 @@ export function App() {
             }
           />
         </>
-      ) : (
-        !selected && (
-          <div className="app-fab">
-            <Button size="lg" icon={<ListIcon size={18} />} onClick={() => setListOpen(true)}>
-              Miejsca
-            </Button>
-          </div>
-        )
-      )}
+      ) : null}
 
       {looksOpen && (
         <>
@@ -888,24 +886,54 @@ export function App() {
         ) : null}
       </PeekCard>
 
-      <BottomSheet open={listOpen} onClose={() => setListOpen(false)} title="Miejsca do odkrycia">
+      {/*
+        Arkusz miejsc jest OTWARTY, a nie schowany za przyciskiem (Jarek: „zamiast
+        przycisku Miejsca widać bottom sheet otwarty z miejscami, gdzie widać
+        półtorej celki z parkami, można to rozwijać"). To zresztą dopiero teraz
+        zgadza się z briefem: „pełnoekranowa mapa fog-of-war + bottom sheet z
+        kartami parków".
+        Wysokość wystawania jest z pomiaru, nie na oko: wiersz miejsca ma 76 px,
+        więc półtora wiersza to 114, a z chwytem i jedną linijką podpisu wychodzi
+        174. Zmierzone po zmianie: 1,50 komórki.
+        Nagłówek DS (84) i zakładki (44) czekają do rozwinięcia, bo przy 174
+        pikselach zjadłyby całe miejsce na miejsca.
+        Znika tylko wtedy, gdy dół należy do czegoś innego: do karty wybranego
+        miejsca albo do paska wyprawy. Jedna powierzchnia na raz.
+      */}
+      <BottomSheet
+        open={listOpen && !selected && !expedition}
+        onClose={() => undefined}
+        modal={false}
+        minHeight={174}
+        openAt="min"
+        onDetent={setListDetent}
+        title={listDetent === 'min' ? undefined : 'Miejsca do odkrycia'}
+      >
+        {listDetent === 'min' && (
+          <p className="t-caption app-dockhint">Miejsca blisko Ciebie</p>
+        )}
         {/* the city and the day trips are different kinds of outing, so they get
             their own tabs rather than one long mixed list */}
-        <Segmented
-          className="app-listtabs"
-          options={LIST_TABS}
-          value={listTab}
-          onChange={setListTab}
-          aria-label="Rodzaj miejsc"
-        />
+        {listDetent !== 'min' && (
+          <Segmented
+            className="app-listtabs"
+            options={LIST_TABS}
+            value={listTab}
+            onChange={setListTab}
+            aria-label="Rodzaj miejsc"
+          />
+        )}
         {LIST_GROUPS.map((group) => {
           const rows = grouped[group.key]
           if (!rows.length) return null
           return (
             <section key={group.key} className="app-listgroup">
-              <h3 className="t-title app-listgroup__head">
-                {group.label} <span className="app-listgroup__count">{rows.length}</span>
-              </h3>
+              {/* naglowek grupy zabralby polowe wystajacego arkusza, wiec czeka */}
+              {listDetent !== 'min' && (
+                <h3 className="t-title app-listgroup__head">
+                  {group.label} <span className="app-listgroup__count">{rows.length}</span>
+                </h3>
+              )}
               <List className="app-parklist">
                 {rows.map(({ f, earned, total, done, visited, hasPlay, hasFood }) => (
                   <ListItem

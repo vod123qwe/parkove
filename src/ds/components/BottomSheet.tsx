@@ -28,7 +28,12 @@ export type BottomSheetProps = {
    * dwóch trzecich ekranu każe przewijać po drugim zdaniu. Przeciągnięciem w dół
    * dalej można go zmniejszyć.
    */
-  openAt?: 'auto' | 'full'
+  /*
+   * 'min' wymaga `minHeight` i znaczy „otwórz się na samym wystawaniu": arkusz
+   * jest od początku na ekranie, ale zajmuje tylko tyle, ile mu dano, i czeka na
+   * przeciągnięcie w górę. Tak działa lista miejsc na ekranie głównym.
+   */
+  openAt?: 'min' | 'auto' | 'full'
   /**
    * Arkusz zajmuje pełną wysokość detentu, nawet gdy treści jest mniej.
    * Domyślnie 'full' znaczy „tyle, ile treść, maksymalnie 92 procent ekranu", co
@@ -36,6 +41,13 @@ export type BottomSheetProps = {
    * niski, a po trzech skakałby w górę. Z tym ustawieniem miejsce jest od razu.
    */
   stretch?: boolean
+  /**
+   * Na jakiej wysokości arkusz właśnie stoi. Potrzebne, gdy treść ma się różnić
+   * zależnie od tego: wystający na dole arkusz z listą pokazuje w zatrzasku
+   * najniższym jedną linijkę i półtora wiersza, a nagłówek i zakładki dokłada
+   * dopiero po rozwinięciu, bo przy 174 pikselach nie ma na nie miejsca.
+   */
+  onDetent?: (detent: 'min' | 'auto' | 'full') => void
 }
 
 // iOS-like sheet: two detents (auto-height and full), draggable anywhere,
@@ -64,12 +76,17 @@ export function BottomSheet({
   minHeight,
   openAt = 'auto',
   stretch = false,
+  onDetent,
 }: BottomSheetProps) {
   const { shown, closing, requestClose } = useOverlay(open, onClose, EXIT_MS)
   const panelRef = useRef<HTMLDivElement>(null)
   const headRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const [detent, setDetent] = useState<Detent>(openAt)
+  /* zgłaszamy zatrzask na zewnątrz, ale w efekcie, nie w trakcie renderowania */
+  useEffect(() => {
+    onDetent?.(detent)
+  }, [detent, onDetent])
   const [heights, setHeights] = useState<{ full: number; auto: number } | null>(null)
   const drag = useRef<{
     startY: number

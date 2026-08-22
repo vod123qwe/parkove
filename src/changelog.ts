@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.86.1'
+export const VERSION = '0.87.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.87.0',
+    date: '2026-08-22',
+    title: 'Places sit open at the bottom instead of behind a button',
+    tldr:
+      'Miejsca wystają na dole, zamiast siedzieć za przyciskiem.',
+    changes: [
+      ['changed', 'The places sheet is open on the main screen, showing a row and a half, and pulls up to the full list. The Miejsca button is gone. This is also the first time the main screen matches its own brief, which promised a full screen map plus a bottom sheet of park cards and had a button opening a modal instead'],
+      ['changed', 'The peek height is measured rather than guessed: a place row is 76 px, so a row and a half is 114, and with the grabber and one caption line that comes to 174. Measured after the change: exactly 1.50 cells'],
+      ['changed', 'The heading, the tabs and the group titles wait until you pull the sheet up. At 174 px they would have eaten the whole space meant for places. The first caption also tried to say drag up to see everything, wrapped onto two lines and took half a row: the grabber above it already says that'],
+      ['changed', 'The sheet steps aside when the bottom belongs to something else, which is a selected place or a walk in progress. One surface at a time'],
+    ],
+  },
   {
     version: '0.86.1',
     date: '2026-08-22',
