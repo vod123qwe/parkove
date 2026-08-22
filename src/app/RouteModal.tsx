@@ -36,7 +36,7 @@ export function RouteModal({
             : `: ${route.m >= 1000 ? (route.m / 1000).toFixed(1).replace('.', ',') + ' km' : route.m + ' m'} ścieżkami do wejścia na szlak, około ${route.min} min.`
           : ': trasy pieszej nie policzyliśmy, więc linia pokazuje tylko kierunek i odległość.'}
       </p>
-      <TileMap parkId={parkId} point={point} route={route} showStraight height={Math.round(window.innerHeight * 0.46)} />
+      <TileMap parkId={parkId} point={point} route={route} showStraight height={Math.round(window.innerHeight * 0.6)} />
       <div className="app-routeactions">
         <Button
           full

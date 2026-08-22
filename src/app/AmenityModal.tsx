@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Compass } from 'lucide-react'
 import { IconButton, Modal, PlaceRow } from '../ds'
 import { TileMap } from './TileMap'
+import { RouteModal } from './RouteModal'
 import { KIND_LABEL, amenitiesFor, fmtHours, isFood, walkUrl } from './data/amenities'
 import { detailFor } from './data/amenity-details'
 
@@ -28,6 +29,7 @@ export function AmenityModal({
   const wantFood = kind === 'food'
   const spots = amenitiesFor(parkId).filter((s) => isFood(s.kind) === wantFood)
   const [picked, setPicked] = useState<string | null>(null)
+  const [routeFor, setRouteFor] = useState<string | null>(null)
 
   return (
     <Modal
@@ -56,6 +58,7 @@ export function AmenityModal({
               key={s.id}
               index={i + 1}
               map={<TileMap parkId={parkId} point={s.coords} />}
+              onMapClick={() => setRouteFor(s.id)}
               title={s.name}
               pills={pills}
               selected={picked === s.id}
@@ -76,6 +79,19 @@ export function AmenityModal({
           )
         })}
       </div>
+      {(() => {
+        const spot = spots.find((x) => x.id === routeFor)
+        if (!spot) return null
+        return (
+          <RouteModal
+            open
+            onClose={() => setRouteFor(null)}
+            parkId={parkId}
+            title={spot.name}
+            point={spot.coords}
+          />
+        )
+      })()}
       {spots.length === 0 && (
         <p className="t-body-sm park-muted">
           {wantFood ? 'Nic tu nie znaleźliśmy w OpenStreetMap.' : 'Placu zabaw tu nie ma.'}

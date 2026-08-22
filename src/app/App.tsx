@@ -27,6 +27,8 @@ import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
+import { REFRESH_FROM } from './refresh'
+import { VERSION } from '../changelog'
 import { EndWalkSheet } from './EndWalkSheet'
 import { JourneyScreen } from './JourneyScreen'
 import { StampScreen } from './StampScreen'
@@ -97,6 +99,21 @@ export function App() {
   const [pointsOpen, setPointsOpen] = useState(false)
   const [targetPoiId, setTargetPoiId] = useState<string | null>(null)
   const [wantHeading, setWantHeading] = useState(false)
+  /* wynik odświeżenia wersji: pokazujemy raz, po przeładowaniu */
+  /*
+   * Wynik odświeżenia wersji. Czytamy w inicjalizatorze stanu i NIE usuwamy tu
+   * znacznika: moduł w trybie deweloperskim wykonuje się dwa razy, a StrictMode
+   * montuje komponent dwa razy, więc każde „przeczytaj i skasuj” gubiło
+   * informację przed pokazaniem. Znacznik ginie razem z zamknięciem paska.
+   */
+  const [refreshInfo, setRefreshInfo] = useState(() => {
+    try {
+      const from = sessionStorage.getItem(REFRESH_FROM)
+      return from ? { nowa: from !== VERSION, z: from } : null
+    } catch {
+      return null
+    }
+  })
   const [mapStyle, setMapStyleState] = useState<MapStyleId>(getMapStyle)
 
   const pickMapStyle = (id: MapStyleId) => {
@@ -155,6 +172,21 @@ export function App() {
         : null,
     [selected, amenitySpotId],
   )
+
+  /* znacznik kasujemy z opoźnieniem, nie przy zamknięciu: w trybie
+     deweloperskim komponent bywa odmontowany w pierwszej sekundzie i informacja
+     ginęła, zanim ktoś ją zobaczył */
+  useEffect(() => {
+    if (!refreshInfo) return
+    const t = window.setTimeout(() => {
+      try {
+        sessionStorage.removeItem(REFRESH_FROM)
+      } catch {
+        // nic
+      }
+    }, 1500)
+    return () => window.clearTimeout(t)
+  }, [refreshInfo])
 
   const expeditionPark = expedition ? FEATURES.find((f) => f.id === expedition.parkId) : null
   const expeditionQuest = expedition ? questForPark(expedition.parkId) : null
@@ -834,6 +866,23 @@ export function App() {
             setMovingPhotoId(openPhoto.id)
             setPhotoId(null)
           }}
+        />
+      )}
+
+      {refreshInfo && (
+        <Toast
+          open
+          onClose={() => setRefreshInfo(null)}
+          tone={refreshInfo.nowa ? 'reward' : 'info'}
+          icon={<RefreshCw size={18} />}
+          title={refreshInfo.nowa ? `Nowa wersja ${VERSION}` : 'Brak zmian'}
+          text={
+            refreshInfo.nowa
+              ? `Było ${refreshInfo.z}, jest ${VERSION}`
+              : `Masz najnowszą wersję, ${VERSION}`
+          }
+          autoMs={6000}
+          offset={76}
         />
       )}
 

@@ -1,3 +1,8 @@
+import { VERSION } from '../changelog'
+
+/** klucz sesji: wersja, z której odchodzimy, żeby po przeładowaniu mieć z czym porównać */
+export const REFRESH_FROM = 'pk-refresh-from'
+
 /**
  * Ręczne odświeżenie wersji.
  *
@@ -24,6 +29,14 @@ export async function refreshVersion() {
     }
   } catch {
     // brak Cache API: zostaje samo przeładowanie
+  }
+  /* wersja sprzed przeładowania: po starcie porównamy ją z nową i powiemy wprost,
+     czy coś przyszło, czy nie ma zmian. sessionStorage, bo to informacja na jedno
+     przeładowanie, a nie stan aplikacji */
+  try {
+    sessionStorage.setItem(REFRESH_FROM, VERSION)
+  } catch {
+    // brak sessionStorage: po prostu nie pokażemy podsumowania
   }
   // cache-busting w adresie, żeby nawet pamięć przeglądarki oddała nowy dokument
   const url = new URL(window.location.href)

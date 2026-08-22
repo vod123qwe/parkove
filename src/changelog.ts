@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.58.0'
+export const VERSION = '0.59.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.59.0',
+    date: '2026-08-22',
+    title: 'Three intentions in a row, and the app finally tells you what it just loaded',
+    changes: [
+      ['added', 'Refresh version in the profile now reports what happened: a green notice with the new number, or a plain one saying you already had the newest. The version you left is compared with the one that loaded, so the answer is a fact, not a guess'],
+      ['changed', 'A place row has three separate things to tap: the map frame opens the approach at sixty percent of the screen, the row selects the place, and the arrow goes straight to navigation. They used to be one button with another button inside it, which is invalid HTML and unreliable on a phone'],
+      ['added', 'Parkings carry a link to Google reviews and photographs, the same pill the cafes have'],
+    ],
+  },
   {
     version: '0.58.0',
     date: '2026-08-22',

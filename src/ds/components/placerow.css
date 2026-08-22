@@ -1,28 +1,47 @@
 .pk-placerow {
-  display: flex;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
   width: 100%;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-4);
-  border: 0;
   border-radius: 20px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface-sunken);
-  text-align: left;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition:
-    background 140ms linear,
-    transform 140ms var(--ease-out);
+  overflow: hidden;
 }
 
-.pk-placerow:active {
-  transform: scale(0.99);
-}
-
-/* wybrany wiersz: ten sam wiersz, który świeci się na mini mapie */
+/* wybrany wiersz: ten sam, który świeci się na kadrze */
 .pk-placerow.-selected {
   background: var(--bg-mint);
   box-shadow: inset 0 0 0 1.5px var(--border-mint);
+}
+
+/* kadr mapy pełną szerokością na górze; klikalny, gdy prowadzi do powiększenia */
+.pk-placerow__map {
+  grid-column: 1 / -1;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pk-placerow__map .app-tilemap {
+  margin: 0;
+  border-radius: 0;
+}
+
+.pk-placerow__main {
+  display: flex;
+  gap: var(--sp-4);
+  min-width: 0;
+  padding: var(--sp-4);
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .pk-placerow__lead {
@@ -88,16 +107,11 @@
 }
 
 .pk-placerow__action {
-  flex: 0 0 auto;
   align-self: center;
+  padding-right: var(--sp-4);
 }
 
-/* kafel z mapą: mapa pełną szerokością na górze, pod nią numer, nazwa i opis */
-.pk-placerow:has(.pk-placerow__map) {
-  flex-wrap: wrap;
-}
-
-.pk-placerow__map {
-  flex: 0 0 100%;
-  display: block;
+.pk-placerow__extra {
+  grid-column: 1 / -1;
+  padding: 0 var(--sp-4) var(--sp-4);
 }

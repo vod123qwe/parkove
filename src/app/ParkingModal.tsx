@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Navigation } from 'lucide-react'
+import { ArrowUpRight, Navigation, Star } from 'lucide-react'
 import { IconButton, Modal, PlaceRow } from '../ds'
 import { TileMap } from './TileMap'
 import { RouteModal } from './RouteModal'
 import { OCCUPANCY_LABEL, PARKING } from './data/parking'
 import { walkRoute } from './data/walk-routes'
+import { reviewsUrl } from './data/amenities'
 
 /**
  * Parkingi przy jednym miejscu.
@@ -43,16 +44,35 @@ export function ParkingModal({
             key={s.id}
             index={i + 1}
             map={<TileMap parkId={parkId} point={s.coords} route={walkRoute(parkId, s.id)} showStraight />}
+            onMapClick={() => setRouteFor(s.id)}
             title={s.name}
             pills={[s.fee, s.occupancy ? OCCUPANCY_LABEL[s.occupancy] : null].filter(Boolean) as string[]}
             note={s.hint}
+            extra={
+              <a
+                className="app-chip -link t-caption"
+                href={reviewsUrl(s.name, s.coords)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Star size={13} />
+                Opinie i zdjęcia
+                <ArrowUpRight size={13} className="app-chip__arrow" />
+              </a>
+            }
             selected={picked === s.id}
             onClick={() => setPicked(picked === s.id ? null : s.id)}
             action={
               <IconButton
-                aria-label={`Dojście: ${s.name}`}
+                aria-label={`Prowadź: ${s.name}`}
                 variant="tonal"
-                onClick={() => setRouteFor(s.id)}
+                onClick={() =>
+                  window.open(
+                    `https://www.google.com/maps/dir/?api=1&destination=${s.coords[1]},${s.coords[0]}`,
+                    '_blank',
+                    'noopener',
+                  )
+                }
               >
                 <Navigation size={18} />
               </IconButton>
