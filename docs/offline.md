@@ -106,6 +106,63 @@ czyszczenie danych strony jest wszystko-albo-nic: nie zdarza się, żeby znikną
 drugi kafel. Gdy ich nie ma, spis poprawia się sam, a wiersz mówi wprost, co się
 stało: „ta mapa była pobrana, ale telefon posprzątał dane, żeby zrobić miejsce".
 
+## Dlaczego było wolno
+
+Jarek: „zastanawiam się, dlaczego tak wolno się pobiera, 8 MB trwa to z 2 minuty,
+od czego to zależy, bo jestem na dobrym internecie".
+
+Pomiar najpierw: 48 kafli z Geoportalu, surowo, bez naszej pętli. **11 ms na
+kafel przy 6 wątkach, 7 ms przy 16, przy 32 już nic.** Czyli to praca
+ograniczona **opóźnieniem, nie pasmem**: liczy się liczba zapytań w powietrzu, a
+nie szerokość łącza. Sieć nie była winna.
+
+Winne były trzy rzeczy w naszym kodzie, wszystkie po stronie dysku:
+
+1. **Service worker robił całą pracę drugi raz.** Każdy kafel przechodził przez
+   jego obsługę: dwa otwarcia koszyka, dwa odczyty, zapis do zwykłego koszyka
+   kafelków i przycinanie. Czyli **dwa zapisy na dysk telefonu na jeden kafel**,
+   bo strona zapisywała ten sam kafel do paczki.
+2. **Przycinanie przechodziło cały koszyk przy każdym zapisie.** `cache.keys()`
+   na koszyku trzymającym 900 pozycji, tysiąc razy pod rząd. To jest ta główna
+   przyczyna.
+3. **Czytaliśmy każde ciało odpowiedzi**, żeby policzyć bajty, choć waga stoi w
+   nagłówku `content-length`.
+
+Poprawki: kafel ciągnięty do paczki jest **oznaczony w zapytaniu** (`pkpack=1`) i
+service worker przepuszcza go bez własnego cache; przycinanie robi się co
+dwudziesty piąty zapis z zapasem nad limitem; wagę bierzemy z nagłówka; wątków
+jest 12, nie 6.
+
+Zmierzone w tym samym środowisku: **z około 20 ms na kafel na 5 ms**, czyli
+cztery razy szybciej. Na telefonie różnica powinna być większa, bo tam service
+worker jest aktywny, a to on wykonywał tę podwójną pracę, i tam dysk jest
+wolniejszy.
+
+Znacznik idzie w zapytaniu, a nie w nagłówku, bo nagłówek na zapytaniu
+międzydomenowym wymusiłby dodatkową rundę CORS. Serwisy kafelkowe nieznane
+parametry ignorują, co sprawdziłem, a do koszyka zapisujemy pod **czystym**
+adresem, bo pod takim mapa potem o kafel pyta.
+
+## Pasek u góry, i naprawione kłamstwo
+
+Wiersz w karcie pisał „możesz zamknąć kartę, pobieranie idzie dalej", a stan
+siedział w tym wierszu i sprzątanie po odmontowaniu **przerywało pobieranie**.
+Komunikat obiecywał dokładnie to, czego kod nie robił.
+
+Teraz zadanie żyje w module, jedno na całą aplikację (bo nie ma sensu ciągnąć
+dwóch dolin przez to samo łącze), i przeżywa zamknięcie każdego widoku. Karta
+miejsca jest tylko jednym z dwóch okien na ten sam stan.
+
+Drugim jest **pasek u samej góry ekranu**: pierścień postępu, nazwa miejsca,
+procent i odliczanie, plus krzyżyk do przerwania. Stoi nad wszystkim (140, czyli
+nad arkuszami, warstwami i odtwarzaniem wspomnienia) i schodzi sam trzy i pół
+sekundy po skończeniu.
+
+Celowo **nie jest** komunikatem od dołu: tam mieszka to, co się właśnie stało, a
+to jest stan, który trwa. Odliczanie jest z pomiaru, nie z obietnicy: bierze
+tempo z tego, co już zeszło, i dlatego pojawia się po dwóch sekundach, gdy jest
+z czego liczyć.
+
 ## Czego jeszcze nie ma
 
 Podpowiadania w drugą stronę: apka nie mówi jeszcze „idziesz do Będkowskiej, a

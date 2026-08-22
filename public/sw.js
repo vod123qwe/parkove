@@ -79,8 +79,22 @@ async function warmAssets() {
   )
 }
 
+/*
+ * Przycinanie kosztuje, wiec nie robimy go co kafel.
+ *
+ * `cache.keys()` przechodzi CALY koszyk, a koszyk kafelkow trzyma 900 pozycji.
+ * Wywolywane przy kazdym zapisie znaczylo 900 odczytow na jeden kafel, a przy
+ * pobieraniu paczki to tysiac razy pod rzad. To byla glowna przyczyna tego, ze
+ * osiem megabajtow schodzilo dwie minuty na dobrym lączu.
+ *
+ * Teraz co dwudziesty piaty zapis, z zapasem nad limitem: koszyk moze na chwile
+ * urosnac o 25 pozycji ponad 900 i nic z tego nie wynika.
+ */
+let putsSinceTrim = 0
 async function trim(cache, limit) {
   if (!limit) return
+  if (++putsSinceTrim < 25) return
+  putsSinceTrim = 0
   const keys = await cache.keys()
   if (keys.length <= limit) return
   for (const key of keys.slice(0, keys.length - limit)) await cache.delete(key)
@@ -148,10 +162,24 @@ async function shellFirst(request) {
   }
 }
 
+/*
+ * Kafel ciagniety do paczki offline jest oznaczony i przechodzi TĘDY, bez
+ * zadnego naszego cache.
+ *
+ * Bez tego kazdy kafel byl obslugiwany dwa razy: strona zapisywala go do paczki,
+ * a ten worker rownolegle do zwyklego koszyka kafelkow, razem z dwoma
+ * odczytami i przycinaniem. Dwa zapisy na dysk telefonu i przejscie po calym
+ * koszyku na jeden kafel. Znacznik idzie w zapytaniu, bo naglowek na zapytaniu
+ * miedzydomenowym wymusilby dodatkowa runde CORS, a serwisy kafelkowe nieznane
+ * parametry i tak ignoruja (sprawdzone).
+ */
+const PASS = 'pkpack'
+
 self.addEventListener('fetch', (event) => {
   const request = event.request
   if (request.method !== 'GET') return
   const url = new URL(request.url)
+  if (url.searchParams.has(PASS)) return
   if (request.mode === 'navigate') return event.respondWith(shellFirst(request))
   if (TILE_HOSTS.includes(url.hostname)) return event.respondWith(cacheFirst(request, TILES, TILE_LIMIT))
   if (FONT_HOSTS.includes(url.hostname)) return event.respondWith(cacheFirst(request, RUNTIME))

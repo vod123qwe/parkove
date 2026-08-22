@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.84.1'
+export const VERSION = '0.85.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.85.0',
+    date: '2026-08-22',
+    title: 'Downloading is four times faster and keeps going when you leave',
+    changes: [
+      ['fixed', 'Downloading was slow for a reason that had nothing to do with the connection. Measured first: 48 tiles straight from the source run at 11 ms each on six lanes and 7 ms on sixteen, so this is work bound by latency rather than bandwidth. The cost was all on the disk. The service worker was doing the whole job a second time, which meant two writes per tile, and its trimming walked the entire nine hundred entry tile cache on every single write, a thousand times in a row. A tile pulled into a pack is now marked in the query so the worker lets it straight through, trimming happens every twenty fifth write, and the weight comes from the header instead of reading every response body. Measured in the same place: from about 20 ms per tile down to 5'],
+      ['fixed', 'The card said you could close it and the download would carry on, and that was not true: the state lived in the card and unmounting aborted the download. The job now lives outside any view, one at a time, and survives closing anything'],
+      ['added', 'A slim bar at the very top while a map downloads: a progress ring, the place, the percentage and a countdown, with a cross to stop it. It sits above everything and leaves by itself three and a half seconds after finishing. Deliberately not a notice at the bottom, because that is where things that just happened live, and this is a state that lasts'],
+      ['changed', 'One download at a time, because two valleys through the same connection is slower than one after another'],
+    ],
+  },
   {
     version: '0.84.1',
     date: '2026-08-22',

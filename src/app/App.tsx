@@ -48,6 +48,7 @@ import { chooseTrail, stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
+import { DownloadStatus } from './DownloadStatus'
 import type { MapStyleId } from './data/mapstyles'
 import { PARKING } from './data/parking'
 import { amenitiesFor, isFood } from './data/amenities'
@@ -671,7 +672,13 @@ export function App() {
       <header className="app-hud">
         {/* filtry po lewej, menu po prawej: rodzenstwo na tej samej wysokosci */}
         <MapFilters show={!!selected || onWalk} />
-        <button className="app-profilebtn pk-press" aria-label="Menu" onClick={() => setMenuOpen(true)}>
+        {/*
+        Pasek pobierania mapy. Nad wszystkim i u samej gory, bo to jedyna rzecz w
+        apce, ktora dzieje sie dalej po zamknieciu widoku, w ktorym ja zaczeto.
+      */}
+      <DownloadStatus />
+
+      <button className="app-profilebtn pk-press" aria-label="Menu" onClick={() => setMenuOpen(true)}>
           <Menu strokeWidth={2} />
         </button>
       </header>

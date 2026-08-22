@@ -1,7 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Check, CloudDownload, Trash2, X } from 'lucide-react'
-import { downloadPack, dropPack, estimatePack, fmtMB, packIndex, verifyPack } from './offline'
-import type { PackInfo, PackProgress } from './offline'
+import {
+  cancelDownload,
+  currentJob,
+  dropPack,
+  estimatePack,
+  fmtMB,
+  jobEta,
+  packIndex,
+  startDownload,
+  verifyPack,
+  watchJob,
+} from './offline'
+import type { PackInfo } from './offline'
 
 /**
  * „Mapa offline" w karcie miejsca.
@@ -13,16 +24,25 @@ import type { PackInfo, PackProgress } from './offline'
  * Wiersz mówi wprost, ile to waży, i mówi to PRZED pobraniem, z próbki
  * prawdziwych kafli, a nie z tabelki. Dane komórkowe są Jarka, nie moje, więc
  * nic nie zaczyna się samo.
+ *
+ * Sam wiersz NIE trzyma pobierania. Pobieranie żyje w module (`offline.ts`),
+ * więc przeżywa zamknięcie karty, a ten wiersz jest tylko jednym z dwóch okien
+ * na ten sam stan; drugim jest pasek u góry ekranu.
  */
 export function OfflineRow({ parkId, parkName }: { parkId: string; parkName: string }) {
   const [info, setInfo] = useState<PackInfo | null>(() => packIndex()[parkId] ?? null)
   const [guess, setGuess] = useState<{ tiles: number; bytes: number } | null>(null)
   const [sharpGuess, setSharpGuess] = useState<{ tiles: number; bytes: number } | null>(null)
-  const [busy, setBusy] = useState<PackProgress | null>(null)
-  const [done, setDone] = useState<string | null>(null)
-  /** paczka byla, a zniknela: system wyczyscil dane strony */
+  const [job, setJob] = useState(currentJob)
+  /** paczka była, a zniknęła: system wyczyścił dane strony */
   const [gone, setGone] = useState(false)
-  const stop = useRef<AbortController | null>(null)
+
+  useEffect(() => watchJob(() => setJob(currentJob())), [])
+
+  /* skończone pobieranie tego miejsca odświeża wiersz na „gotowe" */
+  useEffect(() => {
+    if (job?.parkId === parkId && job.state === 'done') setInfo(packIndex()[parkId] ?? null)
+  }, [job, parkId])
 
   /*
    * Ufaj, ale sprawdź. Spis pobranych miejsc i koszyk z kaflami to dwa osobne
@@ -58,43 +78,32 @@ export function OfflineRow({ parkId, parkName }: { parkId: string; parkName: str
     }
   }, [parkId, info])
 
-  useEffect(() => () => stop.current?.abort(), [])
+  const mine = job?.parkId === parkId && job.state === 'run' ? job : null
+  const busyElsewhere = job?.state === 'run' && job.parkId !== parkId
 
-  const run = async (sharp: boolean) => {
-    const ctrl = new AbortController()
-    stop.current = ctrl
-    setBusy({ done: 0, total: (sharp ? sharpGuess : guess)?.tiles ?? 0, bytes: 0 })
-    const out = await downloadPack(parkId, sharp, setBusy, ctrl.signal)
-    stop.current = null
-    setBusy(null)
-    if (!out || out.aborted) return
-    setInfo(packIndex()[parkId] ?? null)
-    setDone(
-      out.failed > 0
-        ? `Pobrane, ale ${out.failed} kafli się nie udało. Spróbuj jeszcze raz przy lepszym łączu.`
-        : `${parkName} zmieści się w kieszeni.`,
-    )
-  }
-
-  if (busy) {
-    const pct = busy.total > 0 ? Math.round((busy.done / busy.total) * 100) : 0
+  if (mine) {
+    const pct = mine.total > 0 ? Math.round((mine.done / mine.total) * 100) : 0
+    const eta = jobEta(mine)
     return (
       <div className="offline -busy">
-        <span className="offline__ring" style={{ ['--pct' as string]: `${pct}%` }} aria-hidden="true">
+        <span
+          className="offline__ring"
+          style={{ ['--pct' as string]: `${pct}%` }}
+          aria-hidden="true"
+        >
           {pct}
         </span>
         <div className="offline__body">
           <p className="t-label offline__name">Pobieram mapę…</p>
           <p className="t-caption offline__hint">
-            {busy.done} z {busy.total} kafli · {fmtMB(busy.bytes)}. Możesz zamknąć kartę, pobieranie
-            idzie dalej.
+            {mine.done} z {mine.total} kafli · {fmtMB(mine.bytes)}
+            {eta !== null
+              ? ` · jeszcze ${eta < 60 ? `${eta} s` : `${Math.round(eta / 60)} min`}`
+              : ''}
+            . Możesz zamknąć kartę, pobieranie idzie dalej.
           </p>
         </div>
-        <button
-          className="offline__stop"
-          aria-label="Przerwij pobieranie"
-          onClick={() => stop.current?.abort()}
-        >
+        <button className="offline__stop" aria-label="Przerwij pobieranie" onClick={cancelDownload}>
           <X size={18} />
         </button>
       </div>
@@ -137,22 +146,27 @@ export function OfflineRow({ parkId, parkName }: { parkId: string; parkName: str
         <p className="t-caption offline__hint">
           {gone
             ? 'Ta mapa była pobrana, ale telefon posprzątał dane, żeby zrobić miejsce. Trzeba jeszcze raz.'
-            : 'W dolinkach nie ma zasięgu, a mapa bez sieci pokazuje tylko to, co już widziała. Pobierz teraz, w domu.'}
+            : busyElsewhere
+              ? `Najpierw kończy się pobieranie ${job?.parkName}. Jedno naraz, żeby nie dzielić łącza.`
+              : 'W dolinkach nie ma zasięgu, a mapa bez sieci pokazuje tylko to, co już widziała. Pobierz teraz, w domu.'}
         </p>
         <div className="offline__picks">
-          <button className="offline__pick" disabled={!guess} onClick={() => void run(false)}>
+          <button
+            className="offline__pick"
+            disabled={!guess || busyElsewhere}
+            onClick={() => guess && startDownload(parkId, parkName, false, guess.tiles)}
+          >
             {guess ? `Zwykła · ${fmtMB(guess.bytes)}` : 'Liczę…'}
           </button>
-          <button className="offline__pick -alt" disabled={!sharpGuess} onClick={() => void run(true)}>
+          <button
+            className="offline__pick -alt"
+            disabled={!sharpGuess || busyElsewhere}
+            onClick={() => sharpGuess && startDownload(parkId, parkName, true, sharpGuess.tiles)}
+          >
             {sharpGuess ? `Ostrzejsza · ${fmtMB(sharpGuess.bytes)}` : ''}
           </button>
         </div>
       </div>
-      {done && (
-        <p className="t-caption offline__said" role="status">
-          {done}
-        </p>
-      )}
     </div>
   )
 }

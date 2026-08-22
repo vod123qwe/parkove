@@ -5166,3 +5166,128 @@
   margin-top: var(--sp-2);
   color: var(--content-accent);
 }
+
+/* ---- pasek pobierania mapy ---- */
+
+/*
+ * U samej gory i nad wszystkim, bo pobieranie jest jedyna rzecza w apce, ktora
+ * dzieje sie dalej po zamknieciu widoku, w ktorym ja zaczeto. Celowo NIE jest
+ * komunikatem od dolu: tam mieszka to, co sie wlasnie stalo, a to jest stan,
+ * ktory trwa.
+ *
+ * Nad wszystkim znaczy 140: nad arkuszami (100), nad wlasnymi warstwami (110) i
+ * nad odtwarzaniem wspomnienia (120).
+ */
+.dlbar {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-2));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 140;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: calc(100% - 2 * var(--sp-4));
+  padding: 6px 6px 6px var(--sp-3);
+  border-radius: var(--radius-pill);
+  background: rgb(10 16 11 / 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #ffffff;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 0.35);
+  animation: dlbar-in 320ms var(--ease-out);
+}
+
+/* schodzi tak samo, jak przyszlo: w gore, skad nikomu nie zabiera miejsca */
+.dlbar.-done,
+.dlbar.-stopped {
+  animation:
+    dlbar-in 320ms var(--ease-out),
+    dlbar-out 420ms var(--ease-out) 3s forwards;
+}
+
+.dlbar.-stopped {
+  animation:
+    dlbar-in 320ms var(--ease-out),
+    dlbar-out 420ms var(--ease-out) 1.3s forwards;
+}
+
+@keyframes dlbar-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes dlbar-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -14px);
+  }
+}
+
+.dlbar__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.dlbar__num {
+  flex: none;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  color: rgb(255 255 255 / 0.72);
+  font-variant-numeric: tabular-nums;
+}
+
+/* pierscien postepu: stozkowy gradient, wiec bez zadnego SVG */
+.dlbar__ring {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: conic-gradient(var(--bg-lime) var(--pct, 0%), rgb(255 255 255 / 0.18) 0);
+  color: #ffffff;
+}
+
+.dlbar__ring > * {
+  display: block;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: rgb(10 16 11 / 0.9);
+}
+
+.dlbar__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-lime);
+  color: #0f1a0d;
+}
+
+.dlbar__stop {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 0.14);
+  color: #ffffff;
+  cursor: pointer;
+}

@@ -21,8 +21,18 @@ import { questForPark } from './data/quests'
 
 export const PACK_CACHE = 'parkove-packs-v1'
 
-/** ile kafli naraz w powietrzu: dosc, zeby bylo szybko, nie dosc, zeby zdławić */
-const LANES = 6
+/**
+ * Ile kafli naraz w powietrzu.
+ *
+ * Zmierzone na 48 kaflach: przy 6 watkach 11 ms na kafel, przy 16 juz 7 ms, a
+ * przy 32 nic sie nie poprawia. To praca ograniczona OPOZNIENIEM, nie pasmem,
+ * wiec liczy sie liczba zapytan w powietrzu, a nie szerokosc lacza. 12 to
+ * kompromis: prawie cale przyspieszenie, a przegladarki i tak trzymaja okolo
+ * szesciu polaczen na host przy HTTP/1.1.
+ */
+const LANES = 12
+/** znacznik, po ktorym service worker przepuszcza kafel bez wlasnego cache */
+const PASS = 'pkpack=1'
 
 /**
  * Zakresy przybliżeń.
@@ -238,13 +248,22 @@ export async function downloadPack(
       try {
         const hit = await cache.match(url)
         if (hit) {
-          bytes += (await hit.clone().arrayBuffer()).byteLength
+          // waga z naglowka, bez czytania ciala: przy 1300 kaflach kazdy odczyt
+          // to zbedna praca dysku i pamieci
+          bytes += Number(hit.headers.get('content-length') ?? 0)
         } else {
-          const res = await fetch(url, { signal })
+          const res = await fetch(url + (url.includes('?') ? '&' : '?') + PASS, { signal })
           if (res.ok) {
-            const buf = await res.clone().arrayBuffer()
-            bytes += buf.byteLength
-            await cache.put(url, res)
+            const len = Number(res.headers.get('content-length') ?? 0)
+            if (len > 0) {
+              bytes += len
+              // zapisujemy pod CZYSTYM adresem, bo pod takim mapa potem pyta
+              await cache.put(url, res)
+            } else {
+              const copy = res.clone()
+              bytes += (await res.arrayBuffer()).byteLength
+              await cache.put(url, copy)
+            }
           } else failed++
         }
       } catch {
@@ -332,6 +351,103 @@ export async function storageReport() {
 export async function dropAllPacks() {
   await caches.delete(PACK_CACHE)
   localStorage.removeItem(KEY)
+}
+
+/*
+ * Pobieranie żyje w MODULE, nie w komponencie, i to nie jest szczegół
+ * architektury, tylko naprawa kłamstwa.
+ *
+ * Wiersz w karcie miejsca pisał „możesz zamknąć kartę, pobieranie idzie dalej",
+ * a stan siedział w tym wierszu i sprzątanie po odmontowaniu przerywało
+ * pobieranie. Czyli komunikat obiecywał dokładnie to, czego kod nie robił.
+ *
+ * Teraz zadanie jest jedno na całą aplikację (bo i tak nie ma sensu ciągnąć
+ * dwóch dolin naraz przez to samo łącze), przeżywa zamknięcie każdego widoku, a
+ * pasek u góry ekranu pokazuje, na czym stoi.
+ */
+export type Job = {
+  parkId: string
+  parkName: string
+  sharp: boolean
+  done: number
+  total: number
+  bytes: number
+  failed: number
+  startedAt: number
+  state: 'run' | 'done' | 'stopped'
+}
+
+let job: Job | null = null
+let abort: AbortController | null = null
+const watchers = new Set<() => void>()
+
+const tell = () => watchers.forEach((fn) => fn())
+
+export function watchJob(fn: () => void) {
+  watchers.add(fn)
+  return () => {
+    watchers.delete(fn)
+  }
+}
+
+export const currentJob = () => job
+
+/** ile jeszcze, w sekundach, licząc z tego, co już zeszło. null, gdy za wcześnie */
+export function jobEta(j: Job) {
+  const spent = (Date.now() - j.startedAt) / 1000
+  if (j.done < 24 || spent < 2) return null
+  const rate = j.done / spent
+  return Math.max(1, Math.round((j.total - j.done) / rate))
+}
+
+export function cancelDownload() {
+  abort?.abort()
+  abort = null
+  if (job) job = { ...job, state: 'stopped' }
+  tell()
+}
+
+/** komunikat schodzi sam po chwili, ale tylko ten skończony */
+export function clearJob() {
+  if (job?.state === 'run') return
+  job = null
+  tell()
+}
+
+export function startDownload(parkId: string, parkName: string, sharp: boolean, total: number) {
+  if (job?.state === 'run') return
+  abort = new AbortController()
+  job = {
+    parkId,
+    parkName,
+    sharp,
+    done: 0,
+    total,
+    bytes: 0,
+    failed: 0,
+    startedAt: Date.now(),
+    state: 'run',
+  }
+  tell()
+  void downloadPack(
+    parkId,
+    sharp,
+    (p) => {
+      if (!job || job.state !== 'run') return
+      job = { ...job, done: p.done, total: p.total, bytes: p.bytes }
+      tell()
+    },
+    abort.signal,
+  ).then((out) => {
+    abort = null
+    if (!job) return
+    if (!out || out.aborted) {
+      job = { ...job, state: 'stopped' }
+    } else {
+      job = { ...job, state: 'done', bytes: out.bytes, failed: out.failed, done: out.tiles }
+    }
+    tell()
+  })
 }
 
 export async function dropPack(parkId: string) {
