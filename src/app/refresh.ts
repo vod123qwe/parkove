@@ -24,7 +24,13 @@ export async function refreshVersion() {
   }
   try {
     for (const key of await caches.keys()) {
-      if (key.includes('tiles')) continue
+      /*
+       * Kafle i pobrane mapy zostaja. Kafle, bo sa kosztowne w terenie i
+       * wdrozenie ich nie zmienia. Paczki offline, bo to 15 MB swiadomej pracy
+       * uzytkownika: pierwsza wersja tego warunku patrzyla tylko na 'tiles' i
+       * odswiezenie wersji CICHO kasowalo wszystko, co pobral przed wyprawa.
+       */
+      if (key.includes('tiles') || key.includes('packs')) continue
       await caches.delete(key)
     }
   } catch {

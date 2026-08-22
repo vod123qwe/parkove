@@ -39,7 +39,7 @@ import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
 import { useWakeLock } from './wakelock'
 import { REFRESH_FROM } from './refresh'
-import { VERSION } from '../changelog'
+import { VERSION, changesSince } from '../changelog'
 import { EndWalkSheet } from './EndWalkSheet'
 import { JourneyScreen } from './JourneyScreen'
 import { StampScreen } from './StampScreen'
@@ -1055,12 +1055,24 @@ export function App() {
           tone={refreshInfo.nowa ? 'reward' : 'info'}
           icon={<RefreshCw size={18} />}
           title={refreshInfo.nowa ? `Nowa wersja ${VERSION}` : 'Brak zmian'}
+          /*
+           * Po odświeżeniu mówimy CO przyszło, a nie tylko że coś przyszło:
+           * numer wersji nie jest informacją. Jedna linijka na wersję, a przy
+           * kilku naraz najnowsza plus ile jeszcze, bo to się czyta w biegu.
+           */
           text={
             refreshInfo.nowa
-              ? `Było ${refreshInfo.z}, jest ${VERSION}`
+              ? (() => {
+                  const list = changesSince(refreshInfo.z)
+                  if (list.length === 0) return `Było ${refreshInfo.z}, jest ${VERSION}`
+                  if (list.length === 1) return list[0]
+                  return `${list[0]} Do tego ${list.length - 1} ${
+                    list.length === 2 ? 'wersja' : list.length < 5 ? 'wersje' : 'wersji'
+                  } wcześniej.`
+                })()
               : `Masz najnowszą wersję, ${VERSION}`
           }
-          autoMs={6000}
+          autoMs={9000}
           offset={76}
         />
       )}

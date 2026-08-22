@@ -62,11 +62,19 @@
   white-space: nowrap;
 }
 
+/*
+ * Dwie linijki, nie jedna. Jedna z wielokropkiem wystarczala, dopoki komunikat
+ * mowil "zapisano zdjecie", ale po odswiezeniu wersji stoi tu zdanie o tym, co
+ * sie zmienilo, i ucinanie go w polowie robi z informacji zagadke. Dwie to
+ * nadal komunikat czytany w biegu, a nie akapit.
+ */
 .pk-toast__text {
   color: var(--content-secondary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .pk-toast__action {

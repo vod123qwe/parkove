@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.85.0'
+export const VERSION = '0.85.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -9,14 +9,55 @@ export type Release = {
   version: string
   date: string
   title: string
+  /**
+   * Jedna polska linijka, po ludzku, do pokazania po odswiezeniu wersji na
+   * telefonie (Jarek: „wraz przy odswiezaniu pisz, co sie zmienilo, w mega
+   * skroconej formie"). Reszta wpisu jest po angielsku i szczegolowa, bo sluzy
+   * do czytania w katalogu, a nie w pasku na jedna sekunde.
+   */
+  tldr?: string
   changes: Array<[ChangeType, string]>
+}
+
+/** wersje jako liczby, zeby 0.9 nie wyszlo nowsze od 0.10 */
+const num = (v: string) => v.split('.').map(Number)
+const newer = (a: string, b: string) => {
+  const x = num(a)
+  const y = num(b)
+  for (let i = 0; i < Math.max(x.length, y.length); i++) {
+    const d = (x[i] ?? 0) - (y[i] ?? 0)
+    if (d !== 0) return d > 0
+  }
+  return false
+}
+
+/**
+ * Co przyszlo od wersji `from`, w skrocie. Bez tego pasek po odswiezeniu mowil
+ * tylko „bylo 0.84.1, jest 0.85.0", a numer wersji nie jest informacja.
+ */
+export function changesSince(from: string) {
+  return CHANGELOG.filter((r) => newer(r.version, from)).map((r) => r.tldr ?? r.title)
 }
 
 export const CHANGELOG: Release[] = [
   {
+    version: '0.85.1',
+    date: '2026-08-22',
+    title: 'Refreshing says what changed',
+    tldr:
+      'Odświeżenie mówi, co się zmieniło.',
+    changes: [
+      ['fixed', 'Refreshing the version was quietly deleting every downloaded offline map. The condition kept caches whose name contained tiles, and the pack cache is not called that, so fifteen megabytes of deliberate work disappeared on every manual refresh'],
+      ['added', 'After a refresh the notice says what actually arrived, one plain Polish line per version, instead of only which number replaced which. A version number is not information'],
+      ['changed', 'A notice can run to two lines. One with an ellipsis was fine while the message said a photo was saved, but a sentence about what changed cut in half turns information into a riddle'],
+    ],
+  },
+  {
     version: '0.85.0',
     date: '2026-08-22',
     title: 'Downloading is four times faster and keeps going when you leave',
+    tldr:
+      'Pobieranie mapy cztery razy szybsze.',
     changes: [
       ['fixed', 'Downloading was slow for a reason that had nothing to do with the connection. Measured first: 48 tiles straight from the source run at 11 ms each on six lanes and 7 ms on sixteen, so this is work bound by latency rather than bandwidth. The cost was all on the disk. The service worker was doing the whole job a second time, which meant two writes per tile, and its trimming walked the entire nine hundred entry tile cache on every single write, a thousand times in a row. A tile pulled into a pack is now marked in the query so the worker lets it straight through, trimming happens every twenty fifth write, and the weight comes from the header instead of reading every response body. Measured in the same place: from about 20 ms per tile down to 5'],
       ['fixed', 'The card said you could close it and the download would carry on, and that was not true: the state lived in the card and unmounting aborted the download. The job now lives outside any view, one at a time, and survives closing anything'],
@@ -28,6 +69,8 @@ export const CHANGELOG: Release[] = [
     version: '0.84.1',
     date: '2026-08-22',
     title: 'Downloaded maps say where they stand',
+    tldr:
+      'Pobrane mapy mówią, ile ważą.',
     changes: [
       ['added', 'About the app now shows how many places are downloaded, what they weigh, and whether the browser has promised to keep them. That last part is the only honest answer to whether they will still be there: we ask for persistence on every download, but it is a request rather than a guarantee, and here it was not granted, which means the phone may clear them when it runs short of room'],
       ['fixed', 'The list of downloaded places and the tiles themselves live in two separate stores, so the app could promise a map that the phone had already cleared. You would have found out about that in a valley with no signal, trusting a badge. Opening a place now spot-checks three of its tiles and corrects itself, saying plainly that the phone tidied up and it needs downloading again'],
@@ -38,6 +81,8 @@ export const CHANGELOG: Release[] = [
     version: '0.84.0',
     date: '2026-08-22',
     title: 'A memory can have music, made on the spot',
+    tldr:
+      'Cicha muzyka pod wspomnienia, do włączenia.',
     changes: [
       ['added', 'Quiet music under a replay, synthesised live rather than played from a file. Nothing to download, so it works offline by definition, it never repeats, and the offline pack for a place stays at fifteen megabytes instead of nineteen. The key is derived from the walk id, so the same walk sounds the same every time and a different one sounds different: a memory gets its own sound the way it already has its own shape'],
       ['added', 'Your own recording takes priority. When a voice from the walk plays, the music drops almost to nothing and comes back slower than it left'],
@@ -49,6 +94,8 @@ export const CHANGELOG: Release[] = [
     version: '0.83.0',
     date: '2026-08-22',
     title: 'Download a place before you go',
+    tldr:
+      'Mapę miejsca można pobrać na offline.',
     changes: [
       ['added', 'A place can be downloaded for offline in its own card, under the weather, in two weights: the ordinary one covers the zooms the map actually uses in the field, the sharper one goes a level deeper and costs four times the tiles. Elevation, the vectors the 3D replay needs for buildings, and the photographs of the points all come along. Downloading a valley is about fifteen megabytes. Nothing starts by itself, because the mobile data is yours'],
       ['fixed', 'The deeper problem behind a map that would not load: the cache was only ever a souvenir. A service worker saves what you have already seen, so having the valley offline required walking the valley online first, which is precisely the thing you cannot do'],
@@ -63,6 +110,8 @@ export const CHANGELOG: Release[] = [
     version: '0.82.0',
     date: '2026-08-22',
     title: 'Aerial tiles are cached again, and a memory lands instead of cutting',
+    tldr:
+      'Kafle mapy wracają do pamięci telefonu.',
     changes: [
       ['fixed', 'The Polish aerial tiles were not being cached at all. The service worker keeps a list of tile hosts and the Geoportal was never added to it, so from the moment the aerial map became the default the tiles went straight past the cache and a valley with no signal had nothing to draw from. This is the one to blame for a map that would not load today'],
       ['changed', 'Handwriting is Patrick Hand now, in notes on the walk, in a memory and in the viewer. It has a single weight, so every place that used to ask for bold now asks for regular: asking a single-weight face for bold gets you a synthetic outline, not a different face'],
@@ -78,6 +127,8 @@ export const CHANGELOG: Release[] = [
     version: '0.81.0',
     date: '2026-08-22',
     title: 'The throttle moves to the edge, and a memory becomes a thing you look at',
+    tldr:
+      'Suwak prędkości na prawej krawędzi.',
     changes: [
       ['changed', 'The speed control stands vertically on the right edge, in a strip the width of a thumb, instead of lying across the bottom. The bottom now belongs entirely to what you came to see, so it holds no reserve for a control and a memory can sit right down against the progress hairline. Vertical is also more honest about the metaphor: the comment in this file always said push it up and your past self starts moving, while the arc was horizontal'],
       ['added', 'A quest point shows its own photograph. It was the only form with no object at all, just a paragraph on black, while your own photo had a polaroid and a note had a sticker. Meanwhile 45 photographs of these places were sitting in the repository unused. Plain, no white border, because that is what tells it apart from your snapshot: this is not your picture, this is the place'],
@@ -92,6 +143,8 @@ export const CHANGELOG: Release[] = [
     version: '0.80.0',
     date: '2026-08-22',
     title: 'A memory is a film again, not a cockpit',
+    tldr:
+      'Wspomnienie odtwarza się samo.',
     changes: [
       ['changed', 'The replay plays by itself, at a pace that puts an hour and a half of walking into about two minutes, and the controls hide after two and a half seconds. At rest the screen is the map and nothing else: one dimmed way out and a hairline of progress along the bottom edge'],
       ['changed', 'The walker stands at 67 percent down the screen instead of 28. With the camera behind and above, everything below the dot is ground already crossed and everything above it is the road ahead, so the old framing made the frame a rear view mirror. A racing game puts the car low for the same reason'],
@@ -107,6 +160,8 @@ export const CHANGELOG: Release[] = [
     version: '0.79.1',
     date: '2026-08-22',
     title: 'The walk detail track is the lime from a memory',
+    tldr:
+      'Ślad wyprawy w limonce.',
     changes: [
       ['changed', 'The track on the walk detail screen takes the lime the replay uses for the same thing, and drops the white casing. Lime is brighter than anything it can lie on, so it needs no backing, and the screen is one layer cleaner for it. On the main map that colour belongs to the trail, so the track has to differ there, but this screen has no trail on it: one line, and that line is the road you walked'],
     ],
@@ -115,6 +170,8 @@ export const CHANGELOG: Release[] = [
     version: '0.79.0',
     date: '2026-08-22',
     title: 'A pinch of zoom in a memory, and the track stops hiding in the forest',
+    tldr:
+      'Szczypta i lepiej widoczny ślad.',
     changes: [
       ['added', 'The memory replay takes a pinch, within limits: 16.6 give or take 1.5, so from 15.1 to 18.1. The route still drives the frame, so panning and twisting stay off and the pinch only changes height. Not more than 18.1 on purpose: above about 17.5 the tile falls on a zoom level the aerial service does not have, so the picture stops gaining detail and starts going soft'],
       ['fixed', 'The track on the walk detail screen gets the same white casing the main map has. It was drawn in the dark green of the button background and over aerial forest it simply vanished, dark line on dark ground. The colour of the track stays, so it does not get mixed up with the lime trail, which is a suggestion rather than a record'],
@@ -126,6 +183,8 @@ export const CHANGELOG: Release[] = [
     version: '0.78.0',
     date: '2026-08-22',
     title: 'Polish aerial photography, and the memory replay asks for it sharper',
+    tldr:
+      'Polska ortofotomapa jako domyślna.',
     changes: [
       ['added', 'A fourth map style, Ortofoto: the GUGiK aerial photography from Geoportal, and it is the new default. The old imagery was global, which meant Poland got whatever frame fell into the mosaic, and the frame was winter: bare trees, a shadow across half of it, grey. The new one is summer and sharp enough to show plough furrows in a field and single trees in a treeline. Esri satellite stays as a separate style, because a national service has no automatic fallback'],
       ['changed', 'The memory replay always uses the aerial photography, and asks for it one zoom level deeper than the screen strictly needs. A phone has three device pixels per CSS pixel and MapLibre does not count them when it picks a tile, so the photograph was being stretched: that was the lost feeling in the 3D flight. At the replay camera this lands exactly on zoom 19, which is the sharpest the service has'],
