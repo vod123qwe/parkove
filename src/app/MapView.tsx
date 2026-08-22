@@ -58,9 +58,12 @@ type Props = {
   visited: Set<string>
   onSelect: (id: string) => void
   onSelectPoi: (poiId: string) => void
-  /** suggested parking pin of the selected park */
-  parking: { coords: [number, number]; active?: boolean } | null
-  onSelectParking: () => void
+  /**
+   * Parkingi wybranego miejsca. Tablica, nie jeden: filtr „Parkingi" pokazuje
+   * wszystkie, ktore sa w danych, a nie tylko sugerowany. Pusta = zadnych.
+   */
+  parking: Array<{ id: string; coords: [number, number]; active?: boolean }>
+  onSelectParking: (id: string) => void
   /** tap on empty map: close peeks and selection */
   onClearSelection: () => void
   focus: MapFocus | null
@@ -171,11 +174,13 @@ const stampFC = (pins: StampPin[]) => ({
   })),
 })
 
-const parkingFC = (parking: { coords: [number, number]; active?: boolean } | null) => ({
+const parkingFC = (parking: Array<{ id: string; coords: [number, number]; active?: boolean }>) => ({
   type: 'FeatureCollection' as const,
-  features: parking
-    ? [{ type: 'Feature' as const, properties: { label: 'P', active: !!parking.active }, geometry: { type: 'Point' as const, coordinates: parking.coords } }]
-    : [],
+  features: parking.map((p) => ({
+    type: 'Feature' as const,
+    properties: { id: p.id, label: 'P', active: !!p.active },
+    geometry: { type: 'Point' as const, coordinates: p.coords },
+  })),
 })
 
 const trailFC = (trail: { line: Array<[number, number]> } | null) => ({
@@ -889,7 +894,7 @@ export function MapView({
       }
       const parkingHit = hit('parking-hit')
       if (parkingHit) {
-        cb.onSelectParking()
+        cb.onSelectParking(String(parkingHit.properties?.id ?? ''))
         return
       }
       const amenity = hit('amenity-hit')

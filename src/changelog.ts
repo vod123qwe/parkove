@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.60.0'
+export const VERSION = '0.61.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,19 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.61.0',
+    date: '2026-08-22',
+    title: 'Filters in the empty corner, a card you can fold, and the weather for the afternoon',
+    changes: [
+      ['added', 'Map filters in the top left corner, at the height of the menu. Trail, parkings, playgrounds, coffee and food, all on by default. Parkings means all of them, not just the suggested one, which is why the filters exist at all. They appear with a selected place and go away with it, but the settings are kept, so the next place opens the way you left the last one. During a walk they stay visible the whole time, because that is when you most want everything off the map except the trail'],
+      ['added', 'Every parking now has its own page in the peek card, so a pin you can see has somewhere to introduce itself'],
+      ['added', 'The walk card folds. Swipe down and the top of it goes away, leaving the bar with time, kilometres and points; the height follows your finger, so it reads as one thing shortening rather than two cards swapping. It stays folded after a reload, because a walk can outlive a refresh and the wish for more map does not change'],
+      ['added', 'Weather in the place card, below the travel section: what it is now and how it changes hour by hour until evening. The strip starts at now, because the greyed out morning is the part you can no longer do anything about, and past hours stay reachable by scrolling left, because rain at nine means puddles at three. Open-Meteo, no key and no proxy needed, and the last forecast is kept for a valley with no signal, labelled with the hour it came from'],
+      ['added', 'A stamp for Dolina Kobylanska'],
+      ['added', 'Switch, a new component in the design system with its own catalogue card. Segmented picks one of several; a switch answers yes or no. The whole row is the target, because a 42 pixel slider alone is a miss on a phone'],
+    ],
+  },
   {
     version: '0.60.0',
     date: '2026-08-22',

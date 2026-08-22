@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { CarFront, List as ListIcon, Mic, Navigation, Plus, Square, StickyNote, X } from 'lucide-react'
 import { Button } from '../ds'
@@ -13,6 +13,11 @@ import { addMark, deleteMark, listMarks } from './photos'
 
 /** próg, od którego konkretny punkt zaczyna mieć znaczenie */
 const NEAR_M = 300
+
+/** zwinięta karta wyprawy: pamiętamy między uruchomieniami */
+const FOLD_KEY = 'pk-exp-folded'
+/** ruch poniżej tego progu to dotknięcie, nie przeciąganie */
+const TAP_SLOP = 6
 
 function fmtTime(ms: number) {
   const s = Math.floor(ms / 1000)
@@ -55,6 +60,20 @@ export function ExpeditionBar({
   heading?: number | null
 }) {
   const { expedition, parks } = useGameState()
+  /*
+   * Zwijanie karty palcem. Swipe w dol zabiera gore (kreski postepu, cel i
+   * dystans) i zostawia sam pasek z czasem, kilometrami i punktami. Wysokosc
+   * idzie za palcem, wiec widzisz, ze to jedna rzecz, ktora sie skraca, a nie
+   * dwie karty, ktore sie podmieniaja. Stan przezywa przeladowanie, bo w
+   * terenie aplikacja moze wstac od nowa, a decyzja "chce miec wiecej mapy"
+   * zostaje ta sama.
+   */
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(FOLD_KEY) === '1')
+  const [drag, setDrag] = useState<number | null>(null)
+  const [snapping, setSnapping] = useState(false)
+  const foldRef = useRef<HTMLDivElement>(null)
+  const [foldH, setFoldH] = useState(0)
+  const grab = useRef<{ y: number; h: number; moved: boolean } | null>(null)
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
   const [recording, setRecording] = useState(false)
@@ -65,6 +84,45 @@ export function ExpeditionBar({
     const t = setInterval(() => tick((n) => n + 1), 10000)
     return () => clearInterval(t)
   }, [])
+
+  /* wysokość zwijanej części mierzona, nie zgadywana: treść zmienia się w trasie */
+  useLayoutEffect(() => {
+    const el = foldRef.current
+    if (el) setFoldH(el.scrollHeight)
+  })
+
+  const fold = drag ?? (collapsed ? 1 : 0)
+
+  const onDown = (e: React.PointerEvent) => {
+    const el = foldRef.current
+    grab.current = { y: e.clientY, h: el?.scrollHeight || foldH || 1, moved: false }
+  }
+  const onMove = (e: React.PointerEvent) => {
+    const g = grab.current
+    if (!g) return
+    const dy = e.clientY - g.y
+    if (!g.moved && Math.abs(dy) < TAP_SLOP) return
+    g.moved = true
+    const p = collapsed ? 1 - Math.max(0, -dy) / g.h : Math.max(0, dy) / g.h
+    setDrag(Math.min(1, Math.max(0, p)))
+  }
+  const onUp = () => {
+    const g = grab.current
+    grab.current = null
+    if (!g?.moved) {
+      setDrag(null)
+      return
+    }
+    const target = (drag ?? (collapsed ? 1 : 0)) > 0.5 ? 1 : 0
+    setSnapping(true)
+    setDrag(target)
+    window.setTimeout(() => {
+      setCollapsed(target === 1)
+      localStorage.setItem(FOLD_KEY, target === 1 ? '1' : '0')
+      setDrag(null)
+      setSnapping(false)
+    }, 220)
+  }
 
   // the stack sinks back one by one, so it has to outlive the click that closed it
   const shut = () => {
@@ -260,10 +318,27 @@ export function ExpeditionBar({
           rzeczą na ekranie, która wygląda jak kafelek i nic nie robi.
         */}
         <button
-          className="app-nextstop"
-          onClick={onOpenPoints}
+          className={`app-nextstop${fold > 0.98 ? ' -folded' : ''}`}
+          onClick={() => {
+            /* przeciągnięcie nie jest dotknięciem: inaczej zwinięcie otwierałoby listę */
+            if (grab.current?.moved) return
+            onOpenPoints?.()
+          }}
           disabled={!onOpenPoints}
           aria-label={`${label}: ${name}`}
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerCancel={onUp}
+        >
+        <div
+          className={`app-nextstop__fold${snapping ? ' -snap' : ''}`}
+          ref={foldRef}
+          style={
+            drag != null || collapsed
+              ? { height: Math.round(foldH * (1 - fold)), opacity: Math.max(0, 1 - fold * 1.6) }
+              : undefined
+          }
         >
           {total > 0 && (
             <div className="app-nextstop__dashes" aria-label={`Zebrane ${done} z ${total}`}>
@@ -300,10 +375,13 @@ export function ExpeditionBar({
             )}
           </div>
 
+        </div>
+
           {/*
             Wysiłek i postęp w jednej linii, oddzielone włoskową kreską. Dotąd
             czas z kilometrami stały w osobnej pastylce u góry ekranu, czyli
-            wyprawa mówiła z dwóch miejsc. Teraz mówi z jednego.
+            wyprawa mówiła z dwóch miejsc. Teraz mówi z jednego. To jest też
+            wszystko, co zostaje po zwinięciu karty palcem w dół.
           */}
           <div className="app-nextstop__stats">
             <span>

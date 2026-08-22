@@ -55,6 +55,96 @@
   pointer-events: auto;
 }
 
+/*
+ * Filtry mapy: lewy narożnik HUD, na wysokości menu. Ten sam rozmiar i ta sama
+ * powierzchnia co przycisk menu, bo to rodzeństwo, tylko z drugiej strony.
+ */
+.app-filters {
+  position: relative;
+  pointer-events: auto;
+}
+
+.app-filterbtn {
+  position: relative;
+  corner-shape: var(--corner-smooth);
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-btn);
+  background: var(--bg-surface-raised);
+  color: var(--content-secondary);
+  box-shadow: var(--elevation-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-filterbtn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.app-filterbtn.-open {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+/* ile rzeczy zdjąłeś z mapy: bez tego nie wiadomo, że mapa czegoś nie mówi */
+.app-filterbtn__count {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--bg-gold);
+  color: #241c00;
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.app-filters__panel {
+  position: absolute;
+  top: calc(48px + var(--sp-2));
+  left: 0;
+  width: min(268px, calc(100vw - var(--sp-4) * 2));
+  padding: var(--sp-2) var(--sp-2) var(--sp-2);
+  border-radius: 18px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-2);
+  /* zabezpieczenie: panel nigdy nie wchodzi w dolna polowe ekranu, gdzie mieszkaja karty */
+  max-height: calc(var(--screen-h, 100vh) * 0.42);
+  overflow-y: auto;
+  animation: app-filters-in 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-filters__head {
+  margin: var(--sp-1) var(--sp-2) var(--sp-1);
+  color: var(--content-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+@keyframes app-filters-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-filters__panel {
+    animation: none;
+  }
+}
+
 .app-profilebtn {
   corner-shape: var(--corner-smooth);
   width: 48px;
@@ -661,6 +751,180 @@
   gap: var(--sp-4);
 }
 
+/*
+ * Pogoda w karcie miejsca. Duża liczba i ikona odpowiadają na pytanie „czy
+ * wychodzić", pas godzin na pytanie „o której". Pas przewija się poziomo, bo
+ * dwadzieścia cztery godziny nie zmieszczą się na szerokość telefonu, a
+ * ściśnięcie ich do nieczytelnych słupków byłoby udawaniem wykresu.
+ */
+.park-weather {
+  margin: var(--sp-2) 0 var(--sp-4);
+  padding: var(--sp-4) 0 var(--sp-2);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.park-weather__now {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.park-weather__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+}
+
+.park-weather__icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* słońce złote, woda niebieska, reszta spokojna: kolor mówi to samo co ikona */
+.park-weather__icon.-clear,
+.park-weather__hicon.-clear,
+.park-weather__icon.-mostly-clear,
+.park-weather__hicon.-mostly-clear {
+  color: #c98a10;
+}
+
+.park-weather__icon.-rain,
+.park-weather__hicon.-rain,
+.park-weather__icon.-drizzle,
+.park-weather__hicon.-drizzle,
+.park-weather__icon.-downpour,
+.park-weather__hicon.-downpour {
+  color: var(--content-info);
+}
+
+.park-weather__icon.-storm,
+.park-weather__hicon.-storm {
+  color: #7d4bb5;
+}
+
+.park-weather__icon.-snow,
+.park-weather__hicon.-snow,
+.park-weather__icon.-fog,
+.park-weather__hicon.-fog,
+.park-weather__icon.-cloudy,
+.park-weather__hicon.-cloudy,
+.park-weather__icon.-overcast,
+.park-weather__hicon.-overcast {
+  color: var(--content-secondary);
+}
+
+.park-weather__temp {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 36px;
+  font-variant-numeric: tabular-nums;
+}
+
+.park-weather__deg {
+  color: var(--content-tertiary);
+}
+
+.park-weather__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.park-weather__sky {
+  color: var(--content-primary);
+}
+
+.park-weather__sub {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--content-tertiary);
+}
+
+.park-weather__sub svg {
+  margin-left: 2px;
+}
+
+.park-weather__hours {
+  display: flex;
+  gap: var(--sp-1);
+  margin: var(--sp-3) calc(-1 * var(--sp-5)) 0;
+  padding: 0 var(--sp-5);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.park-weather__hours::-webkit-scrollbar {
+  display: none;
+}
+
+.park-weather__hour {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 46px;
+  padding: var(--sp-2) 4px;
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  scroll-snap-align: start;
+}
+
+/* godzina, która trwa: wyróżniona, bo to punkt odniesienia dla całego pasa */
+.park-weather__hour.-now {
+  background: var(--bg-mint);
+}
+
+/* to, co już było: zostaje, bo poranne lanie znaczy kałuże po południu */
+.park-weather__hour.-past {
+  opacity: 0.42;
+}
+
+.park-weather__clock {
+  color: var(--content-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.park-weather__hour.-now .park-weather__clock {
+  color: var(--content-accent);
+  font-weight: 700;
+}
+
+.park-weather__hicon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.park-weather__htemp {
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.park-weather__rain {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--content-info);
+  font-variant-numeric: tabular-nums;
+}
+
+.park-weather__source {
+  margin: var(--sp-2) 0 0;
+  color: var(--content-tertiary);
+}
+
 /* miniatura miejsca: ten sam kadr co przy punkcie, żeby karta była spójna */
 .peek-park__media {
   flex: none;
@@ -1082,6 +1346,39 @@
 
 .app-nextstop:disabled {
   cursor: default;
+}
+
+/*
+ * Zwijana góra karty: kreski postępu, cel i dystans. Przy przeciąganiu wysokość
+ * dostaje wartość w pikselach z palca, więc nie ma tu żadnego przejścia; klasa
+ * -snap włącza je tylko na czas dociągnięcia po puszczeniu.
+ */
+.app-nextstop__fold {
+  overflow: hidden;
+}
+
+.app-nextstop__fold.-snap {
+  transition:
+    height 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease;
+}
+
+/* zwinięta karta to sam pasek: kreska nad statystykami traci sens */
+.app-nextstop.-folded {
+  padding-top: var(--sp-3);
+  padding-bottom: var(--sp-3);
+}
+
+.app-nextstop.-folded .app-nextstop__stats {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nextstop__fold.-snap {
+    transition: none;
+  }
 }
 
 /* postęp kreskami: jedna na punkt, zapalają się po kolei */

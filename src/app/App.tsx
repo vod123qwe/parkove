@@ -13,6 +13,7 @@ import type { ParkFeature } from './ParkSheet'
 import { PoiModal } from './PoiSheet'
 import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
+import { MapFilters } from './MapFilters'
 import { TRAIL_INK, trailById, trailsFor } from './data/trails'
 import { AmenityModal } from './AmenityModal'
 import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekContents'
@@ -41,7 +42,7 @@ import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import type { MapStyleId } from './data/mapstyles'
-import { suggestedParking } from './data/parking'
+import { PARKING } from './data/parking'
 import { amenitiesFor, isFood } from './data/amenities'
 import type { ParkingInfo } from './data/parking'
 import { pointsTotal, questForPark, photosForPark } from './data/quests'
@@ -57,7 +58,7 @@ type PeekPage =
   | { t: 'parking'; parking: ParkingInfo }
 
 export function App() {
-  const { parks: progress, expedition, trails: trailChoice } = useGameState()
+  const { parks: progress, expedition, trails: trailChoice, filters } = useGameState()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [peekIndex, setPeekIndex] = useState(0)
   const [expanded, setExpanded] = useState(false)
@@ -240,13 +241,13 @@ export function App() {
     if (!selected) return []
     const pois = questForPark(selected.id)?.pois ?? []
     const pages: PeekPage[] = [{ t: 'park' }, ...pois.map((poi) => ({ t: 'poi' as const, poi }))]
-    const parking = suggestedParking(selected.id)
-    if (parking) pages.push({ t: 'parking', parking })
+    /* wszystkie parkingi jako strony: pin, ktory widzisz, ma miec swoja kartke */
+    for (const parking of PARKING[selected.id] ?? []) pages.push({ t: 'parking', parking })
     return pages
   }, [selected])
   const page = peekPages[Math.min(peekIndex, Math.max(0, peekPages.length - 1))] ?? null
   const activePoiId = peekOpen && page?.t === 'poi' ? page.poi.id : null
-  const parkingActive = peekOpen && page?.t === 'parking'
+  const activeParkingId = peekOpen && page?.t === 'parking' ? page.parking.id : null
 
   // quest dots follow the walk, or the selected quest park while browsing
   const overlayParkId = expedition?.parkId ?? (selected && questForPark(selected.id) ? selected.id : null)
@@ -277,16 +278,35 @@ export function App() {
     }
   }, [overlayParkId, progress, activePoiId])
 
+  /*
+   * Piny udogodnien i parkingow slucha filtrow (MapFilters). Bierzemy je dla
+   * overlayParkId, nie dla `selected`, zeby w trakcie wyprawy tez byly widoczne:
+   * wtedy pytanie "gdzie kawa" i "gdzie stoi auto" jest najczestsze.
+   */
   const amenityPins = useMemo(
     () =>
-      selected
-        ? amenitiesFor(selected.id).map((a) => ({
-            id: a.id,
-            kind: (isFood(a.kind) ? 'food' : 'playground') as 'food' | 'playground',
-            coords: a.coords,
+      overlayParkId
+        ? amenitiesFor(overlayParkId)
+            .map((a) => ({
+              id: a.id,
+              kind: (isFood(a.kind) ? 'food' : 'playground') as 'food' | 'playground',
+              coords: a.coords,
+            }))
+            .filter((a) => (a.kind === 'food' ? filters.food : filters.play))
+        : [],
+    [overlayParkId, filters.food, filters.play],
+  )
+
+  const parkingPins = useMemo(
+    () =>
+      overlayParkId && filters.parking
+        ? (PARKING[overlayParkId] ?? []).map((p) => ({
+            id: p.id,
+            coords: p.coords,
+            active: p.id === activeParkingId,
           }))
         : [],
-    [selected],
+    [overlayParkId, filters.parking, activeParkingId],
   )
 
   const flyToPark = useCallback((f: ParkFeature, bottomPx: number) => {
@@ -424,17 +444,21 @@ export function App() {
     [overlayParkId, onWalk, expanded, flyToSlide],
   )
 
-  const onSelectParking = useCallback(() => {
-    if (!selected) return
-    setAmenitySpotId(null)
-    const parking = suggestedParking(selected.id)
-    if (peekOpen && parking) {
-      setPeekIndex(peekPages.length - 1)
-      flyToSlide({ t: 'parking', parking })
-    } else {
-      setParkingOpen(true)
-    }
-  }, [selected, peekOpen, peekPages.length, flyToSlide])
+  const onSelectParking = useCallback(
+    (id?: string) => {
+      if (!selected) return
+      setAmenitySpotId(null)
+      const idx = id ? peekPages.findIndex((p) => p.t === 'parking' && p.parking.id === id) : -1
+      const page = idx >= 0 ? peekPages[idx] : null
+      if (peekOpen && page?.t === 'parking') {
+        setPeekIndex(idx)
+        flyToSlide(page)
+      } else {
+        setParkingOpen(true)
+      }
+    },
+    [selected, peekOpen, peekPages, flyToSlide],
+  )
 
   const onPageSwipe = useCallback(
     (dir: 1 | -1) => {
@@ -567,12 +591,12 @@ export function App() {
         visited={visitedIds}
         onSelect={selectParkFromMap}
         onSelectPoi={onSelectPoi}
-        parking={selected ? (() => { const p = suggestedParking(selected.id); return p ? { coords: p.coords, active: parkingActive } : null })() : null}
+        parking={parkingPins}
         onSelectParking={onSelectParking}
         onClearSelection={clearSelection}
         focus={focus}
         quest={questOverlay}
-        trail={trailOverlay}
+        trail={filters.trail ? trailOverlay : null}
         track={expedition?.track ?? null}
         me={
           expedition?.where ??
@@ -606,6 +630,8 @@ export function App() {
           number, not a reason to go outside. Something may earn this corner
           later; until then the map has it */}
       <header className="app-hud">
+        {/* filtry po lewej, menu po prawej: rodzenstwo na tej samej wysokosci */}
+        <MapFilters show={!!selected || onWalk} />
         <button className="app-profilebtn" aria-label="Menu" onClick={() => setMenuOpen(true)}>
           <Menu strokeWidth={2} />
         </button>

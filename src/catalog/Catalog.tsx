@@ -16,6 +16,7 @@ import {
   Navigation,
   Route,
   Sparkles,
+  ToyBrick,
   Trash2,
   Trees,
   Waves,
@@ -39,6 +40,7 @@ import {
   ParkCard,
   ProgressRing,
   Segmented,
+  Switch,
   Stat,
   StatGrid,
   Toast,
@@ -84,6 +86,7 @@ const NAV = [
   ['toast', 'Toast'],
   ['actionbar', 'Action bar'],
   ['segmented', 'Segmented'],
+  ['switch', 'Switch'],
   ['stats', 'Stats'],
 ] as const
 
@@ -202,6 +205,7 @@ export function Catalog() {
   const [changelogOpen, setChangelogOpen] = useState(false)
   const [chips, setChips] = useState({ quests: true, water: false, mounds: false })
   const [segDemo, setSegDemo] = useState('auto')
+  const [swDemo, setSwDemo] = useState(true)
 
   const pickTheme = (t: Theme) => {
     setTheme(t)
@@ -771,6 +775,25 @@ export function Catalog() {
               onChange={setSegDemo}
               className="cat-segdemo"
             />
+          </div>
+        </Section>
+
+        <Section
+          id="switch"
+          title="Switch"
+          lead="One thing on or off, effect immediate. Segmented picks one of several; a switch answers yes or no. The whole row is the target, because on a phone a 42 pixel slider alone is a miss. Filters on the map are switches."
+        >
+          <div className="cat-spec cat-switches">
+            <Switch
+              icon={<Footprints />}
+              label="Szlaki"
+              hint="Wybrany szlak rysuje się na mapie"
+              checked={swDemo}
+              onChange={setSwDemo}
+            />
+            <Switch icon={<ToyBrick />} label="Place zabaw" checked={!swDemo} onChange={(v) => setSwDemo(!v)} />
+            <Switch label="Bez ikony" checked={false} onChange={() => {}} />
+            <Switch label="Wyłączony przełącznik" checked disabled onChange={() => {}} />
           </div>
         </Section>
 

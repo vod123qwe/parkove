@@ -24,6 +24,7 @@ import {
 import { KIND_META } from './kinds'
 import { suggestedParking } from './data/parking'
 import { PhotoButton } from './PhotoButton'
+import { WeatherStrip } from './WeatherStrip'
 import { PARK_INFO } from './data/parkinfo'
 import { amenitiesFor, isFood, topChips } from './data/amenities'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
@@ -399,6 +400,13 @@ export function ParkSheet({
           <ChevronRight size={18} className="park-parking__chevron" />
         </button>
       )}
+
+      {/*
+        Pogoda na dole, pod dojazdem: to ostatnia rzecz, którą sprawdzasz przed
+        wyjściem, i pierwsza, która decyduje, czy w ogóle. Osobne pole zamiast
+        jednej liczby w nagłówku, bo pytanie brzmi „o której", nie „ile stopni".
+      */}
+      <WeatherStrip parkId={park.id} coords={park.properties.center} />
 
       {status.s === 'success' && (
         <p className="t-body-sm park-status -ok" role="status">

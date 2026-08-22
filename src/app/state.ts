@@ -46,6 +46,16 @@ export type Journey = {
   times?: Record<string, number>
 }
 
+/** co widac na mapie dla wybranego miejsca */
+export type MapFilters = {
+  trail: boolean
+  play: boolean
+  food: boolean
+  parking: boolean
+}
+
+export const DEFAULT_FILTERS: MapFilters = { trail: true, play: true, food: true, parking: true }
+
 type GameState = {
   parks: Record<string, ParkProgress>
   /** persistent walk log */
@@ -58,6 +68,13 @@ type GameState = {
    * aplikacja może zostać przeładowana i nie ma jak wybrać ponownie bez sieci.
    */
   trails: Record<string, string>
+  /**
+   * Filtry mapy. Zapisywane, bo ustawienie ma przeżyć odklikniecie parku: filtry
+   * znikają z ekranu razem z wyborem miejsca, ale wracają takie same przy
+   * następnym. Parkingi domyślnie włączone, bo to był powód, dla którego filtry
+   * powstały: chcę widzieć wszystkie, nie tylko sugerowany.
+   */
+  filters: MapFilters
   /** volatile: not persisted, a refresh ends the walk (collected points survive) */
   expedition: Expedition | null
 }
@@ -73,6 +90,7 @@ function load(): GameState {
         journeys?: Journey[]
         answers?: Record<string, number>
         trails?: Record<string, string>
+        filters?: Partial<MapFilters>
       }
       const parks: Record<string, ParkProgress> = {}
       for (const [id, p] of Object.entries(parsed.parks ?? {})) {
@@ -88,13 +106,21 @@ function load(): GameState {
         journeys: parsed.journeys ?? [],
         answers: parsed.answers ?? {},
         trails: parsed.trails ?? {},
+        filters: { ...DEFAULT_FILTERS, ...(parsed.filters ?? {}) },
         expedition: null,
       }
     }
   } catch {
     // corrupted local state: start fresh rather than crash the app
   }
-  return { parks: {}, journeys: [], answers: {}, trails: {}, expedition: null }
+  return {
+    parks: {},
+    journeys: [],
+    answers: {},
+    trails: {},
+    filters: { ...DEFAULT_FILTERS },
+    expedition: null,
+  }
 }
 
 let state: GameState = load()
@@ -110,6 +136,7 @@ function commit(next: GameState, persist = true) {
         journeys: state.journeys,
         answers: state.answers,
         trails: state.trails,
+        filters: state.filters,
       }),
     )
   listeners.forEach((l) => l())
@@ -172,6 +199,10 @@ export function chooseTrail(parkId: string, trailId: string | null) {
   if (!trailId || trails[parkId] === trailId) delete trails[parkId]
   else trails[parkId] = trailId
   commit({ ...state, trails })
+}
+
+export function setFilter(key: keyof MapFilters, on: boolean) {
+  commit({ ...state, filters: { ...state.filters, [key]: on } })
 }
 
 export function startExpedition(parkId: string, name: string) {

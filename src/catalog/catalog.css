@@ -441,3 +441,10 @@
   align-items: stretch;
   max-width: 340px;
 }
+
+/* przełączniki jeden pod drugim, na powierzchni, żeby widać było wiersz jako cel */
+.cat-switches {
+  flex-direction: column;
+  gap: 2px;
+  align-items: stretch;
+}
