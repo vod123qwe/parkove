@@ -67,6 +67,45 @@ wagę robi jedno, najgęstsze przybliżenie.
   już zeszło, zostaje w koszyku, więc druga próba zaczyna od tego miejsca.
 - **Margines 0,004 stopnia** wokół granicy miejsca: dojście, parking, powrót.
 
+## Co się z nimi dzieje później
+
+Pytanie Jarka: „są cały czas gdzieś na moim telefonie, czy z czasem znikają?".
+Odpowiedź ma dwie połowy i tylko pierwsza zależy od nas.
+
+**Nasza połowa: nic ich nie rusza.** Koszyk `parkove-packs-v1` nie ma limitu i
+nie jest przycinany. Nie ma też numeru wersji w nazwie, w przeciwieństwie do
+pozostałych koszyków, więc **przeżywa aktualizację aplikacji**: przy każdym
+wdrożeniu kasujemy koszyki, których nie ma na liście do zachowania, a ten na niej
+jest. Usuwa je tylko kosz w karcie miejsca albo „Usuń wszystkie" w O aplikacji.
+
+**Systemowa połowa: może je usunąć.** Prosimy o trwałość przez
+`navigator.storage.persist()` przy każdym pobraniu, ale to **prośba, nie
+gwarancja**, i przeglądarka nie musi jej dać. Sprawdzone u nas: nie dała
+(`persisted` zwraca fałsz). Bez trwałości dane strony są usuwalne, gdy
+urządzeniu zabraknie miejsca.
+
+Na iPhonie dochodzi jeszcze reguła WebKita: dane stron nieużywanych przez siedem
+dni są czyszczone. **Aplikacja dodana do ekranu domowego jest z tej reguły
+wyjęta**, a Parkove tak właśnie działa, więc to nas nie dotyczy. Zostaje samo
+czyszczenie przy braku miejsca.
+
+Dlatego apka mówi to sama, zamiast kazać pytać: wiersz **Mapy offline** w „O
+aplikacji" pokazuje liczbę miejsc, wagę i wprost, czy przeglądarka obiecała je
+trzymać, czy nie.
+
+## Ufaj, ale sprawdzaj
+
+Przy okazji tego pytania wyszła dziura, którą trzeba było załatać. Spis pobranych
+miejsc leży w pamięci ustawień, a kafle w koszyku przeglądarki, i to są **dwa
+osobne magazyny**. Gdy system wyczyści drugi, spis dalej twierdzi „mapa działa
+offline". To najgorszy możliwy rodzaj awarii: dowiadujesz się o niej w dolinie,
+bez zasięgu, ufając odznaczce.
+
+Więc przy każdym wejściu do karty miejsca sprawdzamy trzy kafle z paczki. Trzy, bo
+czyszczenie danych strony jest wszystko-albo-nic: nie zdarza się, żeby zniknął co
+drugi kafel. Gdy ich nie ma, spis poprawia się sam, a wiersz mówi wprost, co się
+stało: „ta mapa była pobrana, ale telefon posprzątał dane, żeby zrobić miejsce".
+
 ## Czego jeszcze nie ma
 
 Podpowiadania w drugą stronę: apka nie mówi jeszcze „idziesz do Będkowskiej, a

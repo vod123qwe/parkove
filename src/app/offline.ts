@@ -262,6 +262,78 @@ export async function downloadPack(
   return { ...info, failed, aborted: false }
 }
 
+/**
+ * Czy paczka NAPRAWDĘ jeszcze jest.
+ *
+ * Spis pobranych miejsc leży w pamięci ustawień, a kafle w koszyku przeglądarki,
+ * i to są dwa osobne magazyny. System może wyczyścić dane strony, gdy zabraknie
+ * miejsca na telefonie, i wtedy spis dalej twierdzi „mapa działa offline", a
+ * kafli już nie ma. To najgorszy możliwy rodzaj awarii: dowiadujesz się o niej w
+ * dolinie, bez zasięgu, ufając odznaczce.
+ *
+ * Dlatego przy każdym wejściu do karty sprawdzamy trzy kafle z paczki. Trzy, bo
+ * czyszczenie danych strony jest wszystko-albo-nic: nie zdarza się, żeby zniknął
+ * co drugi kafel. Gdy ich nie ma, spis się poprawia sam i wiersz znów proponuje
+ * pobranie.
+ */
+export async function verifyPack(parkId: string) {
+  const info = packIndex()[parkId]
+  if (!info) return false
+  const urls = packUrls(parkId, info.sharp)
+  if (urls.length === 0) return false
+  const cache = await caches.open(PACK_CACHE)
+  const probe = [0, Math.floor(urls.length / 2), urls.length - 1].map((i) => urls[i])
+  for (const u of probe) {
+    if (await cache.match(u)) continue
+    const index = packIndex()
+    delete index[parkId]
+    writeIndex(index)
+    return false
+  }
+  return true
+}
+
+/**
+ * Ile tego wszystkiego jest i czy przeglądarka obiecuje to trzymać.
+ *
+ * `persisted` to jedyna szczera odpowiedź na pytanie „czy to zniknie": prosimy o
+ * trwałość przy każdym pobraniu, ale przeglądarka nie musi jej dać i często nie
+ * daje. Bez niej dane strony są **usuwalne**, gdy telefonowi zabraknie miejsca.
+ */
+export async function storageReport() {
+  const index = packIndex()
+  const places = Object.keys(index)
+  let persisted = false
+  try {
+    persisted = (await navigator.storage?.persisted?.()) ?? false
+  } catch {
+    // przegladarka bez tego API nie obiecuje nic i tak
+  }
+  let usage: number | null = null
+  let quota: number | null = null
+  try {
+    const e = await navigator.storage?.estimate?.()
+    usage = e?.usage ?? null
+    quota = e?.quota ?? null
+  } catch {
+    // to samo: brak liczb nie jest bledem, po prostu nie wiemy
+  }
+  return {
+    places: places.length,
+    tiles: places.reduce((n, id) => n + index[id].tiles, 0),
+    bytes: places.reduce((n, id) => n + index[id].bytes, 0),
+    persisted,
+    usage,
+    quota,
+  }
+}
+
+/** wszystkie paczki naraz: jeden przycisk, gdy telefon zaczyna prosic o miejsce */
+export async function dropAllPacks() {
+  await caches.delete(PACK_CACHE)
+  localStorage.removeItem(KEY)
+}
+
 export async function dropPack(parkId: string) {
   const cache = await caches.open(PACK_CACHE)
   // usuwamy tylko to, co nalezy do tego miejsca, i w obu wariantach ostrosci

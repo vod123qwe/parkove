@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
-import { ChevronRight, Component, FileClock, RefreshCw, Ruler } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ChevronRight, Component, FileClock, HardDrive, RefreshCw, Ruler } from 'lucide-react'
 import { List, ListItem, Modal } from '../ds'
 import { VERSION } from '../changelog'
 import { refreshVersion } from './refresh'
 import { screenReport, toggleGroundDebug } from './screen'
+import { dropAllPacks, fmtMB, storageReport } from './offline'
 
 /**
  * O aplikacji: rzeczy o samej apce, nie o Tobie i nie o wyprawach.
@@ -17,6 +18,21 @@ import { screenReport, toggleGroundDebug } from './screen'
  */
 export function AboutModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [refreshing, setRefreshing] = useState(false)
+  /*
+   * Ile miejsca zajmują pobrane mapy i czy przeglądarka obiecuje je trzymać.
+   *
+   * Jest tutaj, bo Jarek zapytał wprost: „co z tymi pobranymi mapami się później
+   * dzieje, są cały czas gdzieś na moim telefonie, czy z czasem znikają?".
+   * Odpowiedź jest jedna i uczciwa tylko wtedy, gdy pokazuje ją sama apka, a nie
+   * ja w czacie: `persisted` mówi, czy dane są chronione, czy usuwalne przy
+   * braku miejsca.
+   */
+  const [store, setStore] = useState<Awaited<ReturnType<typeof storageReport>> | null>(null)
+  const [wiped, setWiped] = useState(false)
+  useEffect(() => {
+    if (!open) return
+    void storageReport().then(setStore)
+  }, [open, wiped])
   const [diag, setDiag] = useState<string | null>(null)
   const taps = useRef(0)
 
@@ -54,6 +70,37 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
           onClick={() => {
             window.location.href = 'catalog.html'
           }}
+        />
+        <ListItem
+          icon={<HardDrive />}
+          title={
+            store && store.places > 0
+              ? `Mapy offline: ${store.places} ${store.places === 1 ? 'miejsce' : store.places < 5 ? 'miejsca' : 'miejsc'}`
+              : 'Mapy offline'
+          }
+          meta={
+            store === null
+              ? 'Liczę…'
+              : store.places === 0
+                ? 'Nic jeszcze nie pobrane. Pobiera się w karcie miejsca.'
+                : `${fmtMB(store.bytes)} w ${store.tiles} kaflach. ${
+                    store.persisted
+                      ? 'Przeglądarka obiecała je trzymać.'
+                      : 'Telefon może je usunąć, gdy zabraknie mu miejsca.'
+                  }`
+          }
+          onClick={
+            store && store.places > 0
+              ? () => {
+                  void dropAllPacks().then(() => setWiped((v) => !v))
+                }
+              : undefined
+          }
+          trailing={
+            store && store.places > 0 ? (
+              <span className="t-caption profile-diag">Usuń wszystkie</span>
+            ) : undefined
+          }
         />
         <ListItem
           icon={<Ruler />}

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.84.0'
+export const VERSION = '0.84.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.84.1',
+    date: '2026-08-22',
+    title: 'Downloaded maps say where they stand',
+    changes: [
+      ['added', 'About the app now shows how many places are downloaded, what they weigh, and whether the browser has promised to keep them. That last part is the only honest answer to whether they will still be there: we ask for persistence on every download, but it is a request rather than a guarantee, and here it was not granted, which means the phone may clear them when it runs short of room'],
+      ['fixed', 'The list of downloaded places and the tiles themselves live in two separate stores, so the app could promise a map that the phone had already cleared. You would have found out about that in a valley with no signal, trusting a badge. Opening a place now spot-checks three of its tiles and corrects itself, saying plainly that the phone tidied up and it needs downloading again'],
+      ['added', 'Delete all downloaded maps in one place, for when the phone starts asking for room'],
+    ],
+  },
   {
     version: '0.84.0',
     date: '2026-08-22',

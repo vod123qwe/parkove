@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Check, CloudDownload, Trash2, X } from 'lucide-react'
-import { downloadPack, dropPack, estimatePack, fmtMB, packIndex } from './offline'
+import { downloadPack, dropPack, estimatePack, fmtMB, packIndex, verifyPack } from './offline'
 import type { PackInfo, PackProgress } from './offline'
 
 /**
@@ -20,7 +20,28 @@ export function OfflineRow({ parkId, parkName }: { parkId: string; parkName: str
   const [sharpGuess, setSharpGuess] = useState<{ tiles: number; bytes: number } | null>(null)
   const [busy, setBusy] = useState<PackProgress | null>(null)
   const [done, setDone] = useState<string | null>(null)
+  /** paczka byla, a zniknela: system wyczyscil dane strony */
+  const [gone, setGone] = useState(false)
   const stop = useRef<AbortController | null>(null)
+
+  /*
+   * Ufaj, ale sprawdź. Spis pobranych miejsc i koszyk z kaflami to dwa osobne
+   * magazyny, a system może wyczyścić drugi bez pytania. Bez tego wiersz mógłby
+   * obiecywać mapę, której już nie ma, i dowiedziałbyś się o tym w dolinie.
+   */
+  useEffect(() => {
+    if (!info) return
+    let alive = true
+    void verifyPack(parkId).then((ok) => {
+      if (alive && !ok) {
+        setInfo(null)
+        setGone(true)
+      }
+    })
+    return () => {
+      alive = false
+    }
+  }, [parkId, info])
 
   /* szacunek liczymy raz, przy wejściu do karty, i tylko gdy nie ma paczki */
   useEffect(() => {
@@ -114,8 +135,9 @@ export function OfflineRow({ parkId, parkName }: { parkId: string; parkName: str
       <div className="offline__body">
         <p className="t-label offline__name">Pobierz mapę na offline</p>
         <p className="t-caption offline__hint">
-          W dolinkach nie ma zasięgu, a mapa bez sieci pokazuje tylko to, co już widziała. Pobierz
-          teraz, w domu.
+          {gone
+            ? 'Ta mapa była pobrana, ale telefon posprzątał dane, żeby zrobić miejsce. Trzeba jeszcze raz.'
+            : 'W dolinkach nie ma zasięgu, a mapa bez sieci pokazuje tylko to, co już widziała. Pobierz teraz, w domu.'}
         </p>
         <div className="offline__picks">
           <button className="offline__pick" disabled={!guess} onClick={() => void run(false)}>
