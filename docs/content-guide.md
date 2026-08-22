@@ -51,10 +51,13 @@ dotąd: linia 2,2 px zamiast 1,6 i wypełnienie 36 procent zamiast 28 na satelic
 Rozmycia mapy nie da się zrobić: MapLibre nie ma blura w paincie, a filtr CSS
 rozmyłby całą kanwę razem z parkiem.
 
-**Lista punktów w trakcie wyprawy (do zbudowania).** Otwiera ją przycisk Punkty.
+**Lista punktów w trakcie wyprawy (zbudowane).** Otwiera ją przycisk Punkty.
 Wiersze po dystansie, najbliższy nieodkryty na górze, zdobyte na końcu, wyszarzone.
 Dotknięcie punktu **ustawia cel**: karta live przestaje wybierać najbliższy i
 pokazuje ten wskazany. Przy celu ma być **strzałka kierunku** (Jarek zmienił tu
 wcześniejszą decyzję o braku kompasu), więc potrzebny jest kompas telefonu:
 `DeviceOrientationEvent.requestPermission()` po dotknięciu, a gdy nie ma zgody
 albo czujnika, zostaje sam dystans. Bez udawania strzałki.
+
+Na górze tej listy siedzi też wybrany szlak (patrz [trails.md](trails.md)), żeby
+zmiana wariantu w terenie była jednym dotknięciem.

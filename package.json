@@ -1,7 +1,7 @@
 {
   "name": "parkove",
   "private": true,
-  "version": "0.59.0",
+  "version": "0.60.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,9 @@
     "stamps:files": "node scripts/import-stamps.mjs",
     "photos:optimize": "node scripts/optimize-photos.mjs",
     "test-park:remove": "node scripts/remove-test-park.mjs",
-    "icons": "node scripts/make-icons.mjs"
+    "icons": "node scripts/make-icons.mjs",
+    "trails": "node scripts/build-trails.mjs",
+    "borders": "node scripts/build-borders.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.33.0",

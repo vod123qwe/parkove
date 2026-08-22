@@ -52,6 +52,12 @@ type GameState = {
   journeys: Journey[]
   /** dilemma answers, keyed "parkId/poiId" -> chosen option index */
   answers: Record<string, number>
+  /**
+   * Wybrany szlak per miejsce: parkId -> id trasy z data/trails.ts.
+   * Zapisywany na stałe, bo wybór robi się w domu przy planowaniu, a w dolinie
+   * aplikacja może zostać przeładowana i nie ma jak wybrać ponownie bez sieci.
+   */
+  trails: Record<string, string>
   /** volatile: not persisted, a refresh ends the walk (collected points survive) */
   expedition: Expedition | null
 }
@@ -66,6 +72,7 @@ function load(): GameState {
         parks?: Record<string, Partial<ParkProgress>>
         journeys?: Journey[]
         answers?: Record<string, number>
+        trails?: Record<string, string>
       }
       const parks: Record<string, ParkProgress> = {}
       for (const [id, p] of Object.entries(parsed.parks ?? {})) {
@@ -76,12 +83,18 @@ function load(): GameState {
           points: p.points ?? [],
         }
       }
-      return { parks, journeys: parsed.journeys ?? [], answers: parsed.answers ?? {}, expedition: null }
+      return {
+        parks,
+        journeys: parsed.journeys ?? [],
+        answers: parsed.answers ?? {},
+        trails: parsed.trails ?? {},
+        expedition: null,
+      }
     }
   } catch {
     // corrupted local state: start fresh rather than crash the app
   }
-  return { parks: {}, journeys: [], answers: {}, expedition: null }
+  return { parks: {}, journeys: [], answers: {}, trails: {}, expedition: null }
 }
 
 let state: GameState = load()
@@ -92,7 +105,12 @@ function commit(next: GameState, persist = true) {
   if (persist)
     localStorage.setItem(
       KEY,
-      JSON.stringify({ parks: state.parks, journeys: state.journeys, answers: state.answers }),
+      JSON.stringify({
+        parks: state.parks,
+        journeys: state.journeys,
+        answers: state.answers,
+        trails: state.trails,
+      }),
     )
   listeners.forEach((l) => l())
 }
@@ -143,6 +161,17 @@ export const answerKey = (parkId: string, poiId: string) => `${parkId}/${poiId}`
 
 export function answerDilemma(parkId: string, poiId: string, option: number) {
   commit({ ...state, answers: { ...state.answers, [answerKey(parkId, poiId)]: option } })
+}
+
+/**
+ * Wybór szlaku dla miejsca. Ten sam klik włącza i wyłącza, bo wariantów jest
+ * kilka i przełączanie ma być jednym dotknięciem, bez osobnego „wyczyść".
+ */
+export function chooseTrail(parkId: string, trailId: string | null) {
+  const trails = { ...state.trails }
+  if (!trailId || trails[parkId] === trailId) delete trails[parkId]
+  else trails[parkId] = trailId
+  commit({ ...state, trails })
 }
 
 export function startExpedition(parkId: string, name: string) {

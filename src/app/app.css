@@ -661,6 +661,32 @@
   gap: var(--sp-4);
 }
 
+/* miniatura miejsca: ten sam kadr co przy punkcie, żeby karta była spójna */
+.peek-park__media {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  color: var(--content-tertiary);
+  overflow: hidden;
+}
+
+.peek-park__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.peek-park__media svg {
+  width: 22px;
+  height: 22px;
+}
+
 .peek-park__text {
   min-width: 0;
 }
@@ -2055,6 +2081,58 @@
   margin: 0;
 }
 
+/*
+ * Rozpoznawanie rośliny: przycisk i lista podpowiedzi. Wynik ma wyglądać na
+ * propozycję, nie na wyrok, dlatego procent stoi obok nazwy, a nie zamiast niej.
+ */
+.marksheet__plant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: var(--sp-1) 0 0;
+}
+
+.marksheet__guesses {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.marksheet__guess {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.marksheet__guessname {
+  flex: 1;
+  min-width: 0;
+}
+
+.marksheet__guessscore {
+  flex: none;
+  color: var(--content-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.marksheet__plantnote {
+  margin: 0;
+  color: var(--content-tertiary);
+}
+
 .marksheet__caption,
 .marksheet__input {
   width: 100%;
@@ -3395,6 +3473,13 @@
   stroke-linecap: round;
   paint-order: stroke;
   filter: drop-shadow(0 0 2px rgb(6 12 6 / 0.8));
+}
+
+/* końce szlaku: start i koniec pętli lądują w tym samym miejscu i to jest OK */
+.app-tilemap__end {
+  fill: #ffffff;
+  stroke: #0b1207;
+  stroke-width: 2;
 }
 
 /* akcje pod powiększonym dojściem: decyzja i wyjście, jedna pod drugą */

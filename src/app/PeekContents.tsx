@@ -1,6 +1,7 @@
 import { ChevronRight, CircleParking, MapPin } from 'lucide-react'
-import { ProgressRing } from '../ds'
 import type { ParkFeature } from './ParkSheet'
+import { heroPhoto } from './data/parkinfo'
+import { photosForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 import type { ParkingInfo } from './data/parking'
 import { KIND_META } from './kinds'
@@ -17,9 +18,18 @@ export function ParkPeekContent({
   total: number
 }) {
   const kind = KIND_META[park.properties.kind] ?? KIND_META.park
+  /*
+   * Miniatura zamiast pierścienia postępu (Jarek, 2026-08-22): postęp i tak
+   * stoi słowami w podpisie („quest 0/3"), a puste kółko nie mówiło nic o
+   * miejscu. Zdjęcie odpowiada na pytanie, które zadajesz na mapie: jak tam
+   * jest. Punkt obok ma dokładnie taką samą miniaturę, więc karta jest spójna.
+   */
+  const photo = heroPhoto(park.id) ?? photosForPark(park.id)[0]?.src ?? null
   return (
     <div className="peek-park">
-      <ProgressRing value={(earned / total) * 100} size="sm" />
+      <span className="peek-park__media">
+        {photo ? <img src={asset(photo)} alt="" /> : kind.icon}
+      </span>
       <div className="peek-park__text">
         <p className="peek-park__name">{park.properties.name}</p>
         <p className="t-caption peek-park__meta">

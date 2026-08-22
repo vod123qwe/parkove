@@ -12,6 +12,8 @@ import { ParkSheet } from './ParkSheet'
 import type { ParkFeature } from './ParkSheet'
 import { PoiModal } from './PoiSheet'
 import { ParkingModal } from './ParkingModal'
+import { TrailModal } from './TrailModal'
+import { TRAIL_INK, trailById, trailsFor } from './data/trails'
 import { AmenityModal } from './AmenityModal'
 import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekContents'
 import { StampsModal } from './StampsModal'
@@ -55,7 +57,7 @@ type PeekPage =
   | { t: 'parking'; parking: ParkingInfo }
 
 export function App() {
-  const { parks: progress, expedition } = useGameState()
+  const { parks: progress, expedition, trails: trailChoice } = useGameState()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [peekIndex, setPeekIndex] = useState(0)
   const [expanded, setExpanded] = useState(false)
@@ -96,6 +98,7 @@ export function App() {
   const [amenityKind, setAmenityKind] = useState<'food' | 'playground' | null>(null)
   /** wybrana konkretna kawiarnia albo plac zabaw: pin rośnie, mapa centruje */
   const [amenitySpotId, setAmenitySpotId] = useState<string | null>(null)
+  const [trailsOpen, setTrailsOpen] = useState(false)
   /* małe cele w terenie: lista punktów wyprawy i wybrany z niej cel */
   const [pointsOpen, setPointsOpen] = useState(false)
   const [targetPoiId, setTargetPoiId] = useState<string | null>(null)
@@ -247,6 +250,16 @@ export function App() {
 
   // quest dots follow the walk, or the selected quest park while browsing
   const overlayParkId = expedition?.parkId ?? (selected && questForPark(selected.id) ? selected.id : null)
+  /*
+   * Szlak rysujemy dla tego samego miejsca, dla ktorego pokazujemy punkty:
+   * w trakcie wyprawy dla niej, poza wyprawa dla wybranego parku.
+   */
+  const trailOverlay = useMemo(() => {
+    const t = trailById(overlayParkId ?? '', overlayParkId ? (trailChoice[overlayParkId] ?? null) : null)
+    if (!t) return null
+    return { line: t.line, ink: t.colour ? TRAIL_INK[t.colour] : undefined }
+  }, [overlayParkId, trailChoice])
+
   const questOverlay = useMemo(() => {
     if (!overlayParkId) return null
     const quest = questForPark(overlayParkId)
@@ -559,6 +572,7 @@ export function App() {
         onClearSelection={clearSelection}
         focus={focus}
         quest={questOverlay}
+        trail={trailOverlay}
         track={expedition?.track ?? null}
         me={
           expedition?.where ??
@@ -810,6 +824,7 @@ export function App() {
         onOpenPoi={(poi) => selected && setPoiCard({ parkId: selected.id, poi })}
         onOpenParking={() => setParkingOpen(true)}
         onOpenAmenity={setAmenityKind}
+        onOpenTrails={() => setTrailsOpen(true)}
       />
       {selected && (
         <ParkingModal
@@ -819,6 +834,19 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
+      {/* w trakcie wyprawy nie ma wybranego parku, a szlak trzeba dac zmienic */}
+      {(() => {
+        const tp = selected ?? expeditionPark
+        if (!tp) return null
+        return (
+          <TrailModal
+            parkId={tp.id}
+            parkName={tp.properties.name}
+            open={trailsOpen}
+            onClose={() => setTrailsOpen(false)}
+          />
+        )
+      })()}
       {stampPark && (
         <StampScreen
           park={stampPark}
@@ -1084,6 +1112,15 @@ export function App() {
           here={expedition?.where?.coords ?? myFix?.coords ?? null}
           targetId={targetPoiId}
           carAway={carAway}
+          trail={(() => {
+            const t = trailById(expeditionQuest.parkId, trailChoice[expeditionQuest.parkId] ?? null)
+            return t ? { name: t.name, m: t.m, min: t.min } : null
+          })()}
+          hasTrails={trailsFor(expeditionQuest.parkId).length > 0}
+          onOpenTrails={() => {
+            setPointsOpen(false)
+            setTrailsOpen(true)
+          }}
           onPick={(poiId) => {
             setTargetPoiId(poiId)
             setPointsOpen(false)

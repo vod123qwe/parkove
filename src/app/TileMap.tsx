@@ -45,12 +45,18 @@ export function TileMap({
   parkId,
   point,
   route,
+  line,
+  caption,
+  ink,
   showStraight = false,
   height = 132,
 }: {
   parkId: string
-  /** miejsce, do którego prowadzimy: parking, kawiarnia, plac zabaw */
-  point: Pt
+  /**
+   * Miejsce, do którego prowadzimy: parking, kawiarnia, plac zabaw. Przy
+   * szlaku nie ma jednego celu, więc kadr obudowujemy samą linią.
+   */
+  point?: Pt
   /**
    * Trasa pieszo od parkingu do najbliższego wejścia na ścieżkę wewnątrz miejsca,
    * policzona routerem OSM i zapisana w danych. Gdy jest, rysujemy ją zamiast
@@ -63,6 +69,15 @@ export function TileMap({
    * tylko w błąd.
    */
   showStraight?: boolean
+  /**
+   * Gotowa linia do narysowania: szlak znakowany albo trasa przez punkty.
+   * Ma początek i koniec zamiast jednego celu, więc dostaje dwie kropki.
+   */
+  line?: Pt[]
+  /** podpis kadru, gdy domyślny („ile do wejścia na szlak") nie ma sensu */
+  caption?: string
+  /** kolor linii: szlak znakowany rysujemy jego kolorem z terenu */
+  ink?: string
   height?: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -87,16 +102,19 @@ export function TileMap({
       : (feature.geometry.coordinates as number[][][][]).flat()
 
   /* najbliższy punkt granicy parku: tam kończy się linia dojścia */
-  const near = rings
-    .flat()
-    .map((c) => ({ c: [c[0], c[1]] as Pt, d: distanceM(point, [c[0], c[1]]) }))
-    .sort((a, b) => a.d - b.d)[0]
+  const near = !point
+    ? null
+    : rings
+        .flat()
+        .map((c) => ({ c: [c[0], c[1]] as Pt, d: distanceM(point, [c[0], c[1]]) }))
+        .sort((a, b) => a.d - b.d)[0]
 
-  if (!w || !near) return <div className="app-tilemap" ref={ref} style={{ height }} />
+  const drawn: Pt[] | null = line?.length ? line : route?.line?.length ? (route.line as Pt[]) : null
+  if (!w || (!near && !drawn)) return <div className="app-tilemap" ref={ref} style={{ height }} />
 
   /* dobierz przybliżenie tak, żeby oba końce linii zmieściły się w kadrze */
   const pad = 26
-  const path: Pt[] = route?.line?.length ? (route.line as Pt[]) : [point, near.c]
+  const path: Pt[] = drawn ?? [point as Pt, (near as { c: Pt }).c]
   const lons = path.map((c) => c[0])
   const lats = path.map((c) => c[1])
   let z = 17
@@ -118,8 +136,9 @@ export function TileMap({
     }
   }
 
-  const a = px(point)
-  const b = px(near.c)
+  const a = point ? px(point) : null
+  const b = near ? px(near.c) : null
+  const ends = line?.length ? [px(line[0]), px(line[line.length - 1])] : null
   return (
     <div className="app-tilemap" ref={ref} style={{ height }}>
       {tiles.map((t) => (
@@ -139,17 +158,23 @@ export function TileMap({
             points={ring.map((c) => px([c[0], c[1]]).map((n) => n.toFixed(1)).join(',')).join(' ')}
           />
         ))}
-        {route?.line?.length ? (
+        {drawn ? (
           <polyline
             className="app-tilemap__route"
-            points={route.line.map((c) => px(c as Pt).map((n) => n.toFixed(1)).join(',')).join(' ')}
+            style={ink ? { stroke: ink } : undefined}
+            points={drawn.map((c) => px(c).map((n) => n.toFixed(1)).join(',')).join(' ')}
           />
-        ) : showStraight ? (
+        ) : showStraight && a && b ? (
           <line className="app-tilemap__walk" x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} />
         ) : null}
-        <circle className="app-tilemap__spot" cx={a[0]} cy={a[1]} r={7} />
+        {ends?.map((e, i) => (
+          <circle key={i} className="app-tilemap__end" cx={e[0]} cy={e[1]} r={5} />
+        ))}
+        {a && <circle className="app-tilemap__spot" cx={a[0]} cy={a[1]} r={7} />}
       </svg>
-      <span className="app-tilemap__label">{label(route, near.d, showStraight)}</span>
+      <span className="app-tilemap__label">
+        {caption ?? label(route, near?.d ?? 0, showStraight)}
+      </span>
     </div>
   )
 }

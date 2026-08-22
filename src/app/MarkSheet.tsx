@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Move, Pencil, Trash2 } from 'lucide-react'
+import { Leaf, Move, Pencil, Trash2 } from 'lucide-react'
 import { ActionBar, BottomSheet, Button, IconButton } from '../ds'
 import { deleteMark, updateMark } from './photos'
 import type { WalkMark } from './photos'
 import { WavePlayer } from './WavePlayer'
+import { identifyPlant, plantEnabled, plantLabel } from './plant'
+import type { PlantAnswer } from './plant'
 
 const fmtWhen = (at: number) =>
   new Date(at).toLocaleString('pl-PL', {
@@ -51,6 +53,22 @@ export function MarkSheet({
 
   const isNote = mark.kind === 'note'
 
+  /*
+   * Rozpoznawanie rośliny. Osobny stan, bo to zapytanie do sieci: w dolinie
+   * często nie wyjdzie i trzeba to powiedzieć wprost, a nie kręcić kółkiem.
+   */
+  const [plant, setPlant] = useState<PlantAnswer | null>(null)
+  const [asking, setAsking] = useState(false)
+  const canAsk = mark.kind === 'photo' && !!mark.blob && plantEnabled()
+
+  const ask = async () => {
+    if (!mark.blob) return
+    setAsking(true)
+    setPlant(null)
+    setPlant(await identifyPlant(mark.blob))
+    setAsking(false)
+  }
+
   return (
     <BottomSheet open modal={false} onClose={onClose} title={TITLES[mark.kind]}>
       <div className="marksheet">
@@ -68,6 +86,44 @@ export function MarkSheet({
         )}
 
         <p className="t-caption marksheet__when">{fmtWhen(mark.at)}</p>
+
+        {canAsk && (
+          <div className="marksheet__plant">
+            <Button
+              variant="tonal"
+              size="md"
+              icon={<Leaf size={16} />}
+              onClick={() => void ask()}
+              disabled={asking}
+            >
+              {asking ? 'Pytam o roślinę…' : 'Co to za roślina?'}
+            </Button>
+            {plant && plant.guesses.length > 0 && (
+              <ul className="marksheet__guesses">
+                {plant.guesses.map((g) => (
+                  <li key={g.latin}>
+                    <button className="marksheet__guess" onClick={() => setText(plantLabel(g))}>
+                      <span className="t-body-sm marksheet__guessname">{plantLabel(g)}</span>
+                      <span className="t-caption marksheet__guessscore">
+                        {Math.round(g.score * 100)}%
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {plant && (plant.note || !plant.guesses.length) && (
+              <p className="t-caption marksheet__plantnote">
+                {plant.note ?? 'Nie rozpoznałem, spróbuj z bliska liścia albo kwiatu'}
+              </p>
+            )}
+            {plant && plant.left != null && plant.guesses.length > 0 && (
+              <p className="t-caption marksheet__plantnote">
+                Dotknij, żeby wstawić jako podpis. Zostało dziś {plant.left} pytań.
+              </p>
+            )}
+          </div>
+        )}
 
         {editing ? (
           isNote ? (

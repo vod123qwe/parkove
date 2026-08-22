@@ -1,0 +1,7 @@
+name = "parkove-plant"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+
+# Klucz Pl@ntNet NIE jest tutaj. Wstawia się go raz komendą:
+#   wrangler secret put PLANTNET_KEY
+# Sekret siedzi po stronie Cloudflare i nie trafia do repozytorium.

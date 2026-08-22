@@ -3,6 +3,7 @@ import { Map as MapGL } from 'maplibre-gl'
 import type { MapLayerMouseEvent } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import parksData from './data/parks.json'
+import bordersData from './data/borders.json'
 import { circlePolygon, trackSegments } from './geo'
 import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import { asset } from './assets'
@@ -65,6 +66,11 @@ type Props = {
   focus: MapFocus | null
   /** quest points of the selected or walked park, null otherwise */
   quest: QuestOverlay | null
+  /**
+   * Wybrany szlak tego miejsca. Rysowany pod sladem GPS i pod pinami: to
+   * podpowiedz, gdzie isc, a nie zapis tego, gdzie byles.
+   */
+  trail: { line: Array<[number, number]>; ink?: string } | null
   /** active expedition GPS track */
   track: Array<[number, number]> | null
   /** live position during a walk: dot, accuracy halo and heading */
@@ -104,6 +110,9 @@ function readMapColors() {
     unvisitedFill: v('--map-unvisited-fill'),
     unvisitedStroke: v('--map-unvisited-stroke'),
     track: v('--map-track'),
+    // szlak: jasny limonkowy jak w mini mapach, żeby nie mieszał się z twoim
+    // śladem GPS, który jest ciemną oliwką i na zdjęciu satelitarnym ginie
+    trail: v('--bg-lime'),
     poiDone: v('--bg-gold'),
     poiOpen: v('--bg-surface'),
     poiStroke: v('--map-visited-stroke'),
@@ -111,6 +120,21 @@ function readMapColors() {
     meRing: v('--bg-surface'),
   }
 }
+
+/*
+ * Kolor granicy. Linie nie leza na zrodle parkow, wiec nie moga czytac
+ * feature-state: odwiedzone rozpoznajemy dopasowaniem po wlasnosci `park`.
+ * Wyrazenie match wymaga niepustej listy etykiet, dlatego przy zerowej liczbie
+ * odwiedzonych wracamy do zwyklego koloru.
+ */
+function borderColor(visited: Set<string>, c: ReturnType<typeof readMapColors>) {
+  if (!visited.size) return c.unvisitedStroke
+  return ['match', ['get', 'park'], [...visited], c.visitedStroke, c.unvisitedStroke]
+}
+
+/** grubosc granicy: park w reflektorze dostaje najgrubsza linie */
+const borderWidth = (focus: string | null, base: number, wide: number) =>
+  focus ? ['case', ['==', ['get', 'park'], focus], wide, base] : base
 
 const questFC = (quest: QuestOverlay | null) => ({
   type: 'FeatureCollection' as const,
@@ -151,6 +175,13 @@ const parkingFC = (parking: { coords: [number, number]; active?: boolean } | nul
   type: 'FeatureCollection' as const,
   features: parking
     ? [{ type: 'Feature' as const, properties: { label: 'P', active: !!parking.active }, geometry: { type: 'Point' as const, coordinates: parking.coords } }]
+    : [],
+})
+
+const trailFC = (trail: { line: Array<[number, number]> } | null) => ({
+  type: 'FeatureCollection',
+  features: trail?.line?.length
+    ? [{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: trail.line } }]
     : [],
 })
 
@@ -265,6 +296,7 @@ export function MapView({
   onClearSelection,
   focus,
   quest,
+  trail,
   track,
   me,
   followMe,
@@ -287,6 +319,7 @@ export function MapView({
   const loadedRef = useRef(false)
   const visitedRef = useRef(visited)
   const questRef = useRef(quest)
+  const trailRef = useRef(trail)
   const trackRef = useRef(track)
   const meRef = useRef(me)
   const followRef = useRef(followMe)
@@ -305,6 +338,7 @@ export function MapView({
   const currentStyleKey = useRef(mapStyle.key)
   visitedRef.current = visited
   questRef.current = quest
+  trailRef.current = trail
   trackRef.current = track
   meRef.current = me
   followRef.current = followMe
@@ -417,6 +451,13 @@ export function MapView({
       for (const f of parksData.features) {
         map.setFeatureState({ source: 'parks', id: f.id }, { visited: visitedRef.current.has(f.id) })
       }
+      // granice nie maja feature-state, wiec kolor przeliczamy wyrazeniem
+      if (map.getLayer('parks-line')) {
+        const c = readMapColors()
+        map.setPaintProperty('parks-line', 'line-color', borderColor(visitedRef.current, c) as never)
+        if (map.getLayer('parks-line-shared'))
+          map.setPaintProperty('parks-line-shared', 'line-color', borderColor(visitedRef.current, c) as never)
+      }
     }
 
     /*
@@ -429,6 +470,9 @@ export function MapView({
     const APP_LAYERS = [
       'parks-fill',
       'parks-line',
+      'parks-line-shared',
+      'trail-casing',
+      'trail-line',
       'track-line',
       'track-gap',
       'me-halo-fill',
@@ -447,6 +491,8 @@ export function MapView({
     ]
     const APP_SOURCES = [
       'parks',
+      'borders',
+      'trail',
       'track',
       'me-halo',
       'me',
@@ -509,15 +555,60 @@ export function MapView({
           'fill-opacity': currentStyleKey.current.startsWith('satellite') ? 0.36 : 0.6,
         },
       })
+      /*
+       * Granice rysujemy z osobnego zrodla (scripts/build-borders.mjs), nie z
+       * wielokatow. Powod: tam gdzie dwa miejsca stykaja sie bokiem, ten bok byl
+       * rysowany dwa razy i czytal sie mocniej niz granica zewnetrzna, jakby
+       * przecinal miejsce na pol. Teraz wspolny odcinek ma wlasna warstwe:
+       * cienszy i przerywany, wiec widac, ze to styk, a nie brzeg.
+       */
+      map.addSource('borders', { type: 'geojson', data: bordersData as never })
       map.addLayer({
         id: 'parks-line',
         type: 'line',
-        source: 'parks',
+        source: 'borders',
+        filter: ['!=', ['get', 'shared'], 1] as never,
         paint: {
-          'line-color': ['case', ['boolean', ['feature-state', 'visited'], false], c.visitedStroke, c.unvisitedStroke] as never,
+          'line-color': borderColor(visitedRef.current, c) as never,
           // grubiej niż 1.6, a park w reflektorze dostaje najgrubszą linię, bo to
           // ona jedna zostaje po zdjęciu wypełnienia
-          'line-width': 2.2,
+          'line-width': borderWidth(focusRef.current, 2.2, 3.4) as never,
+        },
+      })
+      map.addLayer({
+        id: 'parks-line-shared',
+        type: 'line',
+        source: 'borders',
+        filter: ['==', ['get', 'shared'], 1] as never,
+        layout: { 'line-cap': 'butt' },
+        paint: {
+          'line-color': borderColor(visitedRef.current, c) as never,
+          'line-width': borderWidth(focusRef.current, 1.5, 2) as never,
+          'line-opacity': 0.72,
+          'line-dasharray': [2.4, 2.6],
+        },
+      })
+      /*
+       * Szlak: dwie warstwy, bo jedna kolorowa linia na zdjeciu satelitarnym
+       * gubi sie w lesie. Ciemna obwodka daje jej kontrast na kazdym tle.
+       */
+      map.addSource('trail', { type: 'geojson', data: trailFC(trailRef.current) as never })
+      map.addLayer({
+        id: 'trail-casing',
+        type: 'line',
+        source: 'trail',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': '#0b1207', 'line-width': 7, 'line-opacity': 0.55 },
+      })
+      map.addLayer({
+        id: 'trail-line',
+        type: 'line',
+        source: 'trail',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': trailRef.current?.ink ?? c.trail,
+          'line-width': 3.4,
+          'line-opacity': 0.95,
         },
       })
       map.addSource('track', { type: 'geojson', data: trackFC(trackRef.current) as never })
@@ -702,6 +793,8 @@ export function MapView({
 
       // pins must never disappear behind a sticker, nor behind the scrim
       for (const layer of [
+        'trail-casing',
+        'trail-line',
         'track-line',
         'track-gap',
         'me-halo-fill',
@@ -719,13 +812,17 @@ export function MapView({
       }
       // po przebudowie warstw reflektor musi wrócić tam, gdzie był
       if (focusRef.current) {
-        map.setFilter('parks-fill', ['!=', ['id'], focusRef.current] as never)
-        map.setPaintProperty('parks-line', 'line-width', [
-          'case',
-          ['==', ['id'], focusRef.current],
-          3.4,
-          2.2,
-        ] as never)
+        map.setFilter('parks-fill', ['!=', ['get', 'id'], focusRef.current] as never)
+        map.setPaintProperty(
+          'parks-line',
+          'line-width',
+          borderWidth(focusRef.current, 2.2, 3.4) as never,
+        )
+        map.setPaintProperty(
+          'parks-line-shared',
+          'line-width',
+          borderWidth(focusRef.current, 1.5, 2) as never,
+        )
       }
       loadedRef.current = true
       syncVisited()
@@ -735,9 +832,10 @@ export function MapView({
       if (!map.getLayer('parks-fill')) return
       const c = readMapColors()
       const fill = ['case', ['boolean', ['feature-state', 'visited'], false], c.visitedFill, c.unvisitedFill]
-      const stroke = ['case', ['boolean', ['feature-state', 'visited'], false], c.visitedStroke, c.unvisitedStroke]
       map.setPaintProperty('parks-fill', 'fill-color', fill as never)
-      map.setPaintProperty('parks-line', 'line-color', stroke as never)
+      map.setPaintProperty('parks-line', 'line-color', borderColor(visitedRef.current, c) as never)
+      if (map.getLayer('parks-line-shared'))
+        map.setPaintProperty('parks-line-shared', 'line-color', borderColor(visitedRef.current, c) as never)
       map.setPaintProperty('track-line', 'line-color', c.track)
       map.setPaintProperty('track-gap', 'line-color', c.track)
       map.setPaintProperty('me-dot', 'circle-color', c.me)
@@ -959,6 +1057,15 @@ export function MapView({
   useEffect(() => {
     const map = mapRef.current
     if (!map || !loadedRef.current) return
+    ;(map.getSource('trail') as { setData: (d: unknown) => void } | undefined)?.setData(trailFC(trail))
+    // kolor czytamy tak samo jak przy budowie stylu: szlak znakowany ma swoj
+    if (map.getLayer('trail-line'))
+      map.setPaintProperty('trail-line', 'line-color', trail?.ink ?? readMapColors().trail)
+  }, [trail])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !loadedRef.current) return
     ;(map.getSource('track') as { setData: (d: unknown) => void } | undefined)?.setData(trackFC(track))
   }, [track])
 
@@ -1003,11 +1110,30 @@ export function MapView({
       focusFC(focusId ?? null),
     )
     if (!map.getLayer('parks-fill')) return
-    map.setFilter('parks-fill', focusId ? (['!=', ['id'], focusId] as never) : null)
+    /*
+     * ['get', 'id'], nie ['id']. Wyrazenie ['id'] czyta identyfikator kafla, a
+     * promoteId dziala tam tylko dla feature-state, wiec filtr nigdy nie
+     * wykluczal wybranego parku i jego biale wypelnienie zostawalo na mapie.
+     * Wlasnosc `id` jest w kazdym obiekcie parks.json, wiec ta droga jest pewna.
+     */
+    map.setFilter('parks-fill', focusId ? (['!=', ['get', 'id'], focusId] as never) : null)
+    map.setPaintProperty('parks-line', 'line-width', borderWidth(focusId ?? null, 2.2, 3.4) as never)
+    if (map.getLayer('parks-line-shared'))
+      map.setPaintProperty(
+        'parks-line-shared',
+        'line-width',
+        borderWidth(focusId ?? null, 1.5, 2) as never,
+      )
+    /*
+     * W reflektorze inne parki tracą wypełnienie prawie do zera. Zostawione
+     * świeciło jasną plamą przez zasłonę i wyglądało jak brud na mapie, a
+     * sąsiad z granicą i tak jest widoczny linią.
+     */
+    const sat = currentStyleKey.current.startsWith('satellite')
     map.setPaintProperty(
-      'parks-line',
-      'line-width',
-      focusId ? (['case', ['==', ['id'], focusId], 3.4, 2.2] as never) : 2.2,
+      'parks-fill',
+      'fill-opacity',
+      focusId ? (sat ? 0.1 : 0.18) : sat ? 0.36 : 0.6,
     )
   }, [focusId])
 

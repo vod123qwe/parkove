@@ -1,6 +1,6 @@
 # Parkove: czym jest ta aplikacja
 
-Materiał do wklejenia gdzie indziej. Stan na 2026-08-22, wersja 0.58.
+Materiał do wklejenia gdzie indziej. Stan na 2026-08-22, wersja 0.60.
 
 ## W jednym zdaniu
 
@@ -51,6 +51,15 @@ ciekawostki na kiedy indziej.
 **Ślady.** W trakcie wyprawy zostawiasz sobie zdjęcia, notatki, nagrania głosowe
 i miejsce, gdzie stoi auto. Po wyprawie da się to odtworzyć jako wspomnienie z
 przewijaniem trasy.
+
+**Szlaki.** Każde miejsce, w którym jest co chodzić, ma warianty przejścia:
+pętlę przez wszystkie punkty, krótszą pętlę i prawdziwe szlaki znakowane, jeśli
+przez nie przechodzą. Trasy liczone są routerem pieszym OpenStreetMap, szlaki
+znakowane brane z relacji OSM i przycinane do granic miejsca, więc długość mówi
+o tym odcinku, a nie o całym szlaku przez pół Jury. Wszystko policzone raz i
+zapisane, bez edycji w aplikacji, bo w dolinie nie ma zasięgu. Wybrany szlak
+rysuje się na mapie pod śladem GPS: to podpowiedź, gdzie iść, a nie zapis tego,
+gdzie byłeś.
 
 **Dojście.** Każdy parking ma swój kadr mapy satelitarnej z prawdziwą trasą
 pieszo, policzoną routerem OpenStreetMap i zapisaną w danych, więc działa bez

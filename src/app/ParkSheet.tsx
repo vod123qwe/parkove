@@ -6,6 +6,7 @@ import {
   CircleParking,
   Coffee,
   Compass,
+  Footprints,
   MapPin,
   Square,
   ToyBrick,
@@ -33,6 +34,7 @@ import { beginWalk } from './walk'
 import { distanceToParkM, formatDistance, pointInPark } from './geo'
 import type { ParkGeometry, Pt } from './geo'
 import { pointsTotal, questForPark, photosForPark } from './data/quests'
+import { trailById, trailsFor } from './data/trails'
 import type { QuestPoi } from './data/quests'
 
 export type ParkFeature = {
@@ -72,6 +74,7 @@ export function ParkSheet({
   onOpenPoi,
   onOpenParking,
   onOpenAmenity,
+  onOpenTrails,
   onPhotoSaved,
 }: {
   park: ParkFeature | null
@@ -80,10 +83,12 @@ export function ParkSheet({
   onOpenPoi: (poi: QuestPoi) => void
   onOpenParking: () => void
   onOpenAmenity: (kind: 'food' | 'playground') => void
+  /** wybor szlaku: warianty przejscia przez to miejsce */
+  onOpenTrails: () => void
   /** a fresh picture opens its own sheet, where the caption gets written */
   onPhotoSaved: (photoId: string) => void
 }) {
-  const { parks, expedition } = useGameState()
+  const { parks, expedition, trails: chosenTrails } = useGameState()
   const [status, setStatus] = useState<Status>({ s: 'idle' })
 
   useEffect(() => {
@@ -100,6 +105,9 @@ export function ParkSheet({
   const collected = new Set(progress?.points ?? [])
   const earned = quest ? collected.size : visited ? 1 : 0
   const onExpeditionHere = expedition?.parkId === park.id
+  /* szlaki: wybrany rysuje sie na mapie, wiec w karcie wystarczy jeden wiersz */
+  const trailList = trailsFor(park.id)
+  const trail = trailById(park.id, chosenTrails[park.id] ?? null)
 
   const doCheckIn = () => {
     if (!navigator.geolocation) {
@@ -288,6 +296,25 @@ export function ParkSheet({
             )
           })}
         </Carousel>
+      )}
+
+      {/*
+        Szlak stoi zaraz po punktach, bo to odpowiedź na pytanie, które rodzi
+        się od razu po ich zobaczeniu: „w jakiej kolejności je obejść".
+      */}
+      {trailList.length > 0 && (
+        <button className="park-parking" onClick={onOpenTrails}>
+          <Footprints size={18} />
+          <div className="park-parking__body">
+            <p className="t-label park-parking__name">{trail ? trail.name : 'Szlaki i trasy'}</p>
+            <p className="t-caption park-parking__hint">
+              {trail
+                ? `${formatDistance(trail.m)} · ${trail.min} min${trail.kind === 'osm' ? ' · szlak znakowany' : ''}`
+                : `${trailList.length} ${trailList.length === 1 ? 'wariant' : trailList.length < 5 ? 'warianty' : 'wariantów'} do wyboru`}
+            </p>
+          </div>
+          <ChevronRight size={18} className="park-parking__chevron" />
+        </button>
       )}
 
       {/*

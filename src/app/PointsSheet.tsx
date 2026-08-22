@@ -1,4 +1,4 @@
-import { CarFront, Check, ChevronRight, Crosshair } from 'lucide-react'
+import { CarFront, Check, ChevronRight, Crosshair, Footprints } from 'lucide-react'
 import { BottomSheet, List, ListItem } from '../ds'
 import { distanceM, formatDistance } from './geo'
 import type { Pt } from './geo'
@@ -20,6 +20,9 @@ export function PointsSheet({
   here,
   targetId,
   carAway,
+  trail,
+  hasTrails,
+  onOpenTrails,
   onPick,
 }: {
   open: boolean
@@ -31,6 +34,10 @@ export function PointsSheet({
   targetId: string | null
   /** dystans do zapamiętanego auta, gdy w tej wyprawie ktoś je zapisał */
   carAway?: number | null
+  /** wybrany szlak tej wyprawy, żeby dało się go zmienić w terenie */
+  trail?: { name: string; m: number; min: number } | null
+  hasTrails?: boolean
+  onOpenTrails?: () => void
   /** wybór punktu jako celu: karta wyprawy przestaje wybierać najbliższy */
   onPick: (poiId: string) => void
 }) {
@@ -53,6 +60,21 @@ export function PointsSheet({
         <p className="t-body-sm points-car">
           <CarFront size={16} /> Auto stoi {formatDistance(carAway)} stąd
         </p>
+      )}
+      {/* szlak nad listą: w terenie zmiana wariantu to jedno dotknięcie */}
+      {hasTrails && onOpenTrails && (
+        <button className="park-parking" onClick={onOpenTrails}>
+          <Footprints size={18} />
+          <div className="park-parking__body">
+            <p className="t-label park-parking__name">{trail ? trail.name : 'Wybierz szlak'}</p>
+            <p className="t-caption park-parking__hint">
+              {trail
+                ? `${formatDistance(trail.m)} · ${trail.min} min · rysuje się na mapie`
+                : 'Warianty przejścia przez to miejsce'}
+            </p>
+          </div>
+          <ChevronRight size={18} className="park-parking__chevron" />
+        </button>
       )}
       <p className="t-body-sm parking-lead">
         {here

@@ -9,3 +9,9 @@ Thumbs.db
 # kopie robocze pieczatek: zrodla leza juz w assets-in/, tu tylko wejscie dla
 # npm run stamps:files, wiec nie ma po co trzymac ich w gicie dwa razy
 assets-in/stamps/*.png
+
+# pliki robocze generatora szlakow: log biegu i cache, zeby czesciowe
+# przeliczenie nie zjadalo reszty danych. Wynik (src/app/data/trails.ts) jest w gicie
+scripts/.trails-log.txt
+scripts/.trails-log2.txt
+scripts/.trails-cache.json

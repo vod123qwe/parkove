@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.59.0'
+export const VERSION = '0.60.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,21 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.60.0',
+    date: '2026-08-22',
+    title: 'Trails you can choose, and a selected place finally shows what is inside it',
+    changes: [
+      ['added', 'Every place with enough ground now offers walking variants: a loop through all its points, a short loop of the three nearest ones, and any waymarked trail that really runs through it. Both kinds live side by side because both answer different questions. The computed ones come from the OpenStreetMap foot router, the waymarked ones from route relations clipped to the place boundary, and everything is stored, so it works in a valley with no signal'],
+      ['added', 'The chooser looks like the parking list: every variant carries its own frame of satellite map with the route drawn on it, its length, its time and how many points it visits. The chosen one draws on the big map under your GPS track, in lime for a computed route and in the trail colour for a waymarked one, because in the field you look for a colour, not for a name'],
+      ['changed', 'A waymarked trail is named by its colour, with the official name kept as the caption. Its length counts only the stretch inside the place: the Jurassic Strongholds Trail is tens of kilometres long, but through Dolina Bedkowska it runs 5.9 kilometres and that is the number worth knowing'],
+      ['fixed', 'A selected place kept its white fill, so the thing you wanted to look at was covered by a veil. The filter compared the tile feature id, and a promoted id only works for feature state, so it never matched anything. Now the selected place shows the imagery untouched, keeps its border and everything else dims'],
+      ['changed', 'Other places lose almost all their fill while one is selected. A neighbour glowing pale under the scrim read as dirt on the map, and a border line is enough to say it is there'],
+      ['changed', 'Where two places share a boundary, that boundary is drawn thinner and dashed. Drawn from both polygons it read stronger than the outer edge, as if it cut the place in half. Shared stretches are found by distance, not by matching vertices, because Zakrzowek and Skalki Twardowskiego run together without sharing a single point'],
+      ['changed', 'The peek card on the map leads with a photograph of the place instead of an empty progress ring. The progress was already there in words, and a circle said nothing about where you are going'],
+      ['added', 'Plant identification from a photograph, waiting for one address to be pasted in. Google has no free API that names a species, so this goes to Pl@ntNet: 500 identifications a day at no cost, three guesses with a confidence each, and tapping one writes it as the photo caption. The key sits in a small proxy, never in the app, because the app is a public static page'],
+    ],
+  },
   {
     version: '0.59.0',
     date: '2026-08-22',
