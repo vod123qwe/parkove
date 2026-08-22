@@ -2,12 +2,9 @@ import { useState } from 'react'
 import { Navigation } from 'lucide-react'
 import { IconButton, Modal, PlaceRow } from '../ds'
 import { TileMap } from './TileMap'
+import { RouteModal } from './RouteModal'
 import { OCCUPANCY_LABEL, PARKING } from './data/parking'
 import { walkRoute } from './data/walk-routes'
-
-const navigateTo = ([lng, lat]: [number, number]) => {
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank')
-}
 
 /**
  * Parkingi przy jednym miejscu.
@@ -32,6 +29,8 @@ export function ParkingModal({
 }) {
   const spots = PARKING[parkId] ?? []
   const [picked, setPicked] = useState<string | null>(null)
+  /* strzałka pokazuje najpierw dojście w dużym kadrze, a nawigacja jest w nim */
+  const [routeFor, setRouteFor] = useState<string | null>(null)
   return (
     <Modal open={open} onClose={onClose} title="Parking" action="back" presentation="push">
       <p className="t-body-sm parking-lead">
@@ -43,7 +42,7 @@ export function ParkingModal({
           <PlaceRow
             key={s.id}
             index={i + 1}
-            map={<TileMap parkId={parkId} point={s.coords} route={walkRoute(parkId, s.id)} />}
+            map={<TileMap parkId={parkId} point={s.coords} route={walkRoute(parkId, s.id)} showStraight />}
             title={s.name}
             pills={[s.fee, s.occupancy ? OCCUPANCY_LABEL[s.occupancy] : null].filter(Boolean) as string[]}
             note={s.hint}
@@ -51,9 +50,9 @@ export function ParkingModal({
             onClick={() => setPicked(picked === s.id ? null : s.id)}
             action={
               <IconButton
-                aria-label={`Prowadź: ${s.name}`}
+                aria-label={`Dojście: ${s.name}`}
                 variant="tonal"
-                onClick={() => navigateTo(s.coords)}
+                onClick={() => setRouteFor(s.id)}
               >
                 <Navigation size={18} />
               </IconButton>
@@ -61,6 +60,20 @@ export function ParkingModal({
           />
         ))}
       </div>
+      {(() => {
+        const spot = spots.find((x) => x.id === routeFor)
+        if (!spot) return null
+        return (
+          <RouteModal
+            open
+            onClose={() => setRouteFor(null)}
+            parkId={parkId}
+            title={spot.name}
+            point={spot.coords}
+            route={walkRoute(parkId, spot.id)}
+          />
+        )
+      })()}
     </Modal>
   )
 }

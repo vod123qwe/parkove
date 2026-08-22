@@ -35,11 +35,38 @@ export const PARKING: Record<string, ParkingInfo[]> = {
       coords: [19.9633, 50.0381],
     },
   ],
+  /*
+   * Zakrzówek ma trzy różne wejścia i każde ma swój parking, więc „najlepszy”
+   * zależy od tego, po co jedziesz. Dystanse zmierzone od parkingów z OSM do
+   * naszych punktów (2026-08-22): kąpielisko, punkt widokowy nad zalewem i Grota
+   * Twardowskiego leżą po trzech różnych stronach wzgórza.
+   */
   zakrzowek: [
     {
+      id: 'zakrzowek-jacka-parking',
+      name: 'Parking przy św. Jacka',
+      hint: 'Prawdziwy parking, nie ulica: 460 m do punktu widokowego nad zalewem i 680 m do kąpieliska. Najlepszy, gdy jedziesz na wodę i widoki.',
+      fee: 'Bezpłatny',
+      coords: [19.920035, 50.039169],
+    },
+    {
+      id: 'zakrzowek-kaufland',
+      name: 'Przy Kauflandzie, Kamieniarska',
+      hint: 'Najbliżej samego kąpieliska, 560 m, i 126 miejsc, więc zwykle jest gdzie stanąć. To parking sklepowy dla klientów i płatny, więc uczciwie: albo zakupy, albo opłata.',
+      fee: 'Płatny (sklepowy)',
+      coords: [19.911063, 50.030166],
+    },
+    {
+      id: 'zakrzowek-norymberska',
+      name: 'Norymberska, przy jednostce',
+      hint: 'Zachodnie wejście, obok jednostki wojskowej: tylko 285 m do Groty Twardowskiego i najbliżej skałek. Do kąpieliska stąd 800 m.',
+      fee: 'Bezpłatny',
+      coords: [19.902069, 50.036365],
+    },
+    {
       id: 'zakrzowek-jacka',
-      name: 'Ulice przy wejściu od św. Jacka',
-      hint: 'Parkowanie uliczne przy ul. św. Jacka i Wyłom. W pogodne weekendy ciasno, celuj przed południem.',
+      name: 'Ulice przy św. Jacka i Wyłom',
+      hint: 'Zapas, gdy parking przy św. Jacka jest pełny. Parkowanie uliczne, w pogodne weekendy ciasno, celuj przed południem.',
       fee: 'Bezpłatne (uliczne)',
       coords: [19.9169, 50.0433],
     },
@@ -114,14 +141,14 @@ export const PARKING: Record<string, ParkingInfo[]> = {
     {
       id: 'bedkowska-brandysowka',
       name: 'Brandysówka, środek doliny',
-      hint: 'Najbliżej tego, po co się tu jedzie: ścieżkami 500 m i osiem minut do Sokolicy, wodospad Szum po drodze. Gruntowy, płatny, przy schronisku, więc od razu jest gdzie zjeść.',
+      hint: 'Najbliżej tego, po co się tu jedzie: szlak zaczyna się przy samym parkingu, wodospad Szum kilkaset metrów dalej asfaltem, więc da się z wózkiem. Płatny, 15 zł, przy schronisku, które daje pierogi i bigos.',
       fee: 'Płatny',
       coords: [19.740535, 50.172941],
     },
     {
       id: 'bedkowska-nietoperzowa',
       name: 'Przy Jaskini Nietoperzowej',
-      hint: 'Osobny wypad, górny koniec doliny po stronie Jerzmanowic: ścieżką 140 m i dwie minuty do wejścia do jaskini. Żwirowy, bez opłaty. Do wodospadu stąd trzy kilometry.',
+      hint: 'Osobny wypad, górny koniec doliny po stronie Jerzmanowic: 50 m do wejścia na ścieżkę, jaskinia obok. Żwirowy, bez opłaty. Od Brandysówki idąc szutrówką to godzina, dlatego lepiej podjechać.',
       fee: 'Bezpłatny',
       coords: [19.775846, 50.193216],
     },
@@ -134,8 +161,8 @@ export const PARKING: Record<string, ParkingInfo[]> = {
     },
     {
       id: 'bedkowska-bedkowice',
-      name: 'Od Będkowic, dolny wylot',
-      hint: 'Najdalej od punktów: ścieżkami 1,2 km i szesnaście minut. Za to od tej strony wchodzi się w dolinę wzdłuż potoku, co samo w sobie jest spacerem.',
+      name: 'Łazy, przy kościele',
+      hint: 'Spory i bezpłatny, przy kościele w Łazach, kilometr od wodospadu. Od tej strony wchodzi się w dolinę wzdłuż potoku, co samo w sobie jest spacerem. Autobusem: 210, nocą 910.',
       fee: 'Nieznana',
       coords: [19.752579, 50.167952],
     },

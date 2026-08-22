@@ -8,9 +8,12 @@
 // Czego to NIE gwarantuje: że ścieżka jest wygodna, otwarta i przejezdna z
 // wózkiem. Dlatego w aplikacji piszemy „ścieżkami", a nie „łatwo".
 //
-// Cel trasy: najbliższy punkt wyprawy tego miejsca, a gdy quest nie istnieje,
-// środek parku. Dzięki temu parking przy jaskini prowadzi do jaskini, a nie do
-// wodospadu trzy kilometry dalej.
+// Cel trasy: najbliższe WEJŚCIE NA ŚCIEŻKĘ prowadzącą przez park albo dolinę.
+// Pytamy Overpass o pieszą sieć (path, footway, track, steps, pedestrian,
+// bridleway, cycleway) LEŻĄCĄ WEWNĄTRZ obrysu miejsca i celujemy w jej punkt
+// najbliższy parkingowi. Dzięki temu trasa kończy się tam, gdzie zaczyna się
+// spacer, a nie na środku łąki ani na konkretnym punkcie wyprawy trzy kilometry
+// dalej.
 //
 // Uruchomienie: node scripts/fetch-walk-routes.mjs
 // Wynik: src/app/data/walk-routes.ts
@@ -40,18 +43,38 @@ const parkings = []
   }
 }
 
-/** punkty wypraw: cel trasy to najbliższy z nich */
-const questSrc =
-  readFileSync(resolve(root, 'src/app/data/quests.ts'), 'utf8') +
-  readFileSync(resolve(root, 'src/app/data/quests-dolinki.ts'), 'utf8')
-const pois = {}
-{
-  const re = /parkId: '([^']+)'([\s\S]*?)(?=\n  \{|\n\]|$)/g
-  let m
-  while ((m = re.exec(questSrc))) {
-    const list = [...m[2].matchAll(/coords: \[\s*([\d.]+),\s*([\d.]+)\s*\]/g)].map((c) => [+c[1], +c[2]])
-    pois[m[1]] = (pois[m[1]] ?? []).concat(list)
+/** obrys miejsca, uproszczony do zapytania Overpass */
+function ringFor(parkId) {
+  const f = parksData.features.find((x) => x.id === parkId)
+  if (!f) return null
+  const rings =
+    f.geometry.type === 'Polygon' ? f.geometry.coordinates : f.geometry.coordinates.flat()
+  const ring = rings[0]
+  const step = Math.max(1, Math.ceil(ring.length / 60))
+  return ring.filter((_, i) => i % step === 0)
+}
+
+const FOOT = '^(path|footway|track|steps|pedestrian|bridleway|cycleway)$'
+
+/** wszystkie punkty pieszej sieci wewnątrz miejsca: to z nich wybieramy wejście */
+async function trailPoints(parkId) {
+  const ring = ringFor(parkId)
+  if (!ring) return []
+  const poly = ring.map((c) => `${c[1]} ${c[0]}`).join(' ')
+  const q = `[out:json][timeout:90];way(poly:"${poly}")[highway~"${FOOT}"];out geom 800;`
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    await sleep(attempt * 2500)
+    const res = await fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      headers: { ...UA, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'data=' + encodeURIComponent(q),
+    })
+    const text = await res.text()
+    if (!text.trim().startsWith('{')) continue
+    const d = JSON.parse(text)
+    return (d.elements ?? []).flatMap((e) => (e.geometry ?? []).map((g) => [g.lon, g.lat]))
   }
+  return []
 }
 
 const dist = (a, b) => {
@@ -78,13 +101,18 @@ function thin(line) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const routes = {}
+const trailCache = {}
 let ok = 0
 let miss = 0
 for (const p of parkings) {
   if (!p.coords || !p.park) continue
-  const targets = pois[p.park] ?? []
-  const target = targets.length
-    ? targets.map((t) => ({ t, d: dist(p.coords, t) })).sort((a, b) => a.d - b.d)[0].t
+  if (!(p.park in trailCache)) {
+    trailCache[p.park] = await trailPoints(p.park)
+    console.log(`  sieć ścieżek ${p.park}: ${trailCache[p.park].length} punktów`)
+  }
+  const trail = trailCache[p.park]
+  const target = trail.length
+    ? trail.map((t) => ({ t, d: dist(p.coords, t) })).sort((a, b) => a.d - b.d)[0].t
     : centre(p.park)
   if (!target) {
     console.log(`BRAK CELU ${p.park}/${p.id}`)
@@ -103,17 +131,16 @@ for (const p of parkings) {
       continue
     }
     const line = thin(r.geometry.coordinates)
-    const straight = dist(p.coords, target)
     routes[`${p.park}/${p.id}`] = {
       m: Math.round(r.distance),
       min: Math.max(1, Math.round(r.duration / 60)),
       line,
+      trail: trail.length > 0,
     }
     ok++
     console.log(
-      `OK   ${(p.park + '/' + p.id).padEnd(38)} ${String(Math.round(r.distance)).padStart(5)} m ` +
-        `(prosto ${Math.round(straight)} m, obejście ${Math.round((r.distance / straight - 1) * 100)}%), ` +
-        `${Math.round(r.duration / 60)} min, ${line.length} punktów`,
+      `OK   ${(p.park + '/' + p.id).padEnd(38)} ${String(Math.round(r.distance)).padStart(5)} m, ` +
+        `${Math.round(r.duration / 60)} min, ${line.length} punktów${trail.length ? '' : ' (bez sieci ścieżek, cel = środek)'}`,
     )
   } catch (e) {
     console.log(`BLAD ${p.park}/${p.id}: ${e.message}`)
@@ -125,7 +152,7 @@ const body = Object.entries(routes)
   .sort((a, b) => a[0].localeCompare(b[0]))
   .map(
     ([k, v]) =>
-      `  '${k}': { m: ${v.m}, min: ${v.min}, line: [${v.line.map((p) => `[${p[0]},${p[1]}]`).join(',')}] },`,
+      `  '${k}': { m: ${v.m}, min: ${v.min}, trail: ${v.trail}, line: [${v.line.map((p) => `[${p[0]},${p[1]}]`).join(',')}] },`,
   )
   .join('\n')
 
@@ -133,7 +160,8 @@ const NL = String.fromCharCode(10)
 writeFileSync(
   resolve(root, 'src/app/data/walk-routes.ts'),
   [
-    '// Trasy pieszo od parkingu do najblizszego punktu miejsca, policzone raz',
+    '// Trasy pieszo od parkingu do najblizszego wejscia na sciezke wewnatrz',
+    '// miejsca, policzone raz',
     '// routerem pieszym OpenStreetMap (profil foot) i zapisane, zeby aplikacja',
     '// nie potrzebowala sieci ani uslugi w terenie.',
     '//',
@@ -142,7 +170,7 @@ writeFileSync(
     '// Trasa istnieje = w danych OSM jest przejscie sciezkami. To NIE znaczy, ze',
     '// jest wygodne ani otwarte, dlatego w UI mowimy "sciezkami", nie "latwo".',
     '',
-    'export type WalkRoute = { m: number; min: number; line: Array<[number, number]> }',
+    'export type WalkRoute = { m: number; min: number; trail: boolean; line: Array<[number, number]> }',
     '',
     'export const WALK_ROUTES: Record<string, WalkRoute> = {',
     body,

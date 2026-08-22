@@ -27,21 +27,42 @@ const worldY = (lat: number, z: number) => {
   return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * TILE * 2 ** z
 }
 
+/**
+ * Podpis kadru. Cel trasy to wejście na ścieżkę, więc przy parkingach, które
+ * stoją wprost przy szlaku, uczciwiej powiedzieć to słowami niż podać „20 m,
+ * około 1 min”, co brzmi jak pomyłka.
+ */
+function label(route: WalkRoute | null | undefined, straight: number, showStraight: boolean) {
+  if (route) {
+    if (route.m <= 70) return 'szlak zaczyna się przy parkingu'
+    return `${formatDistance(route.m)} ścieżkami do wejścia na szlak, około ${route.min} min`
+  }
+  if (showStraight) return `${formatDistance(straight)} do granicy, w linii prostej`
+  return 'w granicach miejsca'
+}
+
 export function TileMap({
   parkId,
   point,
   route,
+  showStraight = false,
   height = 132,
 }: {
   parkId: string
   /** miejsce, do którego prowadzimy: parking, kawiarnia, plac zabaw */
   point: Pt
   /**
-   * Prawdziwa trasa pieszo, policzona routerem OSM i zapisana w danych. Gdy jest,
-   * rysujemy ją zamiast linii prostej, bo tylko ona odpowiada na pytanie „czy tam
-   * dojdę”. Bez niej zostaje kierunek i wyraźnie to piszemy.
+   * Trasa pieszo od parkingu do najbliższego wejścia na ścieżkę wewnątrz miejsca,
+   * policzona routerem OSM i zapisana w danych. Gdy jest, rysujemy ją zamiast
+   * linii prostej, bo tylko ona odpowiada na pytanie „czy tam dojdę”.
    */
   route?: WalkRoute | null
+  /**
+   * Linia prosta do granicy, gdy nie ma trasy. Dla kawiarni i placów zabaw
+   * wyłączona: tras dla nich nie liczymy, a linia prosta przez pół parku wprowadzała
+   * tylko w błąd.
+   */
+  showStraight?: boolean
   height?: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -123,16 +144,12 @@ export function TileMap({
             className="app-tilemap__route"
             points={route.line.map((c) => px(c as Pt).map((n) => n.toFixed(1)).join(',')).join(' ')}
           />
-        ) : (
+        ) : showStraight ? (
           <line className="app-tilemap__walk" x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} />
-        )}
+        ) : null}
         <circle className="app-tilemap__spot" cx={a[0]} cy={a[1]} r={7} />
       </svg>
-      <span className="app-tilemap__label">
-        {route
-          ? `${formatDistance(route.m)} ścieżkami, około ${route.min} min`
-          : `${formatDistance(near.d)} do granicy, w linii prostej`}
-      </span>
+      <span className="app-tilemap__label">{label(route, near.d, showStraight)}</span>
     </div>
   )
 }

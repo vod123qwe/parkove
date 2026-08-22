@@ -3396,3 +3396,11 @@
   paint-order: stroke;
   filter: drop-shadow(0 0 2px rgb(6 12 6 / 0.8));
 }
+
+/* akcje pod powiększonym dojściem: decyzja i wyjście, jedna pod drugą */
+.app-routeactions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
