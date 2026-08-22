@@ -47,9 +47,13 @@ export function JourneyMap({
     if (!holder.current) return
     const map = new MapGL({
       container: holder.current,
-      // a walk in the journal is a still picture: the flat photograph is enough
-      // and the raised version would pull elevation tiles for no gain here
-      style: resolveMapStyle(getMapStyle() === 'satellite-3d' ? 'satellite' : getMapStyle()).spec,
+      /*
+       * A walk in the journal is a still picture: the flat photograph is enough
+       * and the raised version would pull elevation tiles for no gain here.
+       * Płaskim odpowiednikiem rzeźby terenu jest ortofotomapa, nie satelita
+       * Esri: to ma być to samo zdjęcie, tylko położone.
+       */
+      style: resolveMapStyle(getMapStyle() === 'satellite-3d' ? 'ortho' : getMapStyle()).spec,
       center: track[0] ?? [19.9445, 50.0555],
       zoom: 14,
       attributionControl: { compact: true },
@@ -89,6 +93,22 @@ export function JourneyMap({
             })),
         } as never,
       })
+      /*
+       * Biała obwódka pod śladem, tak samo jak na mapie głównej.
+       *
+       * Sam ślad jest w kolorze --content-accent, czyli w tym samym ciemnym
+       * zielonym, co tło przycisku, i na ortofotomapie lasu ginął: ciemna linia
+       * na ciemnym tle. Jasna otoczka czyta się na każdym podłożu, a kolor śladu
+       * zostaje, więc nie mieszamy go z limonkowym szlakiem, który jest
+       * podpowiedzią, nie zapisem.
+       */
+      map.addLayer({
+        id: 'j-track-casing',
+        type: 'line',
+        source: 'j-track',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': '#ffffff', 'line-width': 7, 'line-opacity': 0.72 },
+      })
       map.addLayer({
         id: 'j-track-line',
         type: 'line',
@@ -96,6 +116,37 @@ export function JourneyMap({
         layout: { 'line-cap': 'round', 'line-join': 'round' },
         paint: { 'line-color': colors.accentStrong, 'line-width': 4, 'line-opacity': 0.9 },
       })
+
+      /*
+       * Złota kropka na starcie, tym samym językiem, co miniatura na liście
+       * wypraw: „tu się zaczęło".
+       *
+       * Metę odpuszczamy świadomie. Po pierwsze większość tych wypraw to pętle,
+       * więc koniec leżałby na starcie i nie mówiłby nic. Po drugie biała kropka
+       * obok zielonych pinów czyta się jak jeszcze jeden pin, a na tej mapie
+       * pinów już jest dość.
+       */
+      if (line.length > 1) {
+        map.addSource('j-start', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: { type: 'Point', coordinates: line[0] },
+          } as never,
+        })
+        map.addLayer({
+          id: 'j-start-dot',
+          type: 'circle',
+          source: 'j-start',
+          paint: {
+            'circle-radius': 5,
+            'circle-color': colors.gold,
+            'circle-stroke-width': 2.5,
+            'circle-stroke-color': '#ffffff',
+          },
+        })
+      }
 
       map.addSource('j-pois', {
         type: 'geojson',

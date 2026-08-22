@@ -29,6 +29,17 @@ const SLOW_FLOOR = 0.35
 const DWELL_MS = 1100
 /** the camera aims at a point this far up the route, so it turns before you do */
 const LOOKAHEAD_M = 28
+/**
+ * Wysokosc kamery i ile z niej wolno oddac w rece.
+ *
+ * Odtwarzanie stoi na 16.6, bo przy tileSize 128 wypada tam dokladnie poziom 19
+ * kafli, czyli maksimum, jakie ma Geoportal (patrz docs/map-imagery.md). Szczypta
+ * w obie strony ma sens, ale w granicach: to jest kamera prowadzona po trasie, a
+ * nie mapa do zwiedzania. Poza tym w gore ostrosc i tak sie konczy, bo od okolo
+ * 17.5 MapLibre musi rozciagac kafle poziomu 19.
+ */
+const BASE_ZOOM = 16.6
+const ZOOM_SPAN = 1.5
 /** how long the camera takes to settle on a new heading, in ms */
 const TURN_TAU = 420
 /**
@@ -90,6 +101,10 @@ export function MemoryPlayer({
   const bearingRef = useRef<number | null>(null)
   const seenRef = useRef<Set<string>>(new Set())
   const dwellUntil = useRef(0)
+  /** wysokosc kamery, ktora moze przestawic szczypta; wraca do bazy przy wyjsciu */
+  const zoomRef = useRef(BASE_ZOOM)
+  /** czy palce sa wlasnie na mapie: wtedy kamera nie wtraca sie do kadru */
+  const pinching = useRef(false)
 
   const [elapsed, setElapsed] = useState(0)
   const [memory, setMemory] = useState<Memory | null>(null)
@@ -146,20 +161,55 @@ export function MemoryPlayer({
       container: holder.current,
       style: replayStyle('relief'),
       center: track[0],
-      zoom: 16.6,
+      zoom: BASE_ZOOM,
+      minZoom: BASE_ZOOM - ZOOM_SPAN,
+      maxZoom: BASE_ZOOM + ZOOM_SPAN,
       pitch: 58,
       bearing: 0,
       attributionControl: { compact: true },
-      // no panning or zooming by hand: the dial and the pins drive this map,
-      // but taps still have to arrive, so the handlers are switched off one by one
+      /*
+       * Kadr prowadzi trasa, wiec przesuwanie i obracanie zostaje wylaczone: bez
+       * tego kamera i palec walczylyby o to samo. Zostaje sama wysokosc, bo o to
+       * poprosil Jarek („moglbym miec mozliwosc lekkiego jeszcze zzoomowania i
+       * odzoomowania, ale zeby byly limity"), i granice pilnuje minZoom/maxZoom.
+       */
       dragPan: false,
       dragRotate: false,
-      scrollZoom: false,
-      touchZoomRotate: false,
+      scrollZoom: true,
+      touchZoomRotate: true,
       doubleClickZoom: false,
       keyboard: false,
       boxZoom: false,
     })
+    // szczypta ma zmieniac wysokosc, nie kat: obrot nalezy do trasy
+    map.touchZoomRotate.disableRotation()
+
+    /*
+     * Kamera przestawia kadr co klatke przez jumpTo, wiec bez tego szczypta
+     * cofalaby sie natychmiast po kazdym palcu. Dwie rzeczy zalatwiaja sprawe.
+     *
+     * Po pierwsze `originalEvent` odsiewa gest od ruchu wlasnego: zdarzenia z
+     * jumpTo go nie maja, a z palca albo kolka zawsze maja. Tylko te pierwsze
+     * zapisujemy jako nowa wysokosc kamery.
+     *
+     * Po drugie w trakcie gestu kamera w ogole nie rusza kadru. Szczypta na
+     * dwoch palcach przesuwa tez srodek miedzy nimi, wiec walka o center
+     * konczylaby sie drganiem. Chodzacy wyjdzie na chwile z osi i wroci, gdy
+     * palce zejda: tego sie nie widzi, a gest jest wtedy taki, jak w mapach.
+     */
+    const grab = (e: { originalEvent?: unknown }) => {
+      if (e.originalEvent) pinching.current = true
+    }
+    const release = () => {
+      if (!pinching.current) return
+      pinching.current = false
+      zoomRef.current = map.getZoom()
+    }
+    map.on('zoomstart', grab)
+    map.on('zoom', (e: { originalEvent?: unknown }) => {
+      if (e.originalEvent) zoomRef.current = map.getZoom()
+    })
+    map.on('zoomend', release)
     mapRef.current = map
     if (import.meta.env.DEV) {
       // a debug handle, the same as the main map has
@@ -400,7 +450,7 @@ export function MemoryPlayer({
       properties: {},
       geometry: { type: 'LineString', coordinates: walkedSoFar(track, timeline.dist, metres) },
     } as never)
-    map.jumpTo({ center: at, bearing, zoom: 16.6, pitch: 58 })
+    if (!pinching.current) map.jumpTo({ center: at, bearing, zoom: zoomRef.current, pitch: 58 })
 
     // a memory shows up when we reach where it was left
     const hit = stops.current.find(

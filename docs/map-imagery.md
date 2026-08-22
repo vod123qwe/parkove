@@ -92,3 +92,68 @@ wyglądać najlepiej, jak potrafimy.
 
 `Ortofotomapa: GUGiK, Geoportal` w polu `attribution` źródła, więc MapLibre
 pokazuje ją sam w rogu.
+
+## Trzy mapy, jedno zdjęcie
+
+Pytanie Jarka: „czy we wspomnieniach jest taka sama mapa jak na ekranie
+głównym?". Zdjęcie pod spodem tak, reszta nie, i to jest celowe.
+
+| Gdzie | Styl | Kadr | Kafle |
+| --- | --- | --- | --- |
+| ekran główny | Twój wybór z Wyglądu (4 style) | z góry, płasko | 256 |
+| szczegóły wyprawy | Twój wybór, ale zawsze płasko | z góry, cała trasa w kadrze | 256 |
+| wspomnienie | własne 3 looki pod przyciskiem warstw | z boku, pitch 58 | **128** |
+
+Odtwarzanie **nie pyta** o styl z Wyglądu i nie powinno: to jeden lot kamery nad
+jedną trasą, więc ma wyglądać najlepiej, jak potrafimy, niezależnie od tego, co
+jest wygodne na codzień. Ma za to swój wybór looków (Rzeźba terenu, Rzeźba
+terenu w nocy, Grafit 3D) pod przyciskiem warstw w narożniku.
+
+Poza kaflami odtwarzanie różni się jeszcze: rzeźba wypchnięta ×3 (żywa mapa ×2.2),
+kamera niżej i bardziej z boku, budynki wyciągnięte z wektorów, zdjęcie lekko
+podbite kontrastem i odsycone.
+
+Szczegóły wyprawy dostają **płaską ortofotomapę**, nie satelitę Esri, gdy
+wybranym stylem jest rzeźba terenu: płaskim odpowiednikiem zdjęcia z rzeźbą jest
+to samo zdjęcie położone, a nie inne zdjęcie.
+
+## Szczypta we wspomnieniu, w granicach
+
+Jarek: „czy w wspomnieniach mógłbym mieć możliwość lekkiego jeszcze
+zzoomowania i odzoomowania, ale żeby były limity".
+
+Zakres to **16.6 ± 1.5**, czyli od 15.1 do 18.1. Kamerę prowadzi trasa, więc
+przesuwanie i obracanie zostaje wyłączone, a szczypta ma zmieniać samą wysokość
+(`touchZoomRotate.disableRotation()`). Granic pilnuje `minZoom`/`maxZoom`, czyli
+MapLibre, a nie nasz kod.
+
+Dlaczego nie więcej w górę: od okolo 17.5 kafel wypada na poziomie 20, którego
+Geoportal nie ma, więc MapLibre musi rozciągać poziom 19. Obraz przestaje wtedy
+zyskiwać detal, a zaczyna miękczeć. 18.1 to jeszcze rozsądny zapas na „chcę
+podejść bliżej", nie więcej.
+
+Dwie pułapki, które trzeba było obejść, bo kamera przestawia kadr **co klatkę**:
+
+- `originalEvent` odsiewa gest od ruchu własnego. Zdarzenia z `jumpTo` go nie
+  mają, a z palca albo kółka mają zawsze, więc tylko te pierwsze zapisujemy jako
+  nową wysokość. Bez tego szczypta cofałaby się natychmiast.
+- **w trakcie gestu kamera w ogóle nie rusza kadru.** Szczypta na dwóch palcach
+  przesuwa też środek między nimi, więc walka o `center` kończyłaby się
+  drganiem. Chodzący wychodzi na chwilę z osi i wraca, gdy palce zejdą: tego się
+  nie widzi, a gest jest wtedy taki, jak w mapach.
+
+Wysokość wraca do bazy przy wyjściu z ekranu, bo trzyma ją `useRef`, a nie
+pamięć telefonu.
+
+## Ślad na szczegółach wyprawy
+
+Ten sam problem, co na mapie głównej: ślad jest w `--content-accent`, czyli w
+tym samym ciemnym zielonym, co tło przycisku, i na ortofotomapie lasu ginął.
+Rozwiązanie też to samo, żeby oba ekrany mówiły jednym językiem: **biała
+obwódka** pod śladem (7 px, krycie 0.72), a kolor śladu zostaje, więc nie miesza
+się z limonkowym szlakiem, który jest podpowiedzią, nie zapisem.
+
+Do tego **złota kropka na starcie**, tym samym językiem, co miniatura na liście
+wypraw. Mety nie ma i to jest decyzja: większość tych wypraw to pętle, więc
+koniec leżałby na starcie i nie mówiłby nic, a biała kropka obok zielonych pinów
+czyta się jak jeszcze jeden pin.

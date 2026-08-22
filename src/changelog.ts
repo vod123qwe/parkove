@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.78.0'
+export const VERSION = '0.79.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.79.0',
+    date: '2026-08-22',
+    title: 'A pinch of zoom in a memory, and the track stops hiding in the forest',
+    changes: [
+      ['added', 'The memory replay takes a pinch, within limits: 16.6 give or take 1.5, so from 15.1 to 18.1. The route still drives the frame, so panning and twisting stay off and the pinch only changes height. Not more than 18.1 on purpose: above about 17.5 the tile falls on a zoom level the aerial service does not have, so the picture stops gaining detail and starts going soft'],
+      ['fixed', 'The track on the walk detail screen gets the same white casing the main map has. It was drawn in the dark green of the button background and over aerial forest it simply vanished, dark line on dark ground. The colour of the track stays, so it does not get mixed up with the lime trail, which is a suggestion rather than a record'],
+      ['added', 'A gold dot where the walk began, the same language the thumbnail in My walks already speaks. No finish marker: most of these walks are loops, so it would sit on the start and say nothing'],
+      ['fixed', 'The walk detail map fell back to Esri satellite when the chosen style was the raised relief. The flat equivalent of a photograph with relief is the same photograph lying down, not a different photograph, so it now falls back to the aerial one'],
+    ],
+  },
   {
     version: '0.78.0',
     date: '2026-08-22',
