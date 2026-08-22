@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronRight, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Sparkles, ToyBrick } from 'lucide-react'
+import { Award, Camera, ChevronRight, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Sparkles, ToyBrick } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
 import { SpotCard } from './SpotCard'
 import { PointsSheet } from './PointsSheet'
 import { asset } from './assets'
-import { getName, greeting } from './profile'
 import type { MapFocus } from './MapView'
 import { ParkSheet } from './ParkSheet'
 import type { ParkFeature } from './ParkSheet'
@@ -15,6 +14,8 @@ import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
 import { TrailPicker } from './TrailPicker'
 import { LooksModal } from './LooksModal'
+import { JourneysModal } from './JourneysModal'
+import { StatsModal } from './StatsModal'
 import { AboutModal } from './AboutModal'
 import { MapFilters } from './MapFilters'
 import { PlantCamera } from './PlantCamera'
@@ -27,7 +28,6 @@ import { AmenityModal } from './AmenityModal'
 import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekContents'
 import { StampsModal } from './StampsModal'
 import { StampCelebration } from './StampCelebration'
-import { ProfileModal } from './ProfileModal'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
 import { MarkSheet } from './MarkSheet'
@@ -102,7 +102,6 @@ export function App() {
   const [stampParkId, setStampParkId] = useState<string | null>(null)
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [profileOpen, setProfileOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
   /*
    * Jeden ekran wygladu (motyw + mapa) i jeden o aplikacji, zamiast czterech
@@ -111,6 +110,8 @@ export function App() {
    */
   const [looksModalOpen, setLooksModalOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [statsOpen, setStatsOpen] = useState(false)
+  const [journeysOpen, setJourneysOpen] = useState(false)
   /** the quick switch on the map itself, for comparing looks in place */
   const [looksOpen, setLooksOpen] = useState(false)
   const [celebrate, setCelebrate] = useState<{ id: string; name: string } | null>(null)
@@ -342,19 +343,6 @@ export function App() {
     )
   }, [listOpen])
 
-  /*
-   * Podpowiedz na dzis: jedno nieodwiedzone miejsce, stabilne w ciagu dnia (numer
-   * dnia modulo pula), z preferencja dla tych, ktore maja punkty. Ta sama regula
-   * co dotad w profilu, tylko teraz widoczna z menu.
-   */
-  const daily = useMemo(() => {
-    const left = FEATURES.filter((f) => !progress[f.id] && f.id !== 'test-piltza')
-    if (!left.length) return null
-    const withQuest = left.filter((f) => questForPark(f.id))
-    const pool = withQuest.length ? withQuest : left
-    return pool[Math.floor(Date.now() / 86400000) % pool.length]
-  }, [progress])
-
   const flyToPark = useCallback((f: ParkFeature, bottomPx: number) => {
     setFocus({
       center: f.properties.center,
@@ -388,16 +376,17 @@ export function App() {
   /**
    * „Pokaż na mapie” z dowolnego ekranu. Zamyka KAŻDĄ warstwę, nie tylko tę, z
    * której kliknąłeś: kolekcja pieczątek zostawała otwarta i zasłaniała mapę, więc
-   * apka odlatywała do parku, którego nie było widаć.
+   * apka odlatywała do parku, którego nie było widać.
    */
   const showOnMap = useCallback(
     (id: string) => {
       setStampParkId(null)
       setStampsOpen(false)
-      setProfileOpen(false)
       setMenuOpen(false)
       setListOpen(false)
       setJourneyId(null)
+      setStatsOpen(false)
+      setJourneysOpen(false)
       selectParkFromMapRef.current?.(id)
     },
     [],
@@ -1174,20 +1163,25 @@ export function App() {
         <p className="t-caption app-menu__head">Ty</p>
         <List className="app-menu">
           <ListItem
-            icon={<CircleUserRound />}
+            icon={<Route />}
             leadTone="accent"
-            title={greeting(getName())}
-            meta={`${completedIds.size} pieczątek, ${journeys.length} wypraw, ${visitedCount} miejsc`}
+            title="Moje liczby"
+            meta={`${completedIds.size} naklejek, ${journeys.length} wypraw, ${visitedCount} miejsc`}
             trailing={<ChevronRight size={18} />}
             onClick={() => {
               setMenuOpen(false)
-              setProfileOpen(true)
+              setStatsOpen(true)
             }}
           />
+          {/*
+            "Album", nie "Pieczatki" (Jarek, 2026-08-22): piecztaki opisuja
+            mechanike, album obiecuje miejsce, do ktorego sie wraca i patrzy, a te
+            ilustracje sa do patrzenia.
+          */}
           <ListItem
             icon={<Award />}
-            title="Pieczątki"
-            meta="Twoja kolekcja, jedna na miejsce"
+            title="Album"
+            meta="Naklejki z odwiedzonych miejsc"
             trailing={<ChevronRight size={18} />}
             onClick={() => {
               setMenuOpen(false)
@@ -1208,24 +1202,20 @@ export function App() {
               setListOpen(true)
             }}
           />
-          {/*
-            Podpowiedz dnia wyszla z dna profilu tutaj: to jedna z niewielu rzeczy
-            w tej apce, ktora realnie wyciaga z domu, a byla najglebiej ukryta.
-            Jeden dotyk pokazuje ja na mapie.
-          */}
-          {daily && (
-            <ListItem
-              icon={<Sparkles />}
-              leadTone="gold"
-              title="Dokąd dziś"
-              meta={`${daily.properties.name} · ${questForPark(daily.id) ? 'czeka wyprawa z punktami' : 'jeszcze nieodkryte'}`}
-              trailing={<ChevronRight size={18} />}
-              onClick={() => {
-                setMenuOpen(false)
-                showOnMap(daily.id)
-              }}
-            />
-          )}
+          <ListItem
+            icon={<Footprints />}
+            title="Moje wyprawy"
+            meta={
+              journeys.length
+                ? `${journeys.length} zapisanych, każda ze swoim śladem`
+                : 'Jeszcze żadnej, zapisują się same po zakończeniu'
+            }
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setJourneysOpen(true)
+            }}
+          />
         </List>
 
         <p className="t-caption app-menu__head">Ustawienia</p>
@@ -1253,19 +1243,22 @@ export function App() {
         </List>
       </BottomSheet>
 
-      <ProfileModal
-        open={profileOpen}
-        onClose={() => setProfileOpen(false)}
-        parks={FEATURES}
-        visitedCount={visitedCount}
-        onOpenStamps={() => setStampsOpen(true)}
-        onOpenLooks={() => setLooksModalOpen(true)}
-        onOpenStamp={setStampParkId}
+      <StatsModal
+        open={statsOpen}
+        onClose={() => setStatsOpen(false)}
+        onOpenPark={(id) => {
+          setStatsOpen(false)
+          showOnMap(id)
+        }}
+      />
+      <JourneysModal
+        open={journeysOpen}
+        onClose={() => setJourneysOpen(false)}
         onOpenJourney={(id) => {
+          setJourneysOpen(false)
           clearSelection()
           setJourneyId(id)
         }}
-        onGoToPark={showOnMap}
       />
       <LooksModal
         open={looksModalOpen}

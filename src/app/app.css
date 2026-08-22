@@ -1959,6 +1959,241 @@
   margin-top: 0;
 }
 
+/* ---- moje wyprawy: kafle ze sladem ---- */
+
+.jrn__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.jrn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  border: 0;
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.jrn:active {
+  transform: scale(0.99);
+}
+
+/*
+ * Slad jako miniatura: kazda wyprawa ma inny ksztalt, wiec rozpoznajesz ja
+ * szybciej niz po dacie. Rysowany z zapisanego przebiegu, bez mapy, bo tu liczy
+ * sie sam ksztalt drogi.
+ */
+.jrn__art {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface);
+}
+
+.jrn__art.-empty {
+  display: grid;
+  place-items: center;
+  color: var(--content-tertiary);
+}
+
+.jrn__line {
+  fill: none;
+  stroke: var(--content-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.jrn__start {
+  fill: var(--bg-gold);
+  stroke: var(--bg-surface);
+  stroke-width: 1.5;
+}
+
+.jrn__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jrn__name {
+  color: var(--content-primary);
+}
+
+.jrn__meta {
+  color: var(--content-tertiary);
+}
+
+.jrn__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.jrn__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--content-secondary);
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.jrn__pill.-on {
+  background: var(--bg-mint);
+  color: var(--content-accent);
+}
+
+.jrn__kind {
+  flex: none;
+  color: var(--content-tertiary);
+}
+
+.jrn__kind svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---- moje liczby ---- */
+
+.stats__hello {
+  margin: 0 0 var(--sp-4);
+}
+
+.stats__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--content-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 30px;
+  cursor: pointer;
+}
+
+.stats__name svg {
+  color: var(--content-tertiary);
+}
+
+.stats__title {
+  margin: var(--sp-6) 0 var(--sp-2);
+}
+
+.stats__line {
+  margin: 0;
+  color: var(--content-secondary);
+}
+
+.stats__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--content-accent);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* rozkład kategorii: słupki, bo różnicę widać, a nie liczy */
+.stats__bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.stats__bar {
+  display: grid;
+  grid-template-columns: 84px 1fr 24px;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.stats__barlabel {
+  color: var(--content-secondary);
+}
+
+.stats__bartrack {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--bg-surface-sunken);
+  overflow: hidden;
+}
+
+.stats__barfill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--bg-primary);
+}
+
+.stats__barnum {
+  color: var(--content-tertiary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats__facts {
+  margin: var(--sp-3) 0 0;
+  padding-left: var(--sp-5);
+  color: var(--content-secondary);
+  font-family: var(--font-text);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.stats__facts li + li {
+  margin-top: 4px;
+}
+
+.stats__marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.stats__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px var(--sp-3);
+  border-radius: 999px;
+  background: var(--bg-surface-sunken);
+  color: var(--content-secondary);
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.stats__mark svg {
+  color: var(--content-tertiary);
+}
+
 /* ---- wyglad: kafle z podgladem ---- */
 
 .looks__title {

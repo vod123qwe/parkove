@@ -22,19 +22,57 @@ Menu jest hubem z trzema półkami. Każda odpowiada na inne pytanie:
 
 | Półka | Pytanie | Co zawiera |
 | --- | --- | --- |
-| **Ty** | co zrobiłem | profil (statystyki, wyprawy, zdjęcia), pieczątki |
-| **Wyprawy** | gdzie iść | miejsca do odkrycia, Dokąd dziś z konkretną nazwą |
+| **Ty** | co zrobiłem | Moje liczby, Album |
+| **Wyprawy** | gdzie iść i gdzie byłem | Miejsca do odkrycia, Moje wyprawy |
 | **Ustawienia** | jak to wygląda i czym jest | Wygląd, O aplikacji |
+
+## Nazwy, które się zmieniły
+
+**„Pieczątki" to teraz „Album"** (Jarek pytał o inną nazwę). Pieczątki opisują
+mechanikę, czyli że coś przybijasz. Album obiecuje miejsce, do którego się wraca
+i **patrzy**, a te ilustracje są właśnie do patrzenia, nie do odhaczania. Przy
+okazji album kojarzy się z naklejkami z dzieciństwa, co jest tonem, o który
+chodzi przy dziecku. Podpis: „Naklejki z odwiedzonych miejsc".
+
+**„Hej [imię]" to teraz „Moje liczby"**, a profil-worek przestał istnieć. Jego
+zawartość rozeszła się tam, gdzie należy: liczby i zdjęcia do „Moich liczb",
+wyprawy do „Moich wypraw", naklejki do Albumu, ustawienia do menu, wersja do „O
+aplikacji".
+
+## Moje liczby: zasada wyboru
+
+Każda liczba ma **coś mówić o tobie**, a nie tylko rosnąć:
+
+- **kilometry, wyprawy, czas w terenie, naklejki** to skala,
+- **odkryte** (miejsca z 55, punkty z 152) to postęp,
+- **co lubicie**: rozkład odkrytych punktów po kategoriach jako słupki. To
+  najciekawsza liczba w całym ekranie, bo mówi, po co tam chodzicie, a nie ile,
+- **rekordy i nawyki**: najdłuższa wyprawa, miejsce, do którego wracacie
+  najczęściej, godzina, o której zwykle wychodzicie, od kiedy chodzicie,
+- **najbliżej naklejki**: jedyna liczba, która jest zaproszeniem, bo da się ją
+  zmienić dzisiaj. Nazwa miejsca jest klikalna i pokazuje je na mapie,
+- **zostawione ślady**: zdjęcia, notatki, nagrania, odpowiedzi na dylematy.
+
+Czego tu nie ma: rankingów i porównań z kimkolwiek. Ta aplikacja nie ma innych
+ludzi i nie będzie mieć.
+
+Polska odmiana nazw własnych nie da się zrobić szablonem („do Dolina
+Będkowska"), więc nazwy stawiamy po dwukropku: „Najczęściej wracacie: **Dolina
+Będkowska**, 3 razy".
+
+## Moje wyprawy: ślad jako miniatura
+
+Wcześniej były wierszami w profilu: ikona, nazwa i sucha linijka liczb. Teraz
+każdy kafel pokazuje **kształt Twojej drogi**, rysowany z zapisanego przebiegu
+(`journey.track`), ze złotą kropką na starcie. Każda wyprawa ma inny kształt, więc
+rozpoznajesz ją z odległości metra, tak jak zdjęcie rozpoznaje się szybciej niż
+podpis. Bez mapy pod spodem: dwadzieścia miniatur to byłoby dwadzieścia
+kontekstów graficznych, a liczy się sam kształt.
 
 **Lista miejsc zostaje w menu**, choć ma też przycisk na mapie, i to nie jest
 duplikat, tylko dwa konteksty: przycisk na mapie **nie istnieje w trakcie
 wyprawy** (jego miejsce zajmuje pasek wyprawy), więc menu jest wtedy jedyną
 drogą do listy. Jarek zapytał o to wprost i to pytanie było odpowiedzią.
-
-**Dokąd dziś** pokazuje nazwę miejsca wprost w menu („Park Zielony Jar · czeka
-wyprawa z punktami"), więc jeden dotyk pokazuje je na mapie. Reguła bez zmian:
-jedno nieodwiedzone miejsce, stabilne w ciągu dnia (numer dnia modulo pula), z
-preferencją dla tych, które mają punkty.
 
 ## Wygląd: kafle z podglądem, nie nazwy
 
@@ -59,7 +97,11 @@ komponentów i **diagnostyka ekranu**. Diagnostyka jest tu jawnym wierszem, a ni
 sekretem pod trzema dotknięciami numeru wersji: ta aplikacja ma jednego
 użytkownika i to on ją debuguje.
 
-## Profil po odchudzeniu
+## Czego nie ma
 
-Zostało to, co jest o Tobie: pieczątki, zdjęcia z wypraw, moje wyprawy. Plus
-jedno skrócenie do Wyglądu, bo o wyglądzie myśli się patrząc na własne zdjęcia.
+**„Dokąd dziś"** wypadło na życzenie Jarka. Było krótko w menu jako podpowiedź
+dnia; wróci, jeśli kiedyś będzie po co.
+
+**Profil** jako osobny ekran przestał istnieć. To była ostatnia rzecz z legacy:
+worek, w którym leżały obok siebie statystyki, naklejki, zdjęcia, wyprawy,
+ustawienia i numer wersji.

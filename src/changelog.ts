@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.76.0'
+export const VERSION = '0.77.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.77.0',
+    date: '2026-08-22',
+    title: 'My numbers, my walks, and an album instead of stamps',
+    changes: [
+      ['added', 'My numbers replaces the greeting row and the profile bag. Every number there has to say something about you rather than just grow: kilometres, walks and time outside for scale, then what you like as a breakdown of the points you found by category, which says why you go rather than how much, then records and habits (longest walk, the place you keep returning to, the hour you usually leave, since when you have been walking), and closest to a sticker, the only number that is an invitation because you can change it today'],
+      ['added', 'My walks is a visual list: every tile draws the shape of your own track with a gold dot at the start, so you recognise a walk from a metre away, the way a photograph beats a caption. No map underneath, because twenty thumbnails would be twenty graphics contexts and what matters is the shape'],
+      ['changed', 'Stamps are now the Album, with the subtitle stickers from places you visited. Stamps describe the mechanism, an album promises somewhere you come back to and look, and these illustrations are for looking at'],
+      ['changed', 'Where to today is gone, at Jarek request, and the profile screen no longer exists: it was the last of the legacy, a bag holding statistics, stickers, photographs, walks, settings and a version number side by side. Everything moved to where it belongs'],
+    ],
+  },
   {
     version: '0.76.0',
     date: '2026-08-22',
