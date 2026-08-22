@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronRight, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Layers, List as ListIcon, LocateFixed, Map as MapIcon, Menu, Palette, RefreshCw, Sparkles, ToyBrick } from 'lucide-react'
+import { Award, Camera, ChevronRight, CircleUserRound, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Sparkles, ToyBrick } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
@@ -14,6 +14,8 @@ import { PoiModal } from './PoiSheet'
 import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
 import { TrailPicker } from './TrailPicker'
+import { LooksModal } from './LooksModal'
+import { AboutModal } from './AboutModal'
 import { MapFilters } from './MapFilters'
 import { PlantCamera } from './PlantCamera'
 import { plantEnabled } from './plant'
@@ -26,7 +28,6 @@ import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekConte
 import { StampsModal } from './StampsModal'
 import { StampCelebration } from './StampCelebration'
 import { ProfileModal } from './ProfileModal'
-import { AppearanceModal, MapStyleModal } from './SettingsModals'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
 import { MarkSheet } from './MarkSheet'
@@ -103,8 +104,13 @@ export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
-  const [appearanceOpen, setAppearanceOpen] = useState(false)
-  const [mapStyleOpen, setMapStyleOpen] = useState(false)
+  /*
+   * Jeden ekran wygladu (motyw + mapa) i jeden o aplikacji, zamiast czterech
+   * wejsc rozsypanych po menu i profilu. Uwaga na nazwe: looksOpen nizej to
+   * szybki przelacznik stylu NA mapie, co innego niz ten ekran.
+   */
+  const [looksModalOpen, setLooksModalOpen] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
   /** the quick switch on the map itself, for comparing looks in place */
   const [looksOpen, setLooksOpen] = useState(false)
   const [celebrate, setCelebrate] = useState<{ id: string; name: string } | null>(null)
@@ -335,6 +341,19 @@ export function App() {
       setGlances,
     )
   }, [listOpen])
+
+  /*
+   * Podpowiedz na dzis: jedno nieodwiedzone miejsce, stabilne w ciagu dnia (numer
+   * dnia modulo pula), z preferencja dla tych, ktore maja punkty. Ta sama regula
+   * co dotad w profilu, tylko teraz widoczna z menu.
+   */
+  const daily = useMemo(() => {
+    const left = FEATURES.filter((f) => !progress[f.id] && f.id !== 'test-piltza')
+    if (!left.length) return null
+    const withQuest = left.filter((f) => questForPark(f.id))
+    const pool = withQuest.length ? withQuest : left
+    return pool[Math.floor(Date.now() / 86400000) % pool.length]
+  }, [progress])
 
   const flyToPark = useCallback((f: ParkFeature, bottomPx: number) => {
     setFocus({
@@ -1144,23 +1163,41 @@ export function App() {
         onClose={() => setPoiCard(null)}
       />
       {/*
-        Menu zamiast ikonki profilu: rzeczy, które dotąd trzeba było szukać w
-        środku profilu, stoją teraz na jednym poziomie. Profil jest jedną z
-        pozycji, a nie workiem na wszystko.
+        Menu jako trzy pieterka, nie jedna plaska lista (decyzja Jarka 2026-08-22).
+        TY: co zrobiles. WYPRAWY: gdzie isc. USTAWIENIA: jak apka wyglada i czym
+        jest. Duplikaty poszly precz: piecztaki mialy wiersz w menu i sekcje w
+        profilu, wyglad mapy i aplikacji mialy po dwa wejscia (menu i profil).
+        Lista miejsc zostaje tutaj mimo przycisku na mapie, bo w trakcie wyprawy
+        ten przycisk nie istnieje i menu jest wtedy jedyna droga.
       */}
       <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
+        <p className="t-caption app-menu__head">Ty</p>
         <List className="app-menu">
           <ListItem
             icon={<CircleUserRound />}
             leadTone="accent"
             title={greeting(getName())}
-            meta="Pieczątki, wyprawy, zdjęcia"
+            meta={`${completedIds.size} pieczątek, ${journeys.length} wypraw, ${visitedCount} miejsc`}
             trailing={<ChevronRight size={18} />}
             onClick={() => {
               setMenuOpen(false)
               setProfileOpen(true)
             }}
           />
+          <ListItem
+            icon={<Award />}
+            title="Pieczątki"
+            meta="Twoja kolekcja, jedna na miejsce"
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setStampsOpen(true)
+            }}
+          />
+        </List>
+
+        <p className="t-caption app-menu__head">Wyprawy</p>
+        <List className="app-menu">
           <ListItem
             icon={<ListIcon />}
             title="Miejsca do odkrycia"
@@ -1171,34 +1208,46 @@ export function App() {
               setListOpen(true)
             }}
           />
-          <ListItem
-            icon={<Award />}
-            title="Pieczątki"
-            meta="Twoja kolekcja"
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setStampsOpen(true)
-            }}
-          />
-          <ListItem
-            icon={<MapIcon />}
-            title="Wygląd mapy"
-            meta="Satelita, Minimal albo rzeźba terenu"
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setMapStyleOpen(true)
-            }}
-          />
+          {/*
+            Podpowiedz dnia wyszla z dna profilu tutaj: to jedna z niewielu rzeczy
+            w tej apce, ktora realnie wyciaga z domu, a byla najglebiej ukryta.
+            Jeden dotyk pokazuje ja na mapie.
+          */}
+          {daily && (
+            <ListItem
+              icon={<Sparkles />}
+              leadTone="gold"
+              title="Dokąd dziś"
+              meta={`${daily.properties.name} · ${questForPark(daily.id) ? 'czeka wyprawa z punktami' : 'jeszcze nieodkryte'}`}
+              trailing={<ChevronRight size={18} />}
+              onClick={() => {
+                setMenuOpen(false)
+                showOnMap(daily.id)
+              }}
+            />
+          )}
+        </List>
+
+        <p className="t-caption app-menu__head">Ustawienia</p>
+        <List className="app-menu">
           <ListItem
             icon={<Palette />}
-            title="Wygląd aplikacji"
-            meta="Motyw jasny, ciemny albo auto"
+            title="Wygląd"
+            meta="Motyw i styl mapy, z podglądem"
             trailing={<ChevronRight size={18} />}
             onClick={() => {
               setMenuOpen(false)
-              setAppearanceOpen(true)
+              setLooksModalOpen(true)
+            }}
+          />
+          <ListItem
+            icon={<Info />}
+            title="O aplikacji"
+            meta={`Wersja ${VERSION}, odświeżanie, katalog`}
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setAboutOpen(true)
             }}
           />
         </List>
@@ -1210,8 +1259,7 @@ export function App() {
         parks={FEATURES}
         visitedCount={visitedCount}
         onOpenStamps={() => setStampsOpen(true)}
-        onOpenAppearance={() => setAppearanceOpen(true)}
-        onOpenMapStyle={() => setMapStyleOpen(true)}
+        onOpenLooks={() => setLooksModalOpen(true)}
         onOpenStamp={setStampParkId}
         onOpenJourney={(id) => {
           clearSelection()
@@ -1219,13 +1267,13 @@ export function App() {
         }}
         onGoToPark={showOnMap}
       />
-      <AppearanceModal open={appearanceOpen} onClose={() => setAppearanceOpen(false)} />
-      <MapStyleModal
-        open={mapStyleOpen}
-        onClose={() => setMapStyleOpen(false)}
+      <LooksModal
+        open={looksModalOpen}
+        onClose={() => setLooksModalOpen(false)}
         mapStyle={mapStyle}
         onMapStyle={pickMapStyle}
       />
+      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
       {/* poza wyprawą karta miejsca stoi sama na dole; w trakcie wyprawy
           wchodzi w miejsce karty „co dalej", bo na dole ma być jedna rzecz */}
       {activeSpot && !onWalk && (

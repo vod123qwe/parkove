@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.75.0'
+export const VERSION = '0.76.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,19 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.76.0',
+    date: '2026-08-22',
+    title: 'The menu has three shelves instead of five flat rows',
+    changes: [
+      ['changed', 'Menu rebuilt into three spaces, each answering a different question. YOU: profile and stamps, what you have done. WALKS: places to discover and where to go today. SETTINGS: how it looks and what it is'],
+      ['fixed', 'The duplicates are gone. Stamps had a row in the menu and a section in the profile. Map look and app look each had two entries, one in the menu and one inside the profile. The version number, the refresh and the component catalogue sat in the profile, between stamps and photographs, although the profile is about what you did'],
+      ['added', 'Where to today came out of the bottom of the profile into the menu, with the name of the place written out: one of the few things in this app that genuinely gets you out of the house was the most deeply buried thing in it. One tap shows it on the map'],
+      ['changed', 'The places list stays in the menu even though the map has its own button, and that is not a duplicate but two contexts: during a walk the map button does not exist, so the menu is the only way to the list'],
+      ['added', 'Look is one screen for the theme and the map style, chosen by preview rather than by name, because with three map styles the names say nothing until you try them. The previews are drawn, not photographed: a real frame would need three map instances at once, and screenshots in the repository go stale with every palette change. The drawings take their colours from the same style definition, so they always match what you get. Auto is cut diagonally, half light and half dark'],
+      ['added', 'About the app holds the things that are about the app: refresh, what is new, the catalogue, and the screen diagnostic as a plain row rather than a secret behind three taps on a version number. This app has one user and he is the one debugging it'],
+    ],
+  },
   {
     version: '0.75.0',
     date: '2026-08-22',

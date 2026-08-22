@@ -1946,6 +1946,108 @@
   width: min(calc(100% - 2 * var(--sp-6)), 420px);
 }
 
+/* nagłówek półki w menu: trzy przestrzenie mają być widoczne z jednego spojrzenia */
+.app-menu__head {
+  margin: var(--sp-5) var(--sp-2) var(--sp-2);
+  color: var(--content-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 700;
+}
+
+.app-menu__head:first-of-type {
+  margin-top: 0;
+}
+
+/* ---- wyglad: kafle z podgladem ---- */
+
+.looks__title {
+  margin: var(--sp-6) 0 var(--sp-2);
+}
+
+.looks__title:first-child {
+  margin-top: 0;
+}
+
+/*
+ * Trzy kafle w rzędzie na telefonie: podgląd musi być czytelny, a nazwa krótka.
+ * Poniżej 360 px szerokości schodzimy na dwa, bo trzy robią się paznokciami.
+ */
+.looks__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+  margin: var(--sp-3) 0 0;
+}
+
+@media (max-width: 360px) {
+  .looks__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.looks__tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-2);
+  border: 1.5px solid transparent;
+  border-radius: 18px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.looks__tile:active {
+  transform: scale(0.97);
+}
+
+/* wybrany: obwódka akcentem i podniesienie, bez zmiany rozmiaru podglądu */
+.looks__tile.-active {
+  border-color: var(--content-accent);
+  background: var(--bg-mint);
+}
+
+.looks__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+}
+
+.looks__label {
+  margin-top: 4px;
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--content-primary);
+}
+
+.looks__note {
+  color: var(--content-tertiary);
+}
+
+.looks__check {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
 /* ---- wybieranie szlaku na mapie ---- */
 
 /*

@@ -1,0 +1,71 @@
+import { useRef, useState } from 'react'
+import { ChevronRight, Component, FileClock, RefreshCw, Ruler } from 'lucide-react'
+import { List, ListItem, Modal } from '../ds'
+import { VERSION } from '../changelog'
+import { refreshVersion } from './refresh'
+import { screenReport, toggleGroundDebug } from './screen'
+
+/**
+ * O aplikacji: rzeczy o samej apce, nie o Tobie i nie o wyprawach.
+ *
+ * Wcześniej mieszkały w profilu, między pieczątkami i zdjęciami: odświeżenie
+ * wersji, katalog komponentów, numer wersji i diagnostyka dolnej krawędzi.
+ * Profil jest o tym, co zrobiłeś, więc numer wersji nie ma tam czego szukać.
+ *
+ * Diagnostyka jest tu jawnym wierszem, a nie sekretem pod trzema dotknięciami:
+ * ta aplikacja ma jednego użytkownika i to on ją debuguje.
+ */
+export function AboutModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [refreshing, setRefreshing] = useState(false)
+  const [diag, setDiag] = useState<string | null>(null)
+  const taps = useRef(0)
+
+  return (
+    <Modal open={open} onClose={onClose} title="O aplikacji" action="back" presentation="push">
+      <p className="t-body-sm settings-lead">
+        Parkove v{VERSION}. Aplikacja działa offline: pliki i kafle mapy siedzą w pamięci telefonu,
+        więc po wdrożeniu nowej wersji trzeba ją raz pobrać ręcznie.
+      </p>
+      <List className="prof-list">
+        <ListItem
+          icon={<RefreshCw className={refreshing ? 'is-spinning' : undefined} />}
+          title={refreshing ? 'Odświeżam…' : 'Odśwież wersję'}
+          meta="Pobiera najnowsze pliki i mówi, czy coś się zmieniło"
+          onClick={() => {
+            if (refreshing) return
+            setRefreshing(true)
+            void refreshVersion()
+          }}
+        />
+        <ListItem
+          icon={<FileClock />}
+          title="Co nowego"
+          meta="Historia zmian, od najnowszej"
+          trailing={<ChevronRight size={18} className="park-parking__chevron" />}
+          onClick={() => {
+            window.location.href = 'catalog.html#changelog'
+          }}
+        />
+        <ListItem
+          icon={<Component />}
+          title="Design system"
+          meta="Katalog komponentów i tokenów"
+          trailing={<ChevronRight size={18} className="park-parking__chevron" />}
+          onClick={() => {
+            window.location.href = 'catalog.html'
+          }}
+        />
+        <ListItem
+          icon={<Ruler />}
+          title="Diagnostyka ekranu"
+          meta="Maluje tło dokumentu na magentę i wypisuje wymiary"
+          onClick={() => {
+            taps.current += 1
+            setDiag(toggleGroundDebug() ? screenReport() : null)
+          }}
+        />
+      </List>
+      {diag && <p className="t-caption profile-diag">{diag}</p>}
+    </Modal>
+  )
+}

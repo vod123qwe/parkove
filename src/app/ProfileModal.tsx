@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
-import { Award, ChevronRight, Component, Footprints, Map as MapIcon, Palette, Pencil, RefreshCw, Route, Sparkles, Trees } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Award, ChevronRight, Footprints, Palette, Pencil, Route, Sparkles, Trees } from 'lucide-react'
 import { Button, Carousel, List, ListItem, Modal, Polaroid, Stamp, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
 import { usePhotos } from './photos'
@@ -7,9 +7,6 @@ import { getName, greeting, initials, setName as saveName } from './profile'
 import { KIND_META } from './kinds'
 import { questForPark } from './data/quests'
 import { isParkComplete } from './progress'
-import { VERSION } from '../changelog'
-import { screenReport, toggleGroundDebug } from './screen'
-import { refreshVersion } from './refresh'
 import type { ParkFeature } from './ParkSheet'
 
 const fmtDate = (ms: number) =>
@@ -26,8 +23,7 @@ export function ProfileModal({
   parks,
   visitedCount,
   onOpenStamps,
-  onOpenAppearance,
-  onOpenMapStyle,
+  onOpenLooks,
   onGoToPark,
   onOpenJourney,
   onOpenStamp,
@@ -37,18 +33,14 @@ export function ProfileModal({
   parks: ParkFeature[]
   visitedCount: number
   onOpenStamps: () => void
-  onOpenAppearance: () => void
-  onOpenMapStyle: () => void
+  /* jeden ekran wygladu zamiast dwoch wejsc */
+  onOpenLooks: () => void
   onGoToPark: (parkId: string) => void
   /** open one past walk: its route lands on the map, details in a sheet */
   onOpenJourney: (journeyId: string) => void
   /** one sticker up close, on its own page */
   onOpenStamp: (parkId: string) => void
 }) {
-  const taps = useRef(0)
-  const [diag, setDiag] = useState<string | null>(null)
-  const [refreshing, setRefreshing] = useState(false)
-
   const { parks: progress, journeys } = useGameState()
   const photos = usePhotos().filter((m) => m.kind === 'photo' && m.url)
   const [name, setNameState] = useState(getName)
@@ -236,65 +228,24 @@ export function ProfileModal({
         </section>
       )}
 
+      {/*
+        Ustawienia wyszly z profilu do menu (2026-08-22). Profil jest o tym, co
+        zrobiles: piecztaki, wyprawy, zdjecia. Numer wersji i katalog komponentow
+        nie mialy tu czego szukac. Zostaje jedno skrocenie: wyglad, bo o nim
+        czlowiek mysli patrzac na wlasne zdjecia.
+      */}
       <section className="prof-section">
-        <h3 className="t-title prof-sectitle">Ustawienia</h3>
         <List className="prof-list">
           <ListItem
             icon={<Palette />}
-            title="Wygląd aplikacji"
-            meta="Motyw jasny, ciemny albo automatyczny"
+            title="Wygląd"
+            meta="Motyw i styl mapy, z podglądem"
             trailing={<ChevronRight size={18} className="park-parking__chevron" />}
-            onClick={onOpenAppearance}
-          />
-          <ListItem
-            icon={<MapIcon />}
-            title="Wygląd mapy"
-            meta="Satelita, Minimal albo rzeźba terenu"
-            trailing={<ChevronRight size={18} className="park-parking__chevron" />}
-            onClick={onOpenMapStyle}
-          />
-          <ListItem
-            icon={<Component />}
-            title="Design system"
-            meta={`Katalog komponentów i tokenów · v${VERSION}`}
-            trailing={<ChevronRight size={18} className="park-parking__chevron" />}
-            onClick={() => {
-              window.location.href = '/catalog.html'
-            }}
+            onClick={onOpenLooks}
           />
         </List>
       </section>
 
-      {/*
-        Odświeżenie wersji: jeden subtelny wiersz, bo to czynność rzadka, ale gdy
-        jest potrzebna, to bardzo. Service worker podaje pliki z pamięci, więc bez
-        tego pierwsze otwarcie po wdrożeniu pokazuje starą wersję.
-      */}
-      <button
-        className="profile-refresh"
-        onClick={() => {
-          setRefreshing(true)
-          void refreshVersion()
-        }}
-        disabled={refreshing}
-      >
-        <RefreshCw size={14} className={refreshing ? 'is-spinning' : undefined} />
-        {refreshing ? 'Odświeżam…' : 'Odśwież wersję'}
-      </button>
-
-      {/* trzy dotknięcia wersji: diagnostyka dolnej krawędzi (patrz screen.ts) */}
-      <p
-        className="t-caption profile-version"
-        onClick={() => {
-          taps.current += 1
-          if (taps.current < 3) return
-          taps.current = 0
-          setDiag(toggleGroundDebug() ? screenReport() : null)
-        }}
-      >
-        Parkove v{VERSION}
-      </p>
-      {diag && <p className="t-caption profile-diag">{diag}</p>}
     </Modal>
   )
 }
