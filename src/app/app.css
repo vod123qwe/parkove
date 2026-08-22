@@ -3928,7 +3928,7 @@
   transform: translateX(16px);
 }
 
-.memplay__ladder,
+.memplay__rail,
 .memplay__grip {
   position: absolute;
   inset: 0;
@@ -5010,4 +5010,125 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ---- mapa offline: pobranie kafli przed wyprawa ---- */
+
+/*
+ * Wiersz w karcie miejsca. Wyglada jak inne wiersze informacyjne (ikona, tytul,
+ * podpis), ale ma pod spodem dwa wybory wagi, bo to jedyne miejsce w apce, w
+ * ktorym decyzja kosztuje megabajty i trzeba ja podjac swiadomie.
+ */
+.offline {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+}
+
+.offline.-ready {
+  border-color: transparent;
+  background: var(--bg-mint);
+}
+
+.offline__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--content-accent);
+}
+
+.offline.-ready .offline__mark {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+.offline__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.offline__name {
+  color: var(--content-primary);
+}
+
+.offline__hint {
+  margin-top: 2px;
+  color: var(--content-secondary);
+}
+
+.offline__picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.offline__pick {
+  padding: var(--sp-2) var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* wariant ostrzejszy jest droższy, wiec nie zaprasza tak mocno */
+.offline__pick.-alt {
+  background: var(--bg-surface);
+  color: var(--content-accent);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+}
+
+.offline__pick:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.offline__stop {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: transparent;
+  color: var(--content-tertiary);
+  cursor: pointer;
+}
+
+/* postep jako pierscien z liczba w srodku: jedna rzecz, nie pasek i etykieta */
+.offline__ring {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  background: conic-gradient(var(--bg-primary) var(--pct, 0%), var(--bg-surface) 0);
+  color: var(--content-primary);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10px;
+  box-shadow: inset 0 0 0 3px var(--bg-surface-sunken);
+}
+
+.offline__said {
+  flex-basis: 100%;
+  margin-top: var(--sp-2);
+  color: var(--content-accent);
 }

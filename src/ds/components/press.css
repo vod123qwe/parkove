@@ -1,0 +1,43 @@
+/*
+ * Morph pod palcem, do użycia na dowolnym elemencie dotykalnym.
+ *
+ * Wzięte z rączki przepustnicy w odtwarzaniu wspomnienia, gdzie się sprawdziło
+ * (Jarek: „podoba mi się ta forma morpha, może powinna być zastosowana też na
+ * innych elementach"). Fizyka jest ta sama, co przy dotknięciu szkła: rzecz
+ * przyciśnięta rozlewa się na boki i spłaszcza. Nie rusza się z miejsca, bo
+ * początek układu jest w jej środku, więc nic nie skacze pod palcem.
+ *
+ * WAŻNE, gdzie tego NIE używać: na przyciskach z tekstem. Rozciągnięty tekst
+ * czyta się jak błąd, nie jak reakcja. To jest do przycisków ikonowych,
+ * pastylek i chwytów, czyli tam, gdzie nie ma liter do zdeformowania.
+ *
+ * Krzywa ma lekki wyskok, więc puszczenie jest odbiciem, a nie samym powrotem.
+ * Powrót jest wyraźnie dłuższy od naciśnięcia: dociśnięcie ma być natychmiast,
+ * a rozprężenie ma być widać.
+ */
+.pk-press {
+  transform-origin: center;
+  transition: transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pk-press:active {
+  transform: scale(1.07, 0.9);
+  transition-duration: 90ms;
+}
+
+/*
+ * Wariant dla chwytów, które ciągnie się wzdłuż osi: wyciąga się w kierunku
+ * jazdy, zamiast rozlewać na boki.
+ */
+.pk-press.-pull:active {
+  transform: scale(0.9, 1.16);
+}
+
+/* nikt nie chce, żeby mu się interfejs ruszał, jeśli o to prosił */
+@media (prefers-reduced-motion: reduce) {
+  .pk-press,
+  .pk-press:active {
+    transform: none;
+    transition: none;
+  }
+}

@@ -11,6 +11,13 @@ const SHELL = `parkove-shell-${VERSION}`
 const RUNTIME = `parkove-runtime-${VERSION}`
 const TILES = `parkove-tiles-${VERSION}`
 const TILE_LIMIT = 900
+/*
+ * Kafle pobrane swiadomie przed wyprawa. OSOBNY koszyk i bez przycinania: TILES
+ * ma limit 900 i wyrzuca najstarsze, wiec pobrana dolina wyparowalaby po jednym
+ * spacerze po Krakowie. Pisze do niego strona (patrz src/app/offline.ts), a ten
+ * plik tylko czyta, i to jako pierwszy.
+ */
+const PACKS = 'parkove-packs-v1'
 
 const SHELL_URLS = ['', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'apple-touch-icon.png']
 const TILE_HOSTS = [
@@ -42,7 +49,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      const keep = new Set([SHELL, RUNTIME, TILES])
+      const keep = new Set([SHELL, RUNTIME, TILES, PACKS])
       for (const key of await caches.keys()) if (!keep.has(key)) await caches.delete(key)
       await self.clients.claim()
       await warmAssets()
@@ -80,6 +87,10 @@ async function trim(cache, limit) {
 }
 
 async function cacheFirst(request, cacheName, limit) {
+  // pobrane przed wyprawa ma pierwszenstwo nad wszystkim innym
+  const packs = await caches.open(PACKS)
+  const packed = await packs.match(request)
+  if (packed) return packed
   const cache = await caches.open(cacheName)
   const hit = await cache.match(request)
   if (hit) return hit
@@ -96,6 +107,10 @@ async function cacheFirst(request, cacheName, limit) {
 }
 
 async function staleWhileRevalidate(request, cacheName) {
+  // zdjecia punktow tez wchodza do paczki, wiec i tu patrzymy tam najpierw
+  const packs = await caches.open(PACKS)
+  const packed = await packs.match(request)
+  if (packed) return packed
   const cache = await caches.open(cacheName)
   const hit = await cache.match(request)
   const network = fetch(request)

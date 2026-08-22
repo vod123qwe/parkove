@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Move, Trash2, X } from 'lucide-react'
+import { Download, Move, Trash2, X } from 'lucide-react'
 import { deleteMark, updateMark } from './photos'
 import { noteType } from './memory'
 import { WavePlayer } from './WavePlayer'
@@ -67,6 +67,49 @@ export function MemoryViewer({
     setEditing(null)
     if (draft.trim() !== (marks.find((m) => m.id === id)?.caption ?? '')) {
       void updateMark(id, { caption: draft.trim() })
+    }
+  }
+
+  /*
+   * Zapis na telefon, i to jest odpowiedz na pytanie Jarka "gdzie sie zapisuja
+   * zdjecia, moge je pobrac na telefon?".
+   *
+   * Zdjecia z wypraw leza w IndexedDB przegladarki, czyli WEWNATRZ aplikacji, a
+   * nie w galerii telefonu. Nie widzi ich Zdjecia, nie widzi ich kopia zapasowa
+   * iCloud i znikaja razem z danymi strony. Dla zdjecia dziecka nad wodospadem
+   * to zle miejsce jako jedyne miejsce.
+   *
+   * Sciezka wyjscia zalezy od systemu. Na iOS `<a download>` bywa martwy, ale
+   * arkusz udostepniania z plikiem dziala i ma w sobie "Zapisz obraz", czyli
+   * dokladnie to, po co tu przyszlismy. Dlatego najpierw arkusz, a klasyczne
+   * pobranie jest zapasem dla przegladarek, ktore arkusza nie maja.
+   */
+  const [saved, setSaved] = useState<string | null>(null)
+  const keep = async (m: WalkMark & { url?: string }) => {
+    if (!m.blob) return
+    const stamp = new Date(m.at).toISOString().slice(0, 16).replace(/[:T]/g, '-')
+    const file = new File([m.blob], `parkove-${stamp}.jpg`, { type: m.blob.type || 'image/jpeg' })
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] })
+        return
+      }
+    } catch {
+      // anulowany arkusz to nie blad: nic nie mowimy i wracamy
+      return
+    }
+    try {
+      const url = m.url ?? URL.createObjectURL(m.blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = file.name
+      a.click()
+      if (!m.url) setTimeout(() => URL.revokeObjectURL(url), 4000)
+      setSaved('Zapisane')
+      setTimeout(() => setSaved(null), 2500)
+    } catch {
+      setSaved('Nie wyszło')
+      setTimeout(() => setSaved(null), 2500)
     }
   }
 
@@ -160,6 +203,11 @@ export function MemoryViewer({
       <div className="memview__foot">
         <span className="t-caption memview__when">{fmtWhen(current.at)}</span>
         <div className="memview__actions">
+          {current.kind === 'photo' && current.blob && (
+            <button className="memview__action" onClick={() => void keep(current)}>
+              <Download size={17} /> {saved ?? 'Zapisz na telefonie'}
+            </button>
+          )}
           {onMove && (
             <button className="memview__action" onClick={() => onMove(current.id)}>
               <Move size={17} /> Przesuń pin

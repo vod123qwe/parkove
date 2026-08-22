@@ -1031,6 +1031,35 @@ export function MemoryPlayer({
     )
 
   /*
+   * Tor jako jeden wypelniony ksztalt, nie prostokat: szerokosc zalezy od
+   * odleglosci od raczki, wiec linia sama sie tam pogrubia. Krzywa Gaussa, bo
+   * daje miekkie przejscie bez zadnego zalamania, a 26 probek wystarczy, zeby
+   * przy tej dlugosci nie bylo widac katow.
+   */
+  const railPath = (() => {
+    const hy = THR_MID - pos * THR_TRAVEL
+    const top = THR_MID - THR_TRAVEL - 4
+    const bottom = THR_MID + THR_TRAVEL + 4
+    const N = 26
+    /*
+     * Szczyt soczewki chowa sie za raczka, wiec liczy sie to, co WYSTAJE nad nia
+     * i pod nia. Dlatego rozstep jest szerszy od samej raczki (30 jednostek),
+     * a nie rowny jej: przy 46 poszerzenie widac jeszcze dobre 20 jednostek
+     * ponad krawedzia chwytu.
+     */
+    const half = (y: number) => 0.8 + 3.6 * Math.exp(-(((y - hy) / 46) ** 2))
+    const right: string[] = []
+    const left: string[] = []
+    for (let i = 0; i <= N; i++) {
+      const y = top + ((bottom - top) * i) / N
+      const w = half(y)
+      right.push(`${(28 + w).toFixed(2)},${y.toFixed(1)}`)
+      left.unshift(`${(28 - w).toFixed(2)},${y.toFixed(1)}`)
+    }
+    return `M ${right.join(' L ')} L ${left.join(' L ')} Z`
+  })()
+
+  /*
    * Morph raczki dzieje sie POD PALCEM i wraca po zwolnieniu (decyzja Jarka).
    *
    * Squash and stretch, najstarsza sztuczka animacji: rzecz, ktora sie rusza,
@@ -1067,7 +1096,7 @@ export function MemoryPlayer({
       </div>
 
       <button
-        className={`memplay__back${chrome ? '' : ' -dim'}`}
+        className={`memplay__back pk-press${chrome ? ' -dim' : ''}`}
         aria-label="Wyjdź ze wspomnień"
         onClick={() => {
           if (performance.now() - closedAt.current < 500) return
@@ -1078,7 +1107,7 @@ export function MemoryPlayer({
       </button>
 
       <button
-        className={`memplay__look${chrome ? '' : ' -off'}`}
+        className={`memplay__look pk-press${chrome ? '' : ' -off'}`}
         aria-label="Zmień wygląd mapy"
         onClick={() => setLooksOpen((v) => !v)}
       >
@@ -1195,52 +1224,52 @@ export function MemoryPlayer({
           onPointerUp={onDialUp}
           onPointerCancel={onDialUp}
         >
-          <svg viewBox="0 0 56 240" className="memplay__ladder" aria-hidden="true">
-            {/*
-              Poswiata idzie za raczka, a nie stoi w srodku toru: to ona robi z
-              drabinki przepustnice, a nie rzad kresek. Gradient w jednostkach
-              uzytkownika, wiec kazda kreska gasnie na swojej dlugosci.
-            */}
+          {/*
+            Tor, po ktorym jezdzi raczka. Byl tu grzebien z 41 kresek i Jarek
+            slusznie sie nad nim zawahal: 41 kresek to duzo halasu za jedna
+            informacje, a poswiata i tak swiecila tylko przy raczce, wiec konce
+            grzebienia wygladaly na zgaszone.
+
+            Teraz jest jedna wlosowa linia, ktora POGRUBIA sie tam, gdzie stoi
+            raczka, jak soczewka. Ta sama fizyka, co morph raczki: kontrolka
+            reaguje na to, gdzie jest kciuk. Do tego karb na srodku, zeby "stop"
+            dalo sie znalezc bez patrzenia, i dwie kropki na koncach zakresu.
+          */}
+          <svg viewBox="0 0 56 240" className="memplay__rail" aria-hidden="true">
             <defs>
               <linearGradient
-                id="pk-lad-fade"
+                id="pk-rail-fade"
                 gradientUnits="userSpaceOnUse"
                 x1="0"
-                y1={THR_MID - pos * THR_TRAVEL - 78}
+                y1={THR_MID - pos * THR_TRAVEL - 96}
                 x2="0"
-                y2={THR_MID - pos * THR_TRAVEL + 78}
+                y2={THR_MID - pos * THR_TRAVEL + 96}
               >
-                <stop offset="0" stopColor="#ffffff" stopOpacity="0" />
-                <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.9" />
-                <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
+                <stop offset="0" stopColor="#ffffff" stopOpacity="0.16" />
+                <stop offset="0.5" stopColor="#ffffff" stopOpacity="0.85" />
+                <stop offset="1" stopColor="#ffffff" stopOpacity="0.16" />
               </linearGradient>
             </defs>
-            {Array.from({ length: 41 }, (_, i) => {
-              const y = THR_MID - THR_TRAVEL + (i / 40) * THR_TRAVEL * 2
-              const mid = i === 20
-              return (
-                <line
-                  key={i}
-                  x1={mid ? 24 : 31}
-                  y1={y}
-                  x2="52"
-                  y2={y}
-                  stroke={mid ? 'var(--trail-edge)' : 'url(#pk-lad-fade)'}
-                  strokeOpacity={mid ? 0.55 : 1}
-                  strokeWidth={mid ? 1.6 : 1.1}
-                  strokeLinecap="round"
-                />
-              )
-            })}
+            <path d={railPath} fill="url(#pk-rail-fade)" />
+            {/* karb na srodku: tu jest stop */}
+            <rect
+              x="19"
+              y={THR_MID - 0.9}
+              width="18"
+              height="1.8"
+              rx="0.9"
+              fill="var(--trail-edge)"
+              fillOpacity="0.5"
+            />
+            {[THR_MID - THR_TRAVEL - 10, THR_MID + THR_TRAVEL + 10].map((y) => (
+              <circle key={y} cx="28" cy={y} r="1.5" fill="#ffffff" fillOpacity="0.22" />
+            ))}
           </svg>
 
           {/*
-            Raczka nad poswiata, wiec nigdy nie gasnie razem z kreskami. Zmienia
-            przy tym ksztalt pod obciazeniem: im dalej ja pchniesz, tym bardziej
-            wyciaga sie w kierunku jazdy i tym szerzej rozchodza sie kropki
-            chwytu. To nie jest ozdoba, to ta sama informacja co pozycja, tylko
-            czytana katem oka, bez patrzenia na podzialke. Halo dochodzi z tego
-            samego powodu: mocniej pchniete znaczy jasniejsze.
+            Raczka nad torem, wiec nigdy nie gasnie razem z nim. Morph i halo
+            dziejace sie pod palcem siedza w CSS, nie tutaj: patrz
+            .memplay__gripbox.
           */}
           <svg viewBox="0 0 56 240" className="memplay__grip" aria-hidden="true">
             <g transform={`translate(0 ${(-pos * THR_TRAVEL).toFixed(2)})`}>

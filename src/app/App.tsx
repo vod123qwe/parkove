@@ -671,7 +671,7 @@ export function App() {
       <header className="app-hud">
         {/* filtry po lewej, menu po prawej: rodzenstwo na tej samej wysokosci */}
         <MapFilters show={!!selected || onWalk} />
-        <button className="app-profilebtn" aria-label="Menu" onClick={() => setMenuOpen(true)}>
+        <button className="app-profilebtn pk-press" aria-label="Menu" onClick={() => setMenuOpen(true)}>
           <Menu strokeWidth={2} />
         </button>
       </header>
@@ -774,7 +774,7 @@ export function App() {
       )}
 
       <button
-        className={`app-look${looksOpen ? ' -on' : ''}`}
+        className={`app-look pk-press${looksOpen ? ' -on' : ''}`}
         aria-label="Zmień wygląd mapy"
         aria-expanded={looksOpen}
         onClick={() => setLooksOpen((v) => !v)}
@@ -783,7 +783,7 @@ export function App() {
       </button>
 
       <button
-        className="app-locate"
+        className="app-locate pk-press"
         aria-label="Pokaż, gdzie jestem"
         onClick={() => {
           if (onWalk) setFollowMe(true)

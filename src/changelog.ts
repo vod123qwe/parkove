@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.82.0'
+export const VERSION = '0.83.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,20 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.83.0',
+    date: '2026-08-22',
+    title: 'Download a place before you go',
+    changes: [
+      ['added', 'A place can be downloaded for offline in its own card, under the weather, in two weights: the ordinary one covers the zooms the map actually uses in the field, the sharper one goes a level deeper and costs four times the tiles. Elevation, the vectors the 3D replay needs for buildings, and the photographs of the points all come along. Downloading a valley is about fifteen megabytes. Nothing starts by itself, because the mobile data is yours'],
+      ['fixed', 'The deeper problem behind a map that would not load: the cache was only ever a souvenir. A service worker saves what you have already seen, so having the valley offline required walking the valley online first, which is precisely the thing you cannot do'],
+      ['changed', 'Downloaded tiles live in a cache of their own that nobody trims. The ordinary tile cache holds nine hundred and evicts the oldest, so a downloaded valley would have evaporated after one walk around Krakow'],
+      ['fixed', 'The size shown before downloading was almost half of the truth. It sampled a flat list of tiles, and the list is dominated by hundreds of light tiles from low zooms while the weight comes from the one densest zoom. It now samples every layer and weights by how many tiles that layer has'],
+      ['added', 'A photograph can be saved to the phone from the viewer. Worth knowing why this was missing: photographs from a walk live in the browser database inside the app, not in the phone camera roll, so the Photos app cannot see them and neither can an iCloud backup. On iOS the share sheet is the way out, because it holds Save Image'],
+      ['changed', 'The scale under the speed handle is one hairline that swells where the handle is, like a lens, instead of forty one ticks. The ticks were a lot of noise for one piece of information, and the glow only ever lit near the handle, so both ends of the comb looked switched off'],
+      ['added', 'The press morph from the speed handle now works on the icon buttons too: menu, layers, locate, back and layers in a memory. Not on buttons with words in them, because stretched text reads as a fault rather than a reaction'],
+    ],
+  },
   {
     version: '0.82.0',
     date: '2026-08-22',

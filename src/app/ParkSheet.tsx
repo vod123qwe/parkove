@@ -25,6 +25,7 @@ import { KIND_META } from './kinds'
 import { suggestedParking } from './data/parking'
 import { PhotoButton } from './PhotoButton'
 import { WeatherStrip } from './WeatherStrip'
+import { OfflineRow } from './OfflineRow'
 import { PARK_INFO } from './data/parkinfo'
 import { amenitiesFor, isFood, topChips } from './data/amenities'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
@@ -406,6 +407,14 @@ export function ParkSheet({
         jednej liczby w nagłówku, bo pytanie brzmi „o której", nie „ile stopni".
       */}
       <WeatherStrip parkId={park.id} coords={park.properties.center} />
+
+      {/*
+        Mapa offline pod pogodą, bo to ostatni krok planowania: sprawdziłeś, czy
+        warto iść, a teraz przygotowujesz się na to, że w dolinie nie będzie
+        zasięgu. Stoi w karcie miejsca, a nie w ustawieniach, bo to decyzja o
+        wyprawie, nie o aplikacji.
+      */}
+      <OfflineRow parkId={park.id} parkName={park.properties.name} />
 
       {status.s === 'success' && (
         <p className="t-body-sm park-status -ok" role="status">

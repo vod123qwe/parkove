@@ -1,4 +1,6 @@
 import './ds.css'
+// narzedzie, nie komponent: zadny plik go nie importuje sam z siebie
+import './components/press.css'
 
 export { cx } from './cx'
 export { Button, IconButton } from './components/Button'
