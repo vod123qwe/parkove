@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Map as MapGL } from 'maplibre-gl'
-import { ChevronLeft, Layers } from 'lucide-react'
+import { ChevronLeft, Layers, Volume2, VolumeX } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { WavePlayer } from './WavePlayer'
 import { MemoryViewer } from './MemoryViewer'
 import { PoiModal } from './PoiSheet'
 import { REPLAY_LOOKS, replayStyle } from './data/mapstyles'
+import { ambientOn, setAmbient, startAmbient } from './ambient'
+import type { Ambient } from './ambient'
 import type { ReplayLook } from './data/mapstyles'
 import { buildTimeline, metresAt, msAtMetres, pointAt, walkedSoFar } from './memory'
 import type { Timeline } from './memory'
@@ -175,6 +177,9 @@ export function MemoryPlayer({
   const pinching = useRef(false)
   /** czy palec siedzi na przepustnicy: od tego zalezy morph raczki */
   const [pressed, setPressed] = useState(false)
+  /** cicha muzyka pod seansem; wybor pamietany miedzy wyprawami */
+  const [sound, setSound] = useState(ambientOn)
+  const music = useRef<Ambient | null>(null)
   /** rozejrzenie sie: przesuniecie kursu i kat kamery, oba trzymane recznie */
   const spin = useRef(0)
   const tilt = useRef(TILT_BASE)
@@ -933,6 +938,31 @@ export function MemoryPlayer({
 
   useEffect(() => () => window.clearTimeout(chromeTimer.current), [])
 
+  /*
+   * Muzyka rusza razem z ekranem. Wolno jej to zrobic bez pytania, bo wejscie
+   * tutaj jest dotknieciem przycisku "przejdz te trase jeszcze raz", a to
+   * wystarcza przegladarce za zgode na dzwiek. Tonacja idzie z identyfikatora
+   * wyprawy, wiec ta sama droga brzmi tak samo za kazdym razem.
+   */
+  useEffect(() => {
+    if (!sound) return
+    music.current = startAmbient(journey.id)
+    return () => {
+      music.current?.stop()
+      music.current = null
+    }
+  }, [sound, journey.id])
+
+  /*
+   * Twoje nagranie ma pierwszenstwo. Gdy na ekranie gra glos z wyprawy, muzyka
+   * schodzi prawie do zera i wraca wolniej, niz zeszla: to jest ten moment, po
+   * ktory sie tu przyszlo, i nic nie ma prawa go zagadac.
+   */
+  const listening = memory?.kind === 'mark' && memory.mark.kind === 'audio'
+  useEffect(() => {
+    music.current?.duck(Boolean(listening))
+  }, [listening])
+
   /** swipe w dol na karcie zdejmuje wspomnienie od razu */
   const cardFrom = useRef<number | null>(null)
 
@@ -1112,6 +1142,19 @@ export function MemoryPlayer({
         onClick={() => setLooksOpen((v) => !v)}
       >
         <Layers size={19} />
+      </button>
+
+      <button
+        className={`memplay__sound pk-press${chrome ? '' : ' -off'}`}
+        aria-label={sound ? 'Wycisz muzykę' : 'Włącz muzykę'}
+        aria-pressed={sound}
+        onClick={() => {
+          const next = !sound
+          setAmbient(next)
+          setSound(next)
+        }}
+      >
+        {sound ? <Volume2 size={18} /> : <VolumeX size={18} />}
       </button>
 
       {looksOpen && (

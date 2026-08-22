@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.83.0'
+export const VERSION = '0.84.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.84.0',
+    date: '2026-08-22',
+    title: 'A memory can have music, made on the spot',
+    changes: [
+      ['added', 'Quiet music under a replay, synthesised live rather than played from a file. Nothing to download, so it works offline by definition, it never repeats, and the offline pack for a place stays at fifteen megabytes instead of nineteen. The key is derived from the walk id, so the same walk sounds the same every time and a different one sounds different: a memory gets its own sound the way it already has its own shape'],
+      ['added', 'Your own recording takes priority. When a voice from the walk plays, the music drops almost to nothing and comes back slower than it left'],
+      ['changed', 'It is off by default. Jarek first listen: this music is very meditative, which was not a compliment. The speaker in the corner turns it on and it stays on'],
+      ['fixed', 'The first version of the drone had pairs of the same note detuned by a few cents. A few cents at 110 Hz is a beat once every two seconds, which means the pair cancels itself twice a second: measured loudness swung by 17 dB and it would have pulsed rather than held. Harmonic intervals instead, each voice breathing at its own very slow rate, and the swing is down to 4.6 dB'],
+    ],
+  },
   {
     version: '0.83.0',
     date: '2026-08-22',

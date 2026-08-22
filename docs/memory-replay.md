@@ -249,3 +249,38 @@ zwolnienie jest odbiciem, nie samym powrotem.
 
 **Włos postępu usunięty** na życzenie Jarka. Argumentowałem za nim („nie ma jak
 poznać, ile zostało"), ale to jego ekran i jego decyzja.
+
+## Muzyka: generowana, nie nagrana, i domyślnie cicha
+
+Jarek chciał „fajną spokojną muzyczkę pod takie wspomnienia". Wybraliśmy
+**syntezę na żywo** zamiast nagrania, z trzech powodów: zero bajtów w paczce
+offline (a paczka miejsca waży 15 MB i nie ma po co dokładać do niej czterech na
+jeden utwór), działa bez sieci z definicji, i nigdy się nie powtarza.
+
+Tonacja jest **wyliczona z identyfikatora wyprawy**, więc ta sama droga brzmi za
+każdym razem tak samo, a inna inaczej. Wspomnienie ma swój dźwięk, tak jak ma
+swój kształt śladu.
+
+Konstrukcja: dron z czterech głosów w relacjach harmonicznych, wolne falowanie
+filtra jako oddech, i pojedyncze dźwięki z pentatoniki molowej w nieregularnych
+odstępach, przez echo.
+
+**Poprawka po pomiarze, warta zapamiętania.** Pierwsza wersja miała pary tego
+samego dźwięku rozstrojone o kilka centów, „bo dwa idealnie zgodne oscylatory
+brzmią jak sygnał". Kilka centów przy 110 Hz to dudnienie raz na dwie sekundy,
+czyli para co dwie sekundy sama się kasuje: zmierzony rozrzut głośności wyniósł
+**17 dB** i brzmiałoby to jak pulsowanie, nie jak pad. Po przejściu na relacje
+harmoniczne (korzeń, kwinta, oktawa, duodecyma) z osobnym, bardzo wolnym
+falowaniem głośności każdego głosu rozrzut spadł do **4,6 dB**.
+
+**Twoje nagranie ma pierwszeństwo**: gdy na ekranie gra głos z wyprawy, muzyka
+schodzi prawie do zera i wraca wolniej, niż zeszła.
+
+**Domyślnie wyłączona.** Jarek po pierwszym odsłuchu: „ta muzyczka jest mega
+medytacyjna". Więc seans startuje w ciszy, a głośnik w narożniku ją włącza.
+
+Urywki znanych utworów, o które pytał, odpadają i to nie z powodów technicznych:
+to cudze nagrania i nie wolno ich wozić w aplikacji. Dwie drogi, które zostają,
+gdyby wrócił do tematu: **własny plik** wybrany z telefonu (jego kopia, tylko
+lokalnie, nic nie wychodzi na zewnątrz) albo **inny charakter syntezy**, bliżej
+lo-fi niż medytacji: miękki puls, akordy z septymą, lekkie falowanie taśmy.
