@@ -1946,6 +1946,111 @@
   width: min(calc(100% - 2 * var(--sp-6)), 420px);
 }
 
+/* ---- wybieranie szlaku na mapie ---- */
+
+/*
+ * Ten sam narożnik ekranu, co pasek wyprawy, i ta sama szerokość: moduły mają się
+ * podmieniać w miejscu, a nie przeskakiwać. Dzięki temu wejście w wybór szlaku
+ * czyta się jak zmiana zawartości, nie jak nowy ekran.
+ */
+.trailpick {
+  position: absolute;
+  isolation: isolate;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-5));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: min(calc(100% - 2 * var(--sp-6)), 420px);
+  animation: pick-in 260ms cubic-bezier(0.34, 1.24, 0.64, 1) both;
+}
+
+@keyframes pick-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.trailpick__card {
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: 26px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-3);
+  touch-action: pan-y;
+}
+
+.trailpick__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.trailpick__ink {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--bg-lime);
+  color: #14250c;
+}
+
+.trailpick__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.trailpick__name {
+  color: var(--content-primary);
+}
+
+.trailpick__meta,
+.trailpick__note {
+  color: var(--content-tertiary);
+}
+
+.trailpick__note {
+  margin: var(--sp-2) 0 0;
+}
+
+/* kropki: ile tras i którą widzisz */
+.trailpick__dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: var(--sp-3) 0 0;
+}
+
+.trailpick__dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-default);
+}
+
+.trailpick__dots span.is-on {
+  width: 18px;
+  background: var(--content-accent);
+}
+
+.trailpick__hint {
+  margin: var(--sp-2) 0 0;
+  color: var(--content-tertiary);
+  text-align: center;
+}
+
+.trailpick .app-expactions {
+  margin-top: var(--sp-4);
+}
+
 /* the camera keeps its own label off: the icon is the whole button */
 /* ---- live status card at the top ---- */
 
@@ -2435,8 +2540,8 @@
 /* krzyżyk wchodzi na końcu kaskady i wychodzi pierwszy: to on zamyka */
 .app-addmenu__close {
   will-change: transform, opacity;
-  animation: add-rise 400ms cubic-bezier(0.34, 1.32, 0.64, 1) both;
-  animation-delay: 200ms;
+  animation: add-rise 300ms cubic-bezier(0.34, 1.32, 0.64, 1) both;
+  animation-delay: 140ms;
 }
 
 .app-addmenu.-out .app-addmenu__close {
@@ -2468,11 +2573,11 @@
   background: linear-gradient(to top, rgb(8 14 8 / 0.62), rgb(8 14 8 / 0.24) 62%, transparent);
   pointer-events: none;
   will-change: opacity;
-  animation: add-veil 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: add-veil 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .app-addmenu.-out .app-addmenu__glass {
-  animation: add-veil 240ms cubic-bezier(0.4, 0, 1, 1) reverse both;
+  animation: add-veil 200ms cubic-bezier(0.4, 0, 1, 1) reverse both;
 }
 
 @keyframes add-veil {
@@ -2528,8 +2633,8 @@
    * Odbicie robi krzywa z przestrzeleniem (1.32 zamiast 1), a nie osobna klatka:
    * jedna droga w górę, bez przystanku, więc nie czyta się jak przeskok.
    */
-  animation: add-rise 420ms cubic-bezier(0.34, 1.32, 0.64, 1) both;
-  animation-delay: calc(var(--rise, 0) * 38ms);
+  animation: add-rise 320ms cubic-bezier(0.34, 1.32, 0.64, 1) both;
+  animation-delay: calc(var(--rise, 0) * 28ms);
 }
 
 /* przerwa między narzędziami i wspomnieniami: grupy widać bez podpisu */
@@ -2545,8 +2650,8 @@
 
 /* zejście: kaskadą OD GÓRY, z przyspieszeniem, w stronę plusa */
 .app-addmenu.-out .app-addmenu__item.pk-btn {
-  animation: add-sink 220ms cubic-bezier(0.4, 0, 1, 1) both;
-  animation-delay: calc(var(--sink, 0) * 34ms);
+  animation: add-sink 180ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation-delay: calc(var(--sink, 0) * 26ms);
 }
 
 @keyframes add-rise {

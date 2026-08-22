@@ -13,6 +13,7 @@ import type { ParkFeature } from './ParkSheet'
 import { PoiModal } from './PoiSheet'
 import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
+import { TrailPicker } from './TrailPicker'
 import { MapFilters } from './MapFilters'
 import { PlantCamera } from './PlantCamera'
 import { plantEnabled } from './plant'
@@ -42,7 +43,7 @@ import { EndWalkSheet } from './EndWalkSheet'
 import { JourneyScreen } from './JourneyScreen'
 import { StampScreen } from './StampScreen'
 import { WalkSummary } from './WalkSummary'
-import { stopExpedition, useGameState } from './state'
+import { chooseTrail, stopExpedition, useGameState } from './state'
 import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
@@ -111,6 +112,12 @@ export function App() {
   /** wybrana konkretna kawiarnia albo plac zabaw: pin rośnie, mapa centruje */
   const [amenitySpotId, setAmenitySpotId] = useState<string | null>(null)
   const [trailsOpen, setTrailsOpen] = useState(false)
+  /*
+   * Wybieranie szlaku na mapie w trakcie wyprawy: numer podgladanej trasy.
+   * null = nie wybieramy. Podglad rysuje sie na mapie, a moduly na dole
+   * podmieniaja sie na pasek wyboru, wiec mapa zostaje ta sama.
+   */
+  const [pickTrail, setPickTrail] = useState<number | null>(null)
   /* pelnoekranowa kamera do sprawdzania roslin */
   const [plantCam, setPlantCam] = useState(false)
   /* małe cele w terenie: lista punktów wyprawy i wybrany z niej cel */
@@ -264,10 +271,15 @@ export function App() {
    * w trakcie wyprawy dla niej, poza wyprawa dla wybranego parku.
    */
   const trailOverlay = useMemo(() => {
-    const t = trailById(overlayParkId ?? '', overlayParkId ? (trailChoice[overlayParkId] ?? null) : null)
+    /* w trybie wyboru mapa pokazuje podglad, nie zapisany wybor */
+    const list = overlayParkId ? trailsFor(overlayParkId) : []
+    const t =
+      pickTrail != null
+        ? (list[pickTrail] ?? null)
+        : trailById(overlayParkId ?? '', overlayParkId ? (trailChoice[overlayParkId] ?? null) : null)
     if (!t) return null
     return { line: t.line, ink: t.colour ? TRAIL_INK[t.colour] : undefined }
-  }, [overlayParkId, trailChoice])
+  }, [overlayParkId, trailChoice, pickTrail])
 
   const questOverlay = useMemo(() => {
     if (!overlayParkId) return null
@@ -659,7 +671,37 @@ export function App() {
         </button>
       </header>
 
-      {onWalk && expeditionPark ? (
+      {onWalk && expeditionPark && pickTrail != null ? (
+        /*
+         * Tryb wyboru szlaku: mapa zostaje, akcje wyprawy schodza, a w ich miejscu
+         * jest pasek z jedna trasa i ptaszkiem. Po wyborze wszystko wraca.
+         */
+        <TrailPicker
+          trails={trailsFor(expeditionPark.id)}
+          index={pickTrail}
+          onIndex={(next) => {
+            setPickTrail(next)
+            const t = trailsFor(expeditionPark.id)[next]
+            /* kadr idzie za trasa: przesuniecie palcem ma pokazac, gdzie ona jest */
+            if (t?.line?.length) {
+              const lons = t.line.map((c) => c[0])
+              const lats = t.line.map((c) => c[1])
+              const span = Math.max(Math.max(...lons) - Math.min(...lons), Math.max(...lats) - Math.min(...lats))
+              setFocus({
+                center: [(Math.min(...lons) + Math.max(...lons)) / 2, (Math.min(...lats) + Math.max(...lats)) / 2],
+                zoom: span > 0.05 ? 12.4 : span > 0.02 ? 13.4 : span > 0.008 ? 14.6 : 15.6,
+                ts: Date.now(),
+                bottomPadding: 220,
+              })
+            }
+          }}
+          onPick={(t) => {
+            chooseTrail(expeditionPark.id, t.id)
+            setPickTrail(null)
+          }}
+          onClose={() => setPickTrail(null)}
+        />
+      ) : onWalk && expeditionPark ? (
         <>
           <ExpeditionBar
             onRequestStop={() => setEndingWalk(true)}
@@ -1212,8 +1254,15 @@ export function App() {
           })()}
           hasTrails={trailsFor(expeditionQuest.parkId).length > 0}
           onOpenTrails={() => {
+            /*
+             * W trakcie wyprawy nie otwieramy arkusza z kaflami, tylko wybor na
+             * mapie: w terenie chcesz zobaczyc trase na mapie, po ktorej idziesz.
+             * Arkusz (TrailModal) zostaje do planowania w domu.
+             */
             setPointsOpen(false)
-            setTrailsOpen(true)
+            const list = trailsFor(expeditionQuest.parkId)
+            const current = list.findIndex((t) => t.id === trailChoice[expeditionQuest.parkId])
+            setPickTrail(current >= 0 ? current : 0)
           }}
           onPick={(poiId) => {
             setTargetPoiId(poiId)

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.74.1'
+export const VERSION = '0.75.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.75.0',
+    date: '2026-08-22',
+    title: 'Pick a trail on the map you are standing on',
+    changes: [
+      ['added', 'During a walk the trail row no longer opens a sheet of tiles: the map stays where it is, the walk actions step down and their place is taken by one trail with a tick. Swipe left or right to browse, the camera follows each route so you can see where it goes, the tick chooses it and everything swaps back. In the field you want the trail on the map you are walking, not on a small frame inside a card'],
+      ['changed', 'The tile sheet stays for planning at home, from the place card, where a small frame next to length and time is exactly right'],
+      ['changed', 'The memory menu moves a touch faster: entry 320 ms with a 28 ms cascade, exit 180 with 26'],
+    ],
+  },
   {
     version: '0.74.1',
     date: '2026-08-22',
