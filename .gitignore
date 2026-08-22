@@ -15,3 +15,6 @@ assets-in/stamps/*.png
 scripts/.trails-log.txt
 scripts/.trails-log2.txt
 scripts/.trails-cache.json
+
+# katalog roboczy wranglera: build Workera powstaje na miejscu przy kazdym deployu
+.wrangler/
