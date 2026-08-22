@@ -69,7 +69,7 @@ export function GuideSheet({
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="Przewodnik">
+    <BottomSheet open={open} onClose={onClose} title="Przewodnik" openAt="full" stretch>
       {/*
         Nazwa po dwukropku, nie w zdaniu: polskiej odmiany nazw własnych nie da
         się zrobić szablonem („w Dolina Będkowska"), a lista miejsc ma i doliny, i
@@ -110,15 +110,22 @@ export function GuideSheet({
         </div>
       )}
 
+      {/*
+        Rozmowa jak rozmowa: twoje słowa w pastylce po prawej, odpowiedź po
+        lewej. Kształt niesie autorstwo, więc nie trzeba podpisywać każdej linii
+        „ty" i „przewodnik", a zaokrąglenie jest to samo, co w reszcie apki.
+      */}
       {thread.map((row, i) => (
         <div key={i} className="guide__turn">
-          <p className="t-body-strong guide__q">{row.q}</p>
-          <p className="t-body guide__a">{row.a}</p>
+          <p className="guide__bubble -me">{row.q}</p>
+          <p className="guide__bubble -guide">{row.a}</p>
         </div>
       ))}
       {busy && (
-        <p className="t-body-sm guide__thinking" role="status">
-          Myślę…
+        <p className="guide__bubble -guide -thinking" role="status">
+          <span />
+          <span />
+          <span />
         </p>
       )}
       <div ref={endRef} />

@@ -1670,40 +1670,104 @@
   opacity: 0.5;
 }
 
+/*
+ * Rozmowa jak rozmowa: pastylki, twoje po prawej, przewodnika po lewej.
+ * Kształt niesie autorstwo, więc nie podpisujemy każdej linii słowem „ty".
+ * Zaokrąglenie i squircle te same, co w reszcie aplikacji, tylko jeden narożnik
+ * przy „ogonie" jest ciaśniejszy, bo to właśnie czyta się jako dymek.
+ */
 .guide__turn {
-  margin: 0 0 var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-4);
 }
 
-.guide__q {
-  margin: 0 0 var(--sp-2);
+.guide__bubble {
+  max-width: 86%;
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 22px;
+}
+
+/* twoje: cieplejsze, po prawej, dociągnięte do krawędzi rozmowy */
+.guide__bubble.-me {
+  align-self: flex-end;
+  border-bottom-right-radius: 7px;
+  background: var(--bg-mint);
   color: var(--content-primary);
+  font-weight: 600;
 }
 
 /*
- * Odpowiedź modelu ma własne tło i lewą krechę: w rozmowie widać wtedy od razu,
- * co jest pytaniem człowieka, a co odpowiedzią maszyny. Ta sama logika, co przy
- * legendach w innym kroju: niepewne nie może wyglądać jak sprawdzone.
+ * Przewodnika: chłodne tło, bo to jedyne miejsce w aplikacji z treścią
+ * niesprawdzoną. Ta sama logika, co legendy w innym kroju.
  */
-.guide__a {
-  margin: 0;
-  padding: var(--sp-3) var(--sp-4);
-  border-left: 3px solid var(--border-info);
-  border-radius: 0 14px 14px 0;
-  corner-shape: var(--corner-smooth);
+.guide__bubble.-guide {
+  align-self: flex-start;
+  border-bottom-left-radius: 7px;
   background: var(--bg-info-subtle);
   color: var(--content-secondary);
+  box-shadow: inset 0 0 0 1px var(--border-info);
 }
 
-.guide__thinking {
+/* trzy kropki zamiast słowa „myślę": mniej hałasu w rozmowie */
+.guide__bubble.-thinking {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: var(--sp-4) var(--sp-4);
   margin: 0 0 var(--sp-4);
-  color: var(--content-tertiary);
 }
 
+.guide__bubble.-thinking span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--content-info);
+  opacity: 0.35;
+  animation: guide-dots 1s ease-in-out infinite;
+}
+
+.guide__bubble.-thinking span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.guide__bubble.-thinking span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes guide-dots {
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide__bubble.-thinking span {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+/*
+ * Pole zostaje na dole rozmowy i lgnie do krawędzi arkusza, żeby przy pełnej
+ * wysokości nie trzeba było przewijać do niego po każdej odpowiedzi.
+ */
 .guide__field {
+  position: sticky;
+  bottom: 0;
   display: flex;
   gap: var(--sp-2);
   align-items: center;
   margin: var(--sp-2) 0 0;
+  padding: var(--sp-3) 0;
+  background: var(--bg-surface);
 }
 
 .guide__input {

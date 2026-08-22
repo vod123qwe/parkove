@@ -14,6 +14,7 @@
 import parksData from './data/parks.json'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
+import { AMENITIES, KIND_LABEL } from './data/amenities'
 import { questForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 import { stampNeed } from './progress'
@@ -60,6 +61,35 @@ function nearbyPlaces(here: Pt, limit = 6) {
     .slice(0, limit)
 }
 
+/**
+ * Udogodnienia wokół Ciebie: place zabaw, kawiarnie, jedzenie, bez względu na to,
+ * do którego parku należą w danych.
+ *
+ * Powód wprost z terenu (Jarek, 2026-08-22): zapytał, gdzie obok jest plac
+ * zabaw, stojąc daleko od jakiegokolwiek parku. Przewodnik znał jego pozycję, ale
+ * nie miał w kontekście ani jednego placu zabaw, więc odesłał go do parku i
+ * kazał szukać samemu, a dwa place były niedaleko. Nie chciał ukryć: on tego po
+ * prostu nie wiedział.
+ */
+function nearbyAmenities(here: Pt, limit = 8) {
+  const names = new Map(
+    (parksData as unknown as { features: Array<{ id: string; properties: { name: string } }> }).features.map(
+      (f) => [f.id, f.properties.name],
+    ),
+  )
+  const all: Array<{ name: string; kind: string; where: string; m: number }> = []
+  for (const [parkId, spots] of Object.entries(AMENITIES))
+    for (const s of spots)
+      all.push({
+        name: s.name,
+        kind: KIND_LABEL[s.kind] ?? s.kind,
+        /* przy którym parku stoi: bez tego trzy „Place zabaw" są nierozróżnialne */
+        where: names.get(parkId) ?? parkId,
+        m: distanceM(here, s.coords),
+      })
+  return all.sort((a, b) => a.m - b.m).slice(0, limit)
+}
+
 export function buildGuideContext(input: GuideInput): { place: string; point: string; story: string } {
   const { parkId, parkName, here, collected, weather, focus } = input
   const quest = parkId ? questForPark(parkId) : null
@@ -91,6 +121,22 @@ export function buildGuideContext(input: GuideInput): { place: string; point: st
       'Najbliższe miejsca z aplikacji (licząc do granicy):',
       ...nearbyPlaces(here).map((n) => `- ${n.name}: ${formatDistance(n.m)}`),
     )
+    /*
+     * Place zabaw i jedzenie wokół, licząc od Ciebie, nie od parku. To jest
+     * odpowiedź na „gdzie obok jest plac zabaw", której przewodnik nie potrafił
+     * dać, bo w kontekście nie było ani jednego.
+     */
+    const am = nearbyAmenities(here)
+    if (am.length)
+      rows.push(
+        /*
+         * Mówimy wprost, czego w tej liście NIE ma. Inaczej model podaje najbliższy
+         * plac zabaw z danych jako „najbliższy w ogóle", a Jarek stał dwie minuty
+         * od osiedlowego, którego nigdy nie skatalogowaliśmy.
+         */
+        'Udogodnienia z aplikacji, licząc od mojej pozycji. UWAGA: to tylko place zabaw i lokale PRZY PARKACH z tej aplikacji. Osiedlowych placów zabaw i zwykłych lokali w mieście tu nie ma, więc jeśli podajesz odległość, dodaj, że mówisz o tych z aplikacji i że bliżej może być coś, czego nie znasz:',
+        ...am.map((a) => `- ${a.kind}: ${a.name} (przy ${a.where}), ${formatDistance(a.m)}`),
+      )
     bits.push(rows.join('\n'))
   } else {
     bits.push('GDZIE JESTEM\nNie znam pozycji: pytam z domu albo bez zgody na lokalizację.')

@@ -22,6 +22,20 @@ export type BottomSheetProps = {
    * is what you want when the sheet IS the screen's content.
    */
   minHeight?: number
+  /**
+   * Na jakiej wysokości arkusz się otwiera. Domyślnie 'auto', czyli tyle, ile
+   * zajmuje treść. Rozmowa potrzebuje 'full' od pierwszej sekundy: czat na
+   * dwóch trzecich ekranu każe przewijać po drugim zdaniu. Przeciągnięciem w dół
+   * dalej można go zmniejszyć.
+   */
+  openAt?: 'auto' | 'full'
+  /**
+   * Arkusz zajmuje pełną wysokość detentu, nawet gdy treści jest mniej.
+   * Domyślnie 'full' znaczy „tyle, ile treść, maksymalnie 92 procent ekranu", co
+   * jest dobre dla kart, a złe dla rozmowy: czat z jedną wiadomością byłby
+   * niski, a po trzech skakałby w górę. Z tym ustawieniem miejsce jest od razu.
+   */
+  stretch?: boolean
 }
 
 // iOS-like sheet: two detents (auto-height and full), draggable anywhere,
@@ -48,12 +62,14 @@ export function BottomSheet({
   hero,
   handle = true,
   minHeight,
+  openAt = 'auto',
+  stretch = false,
 }: BottomSheetProps) {
   const { shown, closing, requestClose } = useOverlay(open, onClose, EXIT_MS)
   const panelRef = useRef<HTMLDivElement>(null)
   const headRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const [detent, setDetent] = useState<Detent>('auto')
+  const [detent, setDetent] = useState<Detent>(openAt)
   const [heights, setHeights] = useState<{ full: number; auto: number } | null>(null)
   const drag = useRef<{
     startY: number
@@ -73,17 +89,17 @@ export function BottomSheet({
     // in hero mode the handle floats over the image, so it takes no layout space
     const headH = hero != null ? 0 : Math.max(0, head.offsetHeight - HEAD_OVERLAP)
     const natural = headH + content.scrollHeight + 4
-    const full = Math.min(natural, vh * FULL_VH)
+    const full = stretch ? vh * FULL_VH : Math.min(natural, vh * FULL_VH)
     let auto = Math.min(natural, vh * AUTO_VH)
     if (full - auto < DETENT_GAP_MIN) auto = full
     setHeights({ full, auto })
-  }, [hero])
+  }, [hero, stretch])
 
   useLayoutEffect(() => {
     if (!shown) return
-    setDetent('auto')
+    setDetent(openAt)
     measure()
-  }, [shown, measure])
+  }, [shown, measure, openAt])
 
   useEffect(() => {
     if (!shown) return

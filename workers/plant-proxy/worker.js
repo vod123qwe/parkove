@@ -115,13 +115,17 @@ async function plant(request, env, origin) {
  */
 const RULES = `Jesteś towarzyszem spaceru w aplikacji Parkove: gra terenowa o parkach Krakowa i Dolinkach Krakowskich, dla rodziny z dzieckiem.
 
+Najważniejsze: ODPOWIADAJ NA PYTANIE, KTÓRE ZADANO. Kontekst poniżej jest pomocą, nie kagańcem. Jeśli ktoś pyta o coś w okolicy, a masz to w kontekście (place zabaw, kawiarnie, jedzenie, miejsca), podaj KONKRET: nazwę i odległość. Nigdy nie odsyłaj do "poszukania samemu" ani "rozejrzenia się w okolicy", gdy odpowiedź masz podaną.
+
+Nie czepiaj się jednego miejsca. Wybrany park to punkt odniesienia, a nie granica rozmowy: jeśli bliżej jest coś innego, powiedz o tym wprost.
+
 Zasady odpowiedzi:
 - Po polsku, prostym językiem, dwa do czterech zdań. Bez list, bez nagłówków.
-- Trzymaj się miejsca, o które pyta użytkownik. Jeśli pytanie odchodzi daleko od tematu, odpowiedz krótko i wróć do miejsca.
-- NIE WYMYŚLAJ. Nie podawaj dat, nazwisk, wysokości ani legend, których nie jesteś pewien. Gdy nie wiesz, powiedz wprost "nie wiem" albo "tego nie jestem pewien".
+- NIE WYMYŚLAJ. Nie podawaj dat, nazwisk, wysokości, nazw ani legend, których nie masz w kontekście. Gdy czegoś nie wiesz, powiedz wprost "nie wiem" albo "tego nie mam".
+- Odległości i nazwy podawaj DOKŁADNIE takie, jakie są w kontekście. Nie zaokrąglaj w drugą stronę i nie zamieniaj miejsc.
 - Legendę zawsze nazywaj legendą, nigdy faktem.
-- Nie doradzaj jedzenia roślin ani grzybów i nie oceniaj bezpieczeństwa jaskiń, skał czy kąpieli: odeślij do oznaczeń na miejscu.
-- Mów o tym, co widać i co da się zrobić na miejscu, bo użytkownik czyta to stojąc w terenie.`
+- Nie doradzaj jedzenia roślin ani grzybów i nie oceniaj bezpieczeństwa jaskiń, skał czy kąpieli: odeślij do oznaczeń na miejscu. To jedyne tematy, w których wolno ci odmówić konkretu.
+- Pamiętaj, że użytkownik czyta to stojąc w terenie, często z dzieckiem: liczy się to, co da się zrobić w najbliższej godzinie.`
 
 async function ask(request, env, origin) {
   if (!env.GEMINI_KEY) return json({ error: 'Brak klucza Gemini w Workerze' }, 500, origin)
@@ -138,7 +142,13 @@ async function ask(request, env, origin) {
   /* kontekst przycięty: nazwa miejsca, nazwa punktu i jego opis z aplikacji */
   const place = String(body.place ?? '').slice(0, 120)
   const point = String(body.point ?? '').slice(0, 120)
-  const story = String(body.story ?? '').slice(0, 2400)
+  /*
+   * 6000, nie 2400. Kontekst przewodnika (guideContext.ts) ma do 5800 znakow i
+   * przy starym limicie ucinalismy jego koniec, czyli postep, pogode i liste
+   * punktow. Numer jeden powod, dla ktorego model "nie wiedzial" rzeczy, ktore
+   * mu wyslalismy.
+   */
+  const story = String(body.story ?? '').slice(0, 6000)
   const asked = Number(body.asked ?? 0)
   if (asked >= ASK_LIMIT)
     return json({ error: `Dzienny limit ${ASK_LIMIT} pytań wyczerpany, wróć jutro` }, 429, origin)
@@ -152,23 +162,53 @@ async function ask(request, env, origin) {
     .filter(Boolean)
     .join('\n\n')
 
-  let res
-  try {
-    res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_KEY },
-      body: JSON.stringify({
-        model: env.GEMINI_MODEL ?? 'gemini-3.7-flash',
-        input,
-        system_instruction: RULES,
-        generation_config: { temperature: 0.4, thinking_level: 'low' },
-      }),
-    })
-  } catch {
-    return json({ error: 'Model nie odpowiada' }, 502, origin)
-  }
+  /*
+   * Kilka modeli po kolei, nie jeden.
+   *
+   * Dwa powody, oba prawdziwe. Darmowy prog Gemini jest liczony PER MODEL i jest
+   * maly (rzad dwudziestu zapytan na dobe), wiec wyczerpany najnowszy nie znaczy,
+   * ze nie ma z czego odpowiedziec. A nazwy modeli zmieniaja sie czesciej niz ta
+   * aplikacja: 404 na jednej nazwie nie moze konczyc funkcji.
+   *
+   * Schodzimy tylko przy 429 (brak limitu) i 404 (nie ma takiego modelu). Blad
+   * merytoryczny zwracamy od razu, bo powtarzanie go na innym modelu nic nie da.
+   */
+  const models = [
+    env.GEMINI_MODEL,
+    'gemini-3.7-flash',
+    'gemini-3-flash-preview',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+  ].filter((m, i, all) => m && all.indexOf(m) === i)
 
-  if (res.status === 429) return json({ error: 'Limit modelu na dziś wyczerpany' }, 429, origin)
+  let res = null
+  let usedModel = null
+  for (const model of models) {
+    try {
+      res = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_KEY },
+        body: JSON.stringify({
+          model,
+          input,
+          system_instruction: RULES,
+          generation_config: { temperature: 0.4, thinking_level: 'low' },
+        }),
+      })
+    } catch {
+      continue
+    }
+    usedModel = model
+    if (res.status !== 429 && res.status !== 404) break
+  }
+  if (!res) return json({ error: 'Model nie odpowiada' }, 502, origin)
+
+  if (res.status === 429)
+    return json(
+      { error: 'Limit modelu wyczerpany na wszystkich, wroc za chwile albo jutro' },
+      429,
+      origin,
+    )
   if (!res.ok) {
     const detail = await res.text()
     return json({ error: `Model odpowiedział ${res.status}`, detail: detail.slice(0, 200) }, 502, origin)
@@ -196,7 +236,7 @@ async function ask(request, env, origin) {
   const text = fromSteps || fromCandidates || String(data.output_text ?? '').trim()
 
   if (!text) return json({ error: 'Model nic nie odpowiedział' }, 502, origin)
-  return json({ text }, 200, origin)
+  return json({ text, model: usedModel }, 200, origin)
 }
 
 export default {

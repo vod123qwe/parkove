@@ -51,12 +51,54 @@ przewodnik mówi to wprost, zamiast udawać, że wie.
 Kontekst jest przycięty do 5800 znaków. Bez tego rósł do kilkunastu tysięcy i
 model gubił pytanie.
 
+## Lekcja z terenu: „jakby nie chciał powiedzieć"
+
+Jarek zapytał w mieście, gdzie obok jest plac zabaw. Przewodnik znał pozycję, ale
+odesłał go do parku i kazał rozejrzeć się koło swojej ulicy, choć dwa place były
+niedaleko. Trzy przyczyny, wszystkie po naszej stronie:
+
+1. **Kontekst nie miał ani jednego placu zabaw.** Mieliśmy je w danych
+   (`amenities.ts`, 211 punktów), ale przewodnik ich nie dostawał. Teraz dostaje
+   osiem najbliższych, licząc od pozycji, z nazwą parku, przy którym stoją.
+2. **Instrukcja kazała mu wracać do parku.** Brzmiała „trzymaj się miejsca, o
+   które pyta użytkownik, a jeśli pytanie odchodzi, wróć do miejsca". To była
+   recepta na wykręcanie się. Teraz pierwsze zdanie instrukcji brzmi „odpowiadaj
+   na pytanie, które zadano", a wybrany park jest **punktem odniesienia, nie
+   granicą rozmowy**.
+3. **Worker ucinał kontekst do 2400 znaków**, a kontekst przewodnika ma do 5800,
+   więc koniec (postęp, pogoda, punkty) po prostu nie docierał. Limit podniesiony
+   do 6000.
+
+Do tego mówimy modelowi wprost, **czego w danych nie ma**: place zabaw mamy tylko
+przy parkach, osiedlowych nie. Dzięki temu odpowiedź brzmi teraz „najbliższe z
+aplikacji to X i Y, ale po drodze możecie trafić na osiedlowe, których nie mam w
+spisie", a nie „poszukaj koło siebie".
+
+## Kilka modeli po kolei
+
+Darmowy próg Gemini jest liczony **per model** i jest mały (rząd dwudziestu
+zapytań na dobę), a nazwy modeli zmieniają się częściej niż ta aplikacja.
+Worker próbuje więc po kolei: `GEMINI_MODEL` (jeśli ustawiony), potem
+`gemini-3.7-flash`, `gemini-3-flash-preview`, `gemini-2.5-flash`,
+`gemini-2.0-flash`. Schodzi niżej **tylko** przy 429 (brak limitu) i 404 (nie ma
+takiego modelu); błąd merytoryczny zwraca od razu, bo powtarzanie go nic nie da.
+Odpowiedź nosi nazwę modelu, który jej udzielił.
+
+W testach 22 sierpnia widać było oba przypadki: najnowszy model kończył limit po
+kilkunastu pytaniach, a Worker schodził na `gemini-3-flash-preview` i rozmowa
+szła dalej.
+
 ## Najważniejsza decyzja jest wizualna
 
 Parkove stoi na zasadzie, że **nigdy nie udaje wiedzy**. Odpowiedź modelu nie
 może więc wyglądać jak treść, którą sprawdziliśmy:
 
-- w rozmowie odpowiedź ma **chłodne tło i lewą krechę**, pytanie człowieka nie,
+- rozmowa wygląda jak rozmowa: **pastylki**, twoje słowa po prawej w miętowej,
+  odpowiedź po lewej w chłodnej, z cienką obwódką. Kształt niesie autorstwo, więc
+  nie podpisujemy każdej linii słowem „ty",
+- arkusz otwiera się **na pełnej wysokości** (`openAt="full" stretch`), bo czat na
+  dwóch trzecich ekranu każe przewijać po drugim zdaniu, a pole wpisywania lgnie
+  do dolnej krawędzi,
 - wejście z karty punktu ma **przerywaną ramkę**,
 - nota jest wprost: „Odpowiada model językowy i może się mylić. Treść punktów w
   aplikacji jest sprawdzona, ta rozmowa nie."

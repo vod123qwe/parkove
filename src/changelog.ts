@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.72.0'
+export const VERSION = '0.73.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.73.0',
+    date: '2026-08-22',
+    title: 'The guide stops deflecting, and the conversation looks like one',
+    changes: [
+      ['fixed', 'Asked where a playground is nearby, the guide sent you to a park and told you to look around your own street, while two playgrounds sat close by. Three causes, all ours: the context contained no playgrounds at all although the app has two hundred of them, the instruction told the model to keep returning to the selected place, and the proxy cut the context at 2400 characters while the guide sends up to 5800, so the end of it never arrived'],
+      ['added', 'The guide now gets the eight nearest amenities measured from you, each with the park it belongs to, and it is told plainly what is missing: we only have playgrounds and places by parks, not the ordinary ones between blocks. So the answer is now two named playgrounds with distances plus an admission that something closer may exist that it does not know'],
+      ['changed', 'The rules start with answer the question that was asked. A selected place is a reference point, not the boundary of the conversation'],
+      ['added', 'The proxy tries several models in turn. The free Gemini allowance is counted per model and is small, and model names change faster than this app, so a used up quota or a renamed model no longer ends the feature. It steps down only on 429 and 404'],
+      ['changed', 'The conversation is pills now: yours on the right in mint, the guide on the left in cool blue. Shape carries who said what, so no line needs a label. The sheet opens at nearly full height, because a chat on two thirds of the screen makes you scroll after the second sentence, and the input sticks to the bottom edge'],
+    ],
+  },
   {
     version: '0.72.0',
     date: '2026-08-22',
