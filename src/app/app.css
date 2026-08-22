@@ -816,15 +816,15 @@
  * ściśnięcie ich do nieczytelnych słupków byłoby udawaniem wykresu.
  */
 .park-weather {
-  margin: var(--sp-3) 0 var(--sp-5);
-  padding: var(--sp-5) 0 var(--sp-2);
+  margin: var(--sp-6) 0 var(--sp-6);
+  padding: var(--sp-6) 0 var(--sp-2);
   border-top: 1px solid var(--border-subtle);
 }
 
 .park-weather__now {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: var(--sp-4);
 }
 
 .park-weather__icon {
@@ -913,10 +913,22 @@
 .park-weather__hours {
   display: flex;
   gap: var(--sp-2);
-  margin: var(--sp-4) calc(-1 * var(--sp-5)) 0;
-  padding: 0 var(--sp-5);
+  /*
+   * Wylewka MUSI być równa marginesowi arkusza (--sp-6), inaczej pierwsza
+   * kolumna zaczyna się kilka pikseli od krawędzi tekstu obok i cała sekcja
+   * wygląda na przesuniętą. Wcześniej było tu --sp-5 i te 4 px było widać.
+   */
+  margin: var(--sp-5) calc(-1 * var(--sp-6)) 0;
+  padding: 0 var(--sp-6);
   overflow-x: auto;
   scroll-snap-type: x proximity;
+  /*
+   * scroll-padding, nie tylko padding. Przyciąganie (scroll-snap-align: start)
+   * wyrównuje kolumnę do krawędzi OKNA przewijania i zwykły padding go nie
+   * interesuje, więc „teraz" lądowało przy samej krawędzi ekranu zamiast w linii
+   * z tekstem obok. To był ten brak wyrównania, o którym mówił Jarek.
+   */
+  scroll-padding-left: var(--sp-6);
   scrollbar-width: none;
 }
 
@@ -934,9 +946,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-width: 56px;
-  padding: var(--sp-3) 6px;
+  gap: var(--sp-2);
+  min-width: 60px;
+  padding: var(--sp-3) var(--sp-2);
   border-radius: 16px;
   corner-shape: var(--corner-smooth);
   scroll-snap-align: start;
@@ -992,10 +1004,10 @@
 .park-weather__window {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: var(--sp-3) 0 0;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: 12px;
+  gap: var(--sp-2);
+  margin: var(--sp-5) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 14px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-mint);
   color: var(--content-primary);
@@ -1016,7 +1028,7 @@
 }
 
 .park-weather__source {
-  margin: var(--sp-2) 0 0;
+  margin: var(--sp-4) 0 0;
   color: var(--content-tertiary);
 }
 

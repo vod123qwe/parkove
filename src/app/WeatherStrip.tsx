@@ -62,7 +62,22 @@ export function WeatherStrip({
   useLayoutEffect(() => {
     const box = hoursRef.current
     const now = box?.querySelector('.-now') as HTMLElement | null
-    if (box && now) box.scrollLeft = Math.max(0, now.offsetLeft - box.offsetLeft - 6)
+    if (!box || !now) return
+    /*
+     * Odejmujemy własny margines pasa, nie stałe 6 px. Pas wylewa się na
+     * krawędzie arkusza, więc bez tego kolumna „teraz" lądowała przy samej
+     * krawędzi ekranu, a nie w linii z tekstem obok, i cała sekcja wyglądała na
+     * przesuniętą.
+     */
+    const pad = parseFloat(getComputedStyle(box).paddingLeft) || 0
+    /*
+     * Liczone różnicą prostokątów, nie przez offsetLeft: w tym silniku offsetLeft
+     * względem kontenera z paddingiem wypada inaczej, niż się wydaje, i kolumna
+     * lądowała przy krawędzi ekranu. Chcemy jednego: żeby „teraz" stało dokładnie
+     * tam, gdzie zaczyna się tekst obok, czyli o padding od krawędzi pasa.
+     */
+    const delta = now.getBoundingClientRect().left - box.getBoundingClientRect().left - pad
+    box.scrollLeft = Math.max(0, box.scrollLeft + delta)
   }, [w])
 
   /* bez danych i bez zapasu nie pokazujemy pustego pudełka */

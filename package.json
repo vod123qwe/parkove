@@ -1,7 +1,7 @@
 {
   "name": "parkove",
   "private": true,
-  "version": "0.67.0",
+  "version": "0.67.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -22,7 +22,10 @@
     "plant:deploy": "wrangler deploy -c workers/plant-proxy/wrangler.toml",
     "plant:log": "wrangler tail -c workers/plant-proxy/wrangler.toml",
     "plant:test": "node scripts/test-plant.mjs",
-    "ask:key": "wrangler secret put GEMINI_KEY -c workers/plant-proxy/wrangler.toml"
+    "ask:key": "wrangler secret put GEMINI_KEY -c workers/plant-proxy/wrangler.toml",
+    "proxy:check": "node scripts/proxy-check.mjs",
+    "proxy:secrets": "wrangler secret list -c workers/plant-proxy/wrangler.toml",
+    "proxy:who": "wrangler whoami"
   },
   "dependencies": {
     "lucide-react": "^1.33.0",

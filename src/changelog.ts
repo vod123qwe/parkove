@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.67.0'
+export const VERSION = '0.67.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.67.1',
+    date: '2026-08-22',
+    title: 'The weather section breathes and lines up',
+    changes: [
+      ['changed', 'More room above, below and inside the weather section: wider hour columns, more space between them, a roomier window line. It was cramped'],
+      ['fixed', 'The hour strip lines up with the rest of the card now. Two things were off: the bleed used a twenty pixel margin where the sheet uses twenty four, and snapping aligns a column to the edge of the scroll window rather than to the margin, so the current hour landed hard against the screen edge. Fixed with scroll-padding, which exists for exactly this'],
+    ],
+  },
   {
     version: '0.67.0',
     date: '2026-08-22',
