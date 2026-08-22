@@ -173,6 +173,8 @@ export function MemoryPlayer({
   const zoomRef = useRef(BASE_ZOOM)
   /** czy palce sa wlasnie na mapie: wtedy kamera nie wtraca sie do kadru */
   const pinching = useRef(false)
+  /** czy palec siedzi na przepustnicy: od tego zalezy morph raczki */
+  const [pressed, setPressed] = useState(false)
   /** rozejrzenie sie: przesuniecie kursu i kat kamery, oba trzymane recznie */
   const spin = useRef(0)
   const tilt = useRef(TILT_BASE)
@@ -206,6 +208,19 @@ export function MemoryPlayer({
   const memSince = useRef(0)
   /** to samo, co stan `memory`, ale czytane z petli, ktora ma puste zaleznosci */
   const memRef = useRef<Memory | null>(null)
+  /**
+   * Poprzednie wspomnienie, jeszcze na ekranie, wypychane przez nowe.
+   *
+   * Jarek: "moze powinny sie nakladac, jezeli sa jeden pod drugim, albo
+   * wypychac jakos". Gdy dwa punkty leza blisko siebie, karta dotad podmieniala
+   * tresc w miejscu i wygladalo to jak przeskok. Teraz stara odjezdza w gore i
+   * gasnie za nowa, jak zdjecie odlozone na kupke.
+   *
+   * Jeden cien, nie stos: dwa polprzezroczyste teksty jeden na drugim robia sie
+   * nieczytelna papka.
+   */
+  const [ghost, setGhost] = useState<Memory | null>(null)
+  const ghostTimer = useRef(0)
   /**
    * Ile jest "czytania" w kadrze: 0 to chodzenie, 1 to wspomnienie na ekranie.
    * Wygladzane co klatke i wysylane razem z reszta kamery, bo easeTo na padding
@@ -576,12 +591,21 @@ export function MemoryPlayer({
     memAt.current = metres
     memSince.current = performance.now()
     padWant.current = 1
+    // to, co bylo, idzie o warstwe w tyl i po chwili znika samo
+    const leaving = memRef.current
+    if (leaving && leaving.id !== body.id) {
+      setGhost(leaving)
+      window.clearTimeout(ghostTimer.current)
+      ghostTimer.current = window.setTimeout(() => setGhost(null), 700)
+    }
     memRef.current = body
     setMemory(body)
   }
   const hideMemory = () => {
     padWant.current = 0
     memRef.current = null
+    window.clearTimeout(ghostTimer.current)
+    setGhost(null)
     setMemory(null)
   }
 
@@ -828,6 +852,7 @@ export function MemoryPlayer({
   }
 
   const onDialDown = (e: React.PointerEvent) => {
+    setPressed(true)
     showChromeRef.current()
     cancelAnimationFrame(tween.current)
     trip.current = null
@@ -847,6 +872,7 @@ export function MemoryPlayer({
   }
   const onDialUp = () => {
     dragFrom.current = null
+    setPressed(false)
     showChromeRef.current()
   }
 
@@ -961,7 +987,58 @@ export function MemoryPlayer({
     drag.current = null
   }
 
-  const progress = timeline.totalMs > 0 ? elapsed / timeline.totalMs : 0
+  /**
+   * Tresc wspomnienia. Wydzielona, bo rysuje ja i karta, i cien pod nia: dwie
+   * kopie tego samego JSX rozjechalyby sie przy pierwszej zmianie formy.
+   */
+  const memoryBody = (m: Memory) =>
+    m.kind === 'mark' ? (
+      m.mark.kind === 'photo' && m.mark.url ? (
+        <>
+          <img className="memplay__snap" src={m.mark.url} alt={m.mark.caption} />
+          {m.mark.caption && <p className="memplay__said">{m.mark.caption}</p>}
+        </>
+      ) : m.mark.kind === 'audio' && m.mark.url ? (
+        <>
+          <WavePlayer src={m.mark.url} blob={m.mark.blob} autoPlay />
+          {m.mark.caption && <p className="memplay__said">{m.mark.caption}</p>}
+        </>
+      ) : (
+        /*
+         * Notatka jest cytatem, nie karteczka. Zolty posit byl najglosniejszym
+         * obiektem w calym kadrze i zabieral pol ekranu czemus, co jest jednym
+         * zdaniem. Zostaje reka, ktora to napisala, i znak cytatu u gory.
+         */
+        <p className="memplay__quote">
+          <span className="memplay__quotemark" aria-hidden="true">
+            &#8220;
+          </span>
+          {m.mark.caption || 'Pusta notatka'}
+        </p>
+      )
+    ) : (
+      <>
+        {/*
+          Punkt dostaje swoje zdjecie, gdy je ma. Byl jedyna forma bez zadnego
+          przedmiotu: sam akapit na czerni. Prosto, bez przekrzywienia i bez
+          bialej ramki: to nie Twoja fotka, to jest to miejsce.
+        */}
+        {m.poi.photo && <img className="memplay__place" src={m.poi.photo} alt={m.poi.name} />}
+        <p className="t-body-strong memplay__poiname">{m.poi.name}</p>
+        <p className="t-body-sm memplay__teaser">{m.poi.teaser}</p>
+        <span className="memplay__more">czytaj więcej</span>
+      </>
+    )
+
+  /*
+   * Morph raczki dzieje sie POD PALCEM i wraca po zwolnieniu (decyzja Jarka).
+   *
+   * Squash and stretch, najstarsza sztuczka animacji: rzecz, ktora sie rusza,
+   * wyciaga sie w kierunku ruchu. Robimy to jednym transformem CSS na grupie, a
+   * nie przeliczaniem szerokosci i wysokosci prostokata: geometria SVG jako
+   * wlasnosc CSS nie jest wszedzie animowalna, a transform jest zawsze i idzie
+   * po stronie kompozytora, wiec nic nie kosztuje.
+   */
 
   return (
     <div className="memplay">
@@ -1044,19 +1121,30 @@ export function MemoryPlayer({
         zjechac az do wlosa postepu.
       */}
       <div className="memplay__bottom">
+        {/*
+          Cien: poprzednie wspomnienie o warstwe w tyl, wypychane przez nowe.
+          Nieinteraktywne i niewidoczne dla czytnika, bo to obraz przejscia, a
+          nie tresc.
+        */}
+        {ghost && (
+          <div className="memplay__ghost" aria-hidden="true">
+            <div className="memplay__memory -flat">{memoryBody(ghost)}</div>
+          </div>
+        )}
+
         {memory &&
           (() => {
             /*
              * Otwiera sie tylko to, co ma co pokazac wiecej: zdjecie ma pelny
              * ekran, punkt ma opis, legende i dylemat. Notatka i nagranie sa tu
              * juz cale, wiec nie udaja, ze gdzies prowadza, i nie sa wtedy
-             * przyciskiem (decyzja Jarka: "jezeli jest audio lub notatka
-             * tekstowa, to niech to nie otwiera sie w nowym oknie").
+             * przyciskiem.
              */
             const openable = memory.kind === 'poi' || memory.mark.kind === 'photo'
             const Tag = (openable ? 'button' : 'div') as 'button'
             return (
               <Tag
+                key={memory.id}
                 className={`memplay__memory${openable ? '' : ' -flat'}`}
                 onPointerDown={(e: React.PointerEvent) => {
                   cardFrom.current = e.clientY
@@ -1088,52 +1176,7 @@ export function MemoryPlayer({
                     : undefined
                 }
               >
-                {memory.kind === 'mark' ? (
-                  memory.mark.kind === 'photo' && memory.mark.url ? (
-                    <>
-                      <img
-                        className="memplay__snap"
-                        src={memory.mark.url}
-                        alt={memory.mark.caption}
-                      />
-                      {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
-                    </>
-                  ) : memory.mark.kind === 'audio' && memory.mark.url ? (
-                    <>
-                      <WavePlayer src={memory.mark.url} blob={memory.mark.blob} autoPlay />
-                      {memory.mark.caption && <p className="memplay__said">{memory.mark.caption}</p>}
-                    </>
-                  ) : (
-                    /*
-                     * Notatka jest cytatem, nie karteczka. Zolty posit byl
-                     * najglosniejszym obiektem w calym kadrze i zabieral pol
-                     * ekranu czemus, co jest jednym zdaniem. Zostaje reka, ktora
-                     * to napisala, i znak cytatu u gory.
-                     */
-                    <p className="memplay__quote">
-                      <span className="memplay__quotemark" aria-hidden="true">
-                        &#8220;
-                      </span>
-                      {memory.mark.caption || 'Pusta notatka'}
-                    </p>
-                  )
-                ) : (
-                  <>
-                    {/*
-                      Punkt dostaje swoje zdjecie, gdy je ma, i to jest ta zmiana
-                      formy, o ktora pytal Jarek. Punkt byl jedyna forma bez
-                      zadnego przedmiotu: sam akapit na czerni. A w repozytorium
-                      leza 45 zdjec punktow, z ktorych ten ekran nie korzystal.
-                      Prosto, bez przekrzywienia: to nie Twoja fotka, to miejsce.
-                    */}
-                    {memory.poi.photo && (
-                      <img className="memplay__place" src={memory.poi.photo} alt={memory.poi.name} />
-                    )}
-                    <p className="t-body-strong memplay__poiname">{memory.poi.name}</p>
-                    <p className="t-body-sm memplay__teaser">{memory.poi.teaser}</p>
-                    <span className="memplay__more">czytaj wiecej</span>
-                  </>
-                )}
+                {memoryBody(memory)}
               </Tag>
             )
           })()}
@@ -1191,32 +1234,53 @@ export function MemoryPlayer({
             })}
           </svg>
 
-          {/* raczka nad poswiata, wiec nigdy nie gasnie razem z kreskami */}
+          {/*
+            Raczka nad poswiata, wiec nigdy nie gasnie razem z kreskami. Zmienia
+            przy tym ksztalt pod obciazeniem: im dalej ja pchniesz, tym bardziej
+            wyciaga sie w kierunku jazdy i tym szerzej rozchodza sie kropki
+            chwytu. To nie jest ozdoba, to ta sama informacja co pozycja, tylko
+            czytana katem oka, bez patrzenia na podzialke. Halo dochodzi z tego
+            samego powodu: mocniej pchniete znaczy jasniejsze.
+          */}
           <svg viewBox="0 0 56 240" className="memplay__grip" aria-hidden="true">
             <g transform={`translate(0 ${(-pos * THR_TRAVEL).toFixed(2)})`}>
-              <rect
-                x="6"
-                y={THR_MID - 15}
-                width="44"
-                height="30"
-                rx="15"
-                fill="var(--trail-fill)"
-                stroke="var(--trail-edge)"
-                strokeWidth="2.6"
-              />
-              {[-3.5, 3.5].map((dx) =>
-                [-3.5, 3.5].map((dy) => (
-                  <rect
-                    key={`${dx}${dy}`}
-                    x={28 + dx - 1.5}
-                    y={THR_MID + dy - 1.5}
-                    width="3"
-                    height="3"
-                    rx="0.8"
-                    fill="#ffffff"
-                  />
-                )),
-              )}
+              <g className={`memplay__gripbox${pressed ? ' -held' : ''}`}>
+                {/* halo: wchodzi razem z morphem i mowi, ze raczka jest w rece */}
+                <rect
+                  className="memplay__griphalo"
+                  x="1"
+                  y={THR_MID - 20}
+                  width="54"
+                  height="40"
+                  rx="20"
+                  fill="none"
+                  stroke="var(--trail-edge)"
+                  strokeWidth="1.4"
+                />
+                <rect
+                  x="6"
+                  y={THR_MID - 15}
+                  width="44"
+                  height="30"
+                  rx="15"
+                  fill="var(--trail-fill)"
+                  stroke="var(--trail-edge)"
+                  strokeWidth="2.6"
+                />
+                {[-3.5, 3.5].map((dx) =>
+                  [-3.5, 3.5].map((dy) => (
+                    <rect
+                      key={`${dx}${dy}`}
+                      x={28 + dx - 1.5}
+                      y={THR_MID + dy - 1.5}
+                      width="3"
+                      height="3"
+                      rx="1"
+                      fill="#ffffff"
+                    />
+                  )),
+                )}
+              </g>
             </g>
           </svg>
         </div>
@@ -1225,14 +1289,6 @@ export function MemoryPlayer({
           <span className="memplay__time">{fmtClock(elapsed).replace(':', ' : ')}</span>
           <span className="memplay__clocklabel">czas wyprawy</span>
         </div>
-      </div>
-
-      {/* gdzie jestes w wyprawie: tego dotad nie bylo nigdzie */}
-      <div className="memplay__bar" aria-hidden="true">
-        <span
-          className="memplay__barfill"
-          style={{ transform: `scaleX(${Math.max(0, Math.min(1, progress))})` }}
-        />
       </div>
 
       {openMark && (

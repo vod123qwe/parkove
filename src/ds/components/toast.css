@@ -16,6 +16,13 @@
   animation: pk-toast-in 280ms var(--ease-out);
 }
 
+/* jedzie za palcem, gdy ciagniesz go w dol; bez animacji, bo to sledzenie */
+.pk-toast.-pulled {
+  transform: translateY(var(--pk-toast-pull, 0px));
+  animation: none;
+  transition: none;
+}
+
 .pk-toast.-closing {
   animation: pk-toast-out 220ms var(--ease-out) forwards;
   pointer-events: none;

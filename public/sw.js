@@ -17,6 +17,10 @@ const TILE_HOSTS = [
   'tiles.openfreemap.org',
   'server.arcgisonline.com',
   'services.arcgisonline.com',
+  // polska ortofotomapa: domyslne zdjecie od 0.78, wiec MUSI tu byc.
+  // Bez tego kafle w ogole nie wchodzily do cache i mapa w dolinie bez zasiegu
+  // nie mialaby z czego sie zlozyc
+  'mapy.geoportal.gov.pl',
   // elevation, for the relief look
   's3.amazonaws.com',
 ]

@@ -3,7 +3,12 @@
 
 :root {
   /* a traveller's hand, for notes left on the map */
-  --font-hand: 'Kalam', 'Caveat', cursive;
+  /*
+   * Reka: Patrick Hand (wybor Jarka). Ma jedna grubosc, wiec wszedzie, gdzie
+   * ten krój wchodzi, waga jest 400: proszenie o 700 daje sztuczny pogrubiony
+   * obrys, a nie inny krój. Kalam zostaje jako zapas, bo byl tu wczesniej.
+   */
+  --font-hand: 'Patrick Hand', 'Kalam', 'Caveat', cursive;
   --font-display: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
   --font-text: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;

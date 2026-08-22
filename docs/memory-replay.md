@@ -221,3 +221,31 @@ Wszystkie pięć form, każda z osobna, na zasianej wyprawie w Dolinie Będkowsk
 punkt ze zdjęciem, punkt bez zdjęcia, polaroid z podpisem, notatka jako cytat i
 nagranie z falą. Do tego obie osie rozejrzenia się (kurs 3 → 51 → −40 stopni,
 kąt 58 → 44 → 60) i to, że karta zostaje na postoju.
+
+## Poprawki po pierwszym teście na telefonie
+
+**Kafle ortofotomapy nie były cache'owane.** Service worker trzyma listę hostów
+kafelków i Geoportalu na niej nie było, więc od chwili, w której ortofoto stało
+się domyślne, kafle szły obok cache i dolina bez zasięgu nie miała z czego się
+złożyć. To jest winowajca mapy, która się nie ładowała.
+
+**Ręczne pismo to Patrick Hand.** Ma jedną grubość, więc wszędzie, gdzie kod
+prosił o 700, prosi teraz o 400: pojedyncza grubość poproszona o pogrubienie daje
+sztuczny obrys, a nie inny krój.
+
+**Zdjęcie ląduje, a nie przeskakuje.** Przyczyna nie była w animacji karty:
+wjeżdżała ona dokładnie w tej samej chwili, w której cztery warstwy
+`backdrop-filter` zmieniały krycie, a przenikanie rozmycia to najdroższa rzecz,
+jaką telefon może robić. Rozmycie ma teraz własny, krótszy przedział czasu i
+wchodzi **po** ruchu karty.
+
+**Wypychanie.** Gdy dwa wspomnienia leżą blisko siebie, stare odjeżdża w górę,
+maleje i gaśnie za nowym, zamiast podmieniać treść w miejscu.
+
+**Morph rączki dzieje się pod palcem** i wraca po zwolnieniu, jednym transformem
+CSS na grupie: geometria SVG jako własność CSS nie jest wszędzie animowalna, a
+transform jest i idzie po stronie kompozytora. Krzywa ma lekki wyskok, więc
+zwolnienie jest odbiciem, nie samym powrotem.
+
+**Włos postępu usunięty** na życzenie Jarka. Argumentowałem za nim („nie ma jak
+poznać, ile zostało"), ale to jego ekran i jego decyzja.

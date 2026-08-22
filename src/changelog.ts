@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.81.0'
+export const VERSION = '0.82.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,21 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.82.0',
+    date: '2026-08-22',
+    title: 'Aerial tiles are cached again, and a memory lands instead of cutting',
+    changes: [
+      ['fixed', 'The Polish aerial tiles were not being cached at all. The service worker keeps a list of tile hosts and the Geoportal was never added to it, so from the moment the aerial map became the default the tiles went straight past the cache and a valley with no signal had nothing to draw from. This is the one to blame for a map that would not load today'],
+      ['changed', 'Handwriting is Patrick Hand now, in notes on the walk, in a memory and in the viewer. It has a single weight, so every place that used to ask for bold now asks for regular: asking a single-weight face for bold gets you a synthetic outline, not a different face'],
+      ['changed', 'A photograph lands rather than cuts. There was one cause and it was not the animation: the card arrived in the same instant that four layers of backdrop blur changed opacity, and cross fading blur is the most expensive thing a phone can do. The blur now has its own shorter window and starts after the card has moved'],
+      ['added', 'When two memories fall close together the older one is pushed out rather than swapped in place: it drifts up, shrinks and fades behind the new one, like a photograph put down on a pile'],
+      ['changed', 'The handle on the speed control squashes and stretches under your finger and springs back when you let go, with a ring that lights while you hold it. It is also aligned to the layers button above it, by arithmetic rather than by eye'],
+      ['changed', 'The recording preview is quieter and has air on both sides. The waveform stays, because it is the only thing that says anything about a recording, but it does not need to reach the edges'],
+      ['added', 'A notice can be dismissed by swiping it down. It arrives from the bottom, so leaving downwards is the same movement in reverse and there is nothing to learn. The cross stays but is no longer the only way out, and it was the smallest target in the whole thing'],
+      ['changed', 'The progress hairline is gone from the memory screen, at Jarek request'],
+    ],
+  },
   {
     version: '0.81.0',
     date: '2026-08-22',
