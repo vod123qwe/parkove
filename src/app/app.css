@@ -1385,6 +1385,231 @@
   margin: 0;
 }
 
+/* ---- sprawdzanie rosliny na pelnym ekranie ---- */
+
+.plantcam {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #050704;
+  overflow: hidden;
+}
+
+.plantcam__view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plantcam__close {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4));
+  left: var(--sp-4);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(6 12 6 / 0.45);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* pasek spustu: kolko na srodku, powtorka po lewej, podpowiedz pod spodem */
+.plantcam__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-6);
+}
+
+.plantcam__retake {
+  grid-column: 1;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * Spust jak w iOS: biały pierścień z wypełnieniem w środku. Po zdjęciu ten sam
+ * krążek robi się zielony z ptaszkiem, a w trakcie sprawdzania kręci się.
+ * Jedno miejsce na ekranie, trzy znaczenia, więc palec nie musi szukać.
+ */
+.plantcam__shutter {
+  grid-column: 2;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  border: 4px solid rgb(255 255 255 / 0.9);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.92);
+  color: #0b1207;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 120ms ease;
+}
+
+.plantcam__shutter:active {
+  transform: scale(0.94);
+}
+
+.plantcam__shutter.-ok {
+  background: var(--bg-lime);
+  border-color: rgb(255 255 255 / 0.75);
+  color: #14250c;
+}
+
+.plantcam__shutter.-busy {
+  background: transparent;
+  border-color: rgb(255 255 255 / 0.25);
+  border-top-color: var(--bg-lime);
+  animation: plantcam-spin 800ms linear infinite;
+  cursor: default;
+}
+
+@keyframes plantcam-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.plantcam__hint {
+  grid-column: 1 / -1;
+  color: rgb(255 255 255 / 0.8);
+  text-align: center;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.6);
+}
+
+/* wynik: tam, gdzie patrzyles, na rozmytym i przyciemnionym tle */
+.plantcam__result {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: var(--sp-5) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-5));
+  background: rgb(6 12 6 / 0.62);
+  backdrop-filter: blur(14px);
+  color: #ffffff;
+}
+
+.plantcam__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+.plantcam__score {
+  margin: 0;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.plantcam__other {
+  margin: var(--sp-2) 0 0;
+  color: rgb(255 255 255 / 0.62);
+}
+
+.plantcam__actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 0;
+}
+
+.plantcam__act {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 46px;
+  padding: 0 var(--sp-3);
+  border: 1px solid rgb(255 255 255 / 0.28);
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  background: rgb(255 255 255 / 0.1);
+  color: #ffffff;
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.plantcam__act.-save {
+  background: var(--bg-lime);
+  border-color: var(--bg-lime);
+  color: #14250c;
+}
+
+.plantcam__error {
+  position: absolute;
+  left: var(--sp-5);
+  right: var(--sp-5);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  z-index: 3;
+  padding: var(--sp-5);
+  border-radius: 18px;
+  corner-shape: var(--corner-smooth);
+  background: rgb(6 12 6 / 0.72);
+  backdrop-filter: blur(12px);
+  color: #ffffff;
+}
+
+.plantcam__error p {
+  margin: 0 0 var(--sp-2);
+}
+
+.plantcam__file {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--sp-2);
+  padding: 0 var(--sp-4);
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-lime);
+  color: #14250c;
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.plantcam__file input {
+  display: none;
+}
+
 /* ---- przewodnik ---- */
 
 .guide__lead {

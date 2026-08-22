@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { CarFront, Mic, Navigation, Plus, Sparkles, Square, StickyNote, X } from 'lucide-react'
+import { CarFront, Leaf, Mic, Navigation, Plus, Sparkles, Square, StickyNote, X } from 'lucide-react'
 import { Button } from '../ds'
 import { useGameState } from './state'
 import { questForPark } from './data/quests'
@@ -41,6 +41,7 @@ export function ExpeditionBar({
   onMark,
   onOpenPoints,
   onOpenGuide,
+  onCheckPlant,
   spotCard,
   targetId,
   heading,
@@ -55,6 +56,8 @@ export function ExpeditionBar({
   onOpenPoints?: () => void
   /** rozmowa z przewodnikiem; zajęła miejsce listy punktów w pasku */
   onOpenGuide?: () => void
+  /** pełnoekranowa kamera do sprawdzania roślin */
+  onCheckPlant?: () => void
   /** wybrana kawiarnia albo plac zabaw: zajmuje miejsce karty „co dalej" */
   spotCard?: ReactNode
   /** mały cel wybrany z listy punktów: wypiera automatyczny „najbliższy" */
@@ -225,6 +228,24 @@ export function ExpeditionBar({
             >
               Nagraj wspomnienie
             </Button>
+            {/*
+              Sprawdzanie rośliny mieszka w tym menu, choć nie jest wspomnieniem:
+              zaczyna się tym samym gestem, czyli zdjęciem czegoś, co masz przed
+              sobą. Otwiera własną kamerę na pełnym ekranie, nie zwykły aparat.
+            */}
+            {onCheckPlant && (
+              <Button
+                className="app-addmenu__item"
+                style={{ '--rise': 2.5, '--sink': 2 } as CSSProperties}
+                icon={<Leaf size={20} />}
+                onClick={() => {
+                  shut()
+                  onCheckPlant()
+                }}
+              >
+                Sprawdź roślinę
+              </Button>
+            )}
             {/*
               Auto nie jest wspomnieniem, ale mieszka w tym samym menu, bo to
               też „rzecz zostawiona sobie na później". Jedno auto na wyprawę:

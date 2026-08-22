@@ -74,6 +74,35 @@ konta.
 
 Gdy coś nie działa, `npm run plant:log` pokazuje na żywo, co Worker odpowiada.
 
+## Pełnoekranowa kamera (od 0.71.0)
+
+Główna droga to własna kamera, nie systemowy aparat. Wejście: menu „+" w trakcie
+wyprawy, pozycja **Sprawdź roślinę**.
+
+Przepływ zamówiony przez Jarka:
+
+1. **Kamera na cały ekran** z podglądem na żywo i spustem jak w iOS: biały
+   pierścień na dole, krzyżyk do zamknięcia w lewym górnym rogu.
+2. Zdjęcie zamraża kadr, a **ten sam krążek zamienia się w zielony ptaszek**.
+   Obok pojawia się strzałka powrotu, czyli „zrób jeszcze raz".
+3. Dotknięcie ptaszka robi z niego **loader** i wysyła zdjęcie.
+4. Wynik pojawia się **w tym samym miejscu**: nazwa, pewność w procentach,
+   rodzina, ile pytań zostało na dziś i dwie pozostałe propozycje modelu. Tło
+   panelu jest przyciemnione i rozmyte, żeby dało się to przeczytać na każdym
+   zdjęciu.
+5. Trzy wyjścia: **Jeszcze raz**, **Zapisz w wyprawie** (rozpoznanie ląduje w
+   dzienniku jako zdjęcie z podpisem) i **Zamknij**.
+
+Jedno kółko, trzy znaczenia, jedno miejsce na ekranie: palec nie musi szukać.
+
+**Gdy nie ma dostępu do kamery** (odmowa uprawnienia, brak urządzenia) spadamy na
+systemowy aparat przez zwykły input z plikiem. Ta droga miała błąd wyłapany w
+testach: komunikat o kamerze zostawał na ekranie razem z ukrytym spustem, więc po
+zrobieniu zdjęcia nie było czym potwierdzić. Teraz komunikat znika, gdy zdjęcie
+już jest.
+
+Kamera jest zamykana razem z oknem: inaczej dioda aparatu zostaje zapalona.
+
 ## Jak to działa w aplikacji
 
 Zdjęcie robisz jak zawsze, w trakcie wyprawy. W karcie zdjęcia jest przycisk

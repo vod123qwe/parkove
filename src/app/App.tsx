@@ -15,6 +15,8 @@ import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
 import { MapFilters } from './MapFilters'
 import { GuideSheet } from './GuideSheet'
+import { PlantCamera } from './PlantCamera'
+import { plantEnabled } from './plant'
 import type { GuideTurn } from './GuideSheet'
 import { askEnabled } from './ask'
 import { getWeather } from './weather'
@@ -32,7 +34,7 @@ import { AppearanceModal, MapStyleModal } from './SettingsModals'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
 import { MarkSheet } from './MarkSheet'
-import { updateMark, useMarks } from './photos'
+import { updateMark, useMarks, addMark } from './photos'
 import { RevealSheet } from './RevealSheet'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
@@ -123,6 +125,8 @@ export function App() {
   const [guideThread, setGuideThread] = useState<GuideTurn[]>([])
   const [guidePoi, setGuidePoi] = useState<QuestPoi | null>(null)
   const [guideWeather, setGuideWeather] = useState<Weather | null>(null)
+  /* pelnoekranowa kamera do sprawdzania roslin */
+  const [plantCam, setPlantCam] = useState(false)
   /* małe cele w terenie: lista punktów wyprawy i wybrany z niej cel */
   const [pointsOpen, setPointsOpen] = useState(false)
   const [targetPoiId, setTargetPoiId] = useState<string | null>(null)
@@ -689,6 +693,7 @@ export function App() {
             onPhoto={setPhotoAdded}
             onMark={setPhotoId}
             onOpenPoints={expeditionQuest ? () => setPointsOpen(true) : undefined}
+            onCheckPlant={plantEnabled() ? () => setPlantCam(true) : undefined}
             onOpenGuide={
               askEnabled()
                 ? () => {
@@ -955,6 +960,26 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
+      <PlantCamera
+        open={plantCam}
+        onClose={() => setPlantCam(false)}
+        onSave={
+          expedition
+            ? (blob, caption) => {
+                /* rozpoznanie zostaje w dzienniku wyprawy jako zdjecie z podpisem */
+                void addMark({
+                  kind: 'photo',
+                  parkId: expedition.parkId,
+                  journeyId: expedition.id,
+                  coords: expedition.where?.coords ?? expedition.track[expedition.track.length - 1],
+                  caption,
+                  blob,
+                })
+              }
+            : undefined
+        }
+      />
+
       <GuideSheet
         open={guideOpen}
         onClose={() => setGuideOpen(false)}

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.70.0'
+export const VERSION = '0.71.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.71.0',
+    date: '2026-08-22',
+    title: 'Point the camera at a leaf',
+    changes: [
+      ['added', 'Check a plant is its own item in the plus menu during a walk, and it opens a full screen camera rather than the system one, so the whole thing happens in one window: live view, an iOS style shutter ring at the bottom, a cross to close in the corner'],
+      ['added', 'One circle, three meanings, one place on the screen so a finger does not have to hunt: the white ring takes the photo, the same circle becomes a green tick that sends it, and while it waits it turns into a spinner'],
+      ['added', 'The answer appears where you were already looking: name, confidence, family, how many identifications are left today and the two runner up guesses, on a dimmed and blurred panel so it reads over any photograph. Three ways out: take another, save it into the walk as a photo with the name as its caption, or close'],
+      ['fixed', 'The fallback path had a dead end, found in testing: when the camera is refused we offer the system camera, but the notice stayed on screen together with a hidden shutter, so after taking the photo there was nothing to confirm with'],
+    ],
+  },
   {
     version: '0.70.0',
     date: '2026-08-22',
