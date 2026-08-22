@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.65.0'
+export const VERSION = '0.65.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,14 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.65.1',
+    date: '2026-08-22',
+    title: 'A source that is not a link no longer takes the whole card down',
+    changes: [
+      ['fixed', 'The five new points in the valleys describe where their numbers come from instead of linking somewhere, and the card ran every source through new URL(), which throws on plain text and took the entire point card with it. Sources that are addresses still become links; the rest are printed as they are'],
+    ],
+  },
   {
     version: '0.65.0',
     date: '2026-08-22',

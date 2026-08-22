@@ -7,6 +7,15 @@ import { asset } from './assets'
 
 const MODE_KEY = 'pk-story-mode'
 
+/** nazwa hosta, gdy źródło jest adresem; null, gdy to zwykły opis */
+function urlHost(s: string) {
+  try {
+    return new URL(s).hostname.replace('www.', '')
+  } catch {
+    return null
+  }
+}
+
 /** full-screen point card: photos and the whole story, readable anytime */
 export function PoiModal({
   poi,
@@ -117,12 +126,26 @@ export function PoiModal({
           {poi.sources && poi.sources.length > 0 && (
             <p className="t-caption poi-sources">
               Źródła:{' '}
-              {poi.sources.map((s, i) => (
-                <a key={s} href={s} target="_blank" rel="noreferrer">
-                  {new URL(s).hostname.replace('www.', '')}
-                  {i < poi.sources!.length - 1 ? ', ' : ''}
-                </a>
-              ))}
+              {poi.sources.map((s, i) => {
+                const sep = i < poi.sources!.length - 1 ? ', ' : ''
+                /*
+                 * Źródło nie musi być linkiem. Część punktów opisuje, skąd wzięte
+                 * są liczby („OpenStreetMap: Wielka Turnia, 45 m, 55 dróg"), a
+                 * new URL() na takim tekście rzuca wyjątkiem i zabierał całą kartę.
+                 */
+                const host = urlHost(s)
+                return host ? (
+                  <a key={s} href={s} target="_blank" rel="noreferrer">
+                    {host}
+                    {sep}
+                  </a>
+                ) : (
+                  <span key={s}>
+                    {s}
+                    {sep}
+                  </span>
+                )
+              })}
             </p>
           )}
         </>
