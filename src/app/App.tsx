@@ -26,7 +26,7 @@ import { SKY_ICONS } from './skyIcons'
 import { TRAIL_INK, trailById, trailsFor } from './data/trails'
 import { AmenityModal } from './AmenityModal'
 import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekContents'
-import { ChallengesModal } from './ChallengesModal'
+import { AchievementsModal } from './AchievementsModal'
 import { StampCelebration } from './StampCelebration'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
@@ -1210,20 +1210,18 @@ export function App() {
             }}
           />
           {/*
-            "Wyzwania", nie "Album" (Jarek, 2026-08-22). Album obiecywal miejsce
-            do patrzenia i tyle: siatka pieczatek nie mowila, co mozna zrobic
-            dalej. Wyzwania mowia, a pieczatki zostaly sekcja na dole tego samego
-            ekranu, wiec nic nie zginelo i nadal jest jedna polka na pytanie
-            "co zdobylem".
+            "Osiagniecia", po drodze przez "Pieczatki", "Album" i "Wyzwania"
+            (Jarek, 2026-08-22). Ostatnia nazwa byla zla z tego samego powodu, co
+            pierwsza: mowila o JEDNYM rodzaju, a w srodku sa dwa rowne sobie.
+            Osiagniecie jest parasolem, pieczatka i wyzwanie sa jego rodzajami,
+            i dlatego siedza w dwoch zakladkach, a nie jedno pod drugim.
           */}
           <ListItem
             icon={<Award />}
-            title="Wyzwania"
-            meta={
-              challengeDone > 0
-                ? `${challengeDone} z ${CHALLENGES.length} zrobionych`
-                : `${CHALLENGES.length} rzeczy do zrobienia, plus pieczątki`
-            }
+            title="Osiągnięcia"
+            meta={`${completedIds.size} ${
+              completedIds.size === 1 ? 'pieczątka' : completedIds.size < 5 ? 'pieczątki' : 'pieczątek'
+            }, ${challengeDone} z ${CHALLENGES.length} wyzwań`}
             trailing={<ChevronRight size={18} />}
             onClick={() => {
               setMenuOpen(false)
@@ -1367,7 +1365,7 @@ export function App() {
           onPick={pickAmenity}
         />
       )}
-      <ChallengesModal
+      <AchievementsModal
         open={stampsOpen}
         onClose={() => setStampsOpen(false)}
         /* z kolekcji wchodzimy w kartę pieczątki: to tam jest napisane, za co jest */

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.86.0'
+export const VERSION = '0.86.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -41,11 +41,23 @@ export function changesSince(from: string) {
 
 export const CHANGELOG: Release[] = [
   {
+    version: '0.86.1',
+    date: '2026-08-22',
+    title: 'Achievements, in two tabs',
+    tldr:
+      'Osiągnięcia: pieczątki i wyzwania w zakładkach.',
+    changes: [
+      ['changed', 'The shelf is called Achievements now, and inside it stickers and challenges sit in two tabs. Both earlier names were wrong the same way: they named one of the two things in there. An achievement is the umbrella and a sticker and a challenge are two kinds of it, equal to each other'],
+      ['fixed', 'Putting the stickers underneath the challenges was worse than it looked: one of two equal things was hidden below the other, and you had to scroll past twenty six rows to see any of it. Stickers come first in the tabs, because you come here to look and a list with progress bars is for reading'],
+      ['changed', 'Each tab carries its own count, so choosing one is not a guess'],
+    ],
+  },
+  {
     version: '0.86.0',
     date: '2026-08-22',
     title: 'Challenges instead of the album',
     tldr:
-      '26 wyzwań zamiast Albumu, pieczątki w środku.',
+      '26 wyzwań zamiast Albumu.',
     changes: [
       ['added', 'Twenty six challenges in place of the album, in four groups: places, points, walks and traces. Every one of them is a function of what the app already knows, so nothing is tracked twice, nothing can be forgotten, and they count backwards: everything you walked before they existed counts from the first time you open the screen'],
       ['changed', 'The album is gone as a screen but the stickers are not: they sit as the last section of Challenges. One shelf now answers the whole question of what you have earned, and a sticker stays what it was, the identity of a place rather than a reward for a challenge'],

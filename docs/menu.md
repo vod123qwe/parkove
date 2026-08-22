@@ -32,10 +32,23 @@ Menu jest hubem z trzema półkami. Każda odpowiada na inne pytanie:
 w pół drogi: obiecywał miejsce do patrzenia i tyle, a siatka pieczątek nie mówiła
 nic o tym, co można zrobić dalej. Jarek: „zamiast albumu powinny być wyzwania".
 
-Wyzwań jest 26, w czterech grupach (miejsca, punkty, wyprawy, ślady), a **pieczątki
-nie zniknęły**: leżą sekcją na dole tego samego ekranu. Jedna półka odpowiada
-więc na całe pytanie „co zdobyłem", a pieczątka zostaje tym, czym była, czyli
-tożsamością miejsca, a nie nagrodą za wyzwanie.
+Docelowa nazwa to jednak **„Osiągnięcia"**, a w środku dwie zakładki: pieczątki i
+wyzwania. Jarek: „to też powinny być taby, pierwszy to pieczątki, a drugi
+wyzwania, a zakładka powinna nazywać się osiągnięcia".
+
+To jest właściwa hierarchia i obie wcześniejsze nazwy były złe w ten sam sposób:
+**nazywały jedną z dwóch rzeczy, które tam są**. Osiągnięcie jest parasolem, a
+pieczątka i wyzwanie to dwa jego rodzaje, równe sobie.
+
+Wersja z pieczątkami dorzuconymi jako ostatnia sekcja Wyzwań była przy tym gorsza,
+niż wyglądała: jedna z dwóch równych rzeczy była **schowana pod drugą**, bo trzeba
+było przewinąć 26 wierszy, żeby zobaczyć naklejki.
+
+Pieczątki są pierwsze, bo są obrazkiem: wchodzisz tu, żeby popatrzeć, a lista z
+paskami postępu jest do czytania. Każda zakładka nosi swoją liczbę, więc wybór nie
+jest w ciemno.
+
+Wyzwań jest 26, w czterech grupach: miejsca, punkty, wyprawy, ślady.
 
 Dwie decyzje warte zapisania:
 
