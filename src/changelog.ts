@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.63.0'
+export const VERSION = '0.64.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.64.0',
+    date: '2026-08-22',
+    title: 'Round is what you came for, square is what serves you',
+    changes: [
+      ['changed', 'Parkings, food and playgrounds are rounded squares now, quest points and everything you left behind stay circles. They used to differ from each other only by the shade of a dark disc, and on satellite imagery of a forest a shade only reads up close: from a distance everything was a dark circle. Shape reads instantly at any size, so it carries the important split and colour can fill in the rest'],
+      ['changed', 'The icons on service pins are brighter, so their hue is visible on the tile rather than after zooming in'],
+      ['changed', 'Size says how much something matters. A parking used to be the largest thing on the map, larger than the point you drove here for. Services stepped down; quest points did not move'],
+      ['fixed', 'The walked track has a white halo under it. The track is dark olive and it simply disappeared on a forest: a dark line on a dark background. The colour stays, so it still cannot be confused with the lime trail, because a trail is a suggestion and a track is a record'],
+    ],
+  },
   {
     version: '0.63.0',
     date: '2026-08-22',

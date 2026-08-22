@@ -478,6 +478,7 @@ export function MapView({
       'parks-line-shared',
       'trail-casing',
       'trail-line',
+      'track-casing',
       'track-line',
       'track-gap',
       'me-halo-fill',
@@ -617,6 +618,20 @@ export function MapView({
         },
       })
       map.addSource('track', { type: 'geojson', data: trackFC(trackRef.current) as never })
+      /*
+       * Biała obwódka pod śladem. Ślad jest ciemną oliwką (--map-track) i na
+       * zdjęciu satelitarnym lasu po prostu ginął: ciemna linia na ciemnym tle.
+       * Jasna otoczka pod nią czyta się na każdym podłożu, a sam kolor śladu
+       * zostaje, więc nie mieszamy go z limonkowym szlakiem, który jest
+       * podpowiedzią, nie zapisem.
+       */
+      map.addLayer({
+        id: 'track-casing',
+        type: 'line',
+        source: 'track',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': '#ffffff', 'line-width': 6.5, 'line-opacity': 0.7 },
+      })
       map.addLayer({
         id: 'track-line',
         type: 'line',
@@ -689,7 +704,12 @@ export function MapView({
         source: 'parking',
         layout: {
           'icon-image': pinImageId('parking', 'parking'),
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11, 0.24, 14, 0.34, 17, 0.46] as never,
+          /*
+           * Mniejszy od punktu wyprawy. Dotad parking byl najwieksza rzecza na
+           * mapie, wieksza od celu, po ktory sie tu przyjechalo. Usluga ma sie
+           * cofnac o krok: kwadrat mowi, czym jest, rozmiar mowi, ile znaczy.
+           */
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11, 0.18, 14, 0.27, 17, 0.36] as never,
           'icon-allow-overlap': true,
         },
       })
@@ -730,11 +750,11 @@ export function MapView({
             ['linear'],
             ['zoom'],
             12,
-            ['case', ['boolean', ['get', 'active'], false], 0.29, 0.2],
+            ['case', ['boolean', ['get', 'active'], false], 0.27, 0.17],
             15,
-            ['case', ['boolean', ['get', 'active'], false], 0.44, 0.3],
+            ['case', ['boolean', ['get', 'active'], false], 0.42, 0.26],
             17,
-            ['case', ['boolean', ['get', 'active'], false], 0.58, 0.4],
+            ['case', ['boolean', ['get', 'active'], false], 0.56, 0.34],
           ] as never,
           'icon-allow-overlap': true,
         },
@@ -800,6 +820,7 @@ export function MapView({
       for (const layer of [
         'trail-casing',
         'trail-line',
+        'track-casing',
         'track-line',
         'track-gap',
         'me-halo-fill',

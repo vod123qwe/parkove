@@ -84,3 +84,32 @@ od 50 procent w najbliższych sześciu godzinach.
 - **Pierścień postępu zniknął z wiersza.** Ten sam powód, co przy karcie
   podglądu: postęp stoi w tym samym wierszu słowami („2 z 5 punktów"), a pusty
   pierścień nie mówił nic o miejscu. Stopnie mówią.
+
+## Język pinów: okrągłe kontra kwadratowe
+
+Problem był taki, że parking, kawa i plac zabaw różniły się od punktów wyprawy
+tylko odcieniem ciemnego krążka, a na zdjęciu satelitarnym lasu odcień widać
+dopiero z bliska. Z daleka wszystko było „ciemnym kółkiem".
+
+Zasada, od 2026-08-22:
+
+- **Okrągłe jest to, po co przyszedłeś**: punkty wyprawy, pieczątki, twoje
+  zdjęcia, notatki i auto.
+- **Kwadratowe (mocno zaokrąglone) jest to, co ci służy**: parking, jedzenie,
+  plac zabaw.
+
+Kształt czyta się natychmiast i w każdym rozmiarze, więc niesie najważniejszy
+podział, a odcień może dopowiadać resztę: niebieski parking, ambrowe jedzenie,
+fioletowy plac zabaw. Znaki na pinach usług **rozjaśnione** (F75, Y78, B78
+zamiast F88, Y88, B84), bo odcień ma być widoczny na kaflu, nie po powiększeniu.
+
+**Rozmiar mówi, ile coś znaczy.** Parking był dotąd największą rzeczą na mapie,
+większą od celu, po który się tu przyjechało. Usługi zjechały o krok w dół
+(0,18 do 0,36 zamiast 0,24 do 0,46), punkty wyprawy zostały bez zmian.
+
+## Ślad z białą obwódką
+
+Ślad wyprawy jest ciemną oliwką (`--map-track`) i na zdjęciu satelitarnym lasu
+po prostu ginął: ciemna linia na ciemnym tle. Pod nim leży teraz biała otoczka
+(6,5 px, 70 procent), która czyta się na każdym podłożu. Sam kolor śladu zostaje,
+więc nie miesza się z limonkowym szlakiem: **szlak to podpowiedź, ślad to zapis**.

@@ -57,6 +57,18 @@ export type PinVariant =
 
 const SIZE = 96 // rendered at 2x of the on-map size
 
+/*
+ * Usługi dostają kwadrat, gra zostaje okrągła.
+ *
+ * Problem był taki: parking, kawa i plac zabaw różniły się od punktów wyprawy
+ * tylko odcieniem ciemnego krążka, a na zdjęciu satelitarnym lasu odcień widać
+ * dopiero z bliska. Z daleka wszystko było „ciemnym kółkiem". Kształt czyta się
+ * natychmiast i w każdym rozmiarze, więc niesie teraz najważniejszy podział:
+ * okrągłe jest to, po co przyszedłeś (punkty, pieczątki, twoje ślady),
+ * kwadratowe to, co ci służy (parking, jedzenie, plac zabaw).
+ */
+const SQUARE: PinVariant[] = ['parking', 'food', 'playground']
+
 /** an SVG pin: round badge with the category icon, styled from DS colours */
 function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, string>) {
   // practical categories get their own hue so they read apart from nature green
@@ -86,6 +98,11 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
     themed[variant] ?? [colors.trailFill, colors.paper, colors.trailIcon]
   const ring = variant === 'active' ? 6 : 4.5
   const r = SIZE / 2 - ring
+  const square = SQUARE.includes(variant)
+  /* kwadrat z zaokrągleniem tak dużym, żeby nie kłócił się z resztą interfejsu */
+  const badge = square
+    ? `<rect x="${ring}" y="${ring}" width="${SIZE - ring * 2}" height="${SIZE - ring * 2}" rx="${SIZE * 0.27}" fill="${fill}" stroke="${stroke}" stroke-width="${ring * 1.6}"/>`
+    : `<circle cx="${SIZE / 2}" cy="${SIZE / 2}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${ring * 1.6}"/>`
   // mniejszy znak w tym samym krążku: spokojniej czyta się na zdjęciu
   const iconScale = 1.72
   const iconOffset = (SIZE - 24 * iconScale) / 2
@@ -99,7 +116,7 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   </g>`
       : ''
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
-  <circle cx="${SIZE / 2}" cy="${SIZE / 2}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${ring * 1.6}"/>
+  ${badge}
   <g transform="translate(${iconOffset} ${iconOffset}) scale(${iconScale})" fill="none" stroke="${icon}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     ${paths.map((d) => `<path d="${d}"/>`).join('')}
   </g>
