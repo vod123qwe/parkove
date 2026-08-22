@@ -28,11 +28,24 @@ Menu jest hubem z trzema półkami. Każda odpowiada na inne pytanie:
 
 ## Nazwy, które się zmieniły
 
-**„Pieczątki" to teraz „Album"** (Jarek pytał o inną nazwę). Pieczątki opisują
-mechanikę, czyli że coś przybijasz. Album obiecuje miejsce, do którego się wraca
-i **patrzy**, a te ilustracje są właśnie do patrzenia, nie do odhaczania. Przy
-okazji album kojarzy się z naklejkami z dzieciństwa, co jest tonem, o który
-chodzi przy dziecku. Podpis: „Naklejki z odwiedzonych miejsc".
+**„Pieczątki" to teraz „Wyzwania"**, po drodze przez „Album". Album był krokiem
+w pół drogi: obiecywał miejsce do patrzenia i tyle, a siatka pieczątek nie mówiła
+nic o tym, co można zrobić dalej. Jarek: „zamiast albumu powinny być wyzwania".
+
+Wyzwań jest 26, w czterech grupach (miejsca, punkty, wyprawy, ślady), a **pieczątki
+nie zniknęły**: leżą sekcją na dole tego samego ekranu. Jedna półka odpowiada
+więc na całe pytanie „co zdobyłem", a pieczątka zostaje tym, czym była, czyli
+tożsamością miejsca, a nie nagrodą za wyzwanie.
+
+Dwie decyzje warte zapisania:
+
+- **każde wyzwanie jest funkcją tego, co apka i tak wie** (odwiedziny, punkty,
+  wyprawy, zdjęcia, notatki, nagrania, odpowiedzi na dylematy). Nic nie jest
+  liczone osobno, więc nie ma czego zapominać ani psuć przy migracji, a wyzwania
+  **działają wstecz**: to, co przeszliście wcześniej, liczy się od pierwszego
+  wejścia,
+- **nic nie wygasa.** Wyzwanie, które przepada w niedzielę, zamienia zabawę w
+  obowiązek. Przy dziecku to ważne: można wrócić po miesiącu i doliczyć swoje.
 
 **„Hej [imię]" to teraz „Moje liczby"**, a profil-worek przestał istnieć. Jego
 zawartość rozeszła się tam, gdzie należy: liczby i zdjęcia do „Moich liczb",

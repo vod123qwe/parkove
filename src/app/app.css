@@ -5291,3 +5291,104 @@
   color: #ffffff;
   cursor: pointer;
 }
+
+/* ---- wyzwania ---- */
+
+.chal__title {
+  margin: var(--sp-8) 0 var(--sp-2);
+  color: var(--content-primary);
+}
+
+.chal__list {
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * Wiersz wyzwania. Ten sam jezyk, co lista wypraw: przezroczyste tlo, wlos
+ * miedzy wierszami, powietrze. Znacznik po lewej jest jednoczesnie licznikiem,
+ * bo dwie rzeczy obok siebie mowilyby to samo.
+ */
+.chal {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-2);
+}
+
+.chal + .chal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(34px + var(--sp-4) + var(--sp-2));
+  right: var(--sp-2);
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.chal__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-sunken);
+  color: var(--content-secondary);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chal.-done .chal__mark {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+/* zrobione schodzi z pierwszego planu, ale nie znika: to jest lista osiagniec */
+.chal.-done .chal__name {
+  color: var(--content-secondary);
+}
+
+.chal.-done .chal__hint {
+  display: none;
+}
+
+.chal__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.chal__name {
+  color: var(--content-primary);
+}
+
+.chal__hint {
+  margin-top: 2px;
+  color: var(--content-tertiary);
+}
+
+.chal__track {
+  display: block;
+  height: 4px;
+  margin-top: var(--sp-3);
+  border-radius: 999px;
+  background: var(--bg-surface-sunken);
+  overflow: hidden;
+}
+
+.chal__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--bg-primary);
+}
+
+.chal__num {
+  flex: none;
+  padding-top: 2px;
+  color: var(--content-tertiary);
+  font-variant-numeric: tabular-nums;
+}

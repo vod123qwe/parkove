@@ -26,7 +26,7 @@ import { SKY_ICONS } from './skyIcons'
 import { TRAIL_INK, trailById, trailsFor } from './data/trails'
 import { AmenityModal } from './AmenityModal'
 import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekContents'
-import { StampsModal } from './StampsModal'
+import { ChallengesModal } from './ChallengesModal'
 import { StampCelebration } from './StampCelebration'
 import { ExpeditionController } from './ExpeditionController'
 import { ExpeditionBar } from './ExpeditionBar'
@@ -49,6 +49,7 @@ import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import { DownloadStatus } from './DownloadStatus'
+import { CHALLENGES, challengeStates } from './data/challenges'
 import type { MapStyleId } from './data/mapstyles'
 import { PARKING } from './data/parking'
 import { amenitiesFor, isFood } from './data/amenities'
@@ -67,7 +68,7 @@ type PeekPage =
   | { t: 'parking'; parking: ParkingInfo }
 
 export function App() {
-  const { parks: progress, expedition, trails: trailChoice, filters } = useGameState()
+  const { parks: progress, expedition, trails: trailChoice, filters, answers } = useGameState()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [peekIndex, setPeekIndex] = useState(0)
   const [expanded, setExpanded] = useState(false)
@@ -149,6 +150,7 @@ export function App() {
     }
   })
   const [mapStyle, setMapStyleState] = useState<MapStyleId>(getMapStyle)
+
 
   const pickMapStyle = (id: MapStyleId) => {
     setMapStyleState(id)
@@ -521,6 +523,22 @@ export function App() {
   const updateReady = useUpdateAvailable()
   const [updateHidden, setUpdateHidden] = useState(false)
   const walkMarks = useMarks()
+
+  /*
+   * Ile wyzwań zrobionych, na podpis w menu. Liczone tu, a nie w ekranie, bo
+   * podpis ma mówić coś, zanim tam wejdziesz: półka bez liczby to półka, na
+   * którą nie ma powodu zaglądać.
+   */
+  const challengeDone = useMemo(
+    () =>
+      challengeStates({
+        parks: progress,
+        journeys,
+        answers,
+        marks: walkMarks,
+      }).filter((c) => c.done).length,
+    [progress, journeys, answers, walkMarks],
+  )
 
   /*
    * Zdjęć konkretnej kawiarni czy placu zabaw nie ma w Wikimedia Commons i nie
@@ -1192,14 +1210,20 @@ export function App() {
             }}
           />
           {/*
-            "Album", nie "Pieczatki" (Jarek, 2026-08-22): piecztaki opisuja
-            mechanike, album obiecuje miejsce, do ktorego sie wraca i patrzy, a te
-            ilustracje sa do patrzenia.
+            "Wyzwania", nie "Album" (Jarek, 2026-08-22). Album obiecywal miejsce
+            do patrzenia i tyle: siatka pieczatek nie mowila, co mozna zrobic
+            dalej. Wyzwania mowia, a pieczatki zostaly sekcja na dole tego samego
+            ekranu, wiec nic nie zginelo i nadal jest jedna polka na pytanie
+            "co zdobylem".
           */}
           <ListItem
             icon={<Award />}
-            title="Album"
-            meta="Naklejki z odwiedzonych miejsc"
+            title="Wyzwania"
+            meta={
+              challengeDone > 0
+                ? `${challengeDone} z ${CHALLENGES.length} zrobionych`
+                : `${CHALLENGES.length} rzeczy do zrobienia, plus pieczątki`
+            }
             trailing={<ChevronRight size={18} />}
             onClick={() => {
               setMenuOpen(false)
@@ -1343,7 +1367,7 @@ export function App() {
           onPick={pickAmenity}
         />
       )}
-      <StampsModal
+      <ChallengesModal
         open={stampsOpen}
         onClose={() => setStampsOpen(false)}
         /* z kolekcji wchodzimy w kartę pieczątki: to tam jest napisane, za co jest */

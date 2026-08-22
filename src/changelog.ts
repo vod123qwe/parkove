@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.85.1'
+export const VERSION = '0.86.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.86.0',
+    date: '2026-08-22',
+    title: 'Challenges instead of the album',
+    tldr:
+      '26 wyzwań zamiast Albumu, pieczątki w środku.',
+    changes: [
+      ['added', 'Twenty six challenges in place of the album, in four groups: places, points, walks and traces. Every one of them is a function of what the app already knows, so nothing is tracked twice, nothing can be forgotten, and they count backwards: everything you walked before they existed counts from the first time you open the screen'],
+      ['changed', 'The album is gone as a screen but the stickers are not: they sit as the last section of Challenges. One shelf now answers the whole question of what you have earned, and a sticker stays what it was, the identity of a place rather than a reward for a challenge'],
+      ['changed', 'Nothing on the list expires. A challenge that lapses on Sunday turns a game into an obligation, and with a child that matters: you can come back after a month and still count what you did'],
+    ],
+  },
   {
     version: '0.85.1',
     date: '2026-08-22',
