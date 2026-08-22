@@ -36,11 +36,11 @@ npm run plant:login
 ```
 
 ```bash
-npm run plant:key
+npm run plant:deploy
 ```
 
 ```bash
-npm run plant:deploy
+npm run plant:key
 ```
 
 ```bash
@@ -48,9 +48,11 @@ npm run plant:test -- https://parkove-plant.TWOJ-LOGIN.workers.dev
 ```
 
 - `plant:login` otwiera przeglądarkę i łączy terminal z kontem Cloudflare.
+- `plant:deploy` wypuszcza Workera i wypisuje jego adres. Idzie PRZED kluczem
+  świadomie: gdy Worker już istnieje, `plant:key` nie pyta, czy go utworzyć.
 - `plant:key` pyta o klucz Pl@ntNet i zapisuje go **po stronie Cloudflare**.
-  Klucz nie trafia do repozytorium ani do niczyich rąk.
-- `plant:deploy` wypuszcza Workera i wypisuje jego adres.
+  Klucz nie trafia do repozytorium ani do niczyich rąk. Po zapisaniu klucza
+  Worker działa od razu, bez ponownego wypuszczania.
 - `plant:test` pyta Workera prawdziwym zdjęciem, pomijając aplikację, więc od
   razu wiadomo, czy działa Worker, czy trzeba szukać w interfejsie.
 
