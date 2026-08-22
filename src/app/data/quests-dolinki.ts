@@ -210,6 +210,55 @@ export const DOLINKI_QUESTS: Quest[] = [
         coords: [19.754366, 50.153675],
         radius: 35,
       },
+      {
+        id: 'kapliczka',
+        category: 'monument',
+        name: 'Kapliczka i filarki',
+        teaser: 'Kapliczka Matki Boskiej, a dwa kroki dalej skałki, które wspinacze nazwali od niej.',
+        description: [
+          'W środku doliny, przy ścieżce, stoi kapliczka Matki Boskiej. Zwykła, wiejska, jedna z tysięcy w Małopolsce, i przez to łatwa do przejścia obok.',
+          'Ciekawe zaczyna się kilka metrów dalej. Skałki obok mają w przewodnikach wspinaczkowych nazwę Filarki obok kapliczki. Nie Filarki Zachodnie, nie Filarki Kobylańskie: obok kapliczki. Wspinacze wzięli za punkt odniesienia to, co i tak było tu pierwsze.',
+          'To jedno miejsce, w którym widać, że dolina ma dwie warstwy: gospodarską, starszą, i sportową, młodszą o sto lat. Obie używają tych samych kamieni.',
+        ],
+        findHint: 'Środek doliny, przy ścieżce, po tej samej stronie co Źródło Antoniego.',
+        reveal:
+          'W nazwach skał w Kobylańskiej widać, kto tu przychodził i po co: Żabi Koń, Dziób Kobylański, Mnich, Dzwon, a obok Filarki obok kapliczki. Wspinacz nazywa to, co widzi z liny, a nie to, co widać z drogi.',
+        dilemma: {
+          question: 'Czy sport ma prawo zawłaszczać miejsca, które dla kogoś innego są święte?',
+          options: ['Tak, jeśli nikomu nie przeszkadza', 'Nie, święte to święte', 'Zależy, kto był pierwszy'],
+          counterpoint:
+            'Skała nie należy do nikogo i wspinaczka jej nie ujmuje, a nazwa od kapliczki jest w tym raczej ukłonem niż zawłaszczeniem. Ale w niedzielę pod kapliczką stoi ktoś, kto przyszedł się modlić, i słyszy komendy z liny piętnaście metrów wyżej.',
+        },
+        sources: ['OpenStreetMap: kapliczka Matki Boskiej (wayside_shrine), Filarki obok kapliczki'],
+        coords: [19.75616, 50.15563],
+        radius: 45,
+      },
+      {
+        id: 'wielblad',
+        category: 'climb',
+        name: 'Wielbłąd, Cycówka i Prawie K2',
+        teaser: 'Wspinacze nazywają skały tak, jak im się skojarzy, i nikt tego nie poprawia.',
+        description: [
+          'W górnej części doliny stoją obok siebie: Wielbłąd, Cycówka, Prawie K2, Dzwon, Mnich, Piersiówka, Kopa Barana, Postrzępiona Turnia, Dwoista Turnia i Turnia z Krzyżem. Kilkaset metrów doliny, a taki spis nazw.',
+          'Nazwy skał wspinaczkowych nie powstają w urzędzie. Wymyśla je ten, kto pierwszy wytyczył drogę, i zostają, jeśli inni zaczną ich używać. Dlatego obok siebie leżą Mnich i Cycówka, a jedna ze skał nazywa się Prawie K2, bo komuś wydała się prawie tak trudna jak ośmiotysięcznik.',
+          'Jest tu jeszcze Ponad Gnój Turnia, i nazwa mówi dokładnie to, co myślisz. Ktoś stał pod nią, popatrzył na to, co ma pod butami, i tak już zostało.',
+        ],
+        findHint:
+          'Górna część doliny, po obu stronach ścieżki. Wielbłąd ma dwa garby, więc rozpoznasz go bez tablicy.',
+        reveal:
+          'W polskiej Jurze jest ponad tysiąc nazwanych skał i prawie żadna nie ma nazwy urzędowej. Ta warstwa nazw istnieje tylko w przewodnikach wspinaczkowych, w mapie OpenStreetMap i w pamięci ludzi, którzy tu chodzą.',
+        dilemma: {
+          question: 'Kto powinien mieć prawo nadawać nazwy miejscom w terenie?',
+          options: ['Ten, kto je odkrył', 'Mieszkańcy', 'Nikt, niech się przyjmą same'],
+          counterpoint:
+            'Nazwy, które przyjmują się same, są najuczciwsze, bo znaczą tyle, ile ktoś zechciał zapamiętać. Ale wtedy najgłośniejsza grupa nazywa wszystko, a Cycówka trafia na mapę, na którą patrzy z dzieckiem ktoś, kto o wspinaczce nie słyszał.',
+        },
+        sources: [
+          'OpenStreetMap: Wielbłąd, Cycówka, Prawie K2, Dzwon, Mnich, Piersiówka, Kopa Barana, Postrzępiona Turnia, Dwoista Turnia, Turnia z Krzyżem, Ponad Gnój Turnia',
+        ],
+        coords: [19.75942, 50.15729],
+        radius: 120,
+      },
     ],
   },
   {
@@ -465,6 +514,90 @@ export const DOLINKI_QUESTS: Quest[] = [
         photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.738284, 50.14893],
         radius: 40,
+      },
+      {
+        id: 'wielka-turnia',
+        category: 'climb',
+        name: 'Grupa Wielkiej Turni',
+        teaser: 'Drugie piętro wspinaczki w tej dolinie, a w skale obok pięciometrowy tunel na przejście.',
+        description: [
+          'Górna część doliny ma własny zespół skał, mniej znany od Sokolicy, a wcale nie mały. Wielka Turnia ma czterdzieści pięć metrów wysokości i pięćdziesiąt pięć dróg wspinaczkowych, w tym wielowyciągowe, czyli takie, na których zatrzymujesz się w połowie ściany i zaczynasz od nowa. Sąsiedni Średnik ma pięćdziesiąt metrów i dwanaście dróg.',
+          'Wokół stoją mniejsze skały z nazwami, które wymyślili wspinacze: Mur Skwirczyńskiego, Dwie Wieże, Fraszka, Jebel, Misiaczek, Kurtyna. Każda ma swoje drogi i swoją trudność, od trzeciej po szóstą z plusami.',
+          'W skale przy ścieżce jest Tunel pośredni w Wielkiej Skale: pięć metrów przejścia na wylot. Nie jest to jaskinia z przewodnikiem, tylko dziura, przez którą się przechodzi, i właśnie dlatego dzieci wracają do niej trzy razy.',
+        ],
+        findHint:
+          'Górna część doliny, powyżej źródła Będkówki, przy ścieżce w stronę Bębła. Ściany widać z drogi, tunel jest w skale bliżej ścieżki.',
+        reveal:
+          'Wielowyciągowych dróg poza Tatrami jest w Polsce niewiele, a dwie z nich są tutaj, obok siebie: na Wielkiej Turni i na Średniku. Wspinacz spędza na tej ścianie więcej czasu niż ty na całym spacerze doliną.',
+        dilemma: {
+          question:
+            'Skały mają nazwy nadane przez wspinaczy, nie przez mieszkańców. Czyja nazwa jest prawdziwa?',
+          options: ['Tego, kto tu chodzi', 'Tego, kto tu mieszka', 'Obie, bo o innym mówią'],
+          counterpoint:
+            'Nazwa wspinaczkowa opisuje drogę, nie miejsce: mówi, gdzie zaczepić linę, i tylko dlatego przetrwała w przewodnikach. Nazwa gospodarska mówi, gdzie pasły się krowy. Jedna trafia do map, druga do pamięci, i żadna nie jest pełna.',
+        },
+        sources: [
+          'OpenStreetMap: Wielka Turnia (45 m, 55 dróg), Średnik (50 m, 12 dróg), Mur Skwirczyńskiego (25 m, 21 dróg), Tunel pośredni w Wielkiej Skale (długość 5 m, J.Olk.I-07.42)',
+          'topo.wspinka.org, grupa Wielkiej Turni',
+        ],
+        coords: [19.76959, 50.18942],
+        radius: 90,
+      },
+      {
+        id: 'labajowa',
+        category: 'cave',
+        name: 'Jaskinia Łabajowa',
+        teaser: 'Jaskinia bez biletu i bez przewodnika, dwieście metrów od tej z biletem.',
+        description: [
+          'Nietoperzowa jest udostępniona: kasa, przewodnik, oświetlenie i godziny otwarcia. Łabajowa leży obok i nie ma nic z tych rzeczy. Wchodzisz z własną latarką albo nie wchodzisz wcale.',
+          'To jedna z jaskiń, które wymienia się przy tej dolinie razem z Nietoperzową, tylko że w milczeniu: bez tablicy, bez opisu na miejscu, bez ścieżki, która by cię tam prowadziła za rękę.',
+          'Dwie jaskinie dwieście metrów od siebie, a dwa różne sposoby zwiedzania. Jedna uczy, druga pozwala się bać.',
+        ],
+        findHint:
+          'Górna część doliny, w skale Łabajowej, na zachód od Jaskini Nietoperzowej. Otwór jest w zboczu, bez tablicy.',
+        reveal:
+          'Jaskinia bez oświetlenia jest ciemna inaczej niż wszystko, co znasz z domu: po dwudziestu metrach oko przestaje się przyzwyczajać, bo nie ma do czego. To jedno z niewielu miejsc, w których można tego doświadczyć bez wyprawy w Tatry.',
+        dilemma: {
+          question:
+            'Czy jaskinia bez przewodnika i bez oświetlenia powinna zostać otwarta dla każdego?',
+          options: ['Tak, na własną odpowiedzialność', 'Nie, to prosi się o wypadek', 'Tak, ale z ostrzeżeniem'],
+          counterpoint:
+            'Zamknięcie chroni ludzi i nietoperze, ale zabiera jedyną rzecz, której udostępniona jaskinia dać nie może: wrażenie, że jesteś tam pierwszy. Otwarcie zostawia je w cenie potłuczonych kolan i zniszczonych nacieków.',
+        },
+        sources: [
+          'Wikipedia: Dolina Będkowska, jaskinie doliny',
+          'sktj.pl, opis Jaskini Łabajowej',
+          'OpenStreetMap: Jaskinia Łabajowa',
+        ],
+        coords: [19.77273, 50.1906],
+        radius: 60,
+      },
+      {
+        id: 'stawy-pstragowe',
+        category: 'water',
+        name: 'Stawy pstrągowe',
+        teaser: 'Stawy z pstrągami w dolnej części doliny, do popatrzenia i do zjedzenia.',
+        description: [
+          'Będkówka jest zimna, czysta i szybka, czyli dokładnie taka, jakiej potrzebuje pstrąg. Dlatego w dolnej części doliny stoi gospodarstwo rybackie z kilkoma stawami, w których ryby widać z brzegu bez żadnego sprzętu.',
+          'Dla dziecka to najprostszy punkt w całej dolinie: woda, ryby i chleb. Dla dorosłego to dowód, jak czysta jest ta rzeka, bo pstrąg nie żyje w wodzie, która jest tylko trochę zanieczyszczona.',
+          'Na miejscu jest też kuchnia, otwarta od dziewiątej do osiemnastej. Zamawianie ryby dwa kroki od stawu, w którym pływa, jest doświadczeniem osobnym i nie każdemu wychodzi na dobre.',
+        ],
+        findHint:
+          'Dolna część doliny, przy drodze wzdłuż Będkówki, poniżej schronisk w Łączkach. Stawy widać z drogi.',
+        reveal:
+          'Pstrąg potrzebuje wody z dużą ilością tlenu i temperaturą poniżej dwudziestu stopni. Hodowla w tym miejscu jest więc świadectwem stanu rzeki: gdyby Będkówka się ociepliła albo zamuliła, gospodarstwo przestałoby istnieć.',
+        dilemma: {
+          question: 'Hodowla ryb w dolinie krajobrazowej: gospodarka czy ochrona?',
+          options: ['Gospodarka, bo to hodowla', 'Ochrona, bo pilnuje wody', 'Jedno i drugie naraz'],
+          counterpoint:
+            'Ten, kto ma z rzeki pieniądze, ma też powód, żeby jej pilnować, i to działa lepiej niż wiele zakazów. Ale hodowla pobiera wodę i zwraca ją cieplejszą, więc ta sama rzeka jest tu chroniona i obciążana przez tego samego właściciela.',
+        },
+        sources: [
+          'Wikipedia: Dolina Będkowska, stawy rybne z hodowlą pstrągów',
+          'OpenStreetMap: Gospodarstwo rybackie Dolina Będkowska, stawy aquaculture=fish',
+        ],
+        coords: [19.73881, 50.15671],
+        radius: 90,
       },
     ],
   },

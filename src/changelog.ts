@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.62.0'
+export const VERSION = '0.63.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,19 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.63.0',
+    date: '2026-08-22',
+    title: 'Five more points in two valleys, all of them checked against the map first',
+    changes: [
+      ['added', 'Dolina Bedkowska: the Wielka Turnia group, a second climbing area in the upper valley with a forty five metre wall, fifty five routes and a five metre tunnel through the rock next to the path, which is the part a child comes back to three times'],
+      ['added', 'Dolina Bedkowska: Jaskinia Labajowa, the cave two hundred metres from the ticketed one that has no ticket, no guide and no lights. Two caves side by side and two different ways of visiting: one teaches, the other lets you be afraid'],
+      ['added', 'Dolina Bedkowska: the trout ponds in the lower valley, fish visible from the bank and a kitchen open nine to six. Trout need cold water with plenty of oxygen, so the farm is a certificate for the state of the stream'],
+      ['added', 'Dolina Kobylanska: the wayside shrine, and next to it the rocks that climbers named Pillars by the shrine. Not Western Pillars, not Kobylany Pillars: by the shrine. The sport took its bearing from what was here first'],
+      ['added', 'Dolina Kobylanska: Wielblad, Cycowka and Prawie K2, a point about how rocks get their names. Nobody gives them officially: whoever puts up the first route names it, and it sticks if others use it. There is also a Ponad Gnoj Turnia, and the name means exactly what you think'],
+      ['changed', 'Every one of the five was found by asking OpenStreetMap what carries a name inside the boundary, not by remembering. The dating of the hillfort on Sokolica was already in the app, so no second point was added sixty metres away'],
+    ],
+  },
   {
     version: '0.62.0',
     date: '2026-08-22',
