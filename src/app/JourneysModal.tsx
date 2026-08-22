@@ -4,6 +4,7 @@ import { useGameState } from './state'
 import type { Journey } from './state'
 import parksData from './data/parks.json'
 import { KIND_META } from './kinds'
+import { plWyprawy } from './naming'
 
 /**
  * Moje wyprawy jako lista wizualna.
@@ -91,8 +92,8 @@ export function JourneysModal({
       ) : (
         <>
           <p className="t-body-sm settings-lead">
-            {rows.length} {rows.length === 1 ? 'wyprawa' : rows.length < 5 ? 'wyprawy' : 'wypraw'}, od
-            najnowszej. Każdy kafel pokazuje kształt Twojej drogi.
+            {rows.length} {plWyprawy(rows.length)}, od najnowszej. Miniatura po lewej to kształt
+            Twojej drogi, ze złotą kropką na starcie.
           </p>
           <div className="jrn__list">
             {rows.map((j) => {

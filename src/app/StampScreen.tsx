@@ -5,6 +5,7 @@ import { questForPark } from './data/quests'
 import { isParkComplete, stampNeed } from './progress'
 import { useMarks } from './photos'
 import type { ParkFeature } from './ParkSheet'
+import { plPunkty } from './naming'
 
 const fmtDate = (at: string) =>
   new Date(at).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -32,15 +33,13 @@ export function StampScreen({
   const need = stampNeed(park.id)
   const left = Math.max(0, need - collected.size)
   const extra = quest ? Math.max(0, quest.pois.length - need) : 0
-  const plPoints = (n: number) =>
-    n === 1 ? 'punkt' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'punkty' : 'punktów'
   const ruleText = !quest
     ? complete
       ? 'Za bycie na miejscu. Zameldowałeś się i pieczątka jest Twoja.'
       : 'Za bycie na miejscu: wejdź do parku i zamelduj się w aplikacji.'
     : complete
-      ? `Za ${need} ${plPoints(need)} wyprawy. Zebrane, więc pieczątka jest Twoja.`
-      : `Za ${need} ${plPoints(need)} wyprawy. Masz ${collected.size}, brakuje ${left}.`
+      ? `Za ${need} ${plPunkty(need)} wyprawy. Zebrane, więc pieczątka jest Twoja.`
+      : `Za ${need} ${plPunkty(need)} wyprawy. Masz ${collected.size}, brakuje ${left}.`
 
   return (
     <Modal open onClose={onClose} title="Pieczątka" action="back" presentation="push">
@@ -80,7 +79,7 @@ export function StampScreen({
           <p className="t-body stampscreen__rule-text">{ruleText}</p>
           {extra > 0 && (
             <p className="t-body-sm park-muted stampscreen__rule-extra">
-              Pozostałe {extra} {plPoints(extra)} tego miejsca to ciekawostki: możesz je zebrać
+              Pozostałe {extra} {plPunkty(extra)} tego miejsca to ciekawostki: możesz je zebrać
               kiedy indziej, pieczątka na nie nie czeka.
             </p>
           )}

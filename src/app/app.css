@@ -1961,30 +1961,65 @@
 
 /* ---- moje wyprawy: kafle ze sladem ---- */
 
+/*
+ * Wiersze z kreską, nie pudełka (Jarek, 2026-08-22: „bardziej oddzielone jak
+ * miejsca do odkrycia, w większym spacingu, i popraw hovery, bo są z takiego
+ * boxowego vibe"). Ta sama zasada, co w liście miejsc: tło jest jedno, a wiersze
+ * rozdziela włoskowa linia, więc rytm robi odstęp, nie ramka.
+ */
 .jrn__list {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
   margin-top: var(--sp-4);
 }
 
 .jrn {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--sp-4);
   width: 100%;
-  padding: var(--sp-3) var(--sp-4);
+  /* wiecej powietrza niz w liscie miejsc: slad zajmuje wysokosc, wiec i tak jest wyzszy */
+  padding: var(--sp-4) var(--sp-2);
   border: 0;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-sunken);
+  background: transparent;
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background var(--motion-fast) var(--ease-out);
+}
+
+/* kreska między wierszami, zaczynająca się za miniaturą śladu */
+.jrn + .jrn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(56px + var(--sp-4) + var(--sp-2));
+  right: var(--sp-2);
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* hover i dotknięcie jak w liście: podświetlenie tła, bez skalowania */
+.jrn:hover {
+  background: var(--bg-surface-sunken);
 }
 
 .jrn:active {
-  transform: scale(0.99);
+  background: var(--bg-mint);
+}
+
+/*
+ * Miniatura i pastylki stoją na tle wpuszczonym, a podświetlenie wiersza jest
+ * tym samym tłem, więc na hoverze znikały i ślad zostawał w powietrzu. Na
+ * podświetlonym wierszu wracają o stopień wyżej, na tło karty: hover ma
+ * podnosić cały wiersz, a nie zjadać z niego elementy.
+ */
+.jrn:hover .jrn__art,
+.jrn:hover .jrn__pill:not(.-on) {
+  background: var(--bg-surface);
 }
 
 /*
@@ -1996,9 +2031,9 @@
   flex: none;
   width: 56px;
   height: 56px;
-  border-radius: 14px;
+  border-radius: 16px;
   corner-shape: var(--corner-smooth);
-  background: var(--bg-surface);
+  background: var(--bg-surface-sunken);
 }
 
 .jrn__art.-empty {
@@ -2050,7 +2085,7 @@
   gap: 3px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--bg-surface);
+  background: var(--bg-surface-sunken);
   color: var(--content-secondary);
   font-family: var(--font-text);
   font-weight: 600;

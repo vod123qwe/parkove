@@ -5,6 +5,7 @@ import { COLOUR_PL, TRAIL_INK, trailsFor } from './data/trails'
 import type { Trail } from './data/trails'
 import { formatDistance } from './geo'
 import { chooseTrail, useGameState } from './state'
+import { plPunkty } from './naming'
 
 /**
  * Wybór szlaku dla miejsca.
@@ -20,11 +21,9 @@ import { chooseTrail, useGameState } from './state'
  * policzy nic.
  */
 
-const plPoints = (n: number) => (n === 1 ? 'punkt' : n < 5 ? 'punkty' : 'punktów')
-
 function pillsFor(t: Trail) {
   const out = [formatDistance(t.m), `${t.min} min`]
-  if (t.kind === 'points' && t.stops?.length) out.push(`${t.stops.length} ${plPoints(t.stops.length)}`)
+  if (t.kind === 'points' && t.stops?.length) out.push(`${t.stops.length} ${plPunkty(t.stops.length)}`)
   if (t.kind === 'osm') out.push('znakowany')
   return out
 }

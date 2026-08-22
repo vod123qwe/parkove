@@ -55,6 +55,7 @@ import type { ParkingInfo } from './data/parking'
 import { pointsTotal, questForPark, photosForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 import parksData from './data/parks.json'
+import { plMiejsca, plNaklejki, plPunkty, plWyprawy, plZapisane } from './naming'
 import './app.css'
 
 const FEATURES = parksData.features as unknown as ParkFeature[]
@@ -568,10 +569,6 @@ export function App() {
    * trzech kubełkach według stanu. Alfabet był najgorszą możliwą kolejnością,
    * bo nazwa nie mówi ani gdzie to jest, ani czy tam już byłeś.
    */
-  /** polska odmiana: 1 punkt, 2 punkty, 5 punktów */
-  const plPoints = (n: number) =>
-    n === 1 ? 'punkt' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'punkty' : 'punktów'
-
   const LIST_GROUPS = [
     { key: 'started' as const, label: 'Zaczęte' },
     { key: 'fresh' as const, label: 'Nietknięte' },
@@ -896,7 +893,7 @@ export function App() {
                         : questForPark(f.id)
                           ? visited
                             ? `${earned} z ${total} punktów`
-                            : `${total} ${plPoints(total)} do odkrycia`
+                            : `${total} ${plPunkty(total)} do odkrycia`
                           : visited
                             ? 'odwiedzone'
                             : 'jeszcze nieodkryte'
@@ -1166,7 +1163,9 @@ export function App() {
             icon={<Route />}
             leadTone="accent"
             title="Moje liczby"
-            meta={`${completedIds.size} naklejek, ${journeys.length} wypraw, ${visitedCount} miejsc`}
+            meta={`${completedIds.size} ${plNaklejki(completedIds.size)}, ${journeys.length} ${plWyprawy(
+              journeys.length,
+            )}, ${visitedCount} ${plMiejsca(visitedCount)}`}
             trailing={<ChevronRight size={18} />}
             onClick={() => {
               setMenuOpen(false)
@@ -1207,7 +1206,7 @@ export function App() {
             title="Moje wyprawy"
             meta={
               journeys.length
-                ? `${journeys.length} zapisanych, każda ze swoim śladem`
+                ? `${journeys.length} ${plZapisane(journeys.length)}, każda ze swoim śladem`
                 : 'Jeszcze żadnej, zapisują się same po zakończeniu'
             }
             trailing={<ChevronRight size={18} />}

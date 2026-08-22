@@ -37,6 +37,7 @@ import type { ParkGeometry, Pt } from './geo'
 import { pointsTotal, questForPark, photosForPark } from './data/quests'
 import { trailById, trailsFor } from './data/trails'
 import type { QuestPoi } from './data/quests'
+import { plPunkty } from './naming'
 
 export type ParkFeature = {
   id: string
@@ -169,9 +170,7 @@ export function ParkSheet({
   const playCount = spots.length - foodCount
   const hasFood = foodCount > 0
   const hasPlay = playCount > 0
-  const plPoints = (n: number) =>
-    n === 1 ? 'punkt' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'punkty' : 'punktów'
-  const heroMeta = `${kind.label} · ${ha} ha${quest ? ` · ${quest.pois.length} ${plPoints(quest.pois.length)}` : ''}`
+  const heroMeta = `${kind.label} · ${ha} ha${quest ? ` · ${quest.pois.length} ${plPunkty(quest.pois.length)}` : ''}`
 
   /*
    * Ile trzeba na pieczątkę (reguła mieszka w progress.ts) i jak to powiedzieć.
@@ -182,10 +181,10 @@ export function ParkSheet({
   const left = Math.max(0, need - earned)
   const stampNote = hasStamp
     ? need > 0
-      ? `Zdobyta za ${need} ${plPoints(need)} wyprawy.`
+      ? `Zdobyta za ${need} ${plPunkty(need)} wyprawy.`
       : 'Zdobyta za meldunek na miejscu.'
     : need > 0
-      ? `Za ${need} ${plPoints(need)} wyprawy. Brakuje ${left}.`
+      ? `Za ${need} ${plPunkty(need)} wyprawy. Brakuje ${left}.`
       : 'Za meldunek na miejscu. Zamelduj się, gdy tam będziesz.'
   /* jedna linijka autorstwa pod całością, bez powtarzania tego samego nazwiska */
   const creditLine = [
@@ -246,7 +245,7 @@ export function ParkSheet({
             <>
               <p className="t-body-strong">Pieczątka zdobyta</p>
               <p className="t-body-sm park-muted">
-                Zebrane {earned} z {total} {plPoints(total)}. Reszta czeka na kolejny raz.
+                Zebrane {earned} z {total} {plPunkty(total)}. Reszta czeka na kolejny raz.
               </p>
             </>
           ) : visited ? (

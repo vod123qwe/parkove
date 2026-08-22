@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.77.0'
+export const VERSION = '0.78.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,18 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.78.0',
+    date: '2026-08-22',
+    title: 'Polish aerial photography, and the memory replay asks for it sharper',
+    changes: [
+      ['added', 'A fourth map style, Ortofoto: the GUGiK aerial photography from Geoportal, and it is the new default. The old imagery was global, which meant Poland got whatever frame fell into the mosaic, and the frame was winter: bare trees, a shadow across half of it, grey. The new one is summer and sharp enough to show plough furrows in a field and single trees in a treeline. Esri satellite stays as a separate style, because a national service has no automatic fallback'],
+      ['changed', 'The memory replay always uses the aerial photography, and asks for it one zoom level deeper than the screen strictly needs. A phone has three device pixels per CSS pixel and MapLibre does not count them when it picks a tile, so the photograph was being stretched: that was the lost feeling in the 3D flight. At the replay camera this lands exactly on zoom 19, which is the sharpest the service has'],
+      ['changed', 'My walks is rows with hairline dividers instead of boxes: more air, the divider starts past the thumbnail, and hovering lifts the whole row instead of swallowing the thumbnail and the pills into it'],
+      ['fixed', 'Polish number agreement, in one place now instead of copied across six screens. The menu said 1 wypraw and 1 zapisanych, and the short version would have said 22 wypraw at twenty two'],
+      ['fixed', 'Tiles in the replay stop cross fading for 300 ms. With the camera moving continuously every new tile was permanently blending out of its blurry parent, so the picture never resolved'],
+    ],
+  },
   {
     version: '0.77.0',
     date: '2026-08-22',

@@ -4,6 +4,17 @@ import { Carousel, Modal, Polaroid, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
 import { usePhotos } from './photos'
 import { getName, greeting, setName as saveName } from './profile'
+import {
+  plMiejsca,
+  plNaklejki,
+  plNagrania,
+  plNotatki,
+  plOdpowiedzi,
+  plPunkty,
+  plRazy,
+  plWyprawy,
+  plZdjecia,
+} from './naming'
 import { CATEGORY_LABEL, QUESTS, questForPark } from './data/quests'
 import type { PoiCategory } from './data/quests'
 import { stampNeed } from './progress'
@@ -32,9 +43,6 @@ const parkName = (id: string) => FEATURES.find((f) => f.id === id)?.properties.n
 const fmtDate = (ms: number) =>
   new Date(ms).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })
 
-const plWyprawy = (n: number) => (n === 1 ? 'wyprawa' : n < 5 ? 'wyprawy' : 'wypraw')
-const plNaklejki = (n: number) => (n === 1 ? 'naklejka' : n < 5 ? 'naklejki' : 'naklejek')
-const plRazy = (n: number) => (n === 1 ? 'raz' : 'razy')
 
 export function StatsModal({
   open,
@@ -172,8 +180,8 @@ export function StatsModal({
 
       <h3 className="t-title stats__title">Odkryte</h3>
       <p className="t-body-sm stats__line">
-        <strong>{stats.visited}</strong> z {FEATURES.length - 1} miejsc i{' '}
-        <strong>{stats.points}</strong> z {stats.pointsAll} punktów.
+        <strong>{stats.visited}</strong> z {FEATURES.length - 1} {plMiejsca(FEATURES.length - 1)} i{' '}
+        <strong>{stats.points}</strong> z {stats.pointsAll} {plPunkty(stats.pointsAll)}.
         {stats.close && (
           <>
             {' '}
@@ -181,7 +189,7 @@ export function StatsModal({
             <button className="stats__link" onClick={() => onOpenPark(stats.close!.parkId)}>
               {parkName(stats.close.parkId)}
             </button>
-            : {stats.close.got} z {stats.close.need} punktów.
+            : {stats.close.got} z {stats.close.need} {plPunkty(stats.close.need)}.
           </>
         )}
       </p>
@@ -259,16 +267,16 @@ export function StatsModal({
       <h3 className="t-title stats__title">Zostawione ślady</h3>
       <div className="stats__marks">
         <span className="stats__mark">
-          <Camera size={15} /> {stats.photos} zdjęć
+          <Camera size={15} /> {stats.photos} {plZdjecia(stats.photos)}
         </span>
         <span className="stats__mark">
-          <StickyNote size={15} /> {stats.notes} notatek
+          <StickyNote size={15} /> {stats.notes} {plNotatki(stats.notes)}
         </span>
         <span className="stats__mark">
-          <Mic size={15} /> {stats.voices} nagrań
+          <Mic size={15} /> {stats.voices} {plNagrania(stats.voices)}
         </span>
         <span className="stats__mark">
-          <Trees size={15} /> {stats.dilemmas} odpowiedzi na dylematy
+          <Trees size={15} /> {stats.dilemmas} {plOdpowiedzi(stats.dilemmas)} na dylematy
         </span>
       </div>
     </Modal>

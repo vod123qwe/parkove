@@ -60,14 +60,34 @@ Polska odmiana nazw własnych nie da się zrobić szablonem („do Dolina
 Będkowska"), więc nazwy stawiamy po dwukropku: „Najczęściej wracacie: **Dolina
 Będkowska**, 3 razy".
 
+Odmiana liczebników ma za to jedno miejsce: `naming.ts`. Rozsypywała się po
+ekranach jako `n < 5 ? 'wyprawy' : 'wypraw'` i wychodziło z tego „1 wypraw" oraz
+„1 zapisanych" w menu, a przy 22 „22 wypraw" zamiast „22 wyprawy". Reguła jest
+prosta: jeden to liczba pojedyncza, końcówka 2, 3, 4 (ale nie 12, 13, 14) to
+forma bliska, resztę bierze dopełniacz.
+
 ## Moje wyprawy: ślad jako miniatura
 
 Wcześniej były wierszami w profilu: ikona, nazwa i sucha linijka liczb. Teraz
-każdy kafel pokazuje **kształt Twojej drogi**, rysowany z zapisanego przebiegu
+każdy wiersz pokazuje **kształt Twojej drogi**, rysowany z zapisanego przebiegu
 (`journey.track`), ze złotą kropką na starcie. Każda wyprawa ma inny kształt, więc
 rozpoznajesz ją z odległości metra, tak jak zdjęcie rozpoznaje się szybciej niż
 podpis. Bez mapy pod spodem: dwadzieścia miniatur to byłoby dwadzieścia
 kontekstów graficznych, a liczy się sam kształt.
+
+**Wiersze z dywizorami, nie kafle w pudełkach** (Jarek: „moje wyprawy powinny
+być bardziej oddzielone jak miejsca do odkrycia dywizorami ale w większym
+spacingu i też popraw tam hovery, bo są jakby z takiego boxowego vibe"). Wiersz
+jest przezroczysty, oddziela go włos `--border-subtle` zaczynający się za
+miniaturą, a powietrza jest więcej niż w liście miejsc, bo ślad sam zajmuje
+wysokość. Dwie pułapki po drodze:
+
+- dywizor jako `border-top` rysowałby się **pod** podświetleniem hovera, więc
+  jest pseudoelementem `.jrn + .jrn::before`,
+- miniatura i pastylki stały na `--bg-surface-sunken`, czyli na tym samym tle,
+  którym podświetla się wiersz, i na hoverze znikały. Na podświetlonym wierszu
+  wchodzą o stopień wyżej, na `--bg-surface`: hover ma podnosić cały wiersz, a
+  nie zjadać z niego elementy.
 
 **Lista miejsc zostaje w menu**, choć ma też przycisk na mapie, i to nie jest
 duplikat, tylko dwa konteksty: przycisk na mapie **nie istnieje w trakcie

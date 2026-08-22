@@ -130,8 +130,9 @@ export function LooksModal({
 
       <h3 className="t-title looks__title">Styl mapy</h3>
       <p className="t-body-sm settings-lead">
-        Satelita pokazuje, jak jest naprawdę. Minimal czyta się najlepiej w słońcu. Rzeźba terenu
-        pokazuje, gdzie jest stromo.
+        Ortofoto to polskie zdjęcia lotnicze i są najostrzejsze. Satelita działa wszędzie, więc
+        zostaje na zapas. Minimal czyta się najlepiej w słońcu, a rzeźba terenu pokazuje, gdzie jest
+        stromo.
       </p>
       <div className="looks__grid" role="radiogroup" aria-label="Styl mapy">
         {MAP_STYLES.map((s) => (

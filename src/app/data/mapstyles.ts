@@ -3,7 +3,7 @@
 
 import type { StyleSpecification } from 'maplibre-gl'
 
-export type MapStyleId = 'satellite' | 'minimal' | 'satellite-3d'
+export type MapStyleId = 'ortho' | 'satellite' | 'minimal' | 'satellite-3d'
 
 export type MapStyleDef = {
   id: MapStyleId
@@ -13,6 +13,8 @@ export type MapStyleDef = {
 }
 
 export const MAP_STYLES: MapStyleDef[] = [
+  // polska ortofotomapa: ostrzejsza i w lepszym swietle niz globalne zdjecia
+  { id: 'ortho', label: 'Ortofoto', swatch: ['#3c5a35', '#22402c'] },
   { id: 'satellite', label: 'Satelita', swatch: ['#2c4a2f', '#1a2e3f'] },
   { id: 'minimal', label: 'Minimal', swatch: ['#f4f4f0', '#d9dcd4'] },
   // same name as the replay look, because it is the same thing: the photograph
@@ -59,6 +61,51 @@ const IMAGERY = {
   attribution: 'Esri, Maxar, Earthstar Geographics',
 }
 
+/*
+ * Polska ortofotomapa z Geoportalu (GUGiK), i to jest widoczna zmiana jakosci.
+ *
+ * Porownanie na Rynku Glownym, ten sam kafel z 22 sierpnia 2026: Esri dal zdjecie
+ * zimowe, ciemne, z cieniem przez pol placu i bezlistnym drzewem. Geoportal dal
+ * letnie, ostre, z drzewem w lisciach i widocznymi ludzmi. W dolinkach pokrycie
+ * jest, czas odpowiedzi 137 do 171 ms.
+ *
+ * Uklad kafli EPSG:3857 (zgodny z Google), wiec wchodzi jako zwykle zrodlo raster.
+ * Maksymalne przyblizenie to 19: na 20 serwis zwraca blad, wiec nie prosimy.
+ * Nie ma automatycznego zapasu, gdy serwis nie odpowiada, dlatego satelita Esri
+ * zostaje osobnym stylem do przelaczenia.
+ */
+const ORTHO_URL =
+  'https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMTS/StandardResolution' +
+  '?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTOFOTOMAPA&STYLE=default' +
+  '&FORMAT=image/jpeg&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
+
+const ORTHO = {
+  type: 'raster' as const,
+  tiles: [ORTHO_URL],
+  tileSize: 256,
+  maxzoom: 19,
+  attribution: 'Ortofotomapa: GUGiK, Geoportal',
+}
+
+/*
+ * Ta sama ortofotomapa, tylko poproszona o jeden poziom glebiej, i to jest
+ * druga polowa odpowiedzi na "chcialbym lepsza jakosc".
+ *
+ * MapLibre wybiera poziom kafli ze wzoru zoom + log2(512 / tileSize), wiec przy
+ * tileSize 256 dostajemy zoom + 1, a przy 128 zoom + 2. Zdjecie nadal ma 256
+ * pikseli, tylko wchodzi w mniejsze pole: to zwykly supersampling, dwa razy
+ * wiecej pikseli na kazda os. Ma znaczenie na telefonie, bo iPhone ma trzy
+ * piksele urzadzenia na jeden piksel CSS, a MapLibre tego nie wlicza, wiec
+ * zdjecie bylo dotad rozciagane.
+ *
+ * Odtwarzanie stoi na zoomie 16.6, czyli tu wypada dokladnie poziom 19, a to
+ * jest maksimum Geoportalu. Idealnie sie spina: najostrzej jak mozna i ani
+ * jednego kafla ponad to, co serwis ma. Kosztuje cztery razy wiecej kafli,
+ * dlatego zywa mapa zostaje na 256: tam sie przesuwa i przybliza bez konca,
+ * a tutaj kamera leci po jednej trasie i kafle zostaja w pamieci.
+ */
+const ORTHO_SHARP = { ...ORTHO, tileSize: 128 }
+
 // glyphs so symbol layers (the parking P) render on imagery too
 const GLYPHS = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf'
 
@@ -66,6 +113,13 @@ const SATELLITE: StyleSpecification = {
   version: 8,
   glyphs: GLYPHS,
   sources: { sat: IMAGERY },
+  layers: [{ id: 'sat', type: 'raster', source: 'sat' }],
+}
+
+const ORTHO_STYLE: StyleSpecification = {
+  version: 8,
+  glyphs: GLYPHS,
+  sources: { sat: ORTHO },
   layers: [{ id: 'sat', type: 'raster', source: 'sat' }],
 }
 
@@ -80,7 +134,7 @@ const SATELLITE_3D: StyleSpecification = {
   version: 8,
   glyphs: GLYPHS,
   sources: {
-    sat: IMAGERY,
+    sat: ORTHO,
     dem: DEM,
     ofm: {
       type: 'vector',
@@ -112,8 +166,13 @@ const SATELLITE_3D: StyleSpecification = {
 const KEY = 'pk-mapstyle'
 export function getMapStyle(): MapStyleId {
   const v = localStorage.getItem(KEY) as MapStyleId | null
-  // anything else, including a style we used to have, lands on the photograph
-  return MAP_STYLES.some((s) => s.id === v) ? (v as MapStyleId) : 'satellite'
+  /*
+   * Anything else, including a style we used to have, lands on the photograph,
+   * and od teraz na polskiej: ta apka chodzi tylko po Polsce, a tam ortofotomapa
+   * jest ostrzejsza i swiezsza niz zdjecie globalne. Kto juz wybral styl, ten
+   * zostaje przy swoim, bo wybor siedzi w pamieci telefonu.
+   */
+  return MAP_STYLES.some((s) => s.id === v) ? (v as MapStyleId) : 'ortho'
 }
 
 export function setMapStyle(id: MapStyleId) {
@@ -141,6 +200,11 @@ export function resolveMapStyle(id: MapStyleId): ResolvedStyle {
     }
   }
   if (id === 'minimal') return { key: 'minimal', spec: MINIMAL, pitch: 0, terrain: null }
+  /*
+   * Klucz zaczyna sie od 'satellite', bo tak rozpoznajemy w MapView, ze pod
+   * spodem jest zdjecie: od tego zaleza przezroczystosc parkow i kolory pinow.
+   */
+  if (id === 'ortho') return { key: 'satellite-ortho', spec: ORTHO_STYLE, pitch: 0, terrain: null }
   return { key: 'satellite', spec: SATELLITE, pitch: 0, terrain: null }
 }
 
@@ -163,11 +227,17 @@ export const REPLAY_LOOKS: Array<{ id: ReplayLook; label: string }> = [
   { id: 'graphite', label: 'Grafit 3D' },
 ]
 
+/*
+ * Kazda warstwa zdjecia w odtwarzaniu dostaje krotszy crossfade. Domyslne
+ * 300 ms wyglada dobrze przy nieruchomej mapie, ale tutaj kamera leci bez
+ * przerwy, wiec nowy kafel caly czas przenika z rozmytego kafla-rodzica i obraz
+ * nigdy nie dochodzi do ostrosci. 100 ms wystarczy, zeby nie bylo skoku.
+ */
 const raster = (extra: Record<string, unknown>) => ({
   id: 'sat',
   type: 'raster' as const,
   source: 'sat',
-  paint: extra as never,
+  paint: { 'raster-fade-duration': 100, ...extra } as never,
 })
 
 const buildings = (color: string, opacity: number) => ({
@@ -185,15 +255,13 @@ const buildings = (color: string, opacity: number) => ({
 })
 
 const SOURCES = {
-  sat: {
-    type: 'raster' as const,
-    tiles: [
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    ],
-    tileSize: 256,
-    maxzoom: 19,
-    attribution: 'Esri, Maxar, Earthstar Geographics',
-  },
+  /*
+   * Odtwarzanie wyprawy dostaje ortofotomape, nie globalne zdjecie, i to byla
+   * uwaga Jarka: "traci feeling funkcja, gdzie mamy mape w 3D podczas
+   * wspominania trasy". Tekstura jest tu wszystkim, bo kamera leci nisko i
+   * skosnie, a wtedy kazdy nieostry piksel widac dwa razy.
+   */
+  sat: ORTHO_SHARP,
   ofm: {
     type: 'vector' as const,
     url: 'https://tiles.openfreemap.org/planet',
