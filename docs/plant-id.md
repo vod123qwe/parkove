@@ -1,6 +1,7 @@
 # Rozpoznawanie roślin ze zdjęcia
 
-Stan: **kod gotowy, funkcja wyłączona** do wklejenia adresu Workera.
+Stan: **działa** (od wersji 0.69.0). Sprawdzone na zdjęciu Dębu Jagiellońskiego:
+wróciło „Quercus robur, 43 procent" i dwa inne dęby za nim.
 
 ## Dlaczego nie Google
 

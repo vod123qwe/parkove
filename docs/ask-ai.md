@@ -1,7 +1,7 @@
 # Przewodnik (AI)
 
-Stan: **kod gotowy, funkcja wyłączona** do wklejenia adresu Workera i dodania
-klucza Gemini.
+Stan: **działa** (wersja 0.70.0). Worker stoi, oba klucze są po stronie
+Cloudflare, adres siedzi w `src/app/proxy.ts`.
 
 ## Po co, i czym to NIE jest
 
