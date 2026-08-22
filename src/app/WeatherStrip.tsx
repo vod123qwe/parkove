@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Umbrella, Wind } from 'lucide-react'
-import { getWeather, sky } from './weather'
-import type { Weather } from './weather'
+import { Clock, Umbrella, Wind } from 'lucide-react'
+import { bestWindow, getWeather, sky } from './weather'
+import type { Weather, Window } from './weather'
 import { SKY_ICONS } from './skyIcons'
 
 /**
@@ -18,6 +18,18 @@ import { SKY_ICONS } from './skyIcons'
 
 const fmtAt = (at: number) =>
   new Date(at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
+
+/**
+ * Zdanie o oknie pogodowym. Jedno, bo to ma być odpowiedź, nie prognoza: albo
+ * „wyjdź teraz", albo „poczekaj do czternastej", albo „dziś nie wyjdzie".
+ */
+function windowLine(w: Window) {
+  const godziny = w.from === w.to ? `około ${w.from}` : `między ${w.from} a ${w.to}`
+  const stopnie = w.tempMin === w.tempMax ? `${w.tempMax} stopni` : `${w.tempMin} do ${w.tempMax} stopni`
+  if (w.kind === 'dry') return `Spokojnie do wieczora, ${stopnie}.`
+  if (w.kind === 'wet') return `Dziś leje. Najmniej ${godziny}, i tak weź kurtkę.`
+  return `Najlepiej ${godziny}, wtedy ${stopnie}.`
+}
 
 export function WeatherStrip({
   parkId,
@@ -115,6 +127,21 @@ export function WeatherStrip({
           )
         })}
       </div>
+
+      {/*
+        Jedna linijka odpowiedzi pod pasem godzin. Pas mówi, jak będzie; ta
+        linijka mówi, o której wyjść, bo tego nikt nie chce sam wyliczać.
+      */}
+      {(() => {
+        const win = bestWindow(w.hours, hourNow)
+        if (!win) return null
+        return (
+          <p className={`t-body-sm park-weather__window${win.kind === 'wet' ? ' -wet' : ''}`}>
+            <Clock size={14} aria-hidden="true" />
+            {windowLine(win)}
+          </p>
+        )
+      })()}
 
       <p className="t-caption park-weather__source">
         {w.stale

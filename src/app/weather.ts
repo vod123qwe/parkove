@@ -106,6 +106,83 @@ export async function getWeather(
   }
 }
 
+/* ---------- kiedy iść ---------- */
+
+export type Window = {
+  from: number
+  to: number
+  /** największa szansa opadu w oknie */
+  rain: number
+  tempMin: number
+  tempMax: number
+  /** 'dry' cały pozostały dzień spokojny, 'best' jest lepsza pora, 'wet' wszędzie leje */
+  kind: 'dry' | 'best' | 'wet'
+}
+
+const DRY = 30
+const DAY_START = 7
+const DAY_END = 20
+
+/**
+ * Najlepsza pora na wyjście dzisiaj.
+ *
+ * Prognoza godzina po godzinie odpowiada na pytanie „jak będzie", ale nie na
+ * „o której wyjść", bo trzeba ją przeczytać i porównać. Tu robimy to za ciebie:
+ * szukamy najdłuższego ciągu godzin z szansą opadu poniżej trzydziestu procent,
+ * w granicach dnia. Gdy takiego ciągu nie ma, mówimy wprost, że wszędzie leje, i
+ * podajemy porę najmniej mokrą, bo to nadal jest odpowiedź.
+ *
+ * Godziny, które minęły, nie liczą się do niczego: okno zaczyna się najwcześniej
+ * teraz.
+ */
+export function bestWindow(hours: WeatherHour[], nowHour: number): Window | null {
+  const pool = hours.filter((h) => h.h >= Math.max(nowHour, DAY_START) && h.h <= DAY_END)
+  if (pool.length < 2) return null
+
+  const box = (run: WeatherHour[], kind: Window['kind']): Window => ({
+    from: run[0].h,
+    to: run[run.length - 1].h,
+    rain: Math.max(...run.map((h) => h.rain)),
+    tempMin: Math.min(...run.map((h) => h.temp)),
+    tempMax: Math.max(...run.map((h) => h.temp)),
+    kind,
+  })
+
+  /* ciągi suchych godzin */
+  const runs: WeatherHour[][] = []
+  let cur: WeatherHour[] | null = null
+  for (const h of pool) {
+    if (h.rain < DRY) {
+      if (!cur) {
+        cur = []
+        runs.push(cur)
+      }
+      cur.push(h)
+    } else {
+      cur = null
+    }
+  }
+
+  if (runs.length) {
+    /* najdłuższy, a przy równych najsuchszy */
+    const best = runs.sort(
+      (a, b) =>
+        b.length - a.length ||
+        Math.max(...a.map((h) => h.rain)) - Math.max(...b.map((h) => h.rain)),
+    )[0]
+    return box(best, best.length === pool.length ? 'dry' : 'best')
+  }
+
+  /* nigdzie nie jest sucho: podaj najmniej mokre dwie godziny */
+  let driest = pool.slice(0, 2)
+  for (let i = 0; i + 1 < pool.length; i++) {
+    const pair = pool.slice(i, i + 2)
+    if (Math.max(...pair.map((h) => h.rain)) < Math.max(...driest.map((h) => h.rain)))
+      driest = pair
+  }
+  return box(driest, 'wet')
+}
+
 /* ---------- jedno spojrzenie dla całej listy miejsc ---------- */
 
 const LIST_KEY = 'pk-weather-list'

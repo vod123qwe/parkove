@@ -985,6 +985,36 @@
   font-variant-numeric: tabular-nums;
 }
 
+/*
+ * Okno pogodowe: jedna linijka odpowiedzi. Wyróżniona tłem, bo to jedyne zdanie
+ * w tym module, które mówi, co zrobić, a nie jak jest.
+ */
+.park-weather__window {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-mint);
+  color: var(--content-primary);
+}
+
+.park-weather__window svg {
+  flex: none;
+  color: var(--content-accent);
+}
+
+/* mokry dzień: ta sama linijka, ale nie udaje dobrej wiadomości */
+.park-weather__window.-wet {
+  background: var(--bg-info-subtle);
+}
+
+.park-weather__window.-wet svg {
+  color: var(--content-info);
+}
+
 .park-weather__source {
   margin: var(--sp-2) 0 0;
   color: var(--content-tertiary);

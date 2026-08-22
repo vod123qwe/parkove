@@ -70,6 +70,24 @@ pierwsza, która decyduje, czy w ogóle.
   Stara prognoza jest w dolinie warta więcej niż puste pole, ale tylko wtedy,
   gdy widać, że jest stara.
 
+### Okno pogodowe
+
+Pas godzin mówi, **jak będzie**. Jedna linijka pod nim mówi, **o której wyjść**,
+bo tego nikt nie chce sam wyliczać. Szukamy najdłuższego ciągu godzin z szansą
+opadu poniżej 30 procent, w granicach dnia (7 do 20), zaczynając najwcześniej od
+teraz.
+
+Trzy odpowiedzi, trzy tony:
+
+- **cały pozostały dzień suchy**: „Spokojnie do wieczora, 18 do 20 stopni."
+- **jest lepsza pora**: „Najlepiej między 14 a 17, wtedy 19 do 20 stopni."
+- **nigdzie nie jest sucho**: „Dziś leje. Najmniej między 19 a 20, i tak weź
+  kurtkę." Wtedy tło linijki jest niebieskie, nie miętowe: zdanie nie udaje
+  dobrej wiadomości.
+
+Po dwudziestej linijka znika, bo okno na spacer się zamknęło i podpowiadanie
+godziny byłoby udawaniem.
+
 ## Pogoda w liście miejsc
 
 Wybierając w niedzielę rano między pięcioma dolinkami chcesz zobaczyć, gdzie o

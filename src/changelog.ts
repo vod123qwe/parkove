@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.64.0'
+export const VERSION = '0.65.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.65.0',
+    date: '2026-08-22',
+    title: 'One line that says when to go',
+    changes: [
+      ['added', 'The weather in a place card ends with an answer, not a forecast: the longest run of hours with less than thirty percent chance of rain, inside daylight, starting no earlier than now. Best between two and five, and then how warm it will be. When the whole rest of the day is dry it says so instead of inventing a window, and when it rains everywhere it says that too, names the least wet hours and tells you to take a coat, on a blue background rather than a mint one, because that sentence is not good news'],
+      ['changed', 'After eight in the evening the line disappears. The window for a walk has closed and suggesting an hour would be pretending'],
+    ],
+  },
   {
     version: '0.64.0',
     date: '2026-08-22',
