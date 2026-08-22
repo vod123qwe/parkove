@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.69.0'
+export const VERSION = '0.70.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,17 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.70.0',
+    date: '2026-08-22',
+    title: 'A guide that walks with you, not a box at the end of a card',
+    changes: [
+      ['changed', 'The AI moved and became a guide. It used to be a text field at the end of a point card, which answers questions about the paragraph you just read; a guide walks with you instead. One conversation in the whole app with several ways in: next to Places on the main screen, a row in the place card by the weather, one tap from a point card, and in the walk bar where the point list used to be, because the list already opens by tapping the white card above it'],
+      ['added', 'The guide knows four things: where you stand and the three nearest points with distances, how many points you have and how many to the stamp, the weather now and the best window today, and the content of this places points, with the full text of the one you asked about and its legend marked as a legend'],
+      ['added', 'Four starter questions, because an empty field is the worst thing to hand someone standing outside with one free hand: what is most interesting here, will I make it before the rain, what is left for the stamp, what will interest a child'],
+      ['changed', 'The conversation survives closing the sheet. In the field everything gets closed by reflex'],
+    ],
+  },
   {
     version: '0.69.0',
     date: '2026-08-22',

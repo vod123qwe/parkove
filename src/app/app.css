@@ -171,12 +171,32 @@
 }
 
 /* list trigger, bottom center */
+/* przewodnik obok listy miejsc: ta sama wysokosc, wiec to samo pietro decyzji */
+.app-guidebtn {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  color: var(--content-accent);
+  box-shadow: var(--elevation-1);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .app-fab {
   position: absolute;
   bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+  /* dwie rzeczy w rzędzie: lista miejsc i przewodnik */
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
 }
 
 .app-fab .pk-btn {
@@ -1365,18 +1385,173 @@
   margin: 0;
 }
 
+/* ---- przewodnik ---- */
+
+.guide__lead {
+  margin: 0 0 var(--sp-4);
+  color: var(--content-secondary);
+}
+
+/* pytania na start: puste pole to najgorsze, co można dać komuś w terenie */
+.guide__starters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-4);
+}
+
+.guide__starter {
+  min-height: 40px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border-mint);
+  border-radius: 999px;
+  background: var(--bg-mint);
+  color: var(--content-primary);
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.guide__starter:disabled {
+  opacity: 0.5;
+}
+
+.guide__turn {
+  margin: 0 0 var(--sp-5);
+}
+
+.guide__q {
+  margin: 0 0 var(--sp-2);
+  color: var(--content-primary);
+}
+
+/*
+ * Odpowiedź modelu ma własne tło i lewą krechę: w rozmowie widać wtedy od razu,
+ * co jest pytaniem człowieka, a co odpowiedzią maszyny. Ta sama logika, co przy
+ * legendach w innym kroju: niepewne nie może wyglądać jak sprawdzone.
+ */
+.guide__a {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--border-info);
+  border-radius: 0 14px 14px 0;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-info-subtle);
+  color: var(--content-secondary);
+}
+
+.guide__thinking {
+  margin: 0 0 var(--sp-4);
+  color: var(--content-tertiary);
+}
+
+.guide__field {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  margin: var(--sp-2) 0 0;
+}
+
+.guide__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface);
+  color: var(--content-primary);
+  font-family: var(--font-text);
+  font-size: 15px;
+}
+
+.guide__input:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+.guide__send {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.guide__send:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.guide__note {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: var(--sp-3) 0 0;
+  color: var(--content-tertiary);
+}
+
+.guide__note.-bad {
+  color: var(--content-info);
+  font-weight: 600;
+}
+
 /*
  * Pytanie o punkt. Pudełko jest wyraźnie inne od reszty karty, bo odpowiedź
  * modelu nie może wyglądać jak treść, którą sprawdziliśmy: przerywana ramka,
  * chłodne tło i etykieta wprost. Ta sama logika, co przy legendach w innym kroju.
  */
+/* wejscie do przewodnika z karty punktu: jedno dotkniecie, nie osobna rozmowa */
 .poi-ask {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
   margin: var(--sp-5) 0 var(--sp-4);
   padding: var(--sp-4);
   border: 1.5px dashed var(--border-info);
   border-radius: 18px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-info-subtle);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.poi-ask__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--content-info);
+}
+
+.poi-ask__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.poi-ask__title {
+  color: var(--content-primary);
+}
+
+.poi-ask__sub {
+  color: var(--content-tertiary);
 }
 
 .poi-ask__label {

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
-import { CarFront, List as ListIcon, Mic, Navigation, Plus, Square, StickyNote, X } from 'lucide-react'
+import { CarFront, Mic, Navigation, Plus, Sparkles, Square, StickyNote, X } from 'lucide-react'
 import { Button } from '../ds'
 import { useGameState } from './state'
 import { questForPark } from './data/quests'
@@ -40,6 +40,7 @@ export function ExpeditionBar({
   onPhoto,
   onMark,
   onOpenPoints,
+  onOpenGuide,
   spotCard,
   targetId,
   heading,
@@ -52,6 +53,8 @@ export function ExpeditionBar({
   onMark?: (markId: string) => void
   /** karta miejsca z listą punktów */
   onOpenPoints?: () => void
+  /** rozmowa z przewodnikiem; zajęła miejsce listy punktów w pasku */
+  onOpenGuide?: () => void
   /** wybrana kawiarnia albo plac zabaw: zajmuje miejsce karty „co dalej" */
   spotCard?: ReactNode
   /** mały cel wybrany z listy punktów: wypiera automatyczny „najbliższy" */
@@ -432,16 +435,21 @@ export function ExpeditionBar({
             </button>
             <span className="app-expaction__label">Wspomnienie</span>
           </div>
+          {/*
+            Przewodnik zamiast listy punktów (decyzja Jarka 2026-08-22): listę i
+            tak otwiera dotknięcie białej karty wyżej, więc trzeci przycisk paska
+            powtarzał to samo. Rozmowa nie ma innego wejścia w terenie.
+          */}
           <div className="app-expaction">
             <button
               className="app-expaction__btn"
-              aria-label="Punkty tego miejsca"
-              onClick={onOpenPoints}
-              disabled={!onOpenPoints}
+              aria-label="Przewodnik"
+              onClick={onOpenGuide}
+              disabled={!onOpenGuide}
             >
-              <ListIcon size={18} />
+              <Sparkles size={18} />
             </button>
-            <span className="app-expaction__label">Punkty</span>
+            <span className="app-expaction__label">Przewodnik</span>
           </div>
         </div>
       </div>

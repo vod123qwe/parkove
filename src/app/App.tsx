@@ -14,6 +14,11 @@ import { PoiModal } from './PoiSheet'
 import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
 import { MapFilters } from './MapFilters'
+import { GuideSheet } from './GuideSheet'
+import type { GuideTurn } from './GuideSheet'
+import { askEnabled } from './ask'
+import { getWeather } from './weather'
+import type { Weather } from './weather'
 import { getGlances, sky } from './weather'
 import type { Glance } from './weather'
 import { SKY_ICONS } from './skyIcons'
@@ -109,6 +114,15 @@ export function App() {
   /** wybrana konkretna kawiarnia albo plac zabaw: pin rośnie, mapa centruje */
   const [amenitySpotId, setAmenitySpotId] = useState<string | null>(null)
   const [trailsOpen, setTrailsOpen] = useState(false)
+  /*
+   * Przewodnik: jedna rozmowa, wiele wejsc. Watek trzymamy tutaj, nie w arkuszu,
+   * bo arkusz przy zamknieciu jest odmontowywany, a w terenie zamyka sie wszystko
+   * odruchowo i rozmowa musi to przezyc. guidePoi to punkt, o ktory pytasz wprost.
+   */
+  const [guideOpen, setGuideOpen] = useState(false)
+  const [guideThread, setGuideThread] = useState<GuideTurn[]>([])
+  const [guidePoi, setGuidePoi] = useState<QuestPoi | null>(null)
+  const [guideWeather, setGuideWeather] = useState<Weather | null>(null)
   /* małe cele w terenie: lista punktów wyprawy i wybrany z niej cel */
   const [pointsOpen, setPointsOpen] = useState(false)
   const [targetPoiId, setTargetPoiId] = useState<string | null>(null)
@@ -319,6 +333,19 @@ export function App() {
       setGlances,
     )
   }, [listOpen])
+
+  /*
+   * Pogoda do kontekstu przewodnika. Bierzemy ja dla miejsca, o ktorym rozmawiamy,
+   * i tylko gdy rozmowa jest otwarta: getWeather ma wlasny cache na pol godziny,
+   * wiec przy otwartej karcie miejsca to zwykle zero zapytan.
+   */
+  const guideParkId = expedition?.parkId ?? selectedId
+  useEffect(() => {
+    if (!guideOpen || !guideParkId) return
+    const f = FEATURES.find((x) => x.id === guideParkId)
+    if (!f) return
+    void getWeather(guideParkId, f.properties.center).then(setGuideWeather)
+  }, [guideOpen, guideParkId])
 
   const flyToPark = useCallback((f: ParkFeature, bottomPx: number) => {
     setFocus({
@@ -662,6 +689,14 @@ export function App() {
             onPhoto={setPhotoAdded}
             onMark={setPhotoId}
             onOpenPoints={expeditionQuest ? () => setPointsOpen(true) : undefined}
+            onOpenGuide={
+              askEnabled()
+                ? () => {
+                    setGuidePoi(null)
+                    setGuideOpen(true)
+                  }
+                : undefined
+            }
             targetId={targetPoiId}
             heading={heading}
             spotCard={
@@ -684,6 +719,19 @@ export function App() {
             <Button size="lg" icon={<ListIcon size={18} />} onClick={() => setListOpen(true)}>
               Miejsca
             </Button>
+            {/* przewodnik obok listy: to samo pietro decyzji, „gdzie ide" i „zapytaj" */}
+            {askEnabled() && (
+              <button
+                className="app-guidebtn"
+                aria-label="Przewodnik"
+                onClick={() => {
+                  setGuidePoi(null)
+                  setGuideOpen(true)
+                }}
+              >
+                <Sparkles size={20} />
+              </button>
+            )}
           </div>
         )
       )}
@@ -894,6 +942,10 @@ export function App() {
         onOpenParking={() => setParkingOpen(true)}
         onOpenAmenity={setAmenityKind}
         onOpenTrails={() => setTrailsOpen(true)}
+        onOpenGuide={() => {
+          setGuidePoi(null)
+          setGuideOpen(true)
+        }}
       />
       {selected && (
         <ParkingModal
@@ -903,6 +955,22 @@ export function App() {
           onClose={() => setParkingOpen(false)}
         />
       )}
+      <GuideSheet
+        open={guideOpen}
+        onClose={() => setGuideOpen(false)}
+        thread={guideThread}
+        onThread={setGuideThread}
+        input={{
+          parkId: guideParkId,
+          parkName: FEATURES.find((f) => f.id === guideParkId)?.properties.name ?? null,
+          parkGeometry: FEATURES.find((f) => f.id === guideParkId)?.geometry,
+          here: expedition?.where?.coords ?? myFix?.coords ?? null,
+          collected: new Set(guideParkId ? (progress[guideParkId]?.points ?? []) : []),
+          weather: guideWeather,
+          focus: guidePoi,
+        }}
+      />
+
       {/* w trakcie wyprawy nie ma wybranego parku, a szlak trzeba dac zmienic */}
       {(() => {
         const tp = selected ?? expeditionPark
@@ -1075,6 +1143,11 @@ export function App() {
         parkId={poiCard?.parkId ?? null}
         collected={poiCard ? (progress[poiCard.parkId]?.points ?? []).includes(poiCard.poi.id) : false}
         onClose={() => setPoiCard(null)}
+        onAskGuide={(poi) => {
+          /* karta zostaje otwarta pod arkuszem: wracasz do czytania jednym gestem */
+          setGuidePoi(poi)
+          setGuideOpen(true)
+        }}
       />
       {/*
         Menu zamiast ikonki profilu: rzeczy, które dotąd trzeba było szukać w

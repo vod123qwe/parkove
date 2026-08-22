@@ -8,6 +8,7 @@ import {
   Compass,
   Footprints,
   MapPin,
+  Sparkles,
   Square,
   ToyBrick,
   Trees,
@@ -24,6 +25,7 @@ import {
 import { KIND_META } from './kinds'
 import { suggestedParking } from './data/parking'
 import { PhotoButton } from './PhotoButton'
+import { askEnabled } from './ask'
 import { WeatherStrip } from './WeatherStrip'
 import { PARK_INFO } from './data/parkinfo'
 import { amenitiesFor, isFood, topChips } from './data/amenities'
@@ -76,6 +78,7 @@ export function ParkSheet({
   onOpenParking,
   onOpenAmenity,
   onOpenTrails,
+  onOpenGuide,
   onPhotoSaved,
 }: {
   park: ParkFeature | null
@@ -86,6 +89,8 @@ export function ParkSheet({
   onOpenAmenity: (kind: 'food' | 'playground') => void
   /** wybor szlaku: warianty przejscia przez to miejsce */
   onOpenTrails: () => void
+  /** rozmowa z przewodnikiem o tym miejscu */
+  onOpenGuide?: () => void
   /** a fresh picture opens its own sheet, where the caption gets written */
   onPhotoSaved: (photoId: string) => void
 }) {
@@ -395,6 +400,24 @@ export function ParkSheet({
             <p className="t-caption park-parking__hint">
               {TRANSIT[park.id].lines ? `Linie ${TRANSIT[park.id].lines}. ` : ''}
               {TRANSIT[park.id].note} Dotknij, żeby Google Maps wyliczyło trasę z Twojego miejsca.
+            </p>
+          </div>
+          <ChevronRight size={18} className="park-parking__chevron" />
+        </button>
+      )}
+
+      {/*
+        Przewodnik przy pogodzie, bo to te same pytania z innej strony: „czy iść",
+        „o której", „co tam jest". Karta podglądu go nie ma, bo tam mieszka decyzja
+        (szczegóły albo start), a nie rozmowa.
+      */}
+      {askEnabled() && onOpenGuide && (
+        <button className="park-parking" onClick={onOpenGuide}>
+          <Sparkles size={18} />
+          <div className="park-parking__body">
+            <p className="t-label park-parking__name">Zapytaj przewodnika</p>
+            <p className="t-caption park-parking__hint">
+              Wie, gdzie stoisz, co zebrałeś i jaka jest pogoda. Odpowiada model, może się mylić.
             </p>
           </div>
           <ChevronRight size={18} className="park-parking__chevron" />

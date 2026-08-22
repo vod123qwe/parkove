@@ -1,26 +1,60 @@
-# Zapytaj o to miejsce
+# Przewodnik (AI)
 
 Stan: **kod gotowy, funkcja wyłączona** do wklejenia adresu Workera i dodania
 klucza Gemini.
 
-## Po co
+## Po co, i czym to NIE jest
 
-Czytasz o Jaskini Nietoperzowej i rodzi się pytanie, którego w karcie nie ma.
-Dziś nie masz gdzie go zadać. Pudełko na końcu karty punktu przyjmuje pytanie i
-odpowiada, mając w kontekście to, co aplikacja o tym punkcie mówi.
+Pierwsza wersja była widgetem na końcu karty punktu. Jarek od razu powiedział, że
+to złe miejsce, i miał rację: **widget odpowiada na pytanie o akapit, który
+właśnie przeczytałeś, a przewodnik idzie z tobą**. Przewodnik potrzebuje innego
+kontekstu i innego wejścia.
+
+Dlatego jest **jedna rozmowa w całej aplikacji i wiele wejść do niej**:
+
+- **ekran główny**, przycisk obok „Miejsca" (to samo piętro decyzji: gdzie idę,
+  o co pytam),
+- **karta miejsca**, wiersz przy pogodzie, bo to te same pytania z innej strony,
+- **karta punktu**, jedno dotknięcie „Zapytaj przewodnika" z kontekstem tego
+  punktu,
+- **pasek wyprawy**, w miejscu listy punktów: listę i tak otwiera dotknięcie
+  białej karty wyżej, więc trzeci przycisk paska powtarzał to samo.
+
+Wątek rozmowy trzyma `App`, nie arkusz: arkusz przy zamknięciu jest
+odmontowywany, a w terenie zamyka się wszystko odruchowo i rozmowa musi to
+przeżyć.
+
+## Co przewodnik wie (decyzja Jarka: wszystko z czterech)
+
+`src/app/guideContext.ts` buduje kontekst jako zwykły tekst, nie JSON, bo model
+czyta go lepiej, a w logu Workera widać dokładnie to, co dostał:
+
+1. **gdzie stoisz**: dystans do granicy miejsca i trzy najbliższe punkty z
+   odległościami,
+2. **postęp**: ile punktów zdobytych, ile do pieczątki, które zostały,
+3. **pogoda**: teraz i najlepsze okno dnia (to samo, co widać w karcie),
+4. **treść punktów tego miejsca**: nazwy i jednozdaniowe zaczepki, a dla punktu,
+   o który pytasz wprost, cały opis wraz z legendą, wyraźnie oznaczoną jako
+   podanie.
+
+Kontekst jest przycięty do 5800 znaków. Bez tego rósł do kilkunastu tysięcy i
+model gubił pytanie.
 
 ## Najważniejsza decyzja jest wizualna
 
 Parkove stoi na zasadzie, że **nigdy nie udaje wiedzy**. Odpowiedź modelu nie
-może więc wyglądać jak treść, którą sprawdziliśmy. Pudełko ma:
+może więc wyglądać jak treść, którą sprawdziliśmy:
 
-- **przerywaną ramkę** i chłodne tło, inne niż cała reszta karty,
-- etykietę „Zapytaj o to miejsce" z ikoną iskry,
-- notę wprost: „Odpowiada model językowy i może się mylić. Reszta tej karty jest
-  sprawdzona, ta odpowiedź nie."
+- w rozmowie odpowiedź ma **chłodne tło i lewą krechę**, pytanie człowieka nie,
+- wejście z karty punktu ma **przerywaną ramkę**,
+- nota jest wprost: „Odpowiada model językowy i może się mylić. Treść punktów w
+  aplikacji jest sprawdzona, ta rozmowa nie."
 
 Ta sama logika, co przy legendach: legenda ma własny krój, żeby nie udawała
 faktu.
+
+**Pytania na start** (cztery pastylki) są tam z premedytacją: puste pole to
+najgorsze, co można dać komuś, kto stoi w terenie z jedną wolną ręką.
 
 ## Zasady dla modelu siedzą w Workerze
 
