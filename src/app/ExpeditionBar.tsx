@@ -213,27 +213,22 @@ export function ExpeditionBar({
             <span style={{ '--b': '9px', '--from': '22%', '--to': '72%' } as CSSProperties} />
             <span style={{ '--b': '18px', '--from': '48%', '--to': '100%' } as CSSProperties} />
           </div>
+          {/*
+            Kolejnosc niesie use case, nie przypadek.
+            Na dole, pod palcem, to co robisz najczesciej i co jest wspomnieniem:
+            zdjecie, notatka, glos. Wyzej, po przerwie, dwa narzedzia, ktore
+            wspomnieniami nie sa: gdzie stoi auto i co to za roslina. Roslina jest
+            najdalej, bo to zupelnie inna czynnosc (Jarek, 2026-08-22).
+
+            --rise to odleglosc od dolu (wejscie kaskaduje od plusa w gore),
+            --sink to odleglosc od gory (zejscie kaskaduje od gory w dol).
+          */}
           <div className="app-addmenu__stack">
-            <Button
-              className="app-addmenu__item"
-              style={{ '--rise': 2, '--sink': 0 } as CSSProperties}
-              icon={<Mic size={20} />}
-              onClick={() => {
-                shut()
-                setRecording(true)
-              }}
-            >
-              Nagraj wspomnienie
-            </Button>
-            {/*
-              Sprawdzanie rośliny mieszka w tym menu, choć nie jest wspomnieniem:
-              zaczyna się tym samym gestem, czyli zdjęciem czegoś, co masz przed
-              sobą. Otwiera własną kamerę na pełnym ekranie, nie zwykły aparat.
-            */}
             {onCheckPlant && (
               <Button
-                className="app-addmenu__item"
-                style={{ '--rise': 2.5, '--sink': 2 } as CSSProperties}
+                /* przerwę nosi OSTATNIE narzędzie: auto pojawia się tylko z GPS-em */
+                className={`app-addmenu__item${here ? '' : ' -apart'}`}
+                style={{ '--rise': 4, '--sink': 0 } as CSSProperties}
                 icon={<Leaf size={20} />}
                 onClick={() => {
                   shut()
@@ -244,14 +239,14 @@ export function ExpeditionBar({
               </Button>
             )}
             {/*
-              Auto nie jest wspomnieniem, ale mieszka w tym samym menu, bo to
-              też „rzecz zostawiona sobie na później". Jedno auto na wyprawę:
-              nowy wpis zastępuje stary, żeby nie zbierać pięciu miejsc parkowania.
+              Auto: jedno na wyprawę, nowy wpis zastępuje stary, żeby nie zbierać
+              pięciu miejsc parkowania. Ostatnie z narzędzi, więc trzyma przerwę
+              oddzielającą je od wspomnień.
             */}
             {here && (
               <Button
-                className="app-addmenu__item"
-                style={{ '--rise': 3, '--sink': 3 } as CSSProperties}
+                className="app-addmenu__item -apart"
+                style={{ '--rise': 3, '--sink': 1 } as CSSProperties}
                 icon={<CarFront size={20} />}
                 onClick={async () => {
                   shut()
@@ -273,7 +268,18 @@ export function ExpeditionBar({
             )}
             <Button
               className="app-addmenu__item"
-              style={{ '--rise': 1, '--sink': 1 } as CSSProperties}
+              style={{ '--rise': 2, '--sink': 2 } as CSSProperties}
+              icon={<Mic size={20} />}
+              onClick={() => {
+                shut()
+                setRecording(true)
+              }}
+            >
+              Nagraj wspomnienie
+            </Button>
+            <Button
+              className="app-addmenu__item"
+              style={{ '--rise': 1, '--sink': 3 } as CSSProperties}
               icon={<StickyNote size={20} />}
               onClick={async () => {
                 shut()
@@ -296,7 +302,7 @@ export function ExpeditionBar({
               label="Zrób zdjęcie"
               full={false}
               className="app-addmenu__item"
-              style={{ '--rise': 0, '--sink': 2 } as CSSProperties}
+              style={{ '--rise': 0, '--sink': 4 } as CSSProperties}
               onSaved={(id) => {
                 shut()
                 onPhoto?.(id)

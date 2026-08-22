@@ -2435,8 +2435,8 @@
 /* krzyżyk wchodzi na końcu kaskady i wychodzi pierwszy: to on zamyka */
 .app-addmenu__close {
   will-change: transform, opacity;
-  animation: add-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: 140ms;
+  animation: add-rise 400ms cubic-bezier(0.34, 1.32, 0.64, 1) both;
+  animation-delay: 200ms;
 }
 
 .app-addmenu.-out .app-addmenu__close {
@@ -2522,9 +2522,19 @@
   color: #ffffff;
   box-shadow: none;
   will-change: transform, opacity;
-  /* dłużej i miękko, kaskada gęstsza: 40 ms zamiast 55, żeby nie czekać na ostatnią */
-  animation: add-rise 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--rise, 0) * 40ms);
+  /*
+   * Wejście dokładnie tak, jak prosił Jarek: z osiemdziesięciu pikseli poniżej
+   * miejsca docelowego, z zera alfy, szybko i kaskadowo, z lekkim odbiciem.
+   * Odbicie robi krzywa z przestrzeleniem (1.32 zamiast 1), a nie osobna klatka:
+   * jedna droga w górę, bez przystanku, więc nie czyta się jak przeskok.
+   */
+  animation: add-rise 420ms cubic-bezier(0.34, 1.32, 0.64, 1) both;
+  animation-delay: calc(var(--rise, 0) * 38ms);
+}
+
+/* przerwa między narzędziami i wspomnieniami: grupy widać bez podpisu */
+.app-addmenu .app-addmenu__item.-apart {
+  margin-bottom: var(--sp-4);
 }
 
 .app-addmenu .app-addmenu__item.pk-btn:active {
@@ -2533,15 +2543,16 @@
   border-color: rgb(255 255 255 / 0.36);
 }
 
+/* zejście: kaskadą OD GÓRY, z przyspieszeniem, w stronę plusa */
 .app-addmenu.-out .app-addmenu__item.pk-btn {
-  animation: add-sink 240ms cubic-bezier(0.4, 0, 1, 1) both;
-  animation-delay: calc(var(--sink, 0) * 32ms);
+  animation: add-sink 220ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation-delay: calc(var(--sink, 0) * 34ms);
 }
 
 @keyframes add-rise {
   from {
     opacity: 0;
-    transform: translateY(16px) scale(0.96);
+    transform: translateY(80px);
   }
   to {
     opacity: 1;
@@ -2561,7 +2572,7 @@
   }
   to {
     opacity: 0;
-    transform: translateY(14px) scale(0.95);
+    transform: translateY(80px);
   }
 }
 

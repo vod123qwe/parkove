@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.74.0'
+export const VERSION = '0.74.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,15 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.74.1',
+    date: '2026-08-22',
+    title: 'The memory menu in the right order, moving the way it was asked for',
+    changes: [
+      ['changed', 'Order carries the use case now. Nearest the thumb are the things you do most and that are memories: photo, note, voice. Above them, after a gap, two tools that are not memories: where the car is, and what plant this is. The plant sits farthest because it is an entirely different action'],
+      ['changed', 'The pills enter from eighty pixels below with zero alpha, fast, cascading from the button upward, with a slight bounce that comes from the curve rather than an extra keyframe. They leave cascading from the top down, accelerating toward the plus'],
+    ],
+  },
   {
     version: '0.74.0',
     date: '2026-08-22',
