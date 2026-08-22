@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.68.0'
+export const VERSION = '0.69.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -13,6 +13,16 @@ export type Release = {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.69.0',
+    date: '2026-08-22',
+    title: 'Plants and questions are on',
+    changes: [
+      ['added', 'Plant identification works. Photograph something on a walk, tap the button in the photo card and three suggestions come back with a confidence each; tapping one writes it as the caption. Tested on the Jagiellonian Oak, which came back as Quercus robur at forty three percent with two other oaks behind it. Five hundred identifications a day, and the app says how many are left'],
+      ['added', 'Asking about a point works. The model answers in Polish, in a few sentences, in its own dashed box that says the answer may be wrong while the rest of the card is checked'],
+      ['changed', 'Both go through one proxy holding both keys, so neither key is ever in the app. The address lives in a single constant'],
+    ],
+  },
   {
     version: '0.68.0',
     date: '2026-08-22',

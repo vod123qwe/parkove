@@ -10,7 +10,7 @@
  * 'https://parkove-plant.twoj-login.workers.dev'. Pusty = obie funkcje wyłączone
  * i ich przyciski w ogóle się nie pokazują.
  */
-export const PROXY: string = ''
+export const PROXY: string = 'https://parkove-plant.vod123qwe.workers.dev'
 
 export const proxyUrl = (path: 'plant' | 'ask') =>
   PROXY ? `${PROXY.replace(/\/$/, '')}/${path}` : ''
