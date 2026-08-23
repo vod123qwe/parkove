@@ -151,3 +151,27 @@ dnia; wróci, jeśli kiedyś będzie po co.
 **Profil** jako osobny ekran przestał istnieć. To była ostatnia rzecz z legacy:
 worek, w którym leżały obok siebie statystyki, naklejki, zdjęcia, wyprawy,
 ustawienia i numer wersji.
+
+## Arkusz miejsc na ekranie głównym
+
+Nie mieszka już za przyciskiem: wystaje na dole i rozwija się w górę (Jarek,
+2026-08-22). Wystawanie ma **290 px** i jest liczone składnik po składniku, bo
+prośba była konkretna: „tytuł, search, taby i jeden kolejny park".
+
+| Składnik | Wysokość |
+| --- | --- |
+| nagłówek arkusza | 84 |
+| pole szukania z odstępami | 70 |
+| zakładki | 44 |
+| jeden wiersz miejsca | 76 |
+| **razem** | **274 → 290** |
+
+Dlaczego 290, a nie 274: przy 274 pomiar pokazał 60 widocznych pikseli z 76, więc
+park nie był całym parkiem.
+
+Nagłówki grup (Zaczęte, Nietknięte, Zdobyte) czekają do rozwinięcia. Bez tego
+widoczny wiersz byłby tytułem grupy, a nie miejscem.
+
+Ta sama liczba jedzie do `--pk-bottom-taken`, czyli do zmiennej mówiącej, ile u
+dołu jest zajęte. Dzięki temu komunikaty same wiedzą, gdzie się zatrzymać, i nie
+trzeba pamiętać o drugim miejscu przy każdej zmianie wysokości.

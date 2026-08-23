@@ -5410,23 +5410,6 @@
   margin-top: var(--sp-2);
 }
 
-/*
- * Podpis w wystajacym arkuszu miejsc. Jedna linijka i ani slowa wiecej: to caly
- * naglowek, jaki sie tam miesci, bo naglowek DS ma 84 px, a wystawanie 190.
- *
- * Pierwsza wersja dopisywala "przeciagnij w gorze, zeby zobaczyc wszystkie" i
- * zawijala sie na dwie linijki, zabierajac polowe wiersza miejsca. Chwyt nad nia
- * i tak mowi, ze arkusz sie rozwija, wiec instrukcja byla oplacona miejscem na
- * tresc.
- */
-.app-dockhint {
-  margin: 0 0 var(--sp-2);
-  color: var(--content-tertiary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* ---- wyszukiwarka miejsc ---- */
 
 /*

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.88.1'
+export const VERSION = '0.88.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.88.2',
+    date: '2026-08-22',
+    title: 'The places sheet shows its title, search and tabs without dragging',
+    tldr:
+      'Arkusz miejsc pokazuje tytuł, szukanie i zakładki od razu.',
+    changes: [
+      ['changed', 'The sheet at the bottom now stands open far enough to show the title, the search field, the tabs and one whole place. It used to show a row and a half and nothing else, which meant searching required knowing that the search exists behind a drag'],
+      ['changed', 'The peek height is measured, component by component: 84 for the header, 70 for the search with its spacing, 44 for the tabs and 76 for a row. That came to 274, and at 274 the measurement showed only 60 of those 76 pixels, so a place was not a whole place. 290'],
+      ['changed', 'Notices follow the new height on their own, because both the sheet and they read the same one variable'],
+    ],
+  },
   {
     version: '0.88.1',
     date: '2026-08-22',

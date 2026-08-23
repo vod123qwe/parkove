@@ -63,6 +63,21 @@ import './app.css'
 
 const FEATURES = parksData.features as unknown as ParkFeature[]
 
+/**
+ * Ile arkusz miejsc wystaje na ekranie głównym.
+ *
+ * Liczone z pomiaru, składnik po składniku, bo Jarek powiedział dokładnie, co ma
+ * być widać: „tytuł, search, taby i jeden kolejny park". Nagłówek arkusza ma 84,
+ * pole szukania z odstępami 70, zakładki 44, wiersz miejsca 76. Razem 274, a po
+ * pomiarze 290: przy 274 z wiersza było widać 60 pikselów z 76, więc park nie
+ * był całym parkiem.
+ *
+ * Wcześniej było 174 i pokazywało półtora wiersza i nic więcej, a wtedy do
+ * szukania trzeba było najpierw rozwinąć arkusz: wyszukiwarka istniała tylko dla
+ * tych, którzy wiedzą, że tam jest.
+ */
+const DOCK_PEEK = 290
+
 type PeekPage =
   | { t: 'park' }
   | { t: 'poi'; poi: QuestPoi }
@@ -695,7 +710,7 @@ export function App() {
        */
       style={{
         ['--pk-bottom-taken' as string]: dockUp
-          ? '174px'
+          ? `${DOCK_PEEK}px`
           : selected || expedition
             ? '76px'
             : '0px',
@@ -961,58 +976,51 @@ export function App() {
         open={dockUp}
         onClose={() => undefined}
         modal={false}
-        minHeight={174}
+        minHeight={DOCK_PEEK}
         openAt="min"
         onDetent={setListDetent}
-        title={listDetent === 'min' ? undefined : 'Miejsca do odkrycia'}
+        title="Miejsca do odkrycia"
       >
-        {listDetent === 'min' && (
-          <p className="t-caption app-dockhint">Miejsca blisko Ciebie</p>
+        {/*
+          Tytuł, szukanie i zakładki widać od razu, bez rozwijania: to one
+          zamieniają wystający arkusz z podglądu listy w narzędzie. Podpis
+          „Miejsca blisko Ciebie" stał tu zamiast tytułu i wypadł razem z
+          powodem, dla którego istniał.
+        */}
+        <label className="app-search">
+          <Search size={17} aria-hidden="true" />
+          <input
+            className="app-search__field"
+            type="search"
+            value={query}
+            placeholder="Szukaj miejsca"
+            aria-label="Szukaj miejsca"
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {query && (
+            <button className="app-search__clear" aria-label="Wyczyść" onClick={() => setQuery('')}>
+              <X size={15} />
+            </button>
+          )}
+        </label>
+        {/* zakladki nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
+        {!needle && (
+          <Segmented
+            className="app-listtabs"
+            options={LIST_TABS}
+            value={listTab}
+            onChange={setListTab}
+            aria-label="Rodzaj miejsc"
+          />
         )}
-        {/* the city and the day trips are different kinds of outing, so they get
-            their own tabs rather than one long mixed list */}
-        {listDetent !== 'min' && (
-          <>
-            <label className="app-search">
-              <Search size={17} aria-hidden="true" />
-              <input
-                className="app-search__field"
-                type="search"
-                value={query}
-                placeholder="Szukaj miejsca"
-                aria-label="Szukaj miejsca"
-                onChange={(e) => setQuery(e.target.value)}
-              />
-              {query && (
-                <button
-                  className="app-search__clear"
-                  aria-label="Wyczyść"
-                  onClick={() => setQuery('')}
-                >
-                  <X size={15} />
-                </button>
-              )}
-            </label>
-            {/* zakladki nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
-            {!needle && (
-              <Segmented
-                className="app-listtabs"
-                options={LIST_TABS}
-                value={listTab}
-                onChange={setListTab}
-                aria-label="Rodzaj miejsc"
-              />
-            )}
-            {needle && (
-              <p className="t-caption app-search__count">
-                {shownParks.length === 0
-                  ? 'Nic takiego nie ma na liście.'
-                  : `${shownParks.length} ${
-                      shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
-                    }`}
-              </p>
-            )}
-          </>
+        {needle && (
+          <p className="t-caption app-search__count">
+            {shownParks.length === 0
+              ? 'Nic takiego nie ma na liście.'
+              : `${shownParks.length} ${
+                  shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
+                }`}
+          </p>
         )}
         {LIST_GROUPS.map((group) => {
           const rows = grouped[group.key]
