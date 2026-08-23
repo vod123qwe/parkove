@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { CSSProperties, ReactNode } from 'react'
 import { cx } from '../cx'
 import { useOverlay } from '../useOverlay'
+import { useLightChrome } from '../useLightChrome'
 import './bottomsheet.css'
 
 export type BottomSheetProps = {
@@ -79,6 +80,12 @@ export function BottomSheet({
   onDetent,
 }: BottomSheetProps) {
   const { shown, closing, requestClose } = useOverlay(open, onClose, EXIT_MS)
+  /*
+   * Arkusz dotyka dolnej krawędzi ekranu, więc to on decyduje o kolorze pasa nad
+   * wskaźnikiem domu. Bez tego pod białą kartą arkusza zostawał ciemny pasek, bo
+   * tło dokumentu jest ciemne pod mapę. Patrz useLightChrome.
+   */
+  useLightChrome(shown && !closing)
   const panelRef = useRef<HTMLDivElement>(null)
   const headRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)

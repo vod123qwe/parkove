@@ -106,7 +106,7 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
         <ListItem
           icon={<Smartphone />}
           title={sim ? 'Symulacja telefonu: włączona' : 'Symuluj telefon'}
-          meta="Wcięcia iPhone'a i dwa pasiaste pasy tam, gdzie na telefonie jest wyspa i wskaźnik domu"
+          meta="Do sprawdzania na komputerze. Na telefonie doda wcięcia do tych, które już masz, więc treść się przesunie"
           onClick={() => setSim(toggleSimPhone())}
         />
         <ListItem

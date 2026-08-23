@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.89.0'
+export const VERSION = '0.89.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.89.1',
+    date: '2026-08-22',
+    title: 'The strip is painted by the canvas, and only the canvas',
+    tldr:
+      'Pas nad wskaźnikiem domu bierze kolor ekranu, który jest z przodu.',
+    changes: [
+      ['fixed', 'Yesterday I claimed full screen surfaces could spill below the bottom edge of the view and cover the strip. They cannot: html and body have overflow hidden and the view is 797 on an 844 screen, so anything painted below 797 is outside the view and clipped. There is no element that can paint there. The strip is painted by the browser canvas and its colour comes only from the document background'],
+      ['changed', 'So the document background is dark, because underneath it lies dark aerial imagery and a dark strip is then invisible, and light surfaces announce themselves. Two things announce, and not arbitrary ones: a modal and a bottom sheet, exactly the two that touch the bottom edge. A place preview card has a margin, so the map is below it and the strip stays dark'],
+      ['fixed', 'A trap worth remembering: a hook runs on every render, including when the component is about to return null. The first version announced a light screen for every closed modal too, so the marker sat on the document from the first second and the strip was light even under the map. The condition has to live inside the hook'],
+      ['changed', 'The phone simulator says plainly that it is a desktop tool. On a phone it overwrites insets that are already there, so content shifts by the difference'],
+    ],
+  },
   {
     version: '0.89.0',
     date: '2026-08-22',

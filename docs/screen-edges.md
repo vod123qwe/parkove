@@ -108,3 +108,42 @@ szparę**, a nie zgłaszane wcięcie.
 
 Z symulacją 47 px: powłoka i mapa kończą się na 859 przy oknie 812, panel modala
 też, a w ostatnim pikselu ekranu jest **biel panelu**, nie podłoże dokumentu.
+
+## Korekta: wylewka nie mogła zadziałać
+
+Poprzednia wersja tego dokumentu twierdziła, że powierzchnie pełnoekranowe
+„wylewają się" pod dolną krawędź widoku i tym zakrywają pas. **Nie działa i nie
+mogło.** Zrzut Jarka po wdrożeniu pokazał pas dokładnie tam, gdzie był.
+
+Powód: `html` i `body` mają `overflow: hidden`, a widok ma 797 przy ekranie 844.
+Wszystko namalowane poniżej 797 leży **poza widokiem** i jest obcięte. Nie ma
+takiego elementu, który by tam cokolwiek namalował.
+
+Ten pas maluje **płótno przeglądarki**, a jego kolor bierze się wyłącznie z tła
+`html`/`body`. To jedyna dźwignia, jaka istnieje.
+
+## Jak to działa naprawdę
+
+Tło dokumentu jest **ciemne**, bo pod spodem leży ciemne zdjęcie lotnicze i
+ciemny pas jest wtedy niewidoczny. Jasne powierzchnie **zgłaszają się same**
+(`data-pk-light`), bo pod białą kartą ciemny pas widać jak nic innego.
+
+Zgłaszają się dwie rzeczy, i to nie przypadkowe: **modal** i **arkusz dolny**. To
+dokładnie te, które dotykają dolnej krawędzi widoku. Karta podglądu miejsca ma
+margines, więc pod nią jest mapa i pas ma zostać ciemny.
+
+Pułapka po drodze, warta zapamiętania: **hook wykonuje się przy każdym renderze,
+także wtedy, gdy komponent zaraz zwróci `null`.** Pierwsza wersja zgłaszała jasny
+ekran także dla wszystkich zamkniętych modali, więc znacznik siedział na
+dokumencie od pierwszej sekundy i pas był jasny nawet pod mapą. Warunek musi być
+w środku hooka, nie u wołającego.
+
+Ekrany naprawdę ciemne (odtwarzanie wspomnienia, podgląd zdjęć) mówią o sobie
+osobno (`data-pk-dark`) i wygrywają z jasnymi, bo ich reguła stoi w pliku niżej.
+
+## O symulatorze
+
+Symulator jest narzędziem **na komputer**. Na telefonie nadpisuje wcięcia
+wartościami iPhone'a, a te już tam są, więc treść się przesuwa: 47 zamienia się w
+59 i wszystko schodzi o 12 px w dół. Nie jest zepsuty, po prostu nie jest do tego.
+Opis wiersza w „O aplikacji" mówi to teraz wprost.

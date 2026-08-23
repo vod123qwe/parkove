@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import type { ReactNode, UIEvent } from 'react'
 import { cx } from '../cx'
 import { useOverlay } from '../useOverlay'
+import { useLightChrome } from '../useLightChrome'
 import { NavBar } from './NavBar'
 import './modal.css'
 
@@ -33,6 +34,11 @@ export function Modal({
   presentation = 'cover',
 }: ModalProps) {
   const { shown, closing, requestClose } = useOverlay(open, onClose, 280)
+  /*
+   * Ekran pełnoekranowy jest jasny, więc pas nad wskaźnikiem domu też ma być
+   * jasny: to jedyne miejsce, w którym ten pas da się pomalować.
+   */
+  useLightChrome(shown && !closing)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {

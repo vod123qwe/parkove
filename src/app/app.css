@@ -4,8 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  /* to samo, co przy panelach: wylewka pod wskaźnik domu, nie koniec przed nim */
-  bottom: calc(-1 * var(--sa-bleed));
+  bottom: 0;
   min-height: max(var(--screen-h), 100dvh);
   /*
    * Ciemne tło NALEŻY DO TEJ POWŁOKI, a nie do dokumentu, i to jest cała
@@ -3527,12 +3526,8 @@
   top: 0;
   left: 0;
   right: 0;
-  /*
-   * Dolna krawędź WYCHODZI pod wskaźnik domu, tak jak mapa wychodzi pod pasek
-   * stanu, i o zmierzoną różnicę, nie o zgłaszane wcięcie. Treść ma własny
-   * odstęp, więc nic nie jest przycięte.
-   */
-  bottom: calc(-1 * var(--sa-bleed));
+  /* both edges pinned: the bottom does not depend on what vh means today */
+  bottom: 0;
   min-height: max(var(--screen-h), 100dvh);
   z-index: 80;
   background: var(--bg-page);

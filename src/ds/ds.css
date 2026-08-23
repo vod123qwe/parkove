@@ -86,18 +86,18 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
   /*
-   * Podłoże dokumentu ma kolor STRONY, nie własny.
+   * Tło dokumentu to JEDYNA rzecz, która maluje pas nad wskaźnikiem domu.
    *
-   * Było na stałe ciemne, z myślą o ciemnej mapie: „lepiej ciemny pasek pod
-   * ciemną mapą niż biały". I to był błąd, który Jarek widział na telefonie jako
-   * czarną szparę u dołu ekranu wyprawy. Podłoże widać tylko wtedy, gdy jakaś
-   * warstwa nie dosięgła krawędzi, a wtedy jedyna rozsądna barwa to ta sama, co
-   * warstwa nad nią: wtedy niedosięgnięcia po prostu nie widać.
+   * Widok na iPhonie jest niższy od ekranu (zmierzone: 797 przy 844), a `html` i
+   * `body` mają `overflow: hidden`, więc nic namalowanego niżej tam nie dojdzie.
+   * Ten pas to płótno przeglądarki i bierze kolor stąd. Dlatego tu jest ciemno:
+   * pod spodem jest ciemne zdjęcie lotnicze i ciemny pas jest niewidoczny.
    *
-   * Ciemne zostaje tam, gdzie ekran naprawdę jest ciemny, i mówi o tym wprost
-   * (`data-pk-dark`, patrz useDarkChrome).
+   * Jasne ekrany pełnoekranowe zgłaszają się same (`data-pk-light`, patrz Modal),
+   * bo pod białą kartą ciemny pas widać jak nic innego. To był ten „czarny pasek",
+   * który Jarek zgłaszał cztery razy.
    */
-  background: var(--bg-page);
+  background: #0b1207;
 }
 
 /* nailed to the window, so there is nothing left for the document to scroll
@@ -106,6 +106,16 @@ body {
   position: fixed;
   inset: 0;
   width: 100%;
+}
+
+/*
+ * Jasny ekran pełnoekranowy jest z przodu, więc pas nad wskaźnikiem domu też ma
+ * być jasny. Kolejność w pliku ma znaczenie: to stoi po tle domyślnym, a ciemne
+ * po tym, więc ekran, który jawnie mówi „jestem ciemny", wygrywa z wszystkim.
+ */
+html[data-pk-light],
+html[data-pk-light] body {
+  background: var(--bg-page);
 }
 
 /* a dark screen is in front: the strip behind the home indicator has to be
