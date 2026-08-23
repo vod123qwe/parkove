@@ -57,3 +57,54 @@ z telefonu):
 `overflow-x: clip` na powłoce (zamiast `hidden`, które dawało wyliczone
 `overflow-y: auto` i obcinało wylewkę mapy) oraz `data-pk-dark` dla ekranów, które
 naprawdę są ciemne. Oba dalej potrzebne, oba za mało same.
+
+## Rozstrzygnięcie: `env()` nie opisuje tej przestrzeni
+
+Diagnostyka z telefonu Jarka zamknęła sprawę, która wracała cztery razy:
+
+```
+okno 797 · ekran 844 · widok 797 · safe 34 · fixed-dol 797 · dpr 3 · standalone tak
+```
+
+Czyta się to tak: **widok ma 797, ekran 844, a iOS przyznaje się do wcięcia 34.**
+Brakuje 47, a system mówi o 34. Element z `bottom: 0` kończy się na 797, czyli
+47 px nad fizycznym dołem ekranu.
+
+To wyjaśnia, dlaczego wszystkie poprzednie podejścia były skazane: każde z nich
+dopisywało `env(safe-area-inset-bottom)` do odstępu, a **ta liczba nie opisuje
+tej przestrzeni**. Można było dopisywać ją wszędzie i pas zostawał.
+
+Magentowy pas na zrzucie to zresztą nie awaria, a diagnostyka robiąca swoje:
+podłoże dokumentu było pomalowane na magentę i pokazało dokładnie, gdzie żadna
+warstwa nie dosięga.
+
+## Co z tym zrobiliśmy
+
+Podpowiedź przyszła od Jarka: „poprzednio mieliśmy problem, że status bar u góry
+zasłaniał część mapy, a teraz mapa jest za status barem i to jest super, tak to
+się udało naprawić". Na górze zadziałało **wejście pod** systemowy element, a nie
+kończenie się przed nim. Na dole robimy to samo.
+
+**`--sa-bleed`: zmierzona różnica, nie zapytana.** `trackScreenHeight` liczy
+`screen.height - innerHeight` i wpisuje wynik do zmiennej. Powierzchnie
+pełnoekranowe (`.app-shell`, `.pk-modal__panel`, `.jscreen`) wychodzą o tyle pod
+dolną krawędź widoku. Treść ma własne odstępy z `--sa-bottom` w środku, więc nic
+nie jest przycięte: dokładamy tylko tło tam, gdzie go nie było.
+
+Dwa zabezpieczenia, bo `screen.height` to nie okno przeglądarki:
+
+- liczy się **tylko w aplikacji z ekranu domowego** (`navigator.standalone`),
+- i tylko gdy różnica jest wielkości wcięcia (do 96 px). Na komputerze różnica to
+  setki pikseli, a w poziomie iOS podaje `screen.height` z pionu; jedno i drugie
+  odpada jako bezsens i wtedy wylewki nie ma.
+
+**Mapa straciła własną wylewkę.** Wylewa się cała powłoka, a mapa jest w niej, więc
+druga wylewka liczyła szparę dwa razy: zmierzone 906 zamiast 859 przy oknie 812.
+
+Symulator dostał te same 47, więc pasiasty pas u dołu pokazuje teraz **realną
+szparę**, a nie zgłaszane wcięcie.
+
+## Sprawdzone
+
+Z symulacją 47 px: powłoka i mapa kończą się na 859 przy oknie 812, panel modala
+też, a w ostatnim pikselu ekranu jest **biel panelu**, nie podłoże dokumentu.

@@ -5,12 +5,24 @@
   isolation: isolate;
 }
 
+/*
+ * Panel WYLEWA SIĘ pod wskaźnik domu, dokładnie tak jak mapa pod pasek stanu.
+ *
+ * To podpowiedź od Jarka: „poprzednio mieliśmy problem, że status bar u góry
+ * zasłaniał część mapy, a teraz mapa jest za status barem i to jest super". Na
+ * górze zadziałało wejście POD systemowy element, a nie kończenie się przed nim.
+ *
+ * Wylewka idzie o `--sa-bleed`, czyli o ZMIERZONĄ różnicę między ekranem i
+ * widokiem, a nie o wcięcie zgłaszane przez `env()`: na telefonie Jarka pierwsze
+ * to 47 px, a drugie 34. Treść ma własny odstęp od dołu, więc nic nie jest
+ * przycięte; dokładamy tylko tło tam, gdzie go nie było.
+ */
 .pk-modal__panel {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: calc(-1 * var(--sa-bleed));
   min-height: max(var(--screen-h), 100dvh);
   display: flex;
   flex-direction: column;

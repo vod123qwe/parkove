@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.88.2'
+export const VERSION = '0.89.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.89.0',
+    date: '2026-08-22',
+    title: 'The strip above the home indicator, finally understood',
+    tldr:
+      'Koniec paska nad wskaźnikiem domu, tym razem z pomiaru.',
+    changes: [
+      ['fixed', 'The strip above the home indicator, and this time from a measurement instead of a guess. The diagnostic on the phone read: window 797, screen 844, safe area 34. So the view is 47 pixels shorter than the screen while iOS admits to 34, which means the safe area inset does not describe that space at all. Every earlier attempt added that inset to some padding, and every earlier attempt was therefore doomed'],
+      ['changed', 'Full screen surfaces now spill below the bottom edge of the view by the measured difference rather than by the reported inset. This is the trick that already worked at the top, where the map goes behind the status bar instead of stopping in front of it. Content keeps its own padding, so nothing is cut: it only adds background where there was none'],
+      ['changed', 'Two guards on that measurement, because screen height is not the browser window: it counts only in an app launched from the home screen, and only when the difference is inset sized. On a desktop the difference is hundreds of pixels and in landscape iOS reports the portrait height, so both are discarded'],
+      ['fixed', 'The map lost its own spill, because the whole shell spills and the map lives inside it: two spills counted the gap twice, measured as 906 instead of 859 on an 812 window'],
+    ],
+  },
   {
     version: '0.88.2',
     date: '2026-08-22',

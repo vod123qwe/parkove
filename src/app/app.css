@@ -4,6 +4,8 @@
   left: 0;
   right: 0;
   bottom: 0;
+  /* to samo, co przy panelach: wylewka pod wskaźnik domu, nie koniec przed nim */
+  bottom: calc(-1 * var(--sa-bleed));
   min-height: max(var(--screen-h), 100dvh);
   /*
    * Ciemne tło NALEŻY DO TEJ POWŁOKI, a nie do dokumentu, i to jest cała
@@ -35,12 +37,18 @@
  * On an installed app that strip belongs to the document, and the document is
  * white now, so anything the canvas does not cover reads as a white band.
  */
+/*
+ * Mapa nie ma juz WLASNEJ wylewki i to jest celowe. Wylewa sie cala powloka, a
+ * mapa jest w niej, wiec dodanie jej drugiej wylewki liczylo szpare dwa razy:
+ * zmierzone 906 zamiast 859 przy oknie 812. Zero znaczy tutaj "tyle, ile
+ * powloka", a nie "do krawedzi widoku".
+ */
 .app-map {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: calc(-1 * var(--sa-bottom));
+  bottom: 0;
 }
 
 /* HUD: city progress top left, profile top right */
@@ -3519,8 +3527,12 @@
   top: 0;
   left: 0;
   right: 0;
-  /* both edges pinned: the bottom does not depend on what vh means today */
-  bottom: 0;
+  /*
+   * Dolna krawędź WYCHODZI pod wskaźnik domu, tak jak mapa wychodzi pod pasek
+   * stanu, i o zmierzoną różnicę, nie o zgłaszane wcięcie. Treść ma własny
+   * odstęp, więc nic nie jest przycięte.
+   */
+  bottom: calc(-1 * var(--sa-bleed));
   min-height: max(var(--screen-h), 100dvh);
   z-index: 80;
   background: var(--bg-page);
