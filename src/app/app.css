@@ -5429,16 +5429,35 @@
 
 /* ---- wyszukiwarka miejsc ---- */
 
+/*
+ * Pole szukania jest OBRYSOWANE, a nie wypełnione, i to nie jest kosmetyka.
+ *
+ * Pierwsza wersja miała to samo wypełnienie, co tor zakładek pod nią
+ * (--bg-surface-sunken), i Jarek od razu to zobaczył: „input wyszukiwarki zlewa
+ * się z tabami". Dwie pastylki w tym samym kolorze, jedna nad drugą, czytają się
+ * jak jedna bryła.
+ *
+ * Rozróżnienie jest przy tym znaczeniowe, nie tylko wizualne: pole do pisania od
+ * zawsze ma obrys, a przełącznik ma wypełniony tor z podniesioną pastylką. Do
+ * tego dwa razy więcej powietrza między nimi, żeby były dwiema rzeczami.
+ */
 .app-search {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  margin-top: var(--sp-2);
+  margin: var(--sp-2) 0 var(--sp-4);
   padding: 0 var(--sp-4);
   height: 46px;
   border-radius: var(--radius-pill);
-  background: var(--bg-surface-sunken);
+  background: var(--bg-surface);
+  box-shadow: inset 0 0 0 1px var(--border-default);
   color: var(--content-tertiary);
+  transition: box-shadow var(--motion-fast) var(--ease-out);
+}
+
+/* pisanie w polu widać na obrysie, nie na tle: tło zostaje tłem strony */
+.app-search:focus-within {
+  box-shadow: inset 0 0 0 2px var(--border-mint, var(--content-accent));
 }
 
 .app-search__field {
@@ -5469,7 +5488,8 @@
   height: 26px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--bg-surface);
+  /* pole jest teraz jasne, wiec krzyzyk musi byc ciemniejszy od niego */
+  background: var(--bg-surface-sunken);
   color: var(--content-secondary);
   cursor: pointer;
 }

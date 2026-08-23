@@ -1,11 +1,23 @@
+/*
+ * Komunikat stoi NAD tym, co siedzi na dole, i nie tylko w kolejności warstw.
+ *
+ * Dwie poprawki po tym, jak arkusz miejsc zamieszkał na dole ekranu głównego.
+ * Kolejność: 105, czyli nad arkuszem (100), bo komunikat schowany za arkuszem to
+ * komunikat, którego nie ma. Odstęp: `--pk-bottom-taken`, czyli ile pikseli u
+ * dołu jest już zajęte, ustawiane przez aplikację w jednym miejscu. Wcześniej
+ * każde użycie dopisywało własne 76 px, dobrane pod pasek wyprawy, i na ekranie
+ * głównym nie znaczyło nic.
+ */
 .pk-toast {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(var(--sa-bottom) + var(--sp-4) + var(--pk-toast-offset, 0px));
+  bottom: calc(
+    var(--sa-bottom) + var(--sp-4) + var(--pk-bottom-taken, 0px) + var(--pk-toast-offset, 0px)
+  );
   margin-inline: auto;
   width: min(calc(100% - 2 * var(--sp-4)), 480px);
-  z-index: 95;
+  z-index: 105;
   display: flex;
   align-items: center;
   gap: var(--sp-3);

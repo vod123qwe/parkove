@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.88.0'
+export const VERSION = '0.88.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.88.1',
+    date: '2026-08-22',
+    title: 'Notices stop hiding behind the places sheet',
+    tldr:
+      'Komunikaty nad arkuszem miejsc, pole szukania nie zlewa się z zakładkami.',
+    changes: [
+      ['fixed', 'A notice could hide behind the places sheet, the update one worst of all. Two causes: notices sat lower in the stack than the sheet, ninety five against a hundred, so they were literally behind it, and the distance from the bottom was written into five separate places as seventy six pixels, a number chosen for the walk bar which is not even on screen at that moment. There is now one variable saying how much of the bottom is taken, set in the one place that knows'],
+      ['fixed', 'The search field and the tabs read as one blob, because both were the same filled pill sitting one above the other. The field is outlined now and the tabs stay filled, which is a difference in meaning rather than decoration: a field you type into has an outline, a switch has a filled track with a raised pill'],
+    ],
+  },
   {
     version: '0.88.0',
     date: '2026-08-22',

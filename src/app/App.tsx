@@ -198,6 +198,9 @@ export function App() {
 
   const selected = FEATURES.find((f) => f.id === selectedId) ?? null
 
+  /** czy arkusz miejsc stoi na dole: jedna prawda dla niego i dla komunikatów */
+  const dockUp = listOpen && !selected && !expedition
+
   /** wybrana kawiarnia albo plac zabaw: mapa jedzie do pinu, pin się zaznacza */
   const pickAmenity = (id: string) => {
     const spot = selected ? amenitiesFor(selected.id).find((a) => a.id === id) : null
@@ -670,7 +673,34 @@ export function App() {
   )
 
   return (
-    <div className={`app-shell${onWalk ? ' -walking' : ''}`}>
+    <div
+      className={`app-shell${onWalk ? ' -walking' : ''}`}
+      /*
+       * Ile pikseli u dołu jest już zajęte. Jedna zmienna, z której korzystają
+       * wszystkie rzeczy przyklejone do dolnej krawędzi, bo Jarek zobaczył, jak
+       * arkusz miejsc nachodzi na komunikat o aktualizacji.
+       *
+       * Przyczyna była podwójna: komunikaty stały niżej w kolejności warstw niż
+       * arkusz (95 wobec 100), więc chowały się ZA nim, a odstępy od dołu były
+       * wpisane na sztywno jako 76, dobrane pod pasek wyprawy, którego wtedy nie
+       * ma. Zamiast dopisywać kolejne liczby: jedna zmienna, ustawiana tam, gdzie
+       * wiadomo, co stoi na dole.
+       *
+       * Bierzemy wysokość WYSTAWANIA arkusza, nie jego aktualną: komunikat nie
+       * ma gonić rozwijanego arkusza w górę, bo wtedy skacze po ekranie.
+       *
+       * 76 px dla karty miejsca i paska wyprawy to ta sama liczba, która była
+       * wcześniej wpisana w pięć miejsc z osobna. Nie jest lepsza, jest w jednym
+       * miejscu.
+       */
+      style={{
+        ['--pk-bottom-taken' as string]: dockUp
+          ? '174px'
+          : selected || expedition
+            ? '76px'
+            : '0px',
+      }}
+    >
       <MapView
         visited={visitedIds}
         onSelect={selectParkFromMap}
@@ -928,7 +958,7 @@ export function App() {
         miejsca albo do paska wyprawy. Jedna powierzchnia na raz.
       */}
       <BottomSheet
-        open={listOpen && !selected && !expedition}
+        open={dockUp}
         onClose={() => undefined}
         modal={false}
         minHeight={174}
@@ -1181,7 +1211,6 @@ export function App() {
               : `Masz najnowszą wersję, ${VERSION}`
           }
           autoMs={9000}
-          offset={76}
         />
       )}
 
@@ -1192,7 +1221,6 @@ export function App() {
           icon={<Camera size={18} />}
           title="Dotknij mapy"
           text="Tam postawię ten pin ze zdjęciem"
-          offset={76}
         />
       )}
 
@@ -1210,7 +1238,6 @@ export function App() {
             setPhotoAdded(null)
           }}
           autoMs={9000}
-          offset={76}
         />
       )}
 
@@ -1234,7 +1261,6 @@ export function App() {
           title={`Blisko: ${nearNotice.poi.name}`}
           text={`${formatDistance(nearNotice.distance)} stąd, rozejrzyj się`}
           autoMs={8000}
-          offset={76}
         />
       )}
 
@@ -1252,7 +1278,6 @@ export function App() {
             setArrival(null)
           }}
           autoMs={20000}
-          offset={76}
         />
       )}
 
