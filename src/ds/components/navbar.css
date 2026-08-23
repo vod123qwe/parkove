@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: space-between;
   min-height: var(--control-lg);
-  padding: calc(env(safe-area-inset-top, 0px) + var(--sp-3)) var(--sp-4) var(--sp-3);
+  padding: calc(var(--sa-top) + var(--sp-3)) var(--sp-4) var(--sp-3);
   background: var(--bg-page);
   transition: background var(--motion-base) var(--ease-out);
 }

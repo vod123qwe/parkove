@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.87.0'
+export const VERSION = '0.88.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.88.0',
+    date: '2026-08-22',
+    title: 'Search, routes you assemble yourself, and the gap at the bottom',
+    tldr:
+      'Wyszukiwarka miejsc, własne trasy i koniec szpary u dołu.',
+    changes: [
+      ['added', 'Search in the places list. It ignores the tabs and the groups, because typing a name means you want it found rather than told it lives in the other tab, and it ignores Polish accents, because nobody holds a key down on a phone to type them: bedkow finds Bedkowska'],
+      ['added', 'Assemble your own route: tick the parking, the points, the playground and the coffee, and the walking router puts them in a sensible order. With the parking ticked the route comes back to it, because that is where the car is; without it the route runs from the first point to the last. This walks back the earlier decision that variants are fixed, but only halfway: assembling needs the network, so you do it at home, and the finished route is saved and works offline like any other'],
+      ['fixed', 'The gap at the bottom of the screen on the phone, and both causes were mine. The document ground was permanently dark, on the theory that a dark strip under a dark map beats a white one. It did, and it was terrible for everything else: on the light walk screen the same black turned into a gap under a white card. The ground now takes the colour of the page and the darkness moved onto the map shell, where it was actually wanted, so a layer that falls short of the edge is the same colour as whatever sits above it'],
+      ['fixed', 'The second cause: screens were sized from a measured window height that a phone can report shorter than the real screen. Every min-height now takes whichever is larger, the measurement or the real viewport, so the variable can only make a screen taller and never shorter'],
+      ['added', 'A phone simulator, because this gap kept coming back and I kept fixing it from a description. All 43 uses of the safe area insets moved to variables, so they can be overridden, and the simulator sets the iPhone values and draws two transparent striped bands exactly where the island and the home indicator are. Transparent on purpose: you can see what is underneath'],
+    ],
+  },
   {
     version: '0.87.0',
     date: '2026-08-22',

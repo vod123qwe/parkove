@@ -162,7 +162,7 @@
 }
 
 .pk-sheet__content.-hero .pk-sheet__inner {
-  padding: var(--sp-6) var(--sp-6) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  padding: var(--sp-6) var(--sp-6) calc(var(--sa-bottom) + var(--sp-6));
 }
 
 /* inner scroll wakes up only at the full detent */
@@ -182,7 +182,7 @@
 
 .pk-sheet__inner {
   padding-top: 28px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  padding-bottom: calc(var(--sa-bottom) + var(--sp-6));
 }
 
 @keyframes pk-sheet-fade {

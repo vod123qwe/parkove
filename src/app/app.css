@@ -4,14 +4,25 @@
   left: 0;
   right: 0;
   bottom: 0;
-  min-height: var(--screen-h);
+  min-height: max(var(--screen-h), 100dvh);
+  /*
+   * Ciemne tło NALEŻY DO TEJ POWŁOKI, a nie do dokumentu, i to jest cała
+   * poprawka szpary u dołu.
+   *
+   * Wcześniej podłoże dokumentu było na stałe ciemne, „bo pod ciemną mapą lepiej
+   * ciemny pasek niż biały". Miało to sens dla mapy i było fatalne dla wszystkiego
+   * innego: na jasnym ekranie wyprawy ta sama czerń robiła się czarną szparą pod
+   * białą kartą. Teraz dokument ma kolor strony, a ciemność siedzi tu, pod mapą,
+   * czyli dokładnie tam, gdzie była potrzebna.
+   */
+  background: #0b1207;
   /*
    * `clip`, nie `hidden`, i to jest cała przyczyna białego paska na telefonie.
    * W CSS `overflow-x: hidden` z `overflow-y: visible` daje WYLICZONE
    * `overflow-y: auto`: powłoka stawała się kontenerem przewijania i obcinała
    * wylewkę mapy w pas za wskaźnikiem domu, więc świeciło tam tło dokumentu.
    * `overflow-x: clip` zachowuje `overflow-y: visible`, sprawdzone na wyliczonych
-   * wartościach. Na komputerze env(safe-area-inset-bottom) to zero, dlatego błąd
+   * wartościach. Na komputerze var(--sa-bottom) to zero, dlatego błąd
    * był niewidoczny w podglądzie i widać go było tylko na telefonie.
    * `hidden` zostaje jako zapas dla Safari starszego niż 16.
    */
@@ -29,13 +40,13 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  bottom: calc(-1 * var(--sa-bottom));
 }
 
 /* HUD: city progress top left, profile top right */
 .app-hud {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4));
+  top: calc(var(--sa-top) + var(--sp-4));
   left: var(--sp-4);
   right: var(--sp-4);
   z-index: 10;
@@ -173,7 +184,7 @@
 /* list trigger, bottom center */
 .app-fab {
   position: absolute;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  bottom: calc(var(--sa-bottom) + var(--sp-6));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -1389,7 +1400,7 @@
 
 .plantcam__close {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4));
+  top: calc(var(--sa-top) + var(--sp-4));
   left: var(--sp-4);
   z-index: 2;
   display: grid;
@@ -1410,7 +1421,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  bottom: calc(var(--sa-bottom) + var(--sp-6));
   z-index: 2;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -1497,7 +1508,7 @@
   right: 0;
   bottom: 0;
   z-index: 3;
-  padding: var(--sp-5) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-5));
+  padding: var(--sp-5) var(--sp-5) calc(var(--sa-bottom) + var(--sp-5));
   background: rgb(6 12 6 / 0.62);
   backdrop-filter: blur(14px);
   color: #ffffff;
@@ -1560,7 +1571,7 @@
   position: absolute;
   left: var(--sp-5);
   right: var(--sp-5);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  bottom: calc(var(--sa-bottom) + var(--sp-6));
   z-index: 3;
   padding: var(--sp-5);
   border-radius: 18px;
@@ -1612,7 +1623,7 @@
 /* atrybucja mapy wchodziła w podpis „Punkty": w czasie wyprawy idzie wyżej */
 .app-shell.-walking .maplibregl-ctrl-bottom-right,
 .app-shell.-walking .maplibregl-ctrl-bottom-left {
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 252px);
+  bottom: calc(var(--sa-bottom) + 252px);
 }
 
 
@@ -1621,7 +1632,7 @@
   position: absolute;
   left: calc(-1 * var(--sp-6));
   right: calc(-1 * var(--sp-6));
-  bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  bottom: calc(-1 * (var(--sa-bottom) + var(--sp-6)));
   top: -12%;
   z-index: -1;
   pointer-events: none;
@@ -1642,7 +1653,7 @@
   position: absolute;
   left: calc(-1 * var(--sp-6));
   right: calc(-1 * var(--sp-6));
-  bottom: calc(-1 * (env(safe-area-inset-bottom, 0px) + var(--sp-6)));
+  bottom: calc(-1 * (var(--sa-bottom) + var(--sp-6)));
   top: -8%;
   z-index: -1;
   /* pod trzema przyciskami ciemniej, żeby podpisy nie walczyły z jasną trawą */
@@ -1939,7 +1950,7 @@
 .app-expbar {
   position: absolute;
   isolation: isolate;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-5));
+  bottom: calc(var(--sa-bottom) + var(--sp-5));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -2328,7 +2339,7 @@
 .trailpick {
   position: absolute;
   isolation: isolate;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-5));
+  bottom: calc(var(--sa-bottom) + var(--sp-5));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -2449,7 +2460,7 @@
   position: absolute;
   right: var(--sp-4);
   /* pod przyciskiem menu: 48 px menu, 44 px odstępu, potem styl mapy i ten */
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4) + 48px + 44px + 40px + var(--sp-2));
+  top: calc(var(--sa-top) + var(--sp-4) + 48px + 44px + 40px + var(--sp-2));
   z-index: 11;
   display: grid;
   place-items: center;
@@ -2487,7 +2498,7 @@
   corner-shape: var(--corner-smooth);
   left: var(--sp-4);
   right: var(--sp-4);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  bottom: calc(var(--sa-bottom) + var(--sp-4));
   z-index: 14;
   display: flex;
   flex-direction: column;
@@ -2555,7 +2566,7 @@
 .app-look {
   position: absolute;
   right: var(--sp-4);
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4) + 48px + 44px);
+  top: calc(var(--sa-top) + var(--sp-4) + 48px + 44px);
   z-index: 11;
   display: grid;
   place-items: center;
@@ -2596,7 +2607,7 @@
 .app-looks {
   position: absolute;
   right: var(--sp-4);
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-4) + 48px + 44px + 40px + var(--sp-2) + 40px + var(--sp-3));
+  top: calc(var(--sa-top) + var(--sp-4) + 48px + 44px + 40px + var(--sp-2) + 40px + var(--sp-3));
   z-index: 13;
   display: flex;
   flex-direction: column;
@@ -2608,7 +2619,7 @@
   box-shadow: var(--elevation-3);
   animation: looks-in 200ms var(--ease-screen);
   transform-origin: top right;
-  max-height: calc(var(--screen-h) - env(safe-area-inset-top, 0px) - 260px);
+  max-height: calc(var(--screen-h) - var(--sa-top) - 260px);
   overflow-y: auto;
 }
 
@@ -2906,7 +2917,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  padding: 0 var(--sp-5) calc(var(--sa-bottom) + var(--sp-6));
 }
 
 /* krzyżyk wchodzi na końcu kaskady i wychodzi pierwszy: to on zamyka */
@@ -3471,7 +3482,7 @@
   /* above the card: the sheet sits at 100, and a bar hidden behind the thing
      it belongs to is no bar at all */
   z-index: 110;
-  padding: var(--sp-6) var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  padding: var(--sp-6) var(--sp-5) calc(var(--sa-bottom) + var(--sp-4));
   background: linear-gradient(
     to top,
     var(--bg-page) 0%,
@@ -3510,7 +3521,7 @@
   right: 0;
   /* both edges pinned: the bottom does not depend on what vh means today */
   bottom: 0;
-  min-height: var(--screen-h);
+  min-height: max(var(--screen-h), 100dvh);
   z-index: 80;
   background: var(--bg-page);
   /* a walk from the journal is one level deeper, so it arrives from the side */
@@ -3530,7 +3541,7 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  bottom: calc(-1 * var(--sa-bottom));
   height: auto;
   min-height: 0;
   margin: 0;
@@ -3548,7 +3559,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-8));
+  bottom: calc(var(--sa-bottom) + var(--sp-8));
   margin-inline: auto;
   width: fit-content;
   padding: var(--sp-3) var(--sp-5);
@@ -3638,7 +3649,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  min-height: var(--screen-h);
+  min-height: max(var(--screen-h), 100dvh);
   z-index: 120;
   background: #0f1a0d;
   /* a screening is presented over everything, so it rises from the bottom */
@@ -3658,7 +3669,7 @@
 
 .memplay .maplibregl-ctrl-bottom-right {
   /* nad wlosem postepu, zeby sie nie nakladaly */
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 4px);
+  bottom: calc(var(--sa-bottom) + 4px);
 }
 
 .memplay__map {
@@ -3666,13 +3677,13 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  bottom: calc(-1 * var(--sa-bottom));
 }
 
 /* changing how the ground looks: top right, opposite the way out */
 .memplay__look {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3));
+  top: calc(var(--sa-top) + var(--sp-3));
   right: var(--sp-4);
   z-index: 3;
   display: grid;
@@ -3699,7 +3710,7 @@
  */
 .memplay__sound {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3) + 56px);
+  top: calc(var(--sa-top) + var(--sp-3) + 56px);
   right: var(--sp-4);
   z-index: 3;
   display: grid;
@@ -3735,7 +3746,7 @@
 .memplay__looks {
   position: absolute;
   /* pod oba przyciski w kolumnie, nie pod jeden: 48 + 8 razy dwa */
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3) + 112px);
+  top: calc(var(--sa-top) + var(--sp-3) + 112px);
   right: var(--sp-4);
   z-index: 4;
   display: flex;
@@ -3778,7 +3789,7 @@
  */
 .memplay__back {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3));
+  top: calc(var(--sa-top) + var(--sp-3));
   left: var(--sp-4);
   z-index: 4;
   flex: none;
@@ -3907,7 +3918,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sp-3);
-  padding: 0 var(--sp-5) calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  padding: 0 var(--sp-5) calc(var(--sa-bottom) + var(--sp-4));
   color: #ffffff;
   text-align: center;
   pointer-events: none;
@@ -4163,7 +4174,7 @@
   position: absolute;
   left: var(--sp-5);
   right: var(--sp-5);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4));
+  bottom: calc(var(--sa-bottom) + var(--sp-4));
   pointer-events: none;
   transform-origin: bottom center;
   will-change: transform, opacity;
@@ -4328,7 +4339,7 @@
  */
 .memplay__clock {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3) + 14px);
+  top: calc(var(--sa-top) + var(--sp-3) + 14px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -4431,7 +4442,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  min-height: var(--screen-h);
+  min-height: max(var(--screen-h), 100dvh);
   z-index: 130;
   display: flex;
   flex-direction: column;
@@ -4465,7 +4476,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-4);
-  padding: calc(env(safe-area-inset-top, 0px) + var(--sp-3)) var(--sp-4) var(--sp-3);
+  padding: calc(var(--sa-top) + var(--sp-3)) var(--sp-4) var(--sp-3);
 }
 
 .memview__close {
@@ -4615,7 +4626,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-4) calc(env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  padding: var(--sp-4) var(--sp-4) calc(var(--sa-bottom) + var(--sp-6));
 }
 
 .memview__when {
@@ -5180,7 +5191,7 @@
  */
 .dlbar {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + var(--sp-2));
+  top: calc(var(--sa-top) + var(--sp-2));
   left: 50%;
   transform: translateX(-50%);
   z-index: 140;
@@ -5414,4 +5425,196 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ---- wyszukiwarka miejsc ---- */
+
+.app-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+  padding: 0 var(--sp-4);
+  height: 46px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-sunken);
+  color: var(--content-tertiary);
+}
+
+.app-search__field {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--content-primary);
+  font-family: var(--font-text);
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.app-search__field:focus {
+  outline: none;
+}
+
+/* przegladarki dorzucaja swoj krzyzyk do type=search; mamy wlasny */
+.app-search__field::-webkit-search-cancel-button {
+  display: none;
+}
+
+.app-search__clear {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--content-secondary);
+  cursor: pointer;
+}
+
+.app-search__count {
+  margin: var(--sp-3) 0 0;
+  color: var(--content-tertiary);
+}
+
+/* ---- ukladanie wlasnej trasy ---- */
+
+.mytrail {
+  margin: var(--sp-4) 0 var(--sp-6);
+}
+
+.mytrail__lead {
+  margin: 0 0 var(--sp-4);
+  color: var(--content-secondary);
+}
+
+.mytrail__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+/*
+ * Wiersz do zaznaczania. Pelna szerokosc i wysoki cel dotyku, bo zaznacza sie
+ * to kciukiem przy planowaniu, czesto po kilka rzeczy pod rzad.
+ */
+.mytrail__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  corner-shape: var(--corner-smooth);
+  background: transparent;
+  color: var(--content-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.mytrail__item.-on {
+  background: var(--bg-mint);
+}
+
+.mytrail__box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  corner-shape: var(--corner-smooth);
+  box-shadow: inset 0 0 0 1.5px var(--border-default);
+  background: var(--bg-surface);
+  color: var(--content-on-primary);
+}
+
+.mytrail__item.-on .mytrail__box {
+  background: var(--bg-primary);
+  box-shadow: none;
+}
+
+.mytrail__icon {
+  flex: none;
+  color: var(--content-tertiary);
+}
+
+.mytrail__item.-on .mytrail__icon {
+  color: var(--content-accent);
+}
+
+.mytrail__name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-text);
+  font-weight: 600;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mytrail__tag {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-surface-sunken);
+  color: var(--content-secondary);
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mytrail__item.-on .mytrail__tag {
+  background: var(--bg-surface);
+}
+
+.mytrail__acts {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.mytrail__acts > * {
+  flex: 1;
+}
+
+.mytrail__note,
+.mytrail__problem {
+  margin: var(--sp-3) 0 0;
+  color: var(--content-tertiary);
+}
+
+.mytrail__problem {
+  color: var(--content-danger, #a33);
+}
+
+/* wlasna trasa ma kosz; gotowa nie ma czego usuwac */
+.mytrail__row {
+  position: relative;
+}
+
+.mytrail__drop {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--radius-btn);
+  corner-shape: var(--corner-smooth);
+  background: rgb(255 255 255 / 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--content-secondary);
+  cursor: pointer;
 }

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronRight, Component, FileClock, HardDrive, RefreshCw, Ruler } from 'lucide-react'
+import { ChevronRight, Component, FileClock, HardDrive, RefreshCw, Ruler, Smartphone } from 'lucide-react'
 import { List, ListItem, Modal } from '../ds'
 import { VERSION } from '../changelog'
 import { refreshVersion } from './refresh'
-import { screenReport, toggleGroundDebug } from './screen'
+import { screenReport, toggleGroundDebug, toggleSimPhone } from './screen'
 import { dropAllPacks, fmtMB, storageReport } from './offline'
 
 /**
@@ -34,6 +34,7 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
     void storageReport().then(setStore)
   }, [open, wiped])
   const [diag, setDiag] = useState<string | null>(null)
+  const [sim, setSim] = useState(() => document.documentElement.dataset.pkSim === 'phone')
   const taps = useRef(0)
 
   return (
@@ -101,6 +102,12 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
               <span className="t-caption profile-diag">Usuń wszystkie</span>
             ) : undefined
           }
+        />
+        <ListItem
+          icon={<Smartphone />}
+          title={sim ? 'Symulacja telefonu: włączona' : 'Symuluj telefon'}
+          meta="Wcięcia iPhone'a i dwa pasiaste pasy tam, gdzie na telefonie jest wyspa i wskaźnik domu"
+          onClick={() => setSim(toggleSimPhone())}
         />
         <ListItem
           icon={<Ruler />}

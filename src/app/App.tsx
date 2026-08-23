@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronRight, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Sparkles, ToyBrick } from 'lucide-react'
+import { Award, Camera, ChevronRight, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
@@ -49,6 +49,7 @@ import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import { DownloadStatus } from './DownloadStatus'
+import { KIND_META } from './kinds'
 import { CHALLENGES, challengeStates } from './data/challenges'
 import type { MapStyleId } from './data/mapstyles'
 import { PARKING } from './data/parking'
@@ -599,10 +600,36 @@ export function App() {
     { key: 'fresh' as const, label: 'Nietknięte' },
     { key: 'done' as const, label: 'Zdobyte' },
   ]
-  const shownParks = useMemo(
-    () => (listTab === 'all' ? sortedParks : sortedParks.filter((f) => groupOf(f) === listTab)),
-    [sortedParks, listTab],
-  )
+  /*
+   * Wyszukiwarka miejsc (Jarek: „chciałbym mieć wyszukiwarkę parków na
+   * listingu").
+   *
+   * Dwie decyzje, które w niej siedzą. Pierwsza: **szukanie omija zakładki i
+   * grupy**. Jeśli wpisujesz „będkow", to chcesz to znaleźć, a nie dowiedzieć
+   * się, że jest w drugiej zakładce. Druga: **bez ogonków**. Na telefonie nikt
+   * nie przytrzymuje litery, żeby wpisać ę, więc „bedkow" musi znajdować
+   * „Będkowską", a nie zwracać pustą listę.
+   */
+  const [query, setQuery] = useState('')
+  const plain = (t: string) =>
+    t
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/ł/g, 'l')
+      .toLowerCase()
+  const needle = plain(query.trim())
+
+  const shownParks = useMemo(() => {
+    if (needle.length > 0) {
+      /* szukanie po nazwie i po rodzaju miejsca: „dolina" ma znajdować dolinki */
+      return sortedParks.filter(
+        (f) =>
+          plain(f.properties.name).includes(needle) ||
+          plain(KIND_META[f.properties.kind]?.label ?? '').includes(needle),
+      )
+    }
+    return listTab === 'all' ? sortedParks : sortedParks.filter((f) => groupOf(f) === listTab)
+  }, [sortedParks, listTab, needle])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -915,21 +942,56 @@ export function App() {
         {/* the city and the day trips are different kinds of outing, so they get
             their own tabs rather than one long mixed list */}
         {listDetent !== 'min' && (
-          <Segmented
-            className="app-listtabs"
-            options={LIST_TABS}
-            value={listTab}
-            onChange={setListTab}
-            aria-label="Rodzaj miejsc"
-          />
+          <>
+            <label className="app-search">
+              <Search size={17} aria-hidden="true" />
+              <input
+                className="app-search__field"
+                type="search"
+                value={query}
+                placeholder="Szukaj miejsca"
+                aria-label="Szukaj miejsca"
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              {query && (
+                <button
+                  className="app-search__clear"
+                  aria-label="Wyczyść"
+                  onClick={() => setQuery('')}
+                >
+                  <X size={15} />
+                </button>
+              )}
+            </label>
+            {/* zakladki nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
+            {!needle && (
+              <Segmented
+                className="app-listtabs"
+                options={LIST_TABS}
+                value={listTab}
+                onChange={setListTab}
+                aria-label="Rodzaj miejsc"
+              />
+            )}
+            {needle && (
+              <p className="t-caption app-search__count">
+                {shownParks.length === 0
+                  ? 'Nic takiego nie ma na liście.'
+                  : `${shownParks.length} ${
+                      shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
+                    }`}
+              </p>
+            )}
+          </>
         )}
         {LIST_GROUPS.map((group) => {
           const rows = grouped[group.key]
           if (!rows.length) return null
           return (
             <section key={group.key} className="app-listgroup">
-              {/* naglowek grupy zabralby polowe wystajacego arkusza, wiec czeka */}
-              {listDetent !== 'min' && (
+              {/* naglowek grupy zabralby polowe wystajacego arkusza, wiec czeka;
+                  przy szukaniu nie ma go wcale, bo wynik nie jest przegladaniem */}
+              {listDetent !== 'min' && !needle && (
                 <h3 className="t-title app-listgroup__head">
                   {group.label} <span className="app-listgroup__count">{rows.length}</span>
                 </h3>

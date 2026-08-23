@@ -2,7 +2,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sp-4) + var(--pk-toast-offset, 0px));
+  bottom: calc(var(--sa-bottom) + var(--sp-4) + var(--pk-toast-offset, 0px));
   margin-inline: auto;
   width: min(calc(100% - 2 * var(--sp-4)), 480px);
   z-index: 95;

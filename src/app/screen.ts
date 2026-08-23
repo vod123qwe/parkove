@@ -16,6 +16,9 @@ export function trackScreenHeight() {
   if (location.search.includes('ground=debug') || localStorage.getItem(GROUND_KEY) === '1') {
     document.documentElement.dataset.pkGround = 'debug'
   }
+  if (location.search.includes('sim=phone') || localStorage.getItem(SIM_KEY) === '1') {
+    document.documentElement.dataset.pkSim = 'phone'
+  }
   const apply = () => {
     document.documentElement.style.setProperty('--screen-h', `${Math.round(window.innerHeight)}px`)
   }
@@ -42,6 +45,31 @@ export function useDarkChrome() {
 }
 
 export const GROUND_KEY = 'pk-ground-debug'
+export const SIM_KEY = 'pk-sim-phone'
+
+/**
+ * Symulacja bezpiecznych obszarów telefonu na dowolnym ekranie.
+ *
+ * Jarek: „dalej na dole jest przerwa na telefonie, jak możemy to rozwiązać?
+ * możesz zasymulować taką przestrzeń?". Można, i to jest właściwa kolejność:
+ * najpierw odtworzyć problem tam, gdzie widać kod, a potem naprawiać.
+ *
+ * Wcięcia idą przez zmienne `--sa-*` (patrz ds.css), więc wystarczy je nadpisać.
+ * Do tego dwa przezroczyste, pasiaste pasy dokładnie tam, gdzie na telefonie
+ * jest wcięcie: przez nie widać, co jest pod spodem.
+ */
+export function toggleSimPhone() {
+  const root = document.documentElement
+  const on = root.dataset.pkSim === 'phone'
+  if (on) {
+    delete root.dataset.pkSim
+    localStorage.removeItem(SIM_KEY)
+  } else {
+    root.dataset.pkSim = 'phone'
+    localStorage.setItem(SIM_KEY, '1')
+  }
+  return !on
+}
 
 /**
  * Przełącznik diagnostyki białego paska, dostępny w zainstalowanej aplikacji
