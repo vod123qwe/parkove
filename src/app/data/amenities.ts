@@ -23,6 +23,7 @@ export const KIND_LABEL: Record<AmenityKind, string> = {
 
 export const AMENITIES: Record<string, AmenitySpot[]> = {
   'zalew-nowohucki': [
+    { id: 'zalew-huta-wita', name: 'Huta Wita Food Truck Park', kind: 'fast_food', coords: [20.04991, 50.08079] },
     { id: 'zalew-papa-gelato', name: 'Papa Gelato', kind: 'ice_cream', coords: [20.05104, 50.08127] },
     { id: 'zalew-szesze', name: 'Szesze truck', kind: 'fast_food', coords: [20.04997, 50.08065] },
     { id: 'zalew-conieco', name: 'Conieco', kind: 'fast_food', coords: [20.05003, 50.08063] },

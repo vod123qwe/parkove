@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.91.0'
+export const VERSION = '0.92.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,22 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.92.0',
+    date: '2026-08-23',
+    title: 'The map controls stop disappearing, and the lake gets what people go there for',
+    tldr:
+      'Przyciski mapy już nie znikają, a zalew ma tężnię, fontanny, piasek i pętlę brzegiem.',
+    changes: [
+      ['fixed', 'Opening a screen and closing it back to the start left the list sheet standing at full height, which covers 92 percent of the display. Nothing had actually broken: the map controls were behind the sheet and the map was a 45 pixel strip, too narrow to pinch with two fingers, which is why zooming out looked broken too. Expanding the list is a request about a moment, so it now ends when another screen opens and you come back to the start screen you left'],
+      ['added', 'At full height, tapping the strip of map above the sheet brings the map back. Dragging the sheet down already worked, but that is something you have to know; tapping what you want to return to is not'],
+      ['added', 'Zalew Nowohucki has the four things people actually go there for, and every one of them is about the water: the brine graduation tower on the north shore, the fountains that float on the lake rather than standing on the bank, the wooden pier that is the only place you are above the water instead of beside it, and the sandy corner with four beach volleyball courts and a playground'],
+      ['changed', 'The park description says all of that too. It described a loop and a bit of history and left out the tower, the fountains, the sand, the piers, the outdoor gym and the dog run, which is most of the reason to come'],
+      ['changed', 'Real car parks from OpenStreetMap instead of my three guesses, with capacities: the big surfaced lot on Bulwarowa holds twenty, the strip along the road holds thirteen and is closer to the water, plus one north for the tower and the playground and one east for the gym'],
+      ['added', 'A loop that goes around the water, 2.8 km, passing six of the points. Worth saying how it went wrong first: built from the points themselves, in order, it came out as 3.5 km of zigzag, because a router always joins two stops by the shortest path and the shortest path between two points on the same bank never goes around the lake. Measured, 42 percent of it was walked twice, against 20 percent for a real shore loop. So the loop is now drawn by direction, with a few steering points, and the stops are read back from what it actually passes. The sand and the mill are on a dead end and do not make the cut, which is honest: forcing them in cost a kilometre and doubled the backtracking'],
+      ['fixed', 'The walking route generator lost its way home. It had one Overpass server and no alternative, so a single outage aborted the whole script; the trail generator solved this months ago and the fix had not travelled'],
+    ],
+  },
   {
     version: '0.91.0',
     date: '2026-08-23',

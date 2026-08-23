@@ -295,6 +295,28 @@ export function BottomSheet({
   return (
     <div className={cx('pk-sheet', closing && '-closing', !modal && '-nonmodal', className)}>
       {modal && <div className="pk-sheet__scrim" onClick={requestClose} />}
+      {/*
+        Wyjscie stuknieciem w to, co zostalo widoczne pod arkuszem.
+
+        Arkusz-dok na pelnym detencie zajmuje 92% ekranu, wiec ekran pod nim
+        zostaje jako paseczek: u nas jest to mapa z jej wlasnymi przyciskami,
+        ktore w tym stanie sa zakryte. Dotad wracalo sie tylko przeciagnieciem, a
+        to trzeba wiedziec. Stuknieciem tez, bo „dotknij tego, do czego chcesz
+        wrocic" nie wymaga zadnej wiedzy.
+
+        Prawy gorny rog zostaje wolny (--pk-sheet-back-keep): tam siedzi przycisk
+        menu, jedyna kontrolka widoczna nad arkuszem, i przechwytywanie jej
+        klikniec byloby zamiana jednej pulapki na druga.
+      */}
+      {!modal && minHeight != null && detent === 'full' && heights && (
+        <button
+          type="button"
+          className="pk-sheet__back"
+          aria-label="Wróć do mapy"
+          style={{ height: Math.max(0, Math.round(window.innerHeight - heights.full)) }}
+          onClick={() => setDetent('min')}
+        />
+      )}
       <div
         ref={panelRef}
         className={cx('pk-sheet__panel', detent === 'full' && gap > 0 && '-full')}

@@ -25,13 +25,14 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       { src: '/photos/park-zalew-nowohucki-1-2.jpg', credit: 'Fot. sz.u. · CC BY-SA 2.0 · Wikimedia Commons' },
     ],
     description: [
-      'Piętnaście hektarów parku wokół siedmiu hektarów wody, w środku Nowej Huty, dwadzieścia minut tramwajem od Rynku. Pętla wokół zalewu ma około kilometra i nadaje się na spacer z wózkiem: asfalt, ławki co kilkadziesiąt metrów i cień od strony wschodniej.',
-      'Park założono w 1957 roku, razem z dzielnicą, i do dziś prowadzi go miejski Zarząd Zieleni. Woda jest do patrzenia, nie do pływania, i tak było od początku: kąpiel jest zakazana. Za to są fontanny na tafli, siłownia plenerowa na wschodnim brzegu i food trucki przy północno-zachodnim narożniku.',
+      'Piętnaście hektarów parku wokół siedmiu hektarów wody, w środku Nowej Huty, dwadzieścia minut tramwajem od Rynku. Pętla brzegiem ma dwa i pół kilometra i nadaje się na spacer z wózkiem: asfalt, ławki co kilkadziesiąt metrów i cień od strony wschodniej.',
+      'Rzeczy, dla których warto tu przyjechać, są rozłożone wokół wody, więc żadnej nie da się zwiedzić bez obejścia zalewu. Od północy stoi tężnia solankowa, bezpłatna i otwarta bez godzin, obok niej plac zabaw. W północno-zachodnim narożniku jest piasek: cztery boiska do siatkówki plażowej, drugi plac zabaw i food trucki. Na tafli pływają podświetlane fontanny, widoczne z każdego brzegu. Nad wodę wychodzą dwa drewniane pomosty. Od wschodu jest siłownia plenerowa z FlowParkiem i wybieg dla psów.',
+      'Kąpieliska tu nie ma i nigdy nie było, więc woda jest do patrzenia. Park założono w 1957 roku, razem z dzielnicą, i do dziś prowadzi go miejski Zarząd Zieleni.',
       'Najciekawsze jest to, czego na pierwszy rzut oka nie widać: ta woda pracowała tu na długo przed hutą. Dłubnia napędzała młyny, a kanał, który do jednego z nich prowadził, nazywa się Młynówka i wciąż jest na mapie. Nad zalewem stoją jeszcze ruiny młyna, a kawałek dalej dworek, w którym mieszkał Jan Matejko.',
     ],
     amenities: {
-      playground: { has: true, note: 'Siłownia plenerowa na wschodnim brzegu, place zabaw między blokami na Szkolnym i Willowym.' },
-      food: { has: true, note: 'Food trucki i grill przy północno-zachodnim narożniku, restauracja Nad Zalewem od strony Bulwarowej.' },
+      playground: { has: true, note: 'Dwa place zabaw przy wodzie, cztery piaskowe boiska do siatkówki, siłownia plenerowa i FlowPark od wschodu.' },
+      food: { has: true, note: 'Food trucki w północno-zachodnim narożniku (Huta Wita Food Truck Park), lody i kilka bud przy samym brzegu.' },
       verified: false,
     },
   },

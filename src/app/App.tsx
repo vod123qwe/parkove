@@ -231,6 +231,24 @@ export function App() {
    */
   const dockUp = !selected && !expedition
 
+  /*
+   * Rozwiniecie listy jest PROSBA CHWILOWA, nie trybem.
+   *
+   * Jarek: „gdy kliknę osiągnięcia i zamknę ekran do startu, to znikają mi
+   * ikonki i bottom bar". Nic nie zniknelo: arkusz stal rozwiniety na 92%
+   * ekranu, a przyciski mapy siedzialy pod nim. Wracal do stanu, w ktorym byl,
+   * a nie do STARTU, i to bylo mylace, bo „zamykam ekran" znaczy „wracam na
+   * poczatek".
+   *
+   * Wejscie na pelny ekran konczy wiec to rozwiniecie. Prosba o pelna liste
+   * dotyczy chwili, w ktorej o nia poprosiles, a nie calej sesji.
+   */
+  const onScreen =
+    stampsOpen || journeysOpen || statsOpen || aboutOpen || looksModalOpen || pointsOpen || plantCam
+  useEffect(() => {
+    if (onScreen) setListWide(false)
+  }, [onScreen])
+
   /** wybrana kawiarnia albo plac zabaw: mapa jedzie do pinu, pin się zaznacza */
   const pickAmenity = (id: string) => {
     const spot = selected ? amenitiesFor(selected.id).find((a) => a.id === id) : null

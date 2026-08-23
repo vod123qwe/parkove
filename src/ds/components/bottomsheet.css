@@ -196,3 +196,20 @@
     transform: translateY(100%);
   }
 }
+
+/*
+ * Pas nad arkuszem-dokiem: niewidoczny, ale klikalny. Wysokosc liczy komponent,
+ * bo tylko on wie, ile panelu zostalo nad krawedzia. Prawy gorny rog wolny na
+ * przycisk menu.
+ */
+.pk-sheet__back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: var(--pk-sheet-back-keep, 76px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}

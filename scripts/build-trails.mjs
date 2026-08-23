@@ -55,6 +55,43 @@ const OVERPASS_HOSTS = [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
+/*
+ * Pętle prowadzone RĘCZNIE, punktami kierunkowymi.
+ *
+ * Jarek o zalewie: „szlak jest dziwny, powinien kierować wokół jeziora,
+ * uwzględniając też ew. place zabaw".
+ *
+ * Pierwsze podejście układało pętlę z samych punktów wyprawy, po kolei, i było
+ * błędne z powodu, który widać tylko po zmierzeniu. Router zawsze łączy dwa
+ * sąsiednie przystanki NAJKRÓTSZĄ drogą, a najkrótsza droga między dwoma
+ * punktami tego samego brzegu nigdy nie prowadzi wokół wody. Trasa sklejała się
+ * więc do brzegu zachodniego i chodziła po nim tam i z powrotem: zmierzone 42%
+ * długości pokonywane dwa razy, przy 20% dla prawdziwej pętli brzegiem.
+ *
+ * Dlatego tutaj NIE podajemy przystanków, tylko KIERUNEK: kilka punktów, przez
+ * które trasa ma przejść, żeby objechać wodę z obu stron. Przystanki wychodzą
+ * potem same, z tego, co pętla naprawdę mija (patrz stopWithin). Jeśli punkt
+ * leży na slepym zaułku, nie trafia na listę i dobrze: dla zalewu wciągnięcie
+ * piaskowych boisk i młyna wydłużało pętlę z 2,8 do 3,8 km i podnosiło
+ * zawracanie do 52%, bo w północno-zachodni narożnik wchodzi się i wychodzi tą
+ * samą ścieżką. Te punkty zostają w pętli „przez wszystkie punkty", która po to
+ * właśnie jest.
+ */
+const RINGS = {
+  'zalew-nowohucki': {
+    id: 'wokol-wody',
+    name: 'Pętla wokół wody',
+    /* zachodni pomost, tężnia na północy, wschodni brzeg, fontanny od południa */
+    via: [
+      [20.0504, 50.08071],
+      [20.05154, 50.08135],
+      [20.0561, 50.079],
+      [20.05245, 50.0773],
+    ],
+    stopWithin: 60,
+  },
+}
+
 const parksData = JSON.parse(readFileSync(resolve(root, 'src/app/data/parks.json'), 'utf8'))
 
 /* ---------- dane wejściowe czytane z plików TS, bo tam mieszkają ---------- */
@@ -193,6 +230,47 @@ async function osrm(service, coords, extra = '') {
 }
 
 /** pętla od startu przez podane punkty, kolejność układa usługa trip */
+/**
+ * Pętla prowadzona punktami kierunkowymi, z przystankami wyliczonymi z trasy.
+ *
+ * Różnica wobec loopThrough jest zasadnicza. Tam przystanki są WEJŚCIEM i router
+ * dobiera kolejność (usługa trip). Tu wejściem jest KSZTAŁT, a przystanki są
+ * WYNIKIEM: bierzemy te punkty wyprawy, które gotowa trasa naprawdę mija, i
+ * układamy je w kolejności, w jakiej się je spotyka. Dzięki temu żaden punkt nie
+ * wykrzywia pętli, a lista przystanków nie kłamie o tym, co się zobaczy.
+ */
+async function ringThrough(start, pois, ring) {
+  const coords = [start, ...ring.via, start]
+  const r = await osrm('route', coords)
+  if (!r) return null
+  const line = r.trip.geometry.coordinates
+
+  /* dla każdego punktu: jak blisko trasy leży i w którym jej metrze */
+  const near = []
+  for (const poi of pois) {
+    let best = Infinity
+    let at = 0
+    let run = 0
+    for (let i = 0; i < line.length - 1; i++) {
+      const d = dist(poi.coords, line[i])
+      if (d < best) {
+        best = d
+        at = run
+      }
+      run += dist(line[i], line[i + 1])
+    }
+    if (best <= (ring.stopWithin ?? 60)) near.push({ id: poi.id, at })
+  }
+  near.sort((a, b) => a.at - b.at)
+
+  return {
+    m: Math.round(r.trip.distance),
+    min: Math.max(1, Math.round(r.trip.duration / 60)),
+    stops: near.map((n) => n.id),
+    line: thin(line),
+  }
+}
+
 async function loopThrough(start, pois) {
   const coords = [start, ...pois.map((p) => p.coords)]
   const r = await osrm('trip', coords, '&roundtrip=true&source=first')
@@ -364,6 +442,19 @@ for (const parkId of parks) {
    * przejscie miedzy dwoma punktami na kopcu nie jest szlakiem i tylko zasmieca
    * wybor. Male miejsca po prostu nie maja wariantow.
    */
+  /*
+   * Pętla ułożona ręcznie idzie PIERWSZA, bo jest lepszą propozycją niż wynik
+   * optymalizacji: prowadzi brzegiem i mija po drodze to, po co się tu przyszło.
+   */
+  const ring = RINGS[parkId]
+  if (ring) {
+    const r = await ringThrough(start, pois, ring)
+    if (r) {
+      trails.push({ id: ring.id, name: ring.name, kind: 'points', ...r })
+      console.log(`  ${ring.id}: ${r.m} m, mija ${r.stops.length} punktów (${r.stops.join(', ')})`)
+    }
+  }
+
   const full = await loopThrough(start, pois)
   if (full && full.m >= 600)
     trails.push({
@@ -378,7 +469,7 @@ for (const parkId of parks) {
    * dostala w pierwszym biegu "krotka petle" na 200 m, co nie jest spacerem,
    * tylko przejsciem przez skwer.
    */
-  if (pois.length >= 4 && full && full.m > 2500) {
+  if (!ring && pois.length >= 4 && full && full.m > 2500) {
     const near = [...pois].sort((a, b) => dist(start, a.coords) - dist(start, b.coords)).slice(0, 3)
     const short = await loopThrough(start, near)
     if (short && short.m >= 700 && short.m < full.m * 0.7)

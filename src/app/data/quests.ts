@@ -94,6 +94,98 @@ const KRAKOW_QUESTS: Quest[] = [
     parkId: 'zalew-nowohucki',
     pois: [
       {
+        id: 'teznia',
+        category: 'water',
+        name: 'Nowohucka tężnia solankowa',
+        teaser: 'Ściana z gałęzi, która robi morskie powietrze.',
+        description: [
+          'Tężnia to drewniana ściana wypełniona gałęziami tarniny, po których z góry ścieka solanka. Woda paruje, sól zostaje na gałęziach, a wokół konstrukcji unosi się mgiełka z jodem, magnezem i wapniem. Nie trzeba nic robić: stoisz obok i oddychasz.',
+          'To jedno z tych urządzeń, które mają tylko jeden produkt, i tym produktem jest powietrze. Warto pomyśleć, gdzie ono stoi. Nowa Huta wyrosła wokół kombinatu, a powietrze było przez pół wieku największą skargą tej dzielnicy. Tężnia jest dokładnie odwrotnym gestem.',
+          'Wejście jest bezpłatne i o każdej porze. Najlepiej działa w ciepły, bezwietrzny dzień, bo wtedy mgiełka zostaje w miejscu, a nie leci w bok. Kwadrans wystarczy, nie ma czego rezerwować ani kupować.',
+        ],
+        findHint: 'Północny brzeg, między placem zabaw a wodą. Szukaj niskiej drewnianej ściany, nie budynku. Usłyszysz szum ściekającej wody, zanim ją zobaczysz.',
+        reveal:
+          'Solanka ścieka po gałęziach tarniny i paruje, a w powietrzu zostaje sól z jodem i magnezem. Tężnia nad zalewem jest bezpłatna i otwarta bez godzin.',
+        dilemma: {
+          question:
+            'Tężnie stawia się dla zdrowia, ale ich działanie trudno zmierzyć. Czy miasto powinno budować rzeczy, których efekt jest niepewny?',
+          options: ['Tak, ludzie oddychają i zwalniają', 'Tylko jeśli ktoś to sprawdził', 'To i tak lepsze niż nic'],
+          counterpoint:
+            'O leczniczej sile tężni spierają się do dziś i nikt tego uczciwie nie zamknął. Pewne jest coś innego: ludzie tu przychodzą, siadają i oddychają wolniej niż zwykle. To już jest efekt, tylko innego rodzaju niż ten z ulotki.',
+        },
+        coords: [20.05154, 50.08135],
+        radius: 70,
+      },
+      {
+        id: 'fontanny',
+        category: 'water',
+        name: 'Pływające fontanny',
+        teaser: 'Fontanna nie stoi na brzegu, tylko płynie po tafli.',
+        description: [
+          'Na wodzie zalewu leżą pływające fontanny. To znaczy, że słupy wody wychodzą ze środka tafli, a nie z niecki na brzegu, i po zmroku są podświetlone. Z brzegu widać je z każdej strony, bo woda nie zasłania niczego.',
+          'Różnica między fontanną na brzegu a fontanną na wodzie jest większa, niż się wydaje. Tę pierwszą się mija. Ta druga każe patrzeć NA DRUGĄ STRONĘ zalewu, więc mimochodem pokazuje, jaki on jest szeroki. Fontanna robi tu robotę za mapę.',
+          'Najlepszy moment to koniec dnia, kiedy zapala się światło, a wiatr już siada. Przy wietrze słup wody się kładzie i mgiełka leci na brzeg, co dla dziecka jest atrakcją samą w sobie.',
+        ],
+        findHint: 'Południowa promenada. Patrz na wodę, nie na brzeg: fontanny są kilkadziesiąt metrów od Ciebie, na tafli.',
+        reveal:
+          'Fontanny nad zalewem pływają po wodzie i są podświetlone po zmroku, więc słupy wody wychodzą ze środka tafli, a nie z brzegu.',
+        dilemma: {
+          question:
+            'Fontanny na wodzie potrzebują pomp i prądu, a robią rzecz wyłącznie ładną. Czy tak wydaje się pieniądze parku?',
+          options: ['Tak, ładne jest po coś', 'Wolałbym te pieniądze na drzewa', 'Zależy, ile to prądu'],
+          counterpoint:
+            'Ładne bywa najtańszym sposobem, żeby ktoś w ogóle przyszedł, a park bez ludzi psuje się szybciej niż park z ludźmi. Ale to nie unieważnia pytania o rachunek: dobrze wydany prąd i tak jest prądem.',
+        },
+        coords: [20.05245, 50.0773],
+        radius: 80,
+      },
+      {
+        id: 'pomost',
+        category: 'water',
+        name: 'Drewniany pomost',
+        teaser: 'Jedyne miejsce, gdzie stoisz NAD wodą, nie obok.',
+        description: [
+          'Nad zalew wychodzą dwa drewniane pomosty: jeden przy północno-zachodnim narożniku, blisko food trucków, drugi od wschodu. Cała reszta spaceru prowadzi obok wody. Pomost jest jedynym miejscem, w którym woda jest pod Tobą.',
+          'To zmienia więcej, niż brzmi. Z brzegu patrzysz na zalew z boku i widzisz odbicie nieba. Z pomostu patrzysz w dół i widzisz wodę, czyli glony, ryby, cień własnej głowy i to, jak szybko wszystko się rusza. Dla dziecka to najlepsze dwadzieścia metrów całego parku.',
+          'Deski po deszczu bywają śliskie, a kaczki traktują pomost jak własny, więc trzeba patrzeć pod nogi z dwóch powodów.',
+        ],
+        findHint: 'Zachodni brzeg, kawałek za food truckami. Drewniany taras wychodzący w wodę, dobrze widoczny z przeciwnej strony zalewu.',
+        reveal:
+          'Zalew ma dwa drewniane pomosty, na zachodnim i wschodnim brzegu. To jedyne miejsca, z których patrzy się na wodę z góry, a nie z boku.',
+        dilemma: {
+          question:
+            'Zalew ma pomosty, ale kąpieliska nie. Czy woda w mieście powinna być do patrzenia, czy do wchodzenia?',
+          options: ['Do wchodzenia, inaczej po co woda', 'Do patrzenia, jeśli nie jest czysta', 'Niech będzie i jedno, i drugie'],
+          counterpoint:
+            'Kąpielisko to nie tylko woda, ale też ratownik, badania i pieniądze na cały sezon. Pomost daje część tego samego uczucia za znikomy koszt, i dlatego jest ich tu dwa, a kąpieliska nie ma ani jednego.',
+        },
+        coords: [20.0504, 50.08071],
+        radius: 60,
+      },
+      {
+        id: 'piasek',
+        category: 'play',
+        name: 'Piaskowy brzeg',
+        teaser: 'Cztery boiska do siatkówki plażowej. Piasek jest, morza nie.',
+        description: [
+          'Północno-zachodni narożnik zalewu jest zasypany piaskiem: stoją tu cztery boiska do siatkówki plażowej, a kawałek dalej, przy samym brzegu, plac zabaw. Obok są food trucki, więc to jedyny kąt parku, w którym da się spędzić pół dnia i nigdzie nie iść.',
+          'Ciekawe jest samo założenie. Kąpać się w zalewie nie można, a piasek i tak nawieziono, bo piasek to połowa tego, co ludzie lubią w plaży: siedzenie, grzanie się i chodzenie boso. Woda jest tu tłem, nie celem.',
+          'Boiska są otwarte i nikt ich nie rezerwuje, więc bywa, że są zajęte. Plac zabaw obok ratuje sytuację, gdy trzeba na coś poczekać.',
+        ],
+        findHint: 'Północno-zachodni narożnik, za food truckami. Idź w stronę piachu i siatek, plac zabaw jest bliżej wody.',
+        reveal:
+          'W północno-zachodnim narożniku są cztery piaskowe boiska do siatkówki plażowej i plac zabaw. Kąpieliska nie ma, a piasek jest.',
+        dilemma: {
+          question:
+            'Nad wodą, w której nie wolno się kąpać, zrobiono plażę bez kąpieliska. Czy to uczciwe wobec ludzi, którzy tu przychodzą?',
+          options: ['Tak, plaża to nie tylko woda', 'Nie, to obiecuje coś, czego nie ma', 'Wolałbym normalne kąpielisko'],
+          counterpoint:
+            'Nikt tu nie udaje, że można wejść: tablice mówią wprost. Ale trzeba przyznać, że piasek nad wodą wysyła sygnał silniejszy niż każda tablica, i część ludzi przyjeżdża tu z ręcznikiem.',
+        },
+        coords: [20.05018, 50.08209],
+        radius: 90,
+      },
+      {
         id: 'mlyn',
         category: 'history',
         name: 'Ruiny młyna',

@@ -68,3 +68,44 @@ go w domu przy planowaniu, a w dolinie aplikacja może zostać przeładowana.
   prowadzeniem za rękę.
 - Szlaków rowerowych i konnych. Router chodzi profilem pieszym, a relacje
   bierzemy tylko `hiking` i `foot`.
+
+## Pętla prowadzona ręcznie (RINGS w build-trails.mjs)
+
+Jarek o zalewie: „szlak jest dziwny, powinien kierować wokół jeziora,
+uwzględniając też ew. place zabaw".
+
+Pierwsze podejście było oczywiste i błędne: ułożyć pętlę z punktów wyprawy, po
+kolei, brzegiem. Wyszło 3,5 km zygzaka, bo **router łączy dwa sąsiednie
+przystanki najkrótszą drogą, a najkrótsza droga między dwoma punktami tego samego
+brzegu nigdy nie prowadzi wokół wody**. Trasa sklejała się do brzegu zachodniego
+i chodziła po nim tam i z powrotem.
+
+Miara, która to pokazała: ile procent długości trasy przebiega bliżej niż 12 m od
+jej własnego, niesąsiedniego kawałka.
+
+| trasa | długość | zawracanie |
+| --- | --- | --- |
+| pętla brzegiem (kontrola, bez przystanków) | 2545 m | 20% |
+| od parkingu przez wschód i zachód | 2761 m | 27% |
+| moja pętla z 9 przystanków po kolei | 3557 m | 41% |
+| to samo z punktem kierunkowym na wschodzie | 3742 m | 42% |
+| tam i z powrotem (kontrola dolna) | 1117 m | 89% |
+
+Kontrola jest tu ważniejsza od pomiaru. Bez niej 41% wyglądało na katastrofę, a
+20% dla prawdziwej pętli mówi, że część zawracania jest nieusuwalna: dojście od
+parkingu chodzi się w obie strony.
+
+**Wniosek i mechanizm:** w RINGS nie podajemy przystanków, tylko `via`, czyli
+kilka punktów wyznaczających KSZTAŁT. Przystanki wychodzą potem z tego, co gotowa
+trasa mija bliżej niż `stopWithin`. Zalety są dwie i obie praktyczne:
+
+1. żaden punkt nie wykrzywia pętli, bo pętla nie musi go dotknąć,
+2. lista przystanków nie kłamie: mówi, co się zobaczy, a nie co chcieliśmy zobaczyć.
+
+Punkt na slepym zaułku po prostu nie trafia na listę. Dla zalewu wciągnięcie
+piaskowych boisk i ruin młyna wydłużało pętlę z 2,8 do 3,8 km i podnosiło
+zawracanie do 52%, bo w północno-zachodni narożnik wchodzi się i wychodzi tą samą
+ścieżką. Te punkty zostają w „pętli przez wszystkie punkty", która po to jest.
+
+Gdy miejsce ma pętlę ręczną, nie generujemy już „krótkiej pętli": to byłby drugi
+raz ten sam pomysł.
