@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronRight, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
+import { Award, Camera, ChevronRight, CloudOff, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
@@ -35,6 +35,7 @@ import { updateMark, useMarks, addMark } from './photos'
 import { RevealSheet } from './RevealSheet'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
+import { hasPack, verifyPack } from './offline'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
 import { useWakeLock } from './wakelock'
@@ -289,6 +290,41 @@ export function App() {
   /* ekran nie gaśnie w trakcie wyprawy: inaczej ślad urywa się w kieszeni */
   useWakeLock(!!expedition)
   const onWalk = !!expedition
+
+  /*
+   * Wyprawa bez pobranej mapy: powiedz to RAZ, przy starcie.
+   *
+   * Karta miejsca mówi to lepiej i pełniej (wiersz „Pobierz mapę na offline"
+   * podaje wagę i tłumaczy, po co), tylko mówi to w środku karty, więc widzisz
+   * to wyłącznie wtedy, gdy doscrollujesz. A moment, w którym to ma znaczenie,
+   * jest jeden: naciskasz start i wychodzisz z domu. Za godzinę może już nie być
+   * z czego pobierać.
+   *
+   * Strażnik na referencji, nie zależność w efekcie: obiekt wyprawy zmienia się
+   * przy każdym kroku, bo rośnie w nim ślad, więc komunikat wracałby co sekundę.
+   * Jedna wyprawa ma o tym usłyszeć raz.
+   */
+  const [noMapFor, setNoMapFor] = useState<string | null>(null)
+  const toldNoMap = useRef<string | null>(null)
+  useEffect(() => {
+    if (!expedition) return
+    if (toldNoMap.current === expedition.id) return
+    toldNoMap.current = expedition.id
+    const parkId = expedition.parkId
+    if (!hasPack(parkId)) {
+      setNoMapFor(parkId)
+      return
+    }
+    /*
+     * Spis mowi, ze mapa jest. Sprawdz jeszcze, czy kafle naprawde leza w
+     * koszyku, bo iOS czysci go bez pytania i wtedy spis klamie. Gdyby ten
+     * komunikat wierzyl samemu spisowi, milczalby dokladnie wtedy, kiedy jestes
+     * najmniej przygotowany. verifyPack po drodze naprawia spis.
+     */
+    void verifyPack(parkId).then((ok) => {
+      if (!ok) setNoMapFor(parkId)
+    })
+  }, [expedition])
   const peekOpen = !!selected && !expanded && !onWalk
 
   // ...and lands once the walk is closed, one park at a time
@@ -1275,6 +1311,28 @@ export function App() {
               : `Masz najnowszą wersję, ${VERSION}`
           }
           autoMs={9000}
+        />
+      )}
+
+      {noMapFor && (
+        <Toast
+          open
+          onClose={() => setNoMapFor(null)}
+          icon={<CloudOff size={18} />}
+          title="Idziesz bez pobranej mapy"
+          /*
+           * Bez straszenia i bez blokowania: to informacja, nie zgoda. Zdarza
+           * się iść świadomie, na spacer po mieście z zasięgiem, i wtedy
+           * pytanie „czy na pewno" byłoby tylko kliknięciem do odklikania.
+           */
+          text="Poza zasięgiem zobaczysz tylko to, co mapa już zdążyła zobaczyć"
+          actionLabel="Pobierz"
+          onAction={() => {
+            setSelectedId(noMapFor)
+            setExpanded(true)
+            setNoMapFor(null)
+          }}
+          autoMs={12000}
         />
       )}
 
