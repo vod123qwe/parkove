@@ -569,6 +569,8 @@ export const DOLINKI_QUESTS: Quest[] = [
           'sktj.pl, opis Jaskini Łabajowej',
           'OpenStreetMap: Jaskinia Łabajowa',
         ],
+        photo: '/photos/poi-dolina-bedkowska-labajowa.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.77273, 50.1906],
         radius: 60,
       },
@@ -784,6 +786,8 @@ export const DOLINKI_QUESTS: Quest[] = [
         reveal:
           'Dolina Szklarki ma około dziewięciu kilometrów i ciągnie się od Jerzmanowic przez Szklary do Dubia, gdzie jej wylot spotyka się z wylotem Doliny Racławki.',
         sources: ['https://pl.wikipedia.org/wiki/Dolina_Szklarki'],
+        photo: '/photos/poi-dolina-szklarki-brodlo.jpg',
+        photoCredit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [19.717043, 50.17755],
         radius: 45,
       },

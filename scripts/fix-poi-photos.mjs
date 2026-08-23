@@ -12,6 +12,13 @@ import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
+/*
+ * UWAGA na kolejność: ta lista kasuje zdjęcie punktu, a nie konkretny plik. Gdy
+ * punkt dostanie NOWE, sprawdzone zdjęcie, trzeba go z listy zdjąć, bo inaczej
+ * następny bieg tego skryptu usunie dobre zdjęcie za winy poprzedniego. Tak było
+ * z „dolina-szklarki/brodlo": pierwszy raz przyszedł ptak na gałęzi, drugi raz
+ * prawdziwy ostaniec z krzyżem, więc wpis zniknął stąd razem z tą zmianą.
+ */
 /** punkt -> co jest na zdjęciu (powód usunięcia) */
 const WRONG = {
   'skalki-twardowskiego/sciany-wspinaczkowe': 'widok przez otwór jaskini, nie ściany',
@@ -28,7 +35,6 @@ const WRONG = {
   'aleksandry/smok-aleksandry': 'ten sam smok co w Parku Bednarskiego',
   'dolina-bolechowicka/taras': 'bloki mieszkalne, nie widok z góry bramy',
   'dolina-kluczwody/slupy-graniczne': 'plakat propagandowy, nie słupy',
-  'dolina-szklarki/brodlo': 'ptak na gałęzi, nie największy ostaniec doliny',
   'dolina-bedkowska/zrodlo-bedkowki': 'tablica informacyjna, nie źródło',
   'decjusza/flamingi': 'żywe flamingi, prawdopodobnie z zoo',
   'szwedzki/stara-kaplica': 'współczesny budynek, nie stara kaplica',
@@ -36,6 +42,10 @@ const WRONG = {
   'zielony-jar/kosciol-milosierdzia': 'zabytkowy kościół, a ten jest współczesny',
   'kopiec-wandy/wanda-matejko': 'metalowa rzeźba, nie kolumna Matejki',
   'bagry/kosciol-trojcy': 'detal wnętrza (krucyfiks), nie kościół',
+  /* przegląd 2026-08-23, po dociągnięciu zdjęć do nowych punktów */
+  'zalew-nowohucki/mlyn': 'ruiny młyna z Warszawy, nie te nad Dłubnią',
+  'skawina-pilsudskiego/teznia': 'tężnia z parku zdrojowego w Rabce',
+  'zalew-nowohucki/wzlot': 'zdjęcie grupowe konferencji pod hotelem: „Wzlot" to tu nazwa wydarzenia, nie rzeźby',
 }
 
 /** para do zamiany: zdjęcie pomnika wisiało przy alei popiersi */

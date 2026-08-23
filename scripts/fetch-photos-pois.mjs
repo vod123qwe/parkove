@@ -28,6 +28,29 @@ const GENERIC = new Set(
     ' ',
   ),
 )
+/*
+ * Miejscowosci, ktorych u nas nie ma. Filtr "wspolne slowo" nie widzi geografii:
+ * na "Ruiny mlyna" przyszedl plik "Warszawa. Ruiny mlyna", a na "teznia" teznia z
+ * parku zdrojowego w Rabce. Nazwa sie zgadza, miejsce nie.
+ *
+ * Nie ma tu Skawiny, Bebla, Kobylan ani Jerzmanowic, bo te sa nasze. Sa tylko
+ * miasta, ktorych w tym projekcie nie moze byc.
+ *
+ * To NIE zastepuje ogladania. Trzecie zle trafienie z tego samego biegu, zdjecie
+ * grupowe konferencji o nazwie "Wzlot", ma w tytule Krakow i przechodzi kazdy
+ * filtr nazwy, jaki da sie napisac. Po pobraniu nowych zdjec trzeba je zobaczyc.
+ */
+const OBCE = new Set(
+  `warszawa wroclaw poznan gdansk gdynia sopot lodz lublin bialystok szczecin bydgoszcz torun
+   olsztyn kielce rzeszow opole katowice gliwice sosnowiec czestochowa radom rabka zakopane
+   tarnow ciechocinek inowroclaw kolobrzeg krynica ustron wisla busko naleczow sandomierz
+   przemysl zamosc chelm plock kalisz legnica walbrzych elblag koszalin slupsk leszno gorzow
+   suwalki lomza siedlce mielec debica jaslo krosno sanok szczawnica muszyna zywiec bielsko
+   cieszyn oswiecim chrzanow trzebinia olkusz myslowice tychy jaworzno rybnik raciborz`.split(
+    /\s+/,
+  ),
+)
+
 const words = (t) =>
   strip(t)
     .split(/[^a-z0-9]+/)
@@ -89,6 +112,8 @@ for (const poi of pois) {
     const mine = words(poi.name)
     const hit = pages.find((p) => {
       const title = words((p.title ?? '').replace(/^File:/, ''))
+      // obce miasto w tytule przeklada sie na obce miejsce na zdjeciu
+      if (title.some((w) => OBCE.has(w))) return false
       return title.some((w) => mine.some((v) => v.startsWith(w.slice(0, 5)) || w.startsWith(v.slice(0, 5))))
     })
     if (!hit) {
