@@ -109,3 +109,71 @@ zawracanie do 52%, bo w północno-zachodni narożnik wchodzi się i wychodzi t�
 
 Gdy miejsce ma pętlę ręczną, nie generujemy już „krótkiej pętli": to byłby drugi
 raz ten sam pomysł.
+
+## Próba pętli dla pozostałych miejsc (tryb `--rings`)
+
+Ręczna pętla nad zalewem rozwiązała jedno miejsce. Pytanie było, ile innych ma
+ten sam problem, więc najpierw **pomiar wszystkich 33 tras** tą samą miarą
+(procent długości chodzonej drugi raz):
+
+| trasa przez punkty | zawracanie |
+| --- | --- |
+| planty-bienczyckie, jalu-kurka, ogrod-botaniczny (2 punkty) | 95 do 98% |
+| dolina-raclawki (12,1 km), dolina-kobylanska | 87 do 93% |
+| witkowice, laki-nowohuckie, bagry, lotnikow | 65 do 88% |
+| blonia, planty, dolina-eliaszowki, grzegorzecki | 0 do 10% |
+
+Pierwszy wniosek jest zastrzeżeniem do miary: **przy dwóch punktach 98% nie jest
+wadą, tylko geometrią.** Między dwoma punktami nie ma pętli, jest droga tam i ta
+sama droga z powrotem. Te miejsca nie mają czego naprawiać.
+
+Drugi wniosek: doliny Jury są liniowe z natury. Dwanaście kilometrów w Racławce
+to sześć w jedną stronę i sześć z powrotem, i tak się tam chodzi.
+
+Zostają duże, okrągłe miejsca: jeziora i parki. Dla nich generator **próbuje**
+pętli i bierze ją tylko wtedy, gdy się zmierzy.
+
+### Jak działa próba
+
+Sześć punktów kierunkowych z obrysu miejsca (po jednym na 60°), każdy cofnięty do
+75% drogi od środka do krawędzi, i **każdy przyklejony do najbliższej ścieżki
+pieszej** pytaniem `nearest` do routera.
+
+Przyklejanie jest tu całą różnicą i najlepiej widać to na wodzie. Bez niego punkt
+kierunkowy nad jeziorem wypada w wodzie, a router bez pytania dociąga go
+najkrótszą drogą, czyli przez most albo poza park: Bagry wychodziły wtedy 3431 m
+z 95% zawracania. Z przyklejaniem: 3796 m i 16%, czyli prawdziwe obejście
+jeziora. Kandydat, do którego najbliższa ścieżka jest dalej niż 150 m, wypada.
+
+### Kiedy pętla zostaje wzięta
+
+Trzy warunki i każdy ma powód:
+
+1. **zawracanie poniżej 40%** (prawdziwa pętla ma 20 do 27%, trasa tam i z
+   powrotem 89%),
+2. **poprawa o co najmniej 15 punktów procentowych** wobec istniejącej trasy przez
+   punkty,
+3. **co najmniej 800 m**, bo krótsze kółko nie jest spacerem.
+
+Drugi warunek jest najważniejszy, bo to jedyny uczciwy powód, żeby dołożyć drugą
+trasę: nie „bo się udało policzyć", ale „bo tamta chodzi tam i z powrotem, a ta
+nie". Dlatego Błonia pętli nie dostają, choć się liczy: ich trasa przez punkty ma
+10% i nie ma czego poprawiać.
+
+### Pętla może nie mijać żadnego punktu
+
+Pierwsza wersja wymagała trzech mijanych punktów i odrzucała Bagry, mimo 16%
+zawracania. To był mój błąd w rozumieniu, po co ta trasa jest. Nad wodą
+**obejście brzegiem samo jest celem**, a zbieranie punktów ma swoją osobną
+pozycję na liście. Karta trasy nie pokazuje wtedy liczby punktów, bo `stops`
+jest puste, i to jest w porządku.
+
+### Osobny tryb, i dlaczego
+
+`node scripts/build-trails.mjs --rings` dolicza same pętle do tego, co już jest w
+cache. Powstał z dwóch powodów. Pełny bieg pyta Overpass o szlaki znakowane dla
+każdego miejsca i przy niedostępnym serwerze płaci kilkadziesiąt sekund na park,
+czyli trzy kwadranse za coś, co potrzebuje siedmiu pytań do routera. Gorszy jest
+drugi powód: **nieudane pytanie o szlaki zastępuje wiersz miejsca wersją bez
+szlaków**, więc pełny bieg w kiepski dzień po cichu gubi dane, które już
+mieliśmy. Ten tryb nie rusza ani szlaków znakowanych, ani pętli przez punkty.

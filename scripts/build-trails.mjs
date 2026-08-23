@@ -217,7 +217,7 @@ async function osrm(service, coords, extra = '') {
   for (let attempt = 1; attempt <= 3; attempt++) {
     await sleep(attempt * 900)
     try {
-      const res = await fetch(url, { headers: UA })
+      const res = await fetch(url, { headers: UA, signal: AbortSignal.timeout(20000) })
       if (!res.ok) continue
       const d = await res.json()
       const trip = (d.trips ?? d.routes ?? [])[0]
@@ -230,6 +230,93 @@ async function osrm(service, coords, extra = '') {
 }
 
 /** pętla od startu przez podane punkty, kolejność układa usługa trip */
+/**
+ * Ile procent długości trasy przebiega drugi raz tą samą ścieżką.
+ *
+ * Miara istnieje, bo „dziwny szlak" trzeba czymś zmierzyć, zanim się go poprawi.
+ * Kalibracja z zalewu, tą samą metodą: prawdziwa pętla brzegiem 20%, pętla z
+ * dojściem od parkingu 27%, trasa tam i z powrotem 89%. Progi poniżej stoją na
+ * tych liczbach, nie na przeczuciu.
+ *
+ * Uwaga na interpretację: przy DWÓCH punktach wysoki wynik nie jest wadą, tylko
+ * geometrią. Między dwoma punktami nie ma pętli, jest droga tam i droga wracająca
+ * tą samą ścieżką. Dlatego próba pętli niżej wymaga co najmniej trzech
+ * przystanków.
+ */
+function backtrack(line) {
+  let total = 0
+  let twice = 0
+  const mid = (i) => [(line[i][0] + line[i + 1][0]) / 2, (line[i][1] + line[i + 1][1]) / 2]
+  for (let i = 0; i < line.length - 1; i++) {
+    const seg = dist(line[i], line[i + 1])
+    total += seg
+    const a = mid(i)
+    for (let j = 0; j < line.length - 1; j++) {
+      if (Math.abs(i - j) < 4) continue
+      if (dist(a, mid(j)) < 12) {
+        twice += seg
+        break
+      }
+    }
+  }
+  return total > 0 ? twice / total : 1
+}
+
+/** najblizszy punkt sieci pieszej: OSRM sam mowi, gdzie jest sciezka */
+async function snapToPath(pt) {
+  try {
+    const res = await fetch(`${OSRM}/nearest/v1/foot/${pt[0]},${pt[1]}?number=1`, {
+      headers: UA,
+      // bez limitu czasu jedno ciche zapytanie zawiesza caly bieg, sprawdzone
+      signal: AbortSignal.timeout(12000),
+    })
+    if (!res.ok) return null
+    const w = (await res.json()).waypoints?.[0]
+    if (!w) return null
+    return { at: w.location, away: w.distance }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Punkty kierunkowe z OBRYSU miejsca, PRZYKLEJONE do ścieżek.
+ *
+ * Sześć kierunków, każdy cofnięty do 75% drogi od środka do krawędzi, i każdy
+ * przyklejony do najbliższej ścieżki pieszej. Przyklejanie jest tu całą różnicą
+ * i widać to na wodzie: punkt kierunkowy nad jeziorem wypada w wodzie, a router
+ * bez pytania dociąga go najkrótszą drogą, czyli przez most albo w ogóle poza
+ * park. Zapytany wprost, gdzie jest ścieżka, odpowiada „na brzegu".
+ *
+ * Kandydat, do którego najbliższa ścieżka jest dalej niż 150 m, wypada: nie ma
+ * sensu ciągnąć tam trasy tylko po to, żeby kółko było okrągłe.
+ */
+async function compassVia(feature) {
+  const c = feature.properties?.center
+  const rings = feature.geometry?.coordinates
+  if (!c || !rings) return null
+  const outer = feature.geometry.type === 'MultiPolygon' ? rings[0][0] : rings[0]
+  if (!outer || outer.length < 8) return null
+  const via = []
+  for (const want of [0, 60, 120, 180, 240, 300]) {
+    let best = null
+    let bestGap = 999
+    for (const p of outer) {
+      const ang = (Math.atan2(p[1] - c[1], p[0] - c[0]) * 180) / Math.PI
+      const gap = Math.abs(((ang - want + 540) % 360) - 180)
+      if (gap < bestGap) {
+        bestGap = gap
+        best = p
+      }
+    }
+    if (!best) continue
+    const raw = [c[0] + (best[0] - c[0]) * 0.75, c[1] + (best[1] - c[1]) * 0.75]
+    const snap = await snapToPath(raw)
+    if (snap && snap.away <= 150) via.push(snap.at)
+  }
+  return via.length >= 4 ? via : null
+}
+
 /**
  * Pętla prowadzona punktami kierunkowymi, z przystankami wyliczonymi z trasy.
  *
@@ -418,10 +505,21 @@ const quests = readQuests()
 const starts = readParkingStarts()
 const argv = process.argv.slice(2)
 const pruneOnly = argv.includes('--prune')
+/*
+ * Tryb --rings: policz SAME pętle i wmieszaj je w to, co już mamy.
+ *
+ * Powstał z dwóch powodów. Pełny bieg pyta Overpass o szlaki znakowane dla
+ * każdego miejsca i przy niedostępnym serwerze płaci kilkadziesiąt sekund na
+ * park, czyli trzy kwadranse za coś, co potrzebuje siedmiu pytań do routera.
+ * Drugi powód jest ważniejszy: pełny bieg PRZELICZA wiersz miejsca od zera, więc
+ * dokładanie jednej trasy nie powinno w ogóle dotykać szlaków znakowanych.
+ */
+const ringsOnly = argv.includes('--rings')
 const only = argv.filter((a) => !a.startsWith('--'))
-const parks = pruneOnly
-  ? []
-  : Object.keys(quests).filter((p) => (only.length ? only.includes(p) : true))
+const parks =
+  pruneOnly || ringsOnly
+    ? []
+    : Object.keys(quests).filter((p) => (only.length ? only.includes(p) : true))
 
 /*
  * Cache obok wyniku. Bieg dla jednego miejsca ma poprawic JEGO wiersze, a nie
@@ -465,6 +563,47 @@ for (const parkId of parks) {
     })
 
   /*
+   * Próba pętli dla miejsc bez ręcznej: sześć punktów kierunkowych z obrysu,
+   * przyklejonych do ścieżek, i jedno pytanie do routera.
+   *
+   * Bierzemy wynik tylko wtedy, gdy jest WYRAŹNIE LEPSZY od pętli przez punkty,
+   * którą już mamy. To jedyny uczciwy powód, żeby dołożyć drugą trasę: nie
+   * „bo się udało policzyć", ale „bo tamta chodzi tam i z powrotem, a ta nie".
+   * Miejsce, w którym pętli nie ma, po prostu jej nie dostaje.
+   *
+   * Progi: zawracanie poniżej 40% (prawdziwa pętla ma 20 do 27%, trasa tam i z
+   * powrotem 89%), poprawa o co najmniej 15 punktów procentowych, i co najmniej
+   * 800 m, bo krótsze kółko nie jest spacerem.
+   *
+   * Ta trasa może nie mijać ŻADNEGO punktu i to jest w porządku: nad wodą obejście
+   * brzegiem jest tym, po co się przychodzi, a zbieranie punktów ma swoją własną
+   * pozycję na liście. Karta trasy nie pokazuje wtedy liczby punktów.
+   */
+  if (!ring && feature && full) {
+    const fullBack = backtrack(full.line)
+    const via = await compassVia(feature)
+    if (via) {
+      const r = await ringThrough(start, pois, { via, stopWithin: 90 })
+      const back = r ? backtrack(r.line) : 1
+      const better = back < 0.4 && back < fullBack - 0.15 && r && r.m >= 800
+      if (better) {
+        const water = feature.properties?.kind === 'water'
+        trails.unshift({
+          id: 'wokol',
+          name: water ? 'Pętla brzegiem' : 'Pętla po parku',
+          kind: 'points',
+          ...r,
+        })
+      }
+      console.log(
+        `  wokol: ${better ? 'wzięte' : 'odrzucone'} (${r?.m ?? 0} m, zawracanie ${Math.round(
+          back * 100,
+        )}%, przez punkty ${Math.round(fullBack * 100)}%, mija ${r?.stops.length ?? 0})`,
+      )
+    }
+  }
+
+  /*
    * Krotszy wariant tylko wtedy, gdy pelna petla jest naprawde dluga. Skawina
    * dostala w pierwszym biegu "krotka petle" na 200 m, co nie jest spacerem,
    * tylko przejsciem przez skwer.
@@ -503,6 +642,45 @@ writeFileSync(CACHE, JSON.stringify(result), 'utf8')
 /* ---------- zapis ---------- */
 
 const esc = (s) => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+if (ringsOnly) {
+  const targets = only.length ? only : Object.keys(result)
+  for (const parkId of targets) {
+    const list = result[parkId]
+    const pois = quests[parkId]
+    const feature = parksData.features.find((f) => f.id === parkId)
+    if (!list || !pois?.length || !feature) continue
+    if (RINGS[parkId]) continue // ręczna pętla ma pierwszeństwo nad zgadywaną
+    const full = list.find((t) => t.id === 'punkty-wszystkie')
+    if (!full) continue
+    const start = starts[parkId] ?? feature.properties?.center ?? pois[0].coords
+    const fullBack = backtrack(full.line)
+    const via = await compassVia(feature)
+    if (!via) {
+      console.log(`${parkId.padEnd(24)} brak punktów kierunkowych`)
+      continue
+    }
+    const r = await ringThrough(start, pois, { via, stopWithin: 90 })
+    const back = r ? backtrack(r.line) : 1
+    const better = r && back < 0.4 && back < fullBack - 0.15 && r.m >= 800
+    const without = list.filter((t) => t.id !== 'wokol')
+    if (better) {
+      const water = feature.properties?.kind === 'water'
+      result[parkId] = [
+        { id: 'wokol', name: water ? 'Pętla brzegiem' : 'Pętla po parku', kind: 'points', ...r },
+        ...without,
+      ]
+    } else {
+      result[parkId] = without
+    }
+    console.log(
+      `${parkId.padEnd(24)} ${better ? 'WZIĘTE ' : 'odrzuc.'} ${String(r?.m ?? 0).padStart(5)} m  zawracanie ${String(
+        Math.round(back * 100),
+      ).padStart(3)}%  przez punkty ${String(Math.round(fullBack * 100)).padStart(3)}%  mija ${r?.stops.length ?? 0}`,
+    )
+    writeFileSync(CACHE, JSON.stringify(result), 'utf8')
+  }
+}
+
 const body = Object.entries(result)
   .map(([park, trails]) => {
     const rows = trails

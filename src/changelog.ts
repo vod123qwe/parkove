@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.92.0'
+export const VERSION = '0.93.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,21 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.93.0',
+    date: '2026-08-24',
+    title: 'It says when you are walking without a map, and four places get a loop that really goes around',
+    tldr:
+      'Apka mówi, gdy idziesz bez pobranej mapy, rozmiar paczki wreszcie nie kłamie, a cztery miejsca dostały pętlę dookoła.',
+    changes: [
+      ['added', 'Starting a walk without the offline map now says so, once, with one tap to download. The function that knows this had been sitting in the code unused, so the app knew you were leaving without a map and said nothing. It does not block and does not ask you to confirm: walking without a map is a fine choice in the city, and a confirmation you always dismiss is worth nothing. It also does not trust the index alone — iOS clears the tile store without asking, so it checks the tiles are really there'],
+      ['fixed', 'The download size was 39 percent too low: the lake promised 1.2 MB and the pack weighed 1.82 MB. Widening the sample changed nothing, which was the useful clue — not spread, but a systematic error. The estimate was sampling every layer at once, up to fifty tiles in one moment, and some responses came back short while still counting toward the average. Now the samples go in one queue, three at a time, and empty responses are not counted. Measured against the sum of every tile: lake 1.90 against 1.78, Jordan 2.96 against 2.92. That megabyte is what you decide on when you are on mobile data'],
+      ['added', 'Four loops that actually go around: Bagry along the shore (3.8 km), Park Lotników (2.5 km), Skałki Twardowskiego (2.5 km) and Park Piłsudskiego in Skawina (1.7 km). Each one is offered only because it measured better than the loop we already had — Błonia get nothing new, because theirs is already fine'],
+      ['changed', 'The lake loop is a proper loop now (2.8 km, six points). Worth saying how the first attempt failed: built from the points in order, it came out as 3.5 km of zigzag, because a router joins two stops by the shortest path and the shortest path between two points on the same bank never goes around the water. Measured, 42 percent of it was walked twice, against 20 percent for a real shore loop. So loops are drawn by direction now, and the stops are read back from what the route actually passes'],
+      ['fixed', 'A challenge that promised one thing and counted another: "Two days in a row" said "a walk on Saturday and on Sunday" while the code accepted any two consecutive days. The hint was wrong, not the code — with a child, Tuesday and Wednesday count the same. Days are also counted in local time now; before, the boundary fell at 2 a.m. our time, so a walk started at one in the morning belonged to the previous day and the pair silently missed'],
+      ['added', 'Two photographs for points that had none, checked by eye: the cave in Dolina Będkowska and the rock with the cross in Dolina Szklarki. Three hits were thrown out — a mill from Warsaw, a graduation tower from Rabka and a conference group photo in front of a hotel. The first two are now caught by a filter of towns this project does not contain; the third cannot be caught by any name filter, which is why the script now says plainly that new photos have to be looked at'],
+    ],
+  },
   {
     version: '0.92.0',
     date: '2026-08-23',
