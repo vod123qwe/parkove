@@ -259,11 +259,33 @@ export const CHALLENGES: Challenge[] = [
     id: 'walk-weekend',
     group: 'walks',
     name: 'Dwa dni pod rząd',
-    hint: 'Wyprawa w sobotę i w niedzielę.',
+    /*
+     * Treść mówiła „w sobotę i w niedzielę", a kod przyjmuje DOWOLNE dwa dni z
+     * rzędu, tak jak mówi nazwa. Poprawiam treść, nie kod: warunek jest lepszy
+     * niż obietnica, bo weekend to nie jedyny sposób na dwa dni pod rząd, a przy
+     * dziecku wtorek i środa liczą się tak samo.
+     */
+    hint: 'Wyprawa dwa dni z rzędu, w dowolne dni tygodnia.',
     target: 1,
     count: (s) => {
-      const days = new Set(s.journeys.map((j) => Math.floor(j.startedAt / 86400000)))
-      for (const d of days) if (days.has(d + 1)) return 1
+      /*
+       * Dzień LOKALNY, nie UTC. Przy dzieleniu znacznika przez dobę granica dnia
+       * wypada o drugiej w nocy naszego czasu, więc wyprawa zaczęta o pierwszej
+       * należała do dnia poprzedniego i para dni się nie schodziła. Zdarza się
+       * to rzadko, ale kiedy się zdarzy, wyzwanie po prostu nie zapala się bez
+       * powodu widocznego dla nikogo.
+       *
+       * Doba następna przez setDate, a nie przez dodanie 86 400 000: przy zmianie
+       * czasu doba ma 23 albo 25 godzin i arytmetyka na milisekundach rozjeżdża
+       * się właśnie w ten weekend, w który najłatwiej pójść dwa dni pod rząd.
+       */
+      const key = (d: Date) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()
+      const days = new Set(s.journeys.map((j) => key(new Date(j.startedAt))))
+      for (const j of s.journeys) {
+        const next = new Date(j.startedAt)
+        next.setDate(next.getDate() + 1)
+        if (days.has(key(next))) return 1
+      }
       return 0
     },
   },
