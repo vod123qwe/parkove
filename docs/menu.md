@@ -175,3 +175,38 @@ widoczny wiersz byłby tytułem grupy, a nie miejscem.
 Ta sama liczba jedzie do `--pk-bottom-taken`, czyli do zmiennej mówiącej, ile u
 dołu jest zajęte. Dzięki temu komunikaty same wiedzą, gdzie się zatrzymać, i nie
 trzeba pamiętać o drugim miejscu przy każdej zmianie wysokości.
+
+## Trzy półki po przebudowie z 2026-08-23
+
+| Półka | Co zawiera |
+| --- | --- |
+| **Ty** | Moje liczby, Osiągnięcia, Moje wyprawy |
+| **Miejsca** | Wszystkie parki |
+| **Ustawienia** | Wygląd, O aplikacji |
+
+„Moje wyprawy" przeszły do **Ty** na życzenie Jarka, a półka, która po nich
+została, nazywa się teraz **Miejsca**, bo jej jedyne wejście jest o miejscach, a
+nie o wyprawach. Nazwa poszła za treścią, nie odwrotnie.
+
+„Miejsca do odkrycia" to teraz **„Wszystkie parki"**, i tak samo nazywa się
+arkusz, który ten wiersz rozwija: obiecywanie „do odkrycia" było nieuczciwe, bo
+lista pokazuje wszystkie, także zdobyte.
+
+## Arkusz miejsc: widoczność jest wyliczana, nie przełączana
+
+Jarek: „gdy zakończyłem wyprawę, to zniknęły miejsca do odkrycia i musiałem wejść
+w menu".
+
+Widoczność arkusza była **stanem**, gaszonym przy wejściu w miejsce z listy i przy
+pokazywaniu czegoś na mapie, a zapalanym tylko z menu. Po zakończeniu wyprawy
+arkusz nie wracał, bo ktoś go wcześniej zgasił i nikt nie zapalił.
+
+Teraz jest **wyliczana** z tego, co zajmuje dół: `!selected && !expedition`. Nie ma
+tam żadnego stanu, który mógłby zostać w złej pozycji.
+
+Został osobny znacznik na to, czy arkusz stoi **rozwinięty** (menu prosi o pełną
+listę, dotknięcie wyszukiwarki też), i przy nim wyszła pułapka warta zapisania:
+DS zgłaszał zatrzask przy **każdym renderze**, a nie przy zmianie, bo wołający
+podaje funkcję tworzoną w locie. Cokolwiek wołający na tej podstawie ustawiał,
+kasowało się w następnej klatce. Każda prośba o rozwinięcie ginęła cicho.
+Zdarzenie zmiany musi się dziać przy zmianie: w DS pilnuje tego referencja.

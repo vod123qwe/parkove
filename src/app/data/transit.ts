@@ -18,6 +18,12 @@ export type TransitInfo = {
 }
 
 export const TRANSIT: Record<string, TransitInfo> = {
+  'zalew-nowohucki': {
+    stop: 'Zalew Nowohucki',
+    mode: 'both',
+    note: 'Przystanek nazwany od tego miejsca, przy południowym krańcu parku: tramwaj i autobus stają kilkadziesiąt metrów od wody. Od północy jest jeszcze przystanek Krzesławice Młyn, nazwany od młyna, którego ruiny stoją nad zalewem.',
+    verified: false,
+  },
   'kopiec-krakusa': {
     stop: 'Cmentarz Podgórski',
     mode: 'both',

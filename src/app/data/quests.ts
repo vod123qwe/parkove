@@ -105,7 +105,7 @@ const KRAKOW_QUESTS: Quest[] = [
         ],
         findHint: 'Północno-zachodni koniec zalewu, kilkadziesiąt metrów od ścieżki w stronę ulicy Kaczeńcowej. Mur widać z pętli, gdy liście opadną.',
         reveal:
-          'Ruiny młyna nad Dłubnią to najstarsza rzecz w tym miejscu: pochodzą z czasów, gdy nie było tu ani zalewu, ani dzielnicy. Kanał, który prowadził do młyna, nazywa się Młynówka i wciąż jest zaznaczony na mapach.',
+          'Ruiny młyna nad Dłubnią to najstarsza rzecz w tym miejscu: pochodzą z czasów, gdy nie było tu ani zalewu, ani dzielnicy. Kanał, który prowadził do młyna, nazywa się Młynówka i wciąż jest na mapach, a przystanek autobusowy po drugiej stronie wody nazywa się Krzesławice Młyn. Młyna nie ma, a nazwa została w rozkładzie jazdy.',
         dilemma: {
           question:
             'Nowa Huta powstała na wsiach, które zniknęły: pola, młyny i domy zostały rozebrane albo przysypane. Ruina młyna to jedno z niewielu, co zostało. Czy takie ślady trzeba chronić, gdy stoją w środku miasta?',
@@ -181,6 +181,32 @@ const KRAKOW_QUESTS: Quest[] = [
           'Nowa Huta była projektowana razem ze sztuką w przestrzeni: rzeźbami, mozaikami i detalem architektonicznym. Wzlot nad zalewem to jeden z tych elementów, które zostały na swoich miejscach.',
         coords: [20.05237, 50.07658],
         radius: 35,
+      },
+      {
+        id: 'dworek-matejki',
+        category: 'history',
+        name: 'Dworek Jana Matejki',
+        teaser: 'Malarz kupił tu dom na wsi. Wieś jest dziś Nową Hutą.',
+        description: [
+          'Kilkaset metrów na północny wschód od zalewu, za Dłubnią, stoi dworek, który w 1865 roku kupił Jan Matejko. Przyjeżdżał tu z Krakowa na lato, malował i odpoczywał od miasta, a wtedy była to zwykła podkrakowska wieś Krzesławice.',
+          'To najlepsza miara tego, jak bardzo zmieniła się ta okolica. Matejko wybrał to miejsce jako wiejskie zacisze, a osiemdziesiąt lat później postawiono tu jedną z największych fabryk w Europie i dzielnicę dla dwustu tysięcy ludzi. Dworek został.',
+          'Dziś w środku jest muzeum i dom kultury, wokół mały park. Dla dziecka to dobra para z zalewem: godzina nad wodą i piętnaście minut w domu, w którym mieszkał malarz z podręcznika.',
+        ],
+        findHint: 'Na północny wschód od zalewu, za Dłubnią, przy ulicy Wańkowicza. Szukaj niskiego, białego dworu w otoczeniu starych drzew.',
+        reveal:
+          'Jan Matejko kupił dworek w Krzesławicach w 1865 roku jako letni dom na wsi. Osiemdziesiąt lat później wokół tej wsi zbudowano Nową Hutę, a dworek został na swoim miejscu i jest dziś muzeum.',
+        dilemma: {
+          question:
+            'Wieś Krzesławice zniknęła pod dzielnicą, a dworek Matejki przetrwał, bo należał do kogoś znanego. Czy to sprawiedliwe, że pamięć chroni się nazwiskami?',
+          options: ['Tak, inaczej nie zostałoby nic', 'Nie, wszystkie domy były czyimś domem', 'Nazwisko to tylko pretekst'],
+          counterpoint:
+            'Nazwisko bywa jedyną liną, po której da się wyciągnąć całą resztę: ktoś przyjeżdża do dworku Matejki i dowiaduje się, że była tu wieś. Ale to znaczy też, że o wsiach bez znanych mieszkańców nie dowie się nikt, bo nie ma czego zwiedzać.',
+        },
+        photo: '/photos/zalew-nowohucki-dworek.jpg',
+        photoCredit: 'Fot. Maire · CC BY-SA 2.5 · Wikimedia Commons',
+        sources: ['https://pl.wikipedia.org/wiki/Dworek_Jana_Matejki_w_Krzes%C5%82awicach'],
+        coords: [20.05486, 50.0815],
+        radius: 60,
       },
       {
         id: 'podziemia',

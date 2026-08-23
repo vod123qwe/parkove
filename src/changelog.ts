@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.90.0'
+export const VERSION = '0.91.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,23 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.91.0',
+    date: '2026-08-23',
+    title: 'The places sheet stops disappearing, and the lake gets its park',
+    tldr:
+      'Arkusz miejsc już nie znika, a zalew ma park, zdjęcia i 7 punktów.',
+    changes: [
+      ['fixed', 'The places sheet vanished after finishing a walk and only the menu brought it back. Its visibility was a toggle that got switched off when you opened a place from the list and switched on only from the menu, so once off it stayed off. It is derived now, from what occupies the bottom and nothing else: finish a walk or deselect a place and it comes back on its own. A state that can get stuck in the wrong position was simply the wrong tool'],
+      ['fixed', 'A worse version of the same thing in the design system: the sheet reported its detent on every render rather than on change, because the caller passes a function made on the spot. Anything the caller did in response, such as noting that a minimal detent means not expanded, cancelled itself one frame later. Every request to expand died silently'],
+      ['added', 'Touching the search expands the sheet to full height. On a phone the keyboard takes the bottom half, so at a 290 pixel peek you would be typing blind'],
+      ['changed', 'The menu says All parks instead of Places to discover, My walks moved to the You shelf, and the shelf left holding one entry about places is now called Places rather than Walks'],
+      ['changed', 'Zalew Nowohucki is outlined as the park, not just the water: 15.1 hectares from the OpenStreetMap park polygon around 6.7 hectares of lake. That polygon also carried a date, so the description can now say the park was laid out in 1957 rather than gesturing at the era'],
+      ['added', 'Three photographs of the lake from Wikimedia Commons, and a seventh point: the manor Jan Matejko bought in 1865 as a summer house in the countryside. Eighty years later that countryside became Nowa Huta and the manor stayed'],
+      ['added', 'The rest of what a place needs, audited one dataset at a time: three car parks, four places to eat, two playgrounds, the tram and bus stop named after the lake, walking routes from each car park, and two generated loops around the water'],
+      ['fixed', 'The walking route generator now has fallback hosts. It had one Overpass server and no alternative, so a single outage aborted the whole script; the trail generator solved this months ago and the fix simply had not travelled'],
+    ],
+  },
   {
     version: '0.90.0',
     date: '2026-08-23',

@@ -19,6 +19,29 @@ export const OCCUPANCY_LABEL: Record<NonNullable<ParkingInfo['occupancy']>, stri
 }
 
 export const PARKING: Record<string, ParkingInfo[]> = {
+  'zalew-nowohucki': [
+    {
+      id: 'zalew-bulwarowa',
+      name: 'Bulwarowa, przy północno-zachodnim narożniku',
+      hint: 'Najbliżej wejścia od strony food trucków. Stąd nad wodę dwie minuty.',
+      fee: 'bezpłatnie',
+      coords: [20.04914, 50.08204],
+    },
+    {
+      id: 'zalew-wankowicza',
+      name: 'Wańkowicza, od wschodu',
+      hint: 'Po drugiej stronie Dłubni, blisko wschodniego brzegu i siłowni.',
+      fee: 'bezpłatnie',
+      coords: [20.05743, 50.07895],
+    },
+    {
+      id: 'zalew-solidarnosci',
+      name: 'Przy al. Solidarności, od południa',
+      hint: 'Od strony przystanku i fontann. Wjazd od ulicy bocznej, nie z alei.',
+      fee: 'bezpłatnie',
+      coords: [20.04775, 50.07796],
+    },
+  ],
   'kopiec-krakusa': [
     {
       id: 'krakus-powstancow',

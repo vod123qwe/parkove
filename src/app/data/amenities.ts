@@ -22,6 +22,14 @@ export const KIND_LABEL: Record<AmenityKind, string> = {
 }
 
 export const AMENITIES: Record<string, AmenitySpot[]> = {
+  'zalew-nowohucki': [
+    { id: 'zalew-papa-gelato', name: 'Papa Gelato', kind: 'ice_cream', coords: [20.05104, 50.08127] },
+    { id: 'zalew-szesze', name: 'Szesze truck', kind: 'fast_food', coords: [20.04997, 50.08065] },
+    { id: 'zalew-conieco', name: 'Conieco', kind: 'fast_food', coords: [20.05003, 50.08063] },
+    { id: 'zalew-coco', name: 'Coco Mexico', kind: 'fast_food', coords: [20.04989, 50.08067] },
+    { id: 'zalew-plac-polnoc', name: 'Plac zabaw przy północnym brzegu', kind: 'playground', coords: [20.05213, 50.08138] },
+    { id: 'zalew-plac-wschod', name: 'Plac zabaw od wschodu', kind: 'playground', coords: [20.0559, 50.08221] },
+  ],
   blonia: [
     { id: 'trattoria-cichy-k-cik-0', name: "Trattoria Cichy Kącik", kind: 'restaurant', coords: [19.90426, 50.06283] }, // w parku
     { id: 'bistro-b-onia-1', name: "Bistro Błonia", kind: 'restaurant', coords: [19.9057, 50.06239] }, // w parku

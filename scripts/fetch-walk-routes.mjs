@@ -62,18 +62,40 @@ async function trailPoints(parkId) {
   if (!ring) return []
   const poly = ring.map((c) => `${c[1]} ${c[0]}`).join(' ')
   const q = `[out:json][timeout:90];way(poly:"${poly}")[highway~"${FOOT}"];out geom 800;`
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    await sleep(attempt * 2500)
-    const res = await fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST',
-      headers: { ...UA, 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'data=' + encodeURIComponent(q),
-    })
-    const text = await res.text()
-    if (!text.trim().startsWith('{')) continue
-    const d = JSON.parse(text)
-    return (d.elements ?? []).flatMap((e) => (e.geometry ?? []).map((g) => [g.lon, g.lat]))
+  /*
+   * Kilka hostow, bo jeden nie wystarcza. overpass-api.de potrafi nie odpowiadac
+   * godzinami, a wtedy `fetch` konczy sie wyjatkiem po dziesieciu sekundach i
+   * caly skrypt sie wywraca. Ten sam problem i to samo rozwiazanie, co w
+   * build-trails.mjs.
+   *
+   * NIGDY overpass.osm.ch: to wyciag szwajcarski, dla Polski cicho zwraca 200 i
+   * pusty wynik, co jest gorsze od bledu.
+   */
+  const HOSTS = [
+    'https://overpass-api.de/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+    'https://overpass.private.coffee/api/interpreter',
+  ]
+  for (const host of HOSTS) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      await sleep(attempt * 2500)
+      try {
+        const res = await fetch(host, {
+          method: 'POST',
+          headers: { ...UA, 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(q),
+        })
+        const text = await res.text()
+        if (!text.trim().startsWith('{')) continue
+        const d = JSON.parse(text)
+        return (d.elements ?? []).flatMap((e) => (e.geometry ?? []).map((g) => [g.lon, g.lat]))
+      } catch {
+        /* nastepny host albo nastepna proba */
+      }
+    }
+    console.log(`  overpass ${new URL(host).hostname} nie odpowiada, probuje dalej`)
   }
+  console.log('  zaden host overpass nie odpowiedzial: brak sciezek dla tego miejsca')
   return []
 }
 

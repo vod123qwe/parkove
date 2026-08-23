@@ -19,14 +19,19 @@ export type ParkInfo = {
 
 export const PARK_INFO: Record<string, ParkInfo> = {
   'zalew-nowohucki': {
+    photos: [
+      { src: '/photos/park-zalew-nowohucki-1.jpg', credit: 'Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/park-zalew-nowohucki-2.jpg', credit: 'Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/park-zalew-nowohucki-1-2.jpg', credit: 'Fot. sz.u. · CC BY-SA 2.0 · Wikimedia Commons' },
+    ],
     description: [
-      'Niecałe siedem hektarów wody w środku Nowej Huty, na Dłubni, dwadzieścia minut tramwajem od Rynku. Pętla wokół zalewu ma około kilometra i nadaje się na spacer z wózkiem: asfalt, ławki co kilkadziesiąt metrów i cień od strony wschodniej.',
-      'Zalew powstał przy budowie dzielnicy, jako woda do patrzenia, a nie do pływania, i tak zostało: kąpiel jest zakazana. Za to są fontanny na tafli, siłownia plenerowa na wschodnim brzegu i food trucki przy północno-zachodnim narożniku.',
-      'Najciekawsze jest to, czego na pierwszy rzut oka nie widać: ta woda pracowała tu na długo przed hutą. Dłubnia napędzała młyny, a kanał, który do jednego z nich prowadził, nazywa się Młynówka i wciąż jest na mapie. Nad zalewem stoją jeszcze ruiny młyna.',
+      'Piętnaście hektarów parku wokół siedmiu hektarów wody, w środku Nowej Huty, dwadzieścia minut tramwajem od Rynku. Pętla wokół zalewu ma około kilometra i nadaje się na spacer z wózkiem: asfalt, ławki co kilkadziesiąt metrów i cień od strony wschodniej.',
+      'Park założono w 1957 roku, razem z dzielnicą, i do dziś prowadzi go miejski Zarząd Zieleni. Woda jest do patrzenia, nie do pływania, i tak było od początku: kąpiel jest zakazana. Za to są fontanny na tafli, siłownia plenerowa na wschodnim brzegu i food trucki przy północno-zachodnim narożniku.',
+      'Najciekawsze jest to, czego na pierwszy rzut oka nie widać: ta woda pracowała tu na długo przed hutą. Dłubnia napędzała młyny, a kanał, który do jednego z nich prowadził, nazywa się Młynówka i wciąż jest na mapie. Nad zalewem stoją jeszcze ruiny młyna, a kawałek dalej dworek, w którym mieszkał Jan Matejko.',
     ],
     amenities: {
       playground: { has: true, note: 'Siłownia plenerowa na wschodnim brzegu, place zabaw między blokami na Szkolnym i Willowym.' },
-      food: { has: true, note: 'Food trucki przy północno-zachodnim narożniku zalewu, restauracja Santorini kawałek dalej.' },
+      food: { has: true, note: 'Food trucki i grill przy północno-zachodnim narożniku, restauracja Nad Zalewem od strony Bulwarowej.' },
       verified: false,
     },
   },

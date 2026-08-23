@@ -90,8 +90,22 @@ export function BottomSheet({
   const headRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const [detent, setDetent] = useState<Detent>(openAt)
-  /* zgłaszamy zatrzask na zewnątrz, ale w efekcie, nie w trakcie renderowania */
+  /*
+   * Zgłaszamy zatrzask na zewnątrz, ale TYLKO gdy się zmienił.
+   *
+   * Pierwsza wersja miała `onDetent` w zależnościach efektu, a wołający podaje
+   * zwykle funkcję tworzoną w locie, więc efekt wykonywał się przy każdym
+   * renderze i za każdym razem zgłaszał ten sam zatrzask. Konsekwencja była
+   * paskudna i niełatwa do znalezienia: jeśli wołający na podstawie zgłoszenia
+   * zmieniał stan (u nas: „zatrzask minimalny, więc już nie jesteśmy
+   * rozwinięci"), to każda prośba o rozwinięcie ginęła w następnej klatce.
+   *
+   * Referencja zamiast zależności: zdarzenie zmiany ma się dziać przy zmianie.
+   */
+  const toldDetent = useRef<Detent | null>(null)
   useEffect(() => {
+    if (toldDetent.current === detent) return
+    toldDetent.current = detent
     onDetent?.(detent)
   }, [detent, onDetent])
   const [heights, setHeights] = useState<{ full: number; auto: number } | null>(null)

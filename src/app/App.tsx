@@ -90,11 +90,20 @@ export function App() {
   const [expanded, setExpanded] = useState(false)
   const [parkingOpen, setParkingOpen] = useState(false)
   /*
-   * Arkusz miejsc zaczyna otwarty i nie da sie go zamknac do zera: `minHeight`
-   * w DS sprawia, ze zamiast odjechac, osiada na wystawaniu. `listOpen` zostaje,
-   * bo menu nadal go otwiera, gdy dol byl zajety przez karte miejsca.
+   * Arkusz miejsc jest DOMYSLNA powierzchnia ekranu glownego, wiec jego
+   * widocznosc jest wyliczana, a nie przelaczana.
+   *
+   * Wczesniej byla stanem (`listOpen`), ktory gasil sie przy wejsciu w miejsce z
+   * listy i przy pokazywaniu czegos na mapie, a wlaczal tylko z menu. Efekt
+   * zglosil Jarek: po zakonczeniu wyprawy arkusz nie wracal, bo zostal zgaszony
+   * kiedys wczesniej i nikt go nie zapalil. Stan, ktory da sie zablokowac w zlej
+   * pozycji, jest tu po prostu zlym narzedziem.
+   *
+   * Zostaje `listWide`, ale on nie decyduje o WIDOCZNOSCI, tylko o tym, czy
+   * arkusz stoi rozwiniety: menu prosi o pelna liste, a przeciagniecie w dol ja
+   * skleja z powrotem.
    */
-  const [listOpen, setListOpen] = useState(true)
+  const [listWide, setListWide] = useState(false)
   const [listDetent, setListDetent] = useState<'min' | 'auto' | 'full'>('min')
   /** which collection the list shows: everything, the day trips, or the city */
   const [listTab, setListTab] = useState<'all' | 'dolinki' | 'parki'>('all')
@@ -213,8 +222,14 @@ export function App() {
 
   const selected = FEATURES.find((f) => f.id === selectedId) ?? null
 
-  /** czy arkusz miejsc stoi na dole: jedna prawda dla niego i dla komunikatów */
-  const dockUp = listOpen && !selected && !expedition
+  /**
+   * Czy arkusz miejsc stoi na dole: jedna prawda dla niego i dla komunikatów.
+   *
+   * Wyliczane z tego, co zajmuje dół, i tylko z tego. Nie ma tu żadnego stanu,
+   * który mógłby zostać w złej pozycji: skończ wyprawę albo odklikaj miejsce i
+   * arkusz wraca sam.
+   */
+  const dockUp = !selected && !expedition
 
   /** wybrana kawiarnia albo plac zabaw: mapa jedzie do pinu, pin się zaznacza */
   const pickAmenity = (id: string) => {
@@ -365,12 +380,17 @@ export function App() {
     [overlayParkId, filters.parking, activeParkingId],
   )
 
+  /*
+   * Pogoda dla listy miejsc. Bylo warunkowane otwarciem listy, ale arkusz miejsc
+   * stoi teraz na ekranie glownym od pierwszej sekundy, wiec warunek zawsze byl
+   * prawdziwy i tylko udawal oszczednosc. Jedno zapytanie po zaladowaniu:
+   * Open-Meteo przyjmuje wszystkie 57 wspolrzednych naraz.
+   */
   useEffect(() => {
-    if (!listOpen) return
     void getGlances(FEATURES.map((f) => ({ id: f.id, coords: f.properties.center }))).then(
       setGlances,
     )
-  }, [listOpen])
+  }, [])
 
   const flyToPark = useCallback((f: ParkFeature, bottomPx: number) => {
     setFocus({
@@ -412,7 +432,8 @@ export function App() {
       setStampParkId(null)
       setStampsOpen(false)
       setMenuOpen(false)
-      setListOpen(false)
+      // arkusz nie znika, tylko sklada sie do wystawania: ma byc, gdy wrocisz
+      setListWide(false)
       setJourneyId(null)
       setStatsOpen(false)
       setJourneysOpen(false)
@@ -437,7 +458,7 @@ export function App() {
 
   const openFromList = (f: ParkFeature) => {
     setAmenitySpotId(null)
-    setListOpen(false)
+    setListWide(false)
     setSelectedId(f.id)
     setPeekIndex(0)
     setExpanded(true)
@@ -977,9 +998,17 @@ export function App() {
         onClose={() => undefined}
         modal={false}
         minHeight={DOCK_PEEK}
-        openAt="min"
-        onDetent={setListDetent}
-        title="Miejsca do odkrycia"
+        /*
+         * Menu prosi o pelna liste zmiana tej wartosci: DS przy jej zmianie
+         * ustawia zatrzask od nowa, wiec nie trzeba drugiego mechanizmu.
+         */
+        openAt={listWide ? 'full' : 'min'}
+        onDetent={(d) => {
+          setListDetent(d)
+          // przeciagnales w dol: nie jestesmy juz "rozwinieci z menu"
+          if (d === 'min') setListWide(false)
+        }}
+        title="Wszystkie parki"
       >
         {/*
           Tytuł, szukanie i zakładki widać od razu, bez rozwijania: to one
@@ -995,6 +1024,15 @@ export function App() {
             value={query}
             placeholder="Szukaj miejsca"
             aria-label="Szukaj miejsca"
+            /*
+             * Dotknięcie pola rozwija arkusz na pełną wysokość, i to nie jest
+             * uprzejmość, tylko konieczność (Jarek: „jak mam wyszukiwarkę
+             * zaznaczoną, to niech rozciąga się do góry ekranu, żebym podczas
+             * wpisywania widział wyniki na telefonie"). Na telefonie klawiatura
+             * zajmuje dolną połowę, więc przy wystawaniu na 290 px wyników nie
+             * byłoby widać wcale: wpisujesz w ciemno.
+             */
+            onFocus={() => setListWide(true)}
             onChange={(e) => setQuery(e.target.value)}
           />
           {query && (
@@ -1351,20 +1389,6 @@ export function App() {
               setStampsOpen(true)
             }}
           />
-        </List>
-
-        <p className="t-caption app-menu__head">Wyprawy</p>
-        <List className="app-menu">
-          <ListItem
-            icon={<ListIcon />}
-            title="Miejsca do odkrycia"
-            meta={`${FEATURES.length - 1} miejsc, ${completedIds.size} zdobytych`}
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setListOpen(true)
-            }}
-          />
           <ListItem
             icon={<Footprints />}
             title="Moje wyprawy"
@@ -1377,6 +1401,26 @@ export function App() {
             onClick={() => {
               setMenuOpen(false)
               setJourneysOpen(true)
+            }}
+          />
+        </List>
+
+        {/*
+          Polka "Miejsca", nie "Wyprawy" (Jarek, 2026-08-23: „moje wyprawy niech
+          beda w sekcji Ty"). Po przeniesieniu wypraw zostalo tu jedno wejscie i
+          jest ono o miejscach, nie o wyprawach, wiec nazwa polki poszla za
+          trescia.
+        */}
+        <p className="t-caption app-menu__head">Miejsca</p>
+        <List className="app-menu">
+          <ListItem
+            icon={<ListIcon />}
+            title="Wszystkie parki"
+            meta={`${FEATURES.length - 1} miejsc, ${completedIds.size} zdobytych`}
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setListWide(true)
             }}
           />
         </List>
