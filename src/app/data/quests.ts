@@ -91,6 +91,123 @@ export type Quest = {
 
 const KRAKOW_QUESTS: Quest[] = [
   {
+    parkId: 'zalew-nowohucki',
+    pois: [
+      {
+        id: 'mlyn',
+        category: 'history',
+        name: 'Ruiny młyna',
+        teaser: 'Mur nad wodą, starszy od całej dzielnicy.',
+        description: [
+          'Nad północno-zachodnim brzegiem zalewu stoją resztki młyna wodnego. Na mapach są podpisane wprost: ruiny starego młyna, i to jedyny ślad tego, co było tu przed Nową Hutą.',
+          'Dłubnia była rzeką pracującą. Spadek terenu i stały przepływ wystarczały, żeby obracać koło młyńskie, więc nad nią stały młyny, a mąka jechała stąd do Krakowa. Wieś, która tu leżała, zniknęła pod dzielnicą; młyn został ruiną.',
+          'To ciekawa kolejność: najpierw woda napędzała gospodarkę bardzo starą, potem obok postawiono hutę, jedną z największych fabryk w kraju, a dziś ta sama woda służy do chodzenia wokół niej z wózkiem.',
+        ],
+        findHint: 'Północno-zachodni koniec zalewu, kilkadziesiąt metrów od ścieżki w stronę ulicy Kaczeńcowej. Mur widać z pętli, gdy liście opadną.',
+        reveal:
+          'Ruiny młyna nad Dłubnią to najstarsza rzecz w tym miejscu: pochodzą z czasów, gdy nie było tu ani zalewu, ani dzielnicy. Kanał, który prowadził do młyna, nazywa się Młynówka i wciąż jest zaznaczony na mapach.',
+        dilemma: {
+          question:
+            'Nowa Huta powstała na wsiach, które zniknęły: pola, młyny i domy zostały rozebrane albo przysypane. Ruina młyna to jedno z niewielu, co zostało. Czy takie ślady trzeba chronić, gdy stoją w środku miasta?',
+          options: ['Chronić i opisać', 'Zostawić, jak jest', 'Rozebrać, jak inne'],
+          counterpoint:
+            'Ruina bez tablicy jest tylko murem, a mur w krzakach ludzie rozbierają na cegły. Ale odnowiona ruina przestaje być ruiną i staje się dekoracją. Najuczciwsze bywa najnudniejsze: zabezpieczyć, podpisać i nie udawać, że jest cała.',
+        },
+        sources: ['https://pl.wikipedia.org/wiki/D%C5%82ubnia'],
+        coords: [20.04914, 50.08327],
+        radius: 45,
+      },
+      {
+        id: 'dlubnia-wplyw',
+        category: 'water',
+        name: 'Tu Dłubnia wpływa',
+        teaser: 'Rzeka wchodzi do zalewu i to ona go trzyma.',
+        description: [
+          'Zalew nie jest stawem z deszczówki: ma rzekę. Dłubnia wpływa tu od północy i wypływa po drugiej stronie, więc woda cały czas się wymienia. Dlatego zalew nie zarasta tak, jak zarastają zbiorniki bez przepływu.',
+          'Dłubnia ma około pięćdziesięciu kilometrów i zaczyna się na Wyżynie Miechowskiej, a kończy w Wiśle kilka kilometrów stąd. Płynie przez Jurę, więc jej woda jest twarda: przechodzi przez wapień i zabiera z niego wapń.',
+          'Na tym odcinku rzeka jest wąska i łatwo ją przeoczyć między drzewami. Warto się zatrzymać i posłuchać: to jedyne miejsce na pętli, gdzie słychać płynącą wodę, a nie tylko fontanny.',
+        ],
+        findHint: 'Północny koniec zalewu, przy kładce. Szukaj przerwy w drzewach i nurtu wchodzącego do tafli.',
+        reveal:
+          'Dłubnia przepływa przez zalew, a nie tylko go zasila: wpływa z północy i wypływa na południowym wschodzie. Ta wymiana wody decyduje o tym, że zbiornik nie zamienia się w szuwar.',
+        sources: ['https://pl.wikipedia.org/wiki/D%C5%82ubnia'],
+        coords: [20.0515, 50.08215],
+        radius: 40,
+      },
+      {
+        id: 'panorama',
+        category: 'view',
+        name: 'Widok przez wodę',
+        teaser: 'Najlepszy kadr na zalew: z północnego brzegu przez całą taflę.',
+        description: [
+          'Z północnego brzegu widać zalew na całej długości, a za nim bloki Nowej Huty. To najlepszy kadr w tym miejscu, bo woda jest na pierwszym planie, a dzielnica na drugim, i dopiero razem mówią, co to za miejsce.',
+          'Ławki stoją tu gęściej niż gdziekolwiek na pętli i nie bez powodu: brzeg jest odsłonięty, więc słońce trzyma do wieczora. W maju o dwudziestej pierwszej tafla robi się pomarańczowa.',
+          'Nowa Huta była budowana jako miasto idealne, z osiami widokowymi i zieleńcami wpisanymi w plan. Ten widok też jest zaplanowany: zalew nie znalazł się tu przypadkiem.',
+        ],
+        findHint: 'Północny brzeg, przy skupisku ławek. Stań plecami do bloków i patrz na południe.',
+        reveal:
+          'Nowa Huta powstała jako projekt całego miasta naraz: z osiami, placami i zieleńcami zaplanowanymi na papierze przed pierwszym wykopem. Zalew i ta pętla wokół niego są częścią tego planu, nie późniejszym dodatkiem.',
+        coords: [20.0523, 50.081],
+        radius: 45,
+      },
+      {
+        id: 'dlubnia-wyplyw',
+        category: 'water',
+        name: 'Tu Dłubnia wypływa',
+        teaser: 'Wyjście rzeki, a stąd już prosto do Wisły.',
+        description: [
+          'Po południowo-wschodniej stronie rzeka wychodzi z zalewu i rusza w stronę Wisły, do której wpada kilka kilometrów dalej. To najcichszy narożnik pętli: mało ludzi, dużo drzew.',
+          'Odpływ jest miejscem, w którym najlepiej widać, że zalew ma poziom trzymany sztucznie. Woda schodzi tu przez próg, a nie rozlewa się swobodnie, i to on decyduje, gdzie kończy się brzeg.',
+          'Jeśli chcesz obejść zalew w spokoju, zacznij od tej strony: przy fontannach i przy food truckach ludzi jest najwięcej, a tutaj czasem nie ma nikogo.',
+        ],
+        findHint: 'Południowo-wschodni narożnik, za siłownią. Idź ścieżką aż usłyszysz wodę schodzącą z progu.',
+        reveal:
+          'Poziom zalewu jest trzymany sztucznie: woda odchodzi przez próg na południowym wschodzie i dopiero potem wraca do naturalnego biegu Dłubni ku Wiśle.',
+        coords: [20.0564, 50.07724],
+        radius: 40,
+      },
+      {
+        id: 'wzlot',
+        category: 'monument',
+        name: 'Wzlot',
+        teaser: 'Rzeźba nad południowym brzegiem, widoczna z drugiej strony wody.',
+        description: [
+          'Nad południowym brzegiem stoi rzeźba o nazwie Wzlot. Widać ją z przeciwnego brzegu, więc dobrze działa jako punkt orientacyjny: gdy obchodzisz zalew, wiesz, ile zostało.',
+          'Nowa Huta ma dużo takiej sztuki w przestrzeni: dzielnicę projektowano razem z rzeźbami, mozaikami i detalem, bo miała być wizytówką, a nie tylko mieszkaniami. Część tych rzeczy stoi do dziś w miejscach, w których nikt ich nie szuka.',
+          'Warto podejść blisko i spojrzeć w górę: rzeźby nazwane od lotu projektuje się tak, żeby patrzyło się na nie od dołu, i z daleka gubi się cały efekt.',
+        ],
+        findHint: 'Południowy brzeg, blisko ścieżki. Z drugiej strony wody widać ją jako pionowy akcent nad linią drzew.',
+        reveal:
+          'Nowa Huta była projektowana razem ze sztuką w przestrzeni: rzeźbami, mozaikami i detalem architektonicznym. Wzlot nad zalewem to jeden z tych elementów, które zostały na swoich miejscach.',
+        coords: [20.05237, 50.07658],
+        radius: 35,
+      },
+      {
+        id: 'podziemia',
+        category: 'history',
+        name: 'Podziemna Nowa Huta',
+        teaser: 'Pod dzielnicą są schrony, a do części da się wejść.',
+        description: [
+          'Kilkaset metrów od zalewu jest wejście do Podziemnej Nowej Huty: schronów zbudowanych pod dzielnicą i udostępnionych dziś do zwiedzania. To najbardziej zaskakująca rzecz w okolicy, bo z powierzchni nie widać jej wcale.',
+          'Nowa Huta powstawała w czasach, w których wojnę atomową traktowano jako scenariusz do policzenia, więc schrony budowano razem z blokami, szkołami i zakładami. Nie były dodatkiem, tylko częścią projektu.',
+          'Dla dziecka to dobra kolejność na jeden dzień: najpierw godzina wokół wody, potem zejście pod ziemię. Trzeba sprawdzić godziny, bo wejście jest tylko z przewodnikiem.',
+        ],
+        findHint: 'Na południowy zachód od zalewu, w stronę os. Szkolnego. Szukaj oznaczonego wejścia, nie budynku.',
+        reveal:
+          'Pod Nową Hutą jest sieć schronów przeciwatomowych, budowanych razem z dzielnicą. Część jest dziś dostępna do zwiedzania jako Podziemna Nowa Huta.',
+        dilemma: {
+          question:
+            'Schrony pod Nową Hutą budowano na wojnę, która nie przyszła. Dziś są atrakcją turystyczną. Czy z miejsc przygotowanych na katastrofę powinno się robić zwiedzanie?',
+          options: ['Tak, inaczej zapomnimy', 'Tylko z opowieścią o tym, po co były', 'Nie, to nie muzeum'],
+          counterpoint:
+            'Miejsce, do którego nikt nie wchodzi, znika razem z pamięcią o tym, dlaczego powstało. Ale zwiedzanie łatwo zamienia strach w ciekawostkę, a to były realne przygotowania na śmierć wielu ludzi. Różnicę robi opowieść, nie bilet.',
+        },
+        coords: [20.05041, 50.07653],
+        radius: 60,
+      },
+    ],
+  },
+  {
     parkId: 'kopiec-krakusa',
     pois: [
       {

@@ -5,8 +5,8 @@
   bottom: var(--pk-sheet-shift, 0px);
   z-index: 2;
   /* full bleed: it has to reach the edges to read as a bar, not as a row */
-  margin: var(--sp-6) calc(-1 * var(--sp-6)) calc(-1 * (var(--sa-bottom) + var(--sp-6)));
-  padding: var(--sp-5) var(--sp-6) calc(var(--sa-bottom) + var(--sp-4));
+  margin: var(--sp-6) calc(-1 * var(--sp-6)) calc(-1 * (var(--sa-gap) + var(--sp-6)));
+  padding: var(--sp-5) var(--sp-6) calc(var(--sa-gap) + var(--sp-4));
 }
 
 /*

@@ -73,7 +73,7 @@
 .pk-modal__inner {
   max-width: 560px;
   margin: 0 auto;
-  padding-bottom: calc(var(--sa-bottom) + var(--sp-8));
+  padding-bottom: calc(var(--sa-gap) + var(--sp-8));
 }
 
 @keyframes pk-cover-in {

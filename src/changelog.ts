@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.89.1'
+export const VERSION = '0.90.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.90.0',
+    date: '2026-08-23',
+    title: 'Zalew Nowohucki, with the mill that came before the steelworks',
+    tldr:
+      'Nowe miejsce: Zalew Nowohucki z sześcioma punktami.',
+    changes: [
+      ['added', 'Zalew Nowohucki as the fifty seventh place, with its own sticker, six points and a real outline: 6.7 hectares traced from the OpenStreetMap relation rather than drawn by hand'],
+      ['added', 'The six points wrap around the shore, and the story holding them together came out of the map itself. The Dlubnia flows in at the north and out at the south east, there is a channel still named Mlynowka, and there are mill ruins standing on the north west bank. So this water was working water long before anyone built a steelworks next to it, and that is the point of the place'],
+      ['added', 'The other three: the panorama bench on the north shore, the Wzlot sculpture on the south, and the shelters of Podziemna Nowa Huta a few hundred metres away, which is the most surprising thing in the area because nothing of it shows from the surface'],
+      ['changed', 'Content keeps its distance from the bottom edge by the measured gap rather than the reported inset. On the phone the system says 34 and 47 actually goes missing, so a button held 34 away stood 13 too low and looked cut by an edge the eye reads as continuing'],
+    ],
+  },
   {
     version: '0.89.1',
     date: '2026-08-22',

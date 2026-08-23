@@ -13,7 +13,7 @@
   left: 0;
   right: 0;
   bottom: calc(
-    var(--sa-bottom) + var(--sp-4) + var(--pk-bottom-taken, 0px) + var(--pk-toast-offset, 0px)
+    var(--sa-gap) + var(--sp-4) + var(--pk-bottom-taken, 0px) + var(--pk-toast-offset, 0px)
   );
   margin-inline: auto;
   width: min(calc(100% - 2 * var(--sp-4)), 480px);

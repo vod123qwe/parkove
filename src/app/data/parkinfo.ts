@@ -18,6 +18,18 @@ export type ParkInfo = {
 }
 
 export const PARK_INFO: Record<string, ParkInfo> = {
+  'zalew-nowohucki': {
+    description: [
+      'Niecałe siedem hektarów wody w środku Nowej Huty, na Dłubni, dwadzieścia minut tramwajem od Rynku. Pętla wokół zalewu ma około kilometra i nadaje się na spacer z wózkiem: asfalt, ławki co kilkadziesiąt metrów i cień od strony wschodniej.',
+      'Zalew powstał przy budowie dzielnicy, jako woda do patrzenia, a nie do pływania, i tak zostało: kąpiel jest zakazana. Za to są fontanny na tafli, siłownia plenerowa na wschodnim brzegu i food trucki przy północno-zachodnim narożniku.',
+      'Najciekawsze jest to, czego na pierwszy rzut oka nie widać: ta woda pracowała tu na długo przed hutą. Dłubnia napędzała młyny, a kanał, który do jednego z nich prowadził, nazywa się Młynówka i wciąż jest na mapie. Nad zalewem stoją jeszcze ruiny młyna.',
+    ],
+    amenities: {
+      playground: { has: true, note: 'Siłownia plenerowa na wschodnim brzegu, place zabaw między blokami na Szkolnym i Willowym.' },
+      food: { has: true, note: 'Food trucki przy północno-zachodnim narożniku zalewu, restauracja Santorini kawałek dalej.' },
+      verified: false,
+    },
+  },
   'test-piltza': {
     description: [
       'Trasa testowa wzdłuż ulicy Piltza, od numeru 43 do 34: pół kilometra w jedną stronę i sześć punktów, na których sprawdzasz, czy aplikacja robi to, co ma robić w terenie.',
