@@ -139,3 +139,24 @@ Nowe rzeczy, których runda 1 nie widziała:
   gdzie nie wiedziałem, że mogę pójść" — czyli dokładnie nasza obietnica; gniew
   budzi ślad urwany PO CICHU i „offline", które offline nie jest.
 
+## Decyzja Jarka (2026-08-24): wchodzą dwie nowe ścieżki
+
+Z dopisku rundy 2 Jarek wybrał do wdrożenia dwie mechaniki. Obie są narysowane w
+Figmie jako bloki 10 i 11 (sekcja „Parkove × Benchmark — makiety"), obok pasa
+„Podsumowanie audytu".
+
+**10 · Dwie osie trudności (z Geocachingu).** Dojście (D) i Odkrywanie (O)
+osobno, po pięć kropek. Na karcie miejsca para ocen składa zdanie-podpowiedź
+(„dojście łatwe, odkrywanie trudne — idealne na deszczową sobotę"), na liście te
+same oceny siedzą w wierszach i zasilają filtry („Łatwe dojście", „Na cały
+dzień", „Z wózkiem"). W danych to dwa pola na miejsce, ocenione raz, ręcznie —
+57 miejsc to jeden wieczór oceniania.
+
+**11 · Baza, która rośnie (z Zombies, Run!).** Leśniczówka w menu „Ty":
+wyprawy przywożą zapasy (km → drewno, punkty → szyszki, reveal → opowieść),
+zapasy odblokowują części bazy (ognisko, karmnik, ogródek, biblioteczka legend).
+Koniec wyprawy dostaje trzeci krok: „do bazy jedzie…" z jawnym przelicznikiem.
+Zasada po doświadczeniu z wyzwaniami: **wszystko liczone ze stanu, który apka już
+ma** — zero osobnych liczników, działa wstecz, niczego nie da się kupić.
+Odpowiada na pytanie, po co wyjść za dziesiątym razem, gdy nowość miejsc minęła.
+
