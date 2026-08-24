@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.97.0'
+export const VERSION = '0.97.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.97.1',
+    date: '2026-08-24',
+    title: 'Windows in the fog take the shape of the park',
+    tldr:
+      'Okna w chmurach mają kształt parku z falującą krawędzią, a chmury dostały trzecią warstwę, kłęby i podcień.',
+    changes: [
+      ['changed', 'A discovered place now clears the fog in the SHAPE of that place, not a circle: the real outline, slightly irregular, with vertices that sway a few pixels over time so the edge breathes. The soft rim comes from a shadow trick that works on every WebKit, no canvas filters involved'],
+      ['changed', 'Clouds got rebuilt: three tiled layers instead of two flat ones. A slow mass, cauliflower puffs with a shaded underside carrying the form, and fast thin wisps on top; each layer drifts in its own direction with a slight sway, so it stops feeling like a conveyor belt'],
+      ['fixed', 'On sharp screens the holes were not being cut at all: canvas shadow offsets ignore the transform matrix, so on a retina display the shadow landed outside the frame. Offsets are in device pixels now'],
+      ['fixed', 'The ortho style carries its own camera and quietly overrode the opening frame; the whole-city view is enforced after the style loads'],
+    ],
+  },
   {
     version: '0.97.0',
     date: '2026-08-24',

@@ -52,16 +52,22 @@ po prostu odkryte na zawsze. Jeden moment, żadnych powtórek i żadnego grindu.
 
 Zbudowane zgodnie z koncepcją, z trzema świadomymi uproszczeniami:
 
-1. **Okna w mgle są kołami z promieniem z powierzchni miejsca**, nie maskami
-   dokładnych polygonów. Pod oknem i tak rysuje się prawdziwy obrys (fill +
-   ring na mapie), więc kształt widać, a koło daje miękką krawędź tanio.
+1. **Okna w mgle mają kształt miejsca** (od 0.97.1, uwaga Jarka): rzutowany
+   obrys parku, rozepchnięty grubą kreską, z wierzchołkami falującymi w czasie
+   o kilka pikseli. Miękka krawędź bierze się z triku z cieniem (ścieżka
+   rysowana 4096 px poza kadrem, do kadru trafia tylko rozmyty cień), bo
+   ctx.filter na części WebKitów bywa ignorowany. Uwaga na pułapkę: offsety
+   cienia są w pikselach urządzenia i nie podlegają transformacji płótna, więc
+   na retinie trzeba je mnożyć przez dpr, inaczej dziur nie ma wcale.
 2. **Moment odkrycia odpala się przy pierwszym otwarciu ekranu** po nowej
    wizycie (lista obejrzanych w localStorage), nie na końcu wyprawy. Wejście z
    ekranu końca wyprawy można dodać później jednym przyciskiem.
 3. **Rozbicie na bloki-dzielnice poczeka na etap bloków** (makieta 8); karta na
    dole pokazuje na razie licznik ogólny, złote i dolinki.
 
-Technika jak w koncepcie: dwie warstwy kafelków PNG (public/clouds), jeden
+Technika jak w koncepcie, od 0.97.1 z trzema warstwami kafelków (masa, kłęby
+z podcieniem od dołu, smugi), każda w swoim tempie i kierunku z sinusowym
+kołysaniem: jeden
 canvas 2D, destination-out na okna, zarysy i znaki zapytania rysowane na mgle,
 paralaksa z map.project, pętla rAF żyje tylko na tym ekranie. Z daleka zarysy
 tylko dla miejsc od 9 ha, żeby mapa nie była tapetą z pytajników.

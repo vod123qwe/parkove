@@ -40,6 +40,14 @@ const readSeen = (): string[] => {
   }
 }
 
+/** zewnętrzne pierścienie geometrii miejsca (Polygon i MultiPolygon) */
+function outerRings(f: ParkFeature): number[][][] {
+  const g = f.geometry as { type: string; coordinates: unknown }
+  if (g.type === 'Polygon') return [(g.coordinates as number[][][])[0]]
+  if (g.type === 'MultiPolygon') return (g.coordinates as number[][][][]).map((poly) => poly[0])
+  return []
+}
+
 /** promień okna w mgle: z powierzchni miejsca, w pikselach na aktualnym zoomie */
 function windowRadiusPx(map: maplibregl.Map, f: ParkFeature): number {
   const c = f.properties.center
@@ -89,6 +97,9 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
     if (fresh.length) setFreshName(fresh[0].properties.name)
 
     map.on('load', () => {
+      /* styl ortho niesie wlasny center/zoom i nadpisuje opcje konstruktora,
+         wiec kadr calego Krakowa trzeba wymusic po zaladowaniu */
+      map.jumpTo({ center: [19.98, 50.05], zoom: 10.6 })
       map.addSource('disc', {
         type: 'geojson',
         data: {
@@ -135,18 +146,18 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
 
     /* --------------- mgła --------------- */
     const ctx = fog.getContext('2d')!
-    const imgA = new Image()
-    const imgB = new Image()
-    imgA.src = asset('/clouds/fog-a.png')
-    imgB.src = asset('/clouds/fog-b.png')
-    let patA: CanvasPattern | null = null
-    let patB: CanvasPattern | null = null
-    imgA.onload = () => {
-      patA = ctx.createPattern(imgA, 'repeat')
-    }
-    imgB.onload = () => {
-      patB = ctx.createPattern(imgB, 'repeat')
-    }
+    /* warstwa dziur rysowana osobno: cień rzucany z daleka daje miękką krawędź
+       bez ctx.filter, który na starszych WebKitach bywa ignorowany */
+    const holes = document.createElement('canvas')
+    const hctx = holes.getContext('2d')!
+    const pats: (CanvasPattern | null)[] = [null, null, null]
+    ;['/clouds/fog-a.png', '/clouds/fog-b.png', '/clouds/fog-c.png'].forEach((src, i) => {
+      const img = new Image()
+      img.src = asset(src)
+      img.onload = () => {
+        pats[i] = ctx.createPattern(img, 'repeat')
+      }
+    })
 
     const start = performance.now()
     /* animacja świeżych odkryć: dziura rośnie od zera przez 1,6 s */
@@ -179,28 +190,77 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
         ctx.fillRect(-512, -512, w + 1024, h + 1024)
         ctx.restore()
       }
-      layer(patA, 0.9, ref.x * 0.18 + t * 5.5, ref.y * 0.18 + t * 1.6)
-      layer(patB, 0.82, ref.x * 0.32 - t * 3.2, ref.y * 0.32 + t * 2.4)
+      /*
+       * Trzy warstwy zamiast dwóch (uwaga Jarka: „zasymuluj chmury lepiej"):
+       * masa idzie wolno, kłęby z podcieniem średnio i z lekkim kołysaniem,
+       * smugi najszybciej. Różne kierunki i sinusowe znoszenie łamią wrażenie
+       * taśmy produkcyjnej.
+       */
+      layer(pats[0], 0.8, ref.x * 0.1 + t * 2.6, ref.y * 0.1 + t * 0.9)
+      layer(
+        pats[1],
+        0.95,
+        ref.x * 0.24 - t * 4.6 + Math.sin(t * 0.07) * 28,
+        ref.y * 0.24 + t * 1.7 + Math.cos(t * 0.05) * 18,
+      )
+      layer(pats[2], 0.4, ref.x * 0.4 + t * 8.5, ref.y * 0.4 - t * 1.1 + Math.sin(t * 0.11) * 12)
 
-      /* okna nad odkrytymi: miękkie wycięcie */
-      ctx.globalCompositeOperation = 'destination-out'
+      /*
+       * Okna nad odkrytymi mają KSZTAŁT PARKU (uwaga Jarka), lekko nieregularny:
+       * wierzchołki obrysu falują w czasie o kilka pikseli, obrys jest
+       * rozpychany grubą kreską (dylatacja), a miękka krawędź bierze się z
+       * triku z cieniem: ścieżka rysuje się 4096 px w lewo, a do kadru trafia
+       * tylko jej rozmyty cień. Działa wszędzie, bez ctx.filter.
+       */
+      holes.width = fog.width
+      holes.height = fog.height
+      hctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      hctx.clearRect(0, 0, w, h)
+      hctx.shadowColor = 'rgba(0,0,0,1)'
+      /* offsety cienia NIE podlegaja transformacji plotna, sa w pikselach
+         urzadzenia: bez mnozenia przez dpr cien ladowal poza kadrem i dziur
+         nie bylo wcale */
+      hctx.shadowBlur = 20 * dpr
+      hctx.shadowOffsetX = 4096 * dpr
+      hctx.fillStyle = '#000'
+      hctx.strokeStyle = '#000'
+      hctx.lineJoin = 'round'
+      hctx.lineWidth = 22
       for (const f of FEATURES) {
         if (!visited.has(f.id)) continue
-        const p = map.project(f.properties.center as [number, number])
-        if (p.x < -220 || p.y < -220 || p.x > w + 220 || p.y > h + 220) continue
-        let r = windowRadiusPx(map, f)
+        const c = map.project(f.properties.center as [number, number])
+        const rough = windowRadiusPx(map, f) * 2
+        if (c.x < -rough || c.y < -rough || c.x > w + rough || c.y > h + rough) continue
+        let scale = 1
         if (freshIds.has(f.id)) {
           const k = Math.min(1, (now - start) / 1600)
-          r *= 0.15 + 0.85 * (1 - Math.pow(1 - k, 3))
+          scale = 0.12 + 0.88 * (1 - Math.pow(1 - k, 3))
         }
-        const g = ctx.createRadialGradient(p.x, p.y, r * 0.45, p.x, p.y, r)
-        g.addColorStop(0, 'rgba(0,0,0,1)')
-        g.addColorStop(1, 'rgba(0,0,0,0)')
-        ctx.fillStyle = g
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
-        ctx.fill()
+        const wob = (f.id.charCodeAt(0) * 7 + f.id.length * 13) % 97
+        hctx.beginPath()
+        for (const ring of outerRings(f)) {
+          const step = Math.max(1, Math.floor(ring.length / 56))
+          let first = true
+          for (let i = 0; i < ring.length; i += step) {
+            const pt = map.project(ring[i] as [number, number])
+            const dx = Math.sin(t * 0.55 + i * 1.7 + wob) * 6
+            const dy = Math.cos(t * 0.45 + i * 2.3 + wob) * 6
+            const x = c.x + (pt.x - c.x) * scale + dx - 4096
+            const y = c.y + (pt.y - c.y) * scale + dy
+            if (first) {
+              hctx.moveTo(x, y)
+              first = false
+            } else hctx.lineTo(x, y)
+          }
+          hctx.closePath()
+        }
+        hctx.fill()
+        hctx.stroke()
       }
+      ctx.globalCompositeOperation = 'destination-out'
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.drawImage(holes, 0, 0)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.globalCompositeOperation = 'source-over'
 
       /*
