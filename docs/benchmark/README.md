@@ -1,6 +1,6 @@
 # Benchmark: jak inne apki zatrzymują człowieka w terenie
 
-Stan: **runda 1 z 2026-08-24.** Zakres tej rundy ustalony z Jarkiem: same perełki
+Stan: **runda 1 i 2 z 2026-08-24, komplet.** Zakres tej rundy ustalony z Jarkiem: same perełki
 **nieanglojęzyczne** plus osobny kubełek **zjawisk bez aplikacji**, źródła w
 językach oryginału, pełne dane rynkowe, głosy użytkowników ze sklepów i forów.
 
@@ -11,6 +11,18 @@ językach oryginału, pełne dane rynkowe, głosy użytkowników ze sklepów i f
 | [00-co-ukrasc.md](00-co-ukrasc.md) | jednostronicówka: co bym wziął do Parkove, po kolei |
 | [01-perelki-nieanglojezyczne.md](01-perelki-nieanglojezyczne.md) | 9 aplikacji: JP, KR, TW, CN, CZ, FR, SE, AT, PL |
 | [02-zjawiska-bez-apki.md](02-zjawiska-bez-apki.md) | 3 systemy kolekcjonerskie, które działają bez telefonu |
+| [03-wielkie-apki.md](03-wielkie-apki.md) | runda 2: Pikmin Bloom, Geocaching, Strava, komoot, Pokémon GO, AllTrails |
+| [04-reveal-na-miejscu.md](04-reveal-na-miejscu.md) | runda 2: Questo, Agents of Discovery, VoiceMap/ECHOES — trzy drogi do revealu |
+| [05-skandynawskie-zbieractwo.md](05-skandynawskie-zbieractwo.md) | runda 2: Hittaut, Stolpejakten, Turf, Find vej, MOBO |
+| [06-gry-terenowe.md](06-gry-terenowe.md) | runda 2: Munzee, Ingress, Randonautica, Street Tag, Zombies Run!, Beat the Street, Questy, Orna |
+| [07-questy-i-audio.md](07-questy-i-audio.md) | runda 2: Actionbound, Loquiz, ECHOES, Smartify, izi.TRAVEL, STQRY, CluedUpp + 13 warunków odblokowania |
+| [08-dzieci-w-terenie.md](08-dzieci-w-terenie.md) | runda 2: Seek, GooseChase, Junior Ranger ×2, Nature Passport, Odkrywca Krakowskich Parków, PTTK |
+| [09-kolekcje-i-odznaki.md](09-kolekcje-i-odznaki.md) | runda 2: Peakbagger, PeakVisor, Conqueror, Wandernadel, Wainwrights, Hyakumeizan, manhole cards |
+| [10-glosy-uzytkownikow.md](10-glosy-uzytkownikow.md) | runda 2: 31 źródeł opinii ułożonych wokół 4 pytań, nie wokół aplikacji |
+
+**Makiety:** 10 ścieżek z tego researchu narysowane w Figmie, plik
+fOY3ZATV4z8M08fSjw7QiL, strona „Page 28", sekcja **„Parkove × Benchmark — makiety"**
+(node 779:1919, pod istniejącą zawartością strony).
 
 ## Schemat karty
 

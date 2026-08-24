@@ -105,3 +105,37 @@ Nie zaczynam bez Twojej decyzji, bo to jest ten kosztowny kawałek.
   kubełek, który mówi wprost o uwadze pięciolatka.
 - **Kopalnia opinii**: recenzje jedno- i pięciogwiazdkowe plus wątki na Reddicie
   dla ośmiu wybranych apek, żeby oddzielić moje wnioski od głosu użytkowników.
+
+---
+
+## Dopisek po rundzie 2 (2026-08-24, wieczór)
+
+Runda 2 (pliki 03–10) potwierdziła listę z rundy 1 i podniosła kilka rzeczy wyżej.
+**Dziesięć ścieżek jest narysowanych w Figmie** (plik fOY3ZATV4z8M08fSjw7QiL,
+sekcja „Parkove × Benchmark — makiety"): 1a/1b dowód wyprawy (BAC), 2 złota za
+wspomnienie (YAMAP), 3 furtka-kod gdy GPS błądzi (Hittaut+Smartify), 4 zagadka
+otwiera opowieść (Questo), 5 pocztówka na koniec (Pikmin Bloom), 6 domownik parku
+(Strava Local Legend), 7 loteria zamiast rankingu (Stolpejakten), 8 domknij
+dzielnicę (michi-no-eki), 9 droga na tydzień (Pokémon GO).
+
+Nowe rzeczy, których runda 1 nie widziała:
+
+- **Dwie osie trudności** (Geocaching): D znalezienia i T dotarcia osobno — dla
+  rodziny to informacja krytyczna, nie ozdoba.
+- **Punkt zaliczony na zawsze to punkt martwy** (Street Tag: cooldown, nie
+  blokada). U nas 163 punkty są jednorazowe — to jest nasz problem retencji.
+- **Loteria zamiast rankingu** (Stolpejakten): każdy punkt = los; przy trzech
+  osobach jedyna rywalizacja bez przegranych. Poszła prosto do makiety 7.
+- **13 warunków odblokowania treści** (rozdz. 07) i twarde liczby promieni:
+  20 m stałe, 10 m domyślne, 5 m nieaktywowalne — nasze 30–45 m się broni.
+- **Uwaga dziecka** (rozdz. 08): punkt domyka się jednym gestem ciała, rysunek
+  zamiast pisania, dowód niezawodny (papierowe pieczątki giną — krakowska
+  blogerka: 3 braki na 4 parki).
+- **Odkrywca Krakowskich Parków** (start: sierpień 2026, 78 parków, budki ze
+  stemplami) — realny sąsiad; do obejrzenia w terenie i opisania różnic.
+- **Anatomia dobrej listy** (rozdz. 09): lista ma autora i uzasadnienie, drabinę
+  progów z przedmiotem na szczeblu, pierwszy próg absurdalnie niski i nazwany.
+- **Głosy** (rozdz. 10): najczęstsza pochwała gatunku brzmi „zabrało mnie tam,
+  gdzie nie wiedziałem, że mogę pójść" — czyli dokładnie nasza obietnica; gniew
+  budzi ślad urwany PO CICHU i „offline", które offline nie jest.
+
