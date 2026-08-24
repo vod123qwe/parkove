@@ -53,7 +53,7 @@ export function JourneyMap({
        * Płaskim odpowiednikiem rzeźby terenu jest ortofotomapa, nie satelita
        * Esri: to ma być to samo zdjęcie, tylko położone.
        */
-      style: resolveMapStyle(getMapStyle() === 'satellite-3d' ? 'ortho' : getMapStyle()).spec,
+      style: resolveMapStyle(getMapStyle() === 'satellite-3d' ? 'satellite' : getMapStyle()).spec,
       center: track[0] ?? [19.9445, 50.0555],
       zoom: 14,
       attributionControl: { compact: true },

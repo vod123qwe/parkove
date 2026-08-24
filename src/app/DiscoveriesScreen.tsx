@@ -77,7 +77,7 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
     const fog = fogRef.current
     if (!el || !fog) return
 
-    const style = resolveMapStyle('ortho')
+    const style = resolveMapStyle('satellite')
     const map = new maplibregl.Map({
       container: el,
       style: style.spec,
@@ -98,7 +98,7 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
     if (fresh.length) setFreshName(fresh[0].properties.name)
 
     map.on('load', () => {
-      /* styl ortho niesie wlasny center/zoom i nadpisuje opcje konstruktora,
+      /* styl satelity moze niesc wlasny center/zoom i nadpisac opcje konstruktora,
          wiec kadr calego Krakowa trzeba wymusic po zaladowaniu */
       map.jumpTo({ center: [19.98, 50.05], zoom: 10.6 })
       map.addSource('disc', {

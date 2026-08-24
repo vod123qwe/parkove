@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.99.0'
+export const VERSION = '0.99.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.99.1',
+    date: '2026-08-24',
+    title: 'Tilted satellite, quest-style pins, ortho retired',
+    tldr:
+      'Ekran główny stoi na satelicie lekko pochylonej, ortofoto zniknęło, a łezki mówią językiem punktów wyprawy: zielone z limonkową ikoną, zdobyte całe w złocie.',
+    changes: [
+      ['changed', 'The home map defaults to the satellite photo and stands at a gentle 24 degree tilt, just enough depth without lying about where a pin points'],
+      ['changed', 'Park pins now speak the exact language of the quest points you see when a park is selected: dark trail green, lime icon, light rim. A completed place turns full gold, the same gold as its stamp. The landscape colour families from 0.99.0 lasted one release'],
+      ['fixed', 'The GUGiK ortho imagery is gone everywhere: the style picker, the 3D relief, the memory replay and offline packs all use the satellite source now. The replay keeps its sharpness through the same tile supersampling trick, and anyone who had Ortofoto picked lands back on Satelita'],
+    ],
+  },
   {
     version: '0.99.0',
     date: '2026-08-24',

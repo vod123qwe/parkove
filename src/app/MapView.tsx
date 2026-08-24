@@ -667,23 +667,9 @@ export function MapView({
         maxzoom: 11.6,
         paint: {
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2.6, 11.6, 5.5] as never,
-          'circle-color': [
-            'match',
-            ['get', 'state'],
-            'visited',
-            pinc.trailFill,
-            'done',
-            pinc.gold,
-            pinc.paper,
-          ] as never,
+          'circle-color': ['match', ['get', 'state'], 'done', pinc.gold, pinc.trailFill] as never,
           'circle-stroke-width': 1.2,
-          'circle-stroke-color': [
-            'match',
-            ['get', 'state'],
-            'fresh',
-            pinc.trailFill,
-            pinc.paper,
-          ] as never,
+          'circle-stroke-color': pinc.paper,
         },
       })
       map.addLayer({

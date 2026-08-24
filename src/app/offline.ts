@@ -39,7 +39,7 @@ const PASS = 'pkpack=1'
  *
  * Żywa mapa w miejscu chodzi między 14 a 17, i to jest rdzeń. 18 to opcja
  * „ostrzej": kafli jest cztery razy więcej, więc i megabajtów. Wyżej nie ma po
- * co, bo Geoportal kończy się na 19, a 19 dla całej doliny to setki megabajtów.
+ * co, bo zdjęcie kończy się na 19, a 19 dla całej doliny to setki megabajtów.
  */
 const Z_MIN = 13
 const Z_CORE = 17
@@ -50,10 +50,8 @@ const DEM_MAX = 15
 /** budynki w odtwarzaniu 3D wchodzą od 14, więc tyle wystarczy */
 const VEC_Z = 14
 
-const ORTHO =
-  'https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMTS/StandardResolution' +
-  '?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTOFOTOMAPA&STYLE=default' +
-  '&FORMAT=image/jpeg&TILEMATRIXSET=EPSG:3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'
+const SAT =
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 const DEM = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
 const VEC = 'https://tiles.openfreemap.org/planet/{z}/{x}/{y}.pbf'
 
@@ -139,7 +137,7 @@ export function packLayers(parkId: string, sharp: boolean): Layer[] {
     .filter((poi) => poi.photo)
     .map((poi) => new URL(poi.photo as string, location.href).toString())
   return [
-    ...layers(box, ORTHO, Z_MIN, sharp ? Z_SHARP : Z_CORE),
+    ...layers(box, SAT, Z_MIN, sharp ? Z_SHARP : Z_CORE),
     ...layers(box, DEM, DEM_MIN, DEM_MAX),
     ...layers(box, VEC, VEC_Z, VEC_Z),
     ...(photos.length ? [{ urls: photos }] : []),

@@ -208,10 +208,6 @@ export function pinColors() {
     onPrimary: v('--content-on-primary'),
     paper: v('--bg-surface'),
     ink: v('--content-primary'),
-    pinGreen: v('--pin-green'),
-    pinForest: v('--pin-forest'),
-    pinWater: v('--pin-water'),
-    pinEarth: v('--pin-earth'),
     parkingFill: v('--map-parking-fill'),
     parkingIcon: v('--map-parking-icon'),
     infoSubtle: v('--bg-info-subtle'),
@@ -239,18 +235,6 @@ export function pinColors() {
 export type ParkPinState = 'fresh' | 'visited' | 'done'
 export const parkPinImageId = (kind: string, state: ParkPinState) => `ppin-${kind}-${state}`
 
-/** rodzaj -> rodzina koloru: parkGreen / forest / water / earth */
-const PARK_KIND_FAMILY: Record<string, 'pinGreen' | 'pinForest' | 'pinWater' | 'pinEarth'> = {
-  park: 'pinGreen',
-  garden: 'pinGreen',
-  meadow: 'pinGreen',
-  forest: 'pinForest',
-  nature: 'pinForest',
-  water: 'pinWater',
-  mound: 'pinEarth',
-  valley: 'pinEarth',
-}
-
 const PARK_KIND_ICON: Record<string, keyof typeof ICONS> = {
   park: 'park',
   forest: 'forest',
@@ -266,43 +250,27 @@ const PARK_W = 96
 const PARK_H = 124
 
 /*
- * Lezka z MIEKKIM czubkiem (uwaga Jarka: za spiczaste). Dol konczy sie
- * malym lukiem zamiast szpica, boki schodza lagodnymi krzywymi. Czubek i
- * tak WSKAZUJE miejsce, wiec pin moze byc duzy i nie klamie o pozycji.
- *
- * Logika kolorow: KOLOR lezki = rodzina krajobrazu (zielen / las / woda /
- * ziemia), IKONA = konkretny rodzaj, WYPELNIENIE = stan. Nieodwiedzone
- * jest "niewypelnione": papier z kolorowa obwodka i kolorowa ikona.
- * Odwiedzone jest pelne: kolor rodziny z jasna ikona. Domkniete nosi
- * zlota plakietke z ptaszkiem, te sama co zdobyty punkt na wspomnieniach.
+ * Lezka z miekkim czubkiem, w JEZYKU PUNKTOW QUESTOWYCH (uwaga Jarka
+ * 2026-08-24: "piny powinny byc w stylu tych ikonek co sa przy zaznaczeniu
+ * parku"). Kazdy pin: ciemna zielen szlaku, limonkowa ikona rodzaju,
+ * jasna obwodka. Zdobyte miejsce dostaje ZLOTA lezke z ciemna ikona,
+ * te sama zloto co pieczatka. Ikona dalej mowi, CO to za miejsce.
  */
-function parkPinSvg(
-  paths: string[],
-  state: ParkPinState,
-  family: string,
-  colors: Record<string, string>,
-) {
-  const fam = colors[family] ?? colors.trailFill
+function parkPinSvg(paths: string[], state: ParkPinState, colors: Record<string, string>) {
   const [fill, stroke, icon] =
-    state === 'fresh' ? [colors.paper, fam, fam] : [fam, colors.paper, colors.paper]
+    state === 'done'
+      ? [colors.gold, colors.paper, colors.onGold]
+      : [colors.trailFill, colors.paper, colors.trailIcon]
   const drop =
     'M43 103 C 33 88, 11 74, 11 44 A 37 37 0 1 1 85 44 C 85 74, 63 88, 53 103 A 6.5 6.5 0 0 1 43 103 Z'
   const iconScale = 2
   const off = 48 - 12 * iconScale
-  const tick =
-    state === 'done'
-      ? `<g transform="translate(${PARK_W - 32} 2)">
-    <circle cx="14" cy="14" r="13" fill="${colors.gold}" stroke="${colors.paper}" stroke-width="2.5"/>
-    <path d="M8 14.5l4 4 8-8" fill="none" stroke="${colors.onGold}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>`
-      : ''
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${PARK_W}" height="${PARK_H}" viewBox="0 0 ${PARK_W} ${PARK_H}">
   <ellipse cx="48" cy="112" rx="10" ry="3.5" fill="rgba(10, 14, 6, 0.28)"/>
   <path d="${drop}" fill="${fill}" stroke="${stroke}" stroke-width="5.5" stroke-linejoin="round"/>
   <g transform="translate(${off} ${44 - 12 * iconScale}) scale(${iconScale})" fill="none" stroke="${icon}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     ${paths.map((d) => `<path d="${d}"/>`).join('')}
   </g>
-  ${tick}
 </svg>`
 }
 
@@ -316,7 +284,7 @@ export async function buildParkPinImages(
       try {
         out.push([
           parkPinImageId(kind, state),
-          await rasterise(parkPinSvg(ICONS[iconKey], state, PARK_KIND_FAMILY[kind] ?? 'pinGreen', colors), PARK_W, PARK_H),
+          await rasterise(parkPinSvg(ICONS[iconKey], state, colors), PARK_W, PARK_H),
         ])
       } catch {
         // pin, ktorego nie da sie narysowac, po prostu nie wchodzi na mape

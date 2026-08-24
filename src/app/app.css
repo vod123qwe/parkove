@@ -3797,14 +3797,6 @@
   /* a sticky note is canary yellow: near the gold of a stamp but its own thing */
   --paper-note: #fdf19b;
   --ink-note: #33301c;
-  /*
-   * Rodziny pinow parkow: kolor lezki mowi, JAKI to krajobraz, zanim
-   * przeczytasz ikone. Cztery rodziny wystarcza; osiem kolorow to szum.
-   */
-  --pin-green: #3a6b2d; /* parki, ogrody, laki */
-  --pin-forest: #1f4636; /* lasy i uroczyska */
-  --pin-water: #2e7396; /* woda */
-  --pin-earth: #8a6134; /* kopce i dolinki */
 }
 
 .memplay {
