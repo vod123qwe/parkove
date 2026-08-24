@@ -4,7 +4,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  bottom: 0;
   min-height: max(var(--screen-h), 100dvh);
   /*
    * Ciemne tło NALEŻY DO TEJ POWŁOKI, a nie do dokumentu, i to jest cała

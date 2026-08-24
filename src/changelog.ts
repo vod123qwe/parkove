@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.93.0'
+export const VERSION = '0.93.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.93.1',
+    date: '2026-08-24',
+    title: 'The places sheet stops vanishing after you come back from a subpage',
+    tldr:
+      'Arkusz miejsc nie znika już po powrocie z podstrony: powłoka apki nie jest już przesuwana.',
+    changes: [
+      ['fixed', 'Coming back from a subpage sometimes left the home screen dead: the places sheet gone, nothing responding, and tapping around at random eventually brought it back. The cause was a piece of decoration. While a subpage was open, the whole app shell was slid 22 pixels aside and dimmed slightly, as a hint that you had gone one level deeper. Both of those properties, a transform and a filter, turn an element into the containing block for anything positioned fixed inside it, and the places sheet is positioned fixed inside the shell. So for as long as the subpage was open, the sheet was measured against the shell instead of the window; when the subpage closed and the properties went away, iOS did not recompute that until something forced it, and a tap is what forced it. The effect stays where it is safe, on screens and panels that contain nothing fixed'],
+      ['changed', 'That also means the app no longer pushes its whole surface, map canvas included, through a filtered layer every time a subpage opens and closes. It was the most expensive thing we animated on a phone, and it bought a movement you could only see for a quarter of a second before the subpage covered it'],
+    ],
+  },
   {
     version: '0.93.0',
     date: '2026-08-24',

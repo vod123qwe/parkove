@@ -181,15 +181,33 @@ button {
  * What sits under a screen. A push moves the layer below aside and dims it a
  * touch, which is the cue that says "you went deeper, back will bring you
  * here". A cover leaves it in place, because it is presented over, not into.
+ *
+ * .app-shell NIE JEST tu wymieniona i to jest poprawka błędu, nie oszczędność.
+ *
+ * Jarek: „wracam na ekran główny i po chwili znika ten dolny bottom sheet z
+ * miejscami, a funkcjonowanie ekranu wraca, dopiero gdy klikam randomowo".
+ *
+ * Powód: `transform` ORAZ `filter` czynią element BLOKIEM KONTENEROWYM dla
+ * potomków `position: fixed`. Arkusz miejsc (`.pk-sheet`) jest `fixed` i leży
+ * wewnątrz `.app-shell`, więc na czas otwartej podstrony przestawał być
+ * pozycjonowany względem okna, a zaczynał względem powłoki. Po zamknięciu
+ * podstrony właściwość znika i blok kontenerowy wraca do okna, tylko że iOS nie
+ * przelicza wtedy layoutu, dopóki coś go nie zmusi. Dotknięcie ekranu zmusza, i
+ * dlatego „randomowe klikanie" naprawiało widok.
+ *
+ * Do tego `filter` na powłoce przepuszczał przez warstwę filtrowaną CAŁĄ apkę,
+ * razem z płótnem WebGL mapy: na telefonie to najdroższa rzecz, jaką mogliśmy
+ * animować, i robiliśmy to przy każdym wejściu i wyjściu z podstrony.
+ *
+ * Efekt zostaje tam, gdzie jest bezpieczny: na ekranach i panelach, czyli na
+ * warstwach, które same nie zawierają niczego `fixed`.
  */
-[data-pk-pushed] .app-shell,
 [data-pk-pushed] .jscreen,
 [data-pk-pushed] .pk-modal.-cover .pk-modal__panel {
   transform: translateX(-22px);
   filter: brightness(0.94);
 }
 
-.app-shell,
 .jscreen,
 .pk-modal.-cover .pk-modal__panel {
   transition:

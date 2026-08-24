@@ -147,3 +147,34 @@ Symulator jest narzędziem **na komputer**. Na telefonie nadpisuje wcięcia
 wartościami iPhone'a, a te już tam są, więc treść się przesuwa: 47 zamienia się w
 59 i wszystko schodzi o 12 px w dół. Nie jest zepsuty, po prostu nie jest do tego.
 Opis wiersza w „O aplikacji" mówi to teraz wprost.
+
+## Powłoka nie może być przesuwana ani filtrowana
+
+Jarek, 2026-08-24: „wracam na ekran główny i po chwili znika ten dolny bottom
+sheet z miejscami, a funkcjonowanie ekranu wraca dopiero, gdy klikam randomowo".
+
+Winna była dekoracja. Na czas otwartej podstrony cała powłoka apki dostawała
+`transform: translateX(-22px)` i `filter: brightness(0.94)`, jako sygnał „wszedłeś
+o poziom głębiej".
+
+Obie te własności czynią element **blokiem kontenerowym dla potomków
+`position: fixed`**. Arkusz miejsc jest `fixed` i leży wewnątrz powłoki, więc:
+
+1. otwierasz podstronę, powłoka dostaje transform, arkusz przestaje być
+   pozycjonowany względem OKNA i zaczyna względem POWŁOKI,
+2. zamykasz podstronę, własność znika, blok kontenerowy wraca do okna,
+3. iOS nie przelicza wtedy layoutu, dopóki coś go nie zmusi. Dotknięcie ekranu
+   zmusza, więc „randomowe klikanie" naprawiało widok.
+
+Sprawdzone w kodzie, nie zgadnięte: `.pk-sheet` ma `position: fixed`, a jego
+rodzicem jest `.app-shell`, i to jedyny `fixed` wewnątrz powłoki.
+
+Do tego `filter` przepuszczał przez warstwę filtrowaną **całą apkę razem z
+płótnem WebGL mapy**, przy każdym wejściu i wyjściu z podstrony. Na telefonie to
+najdroższa rzecz, jaką dało się tam animować, za ruch widoczny przez ćwierć
+sekundy, zanim podstrona i tak zakryła ekran.
+
+**Zasada:** powłoka, wewnątrz której siedzi cokolwiek `position: fixed`, nie
+dostaje ani `transform`, ani `filter`, ani `backdrop-filter`, ani `perspective`,
+ani `contain: paint`. Efekt „pchnięcia" zostaje na ekranach i panelach, czyli na
+warstwach, które same nie zawierają niczego `fixed`.
