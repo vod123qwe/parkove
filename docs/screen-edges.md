@@ -178,3 +178,39 @@ sekundy, zanim podstrona i tak zakryła ekran.
 dostaje ani `transform`, ani `filter`, ani `backdrop-filter`, ani `perspective`,
 ani `contain: paint`. Efekt „pchnięcia" zostaje na ekranach i panelach, czyli na
 warstwach, które same nie zawierają niczego `fixed`.
+
+## O widoczności nie może decydować animacja
+
+Ciąg dalszy tej samej sprawy, 2026-08-24. Po zdjęciu transformu z powłoki Jarek
+zobaczył arkusz „Wszystkie parki" NA ekranie wyprawy z dziennika. Przy okazji
+szukania tego wyszła rzecz ważniejsza.
+
+**Zła kolejność warstw, ukryta przez kontekst stosu.** Ekran wyprawy miał
+`z-index: 80`, arkusze mają 100. Kolejność była zła od dawna i nikt tego nie
+widział, bo transform na powłoce tworzył kontekst stosu i cała jej zawartość
+malowała się jako jedna warstwa pod tym ekranem. Zdjęcie transformu (konieczne z
+innego powodu) odsłoniło błąd. Wniosek: **kontekst stosu ukrywa błędy w
+kolejności, a nie je naprawia.** Drabinka warstw stoi teraz opisana w jednym
+miejscu, przy `.jscreen` w `app.css`.
+
+**Animacja wejścia decydowała o tym, czy arkusz istnieje.** Panel dostaje pozycję
+inline transformem, ale:
+
+- `@keyframes pk-sheet-up` ma jedną klatkę, `from { translateY(100%) }`, czyli
+  panel dokładnie pod ekranem,
+- a przy `transition: transform` samo ustawienie pozycji staje się przejściem z
+  `none` do wartości docelowej.
+
+Dopóki jedno albo drugie trwa, **o pozycji decyduje animacja, a nie wartość
+końcowa**. Przeglądarka, która nie rysuje klatek, trzyma pierwszą klatkę. Zmierzone
+wprost: `CSSTransition` w stanie `running` z `currentTime: 0`, computed transform
+`none` przy inline `translateY(457px)`, panel na pełnej wysokości; a z animacją
+klatkową computed `translateY(747px)`, czyli arkusz pod ekranem, przy tym samym
+inline. Safari na iOS potrafi przestać rysować na moment po zamknięciu
+pełnoekranowego ekranu i dokładnie wtedy arkusz „znikał", a dotknięcie budziło
+rysowanie.
+
+**Zasada:** pierwsze ustawienie pozycji nigdy nie jest animowane, a powierzchnia,
+która pojawia się BEZ dotknięcia użytkownika, nie ma animacji wejścia. Ruch
+zostaje tam, gdzie zawsze poprzedza go dotknięcie: przy zmianie zatrzasku i przy
+arkuszach modalnych.

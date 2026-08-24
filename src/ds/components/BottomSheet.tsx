@@ -181,9 +181,34 @@ export function BottomSheet({
     [heights, minHeight],
   )
 
+  /*
+   * PIERWSZE ustawienie pozycji nie jest animowane, kolejne są.
+   *
+   * Powód jest zmierzony. Panel dostaje pozycję inline transformem, a przy
+   * `transition: transform` przeglądarka robi z tego przejście z `none` do
+   * wartości docelowej. Dopóki przejście trwa, o pozycji decyduje ONO, a nie
+   * wartość końcowa. Jeżeli przeglądarka w tym momencie nie rysuje klatek, a
+   * Safari na iOS potrafi nie rysować zaraz po zamknięciu pełnoekranowego ekranu,
+   * przejście stoi na swojej pierwszej klatce i arkusz ląduje nie tam, gdzie
+   * powinien: z animacją klatkową pod ekranem (czyli znika), z samym przejściem
+   * na pełnej wysokości.
+   *
+   * Zmierzone u mnie wprost: CSSTransition w stanie running z currentTime 0,
+   * computed transform `none` przy inline `translateY(457px)`.
+   *
+   * Bez animacji pierwszego ustawienia nie ma czego zatrzymać: po obudzeniu
+   * rysowania arkusz jest na swoim miejscu. Ruch przy zmianie zatrzasku zostaje,
+   * bo tam zawsze poprzedza go dotknięcie, czyli przeglądarka na pewno rysuje.
+   */
+  const placed = useRef(false)
   useLayoutEffect(() => {
-    if (!shown || !heights || closing) return
-    setTranslate(restingT(detent), true)
+    if (!shown) {
+      placed.current = false
+      return
+    }
+    if (!heights || closing) return
+    setTranslate(restingT(detent), placed.current)
+    placed.current = true
   }, [shown, heights, detent, closing, restingT])
 
   // exit: slide the panel below the viewport while the scrim fades

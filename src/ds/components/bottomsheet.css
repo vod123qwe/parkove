@@ -198,6 +198,32 @@
 }
 
 /*
+ * Arkusz-dok wjeżdża BEZ animacji klatkowej i to jest poprawka błędu, nie
+ * uproszczenie.
+ *
+ * `pk-sheet-up` ma jedną klatkę: `from { translateY(100%) }`, czyli panel
+ * dokładnie pod ekranem. Dopóki animacja się kręci, TO ONA decyduje o pozycji, a
+ * nie transform ustawiony przez komponent. Jeżeli przeglądarka w tym momencie nie
+ * rysuje klatek, a Safari na iOS potrafi nie rysować zaraz po zamknięciu
+ * pełnoekranowego ekranu, animacja stoi na pierwszej klatce i arkusz zostaje pod
+ * ekranem. Wygląda to na „arkusz zniknął", a wraca, gdy cokolwiek obudzi
+ * rysowanie, na przykład dotknięcie. Zmierzone u mnie wprost: animacja w stanie
+ * running z currentTime 0, computed transform translateY(747px) przy inline
+ * translateY(457px).
+ *
+ * Bez animacji pozycję ustala TYLKO inline transform, czyli stan końcowy. Gdy
+ * rysowanie stoi, po obudzeniu widać arkusz na swoim miejscu, a nie pustkę: brak
+ * ruchu jest gorszy od ruchu, ale nieskończenie lepszy od zniknięcia.
+ *
+ * Arkusze modalne (menu, wybór szlaku) zostają z wjazdem, bo one PRZYCHODZĄ na
+ * chwilę i naprawdę czymś się zapowiadają. Dok jest domyślną powierzchnią ekranu
+ * głównego: ma po prostu być.
+ */
+.pk-sheet.-nonmodal .pk-sheet__panel {
+  animation: none;
+}
+
+/*
  * Pas nad arkuszem-dokiem: niewidoczny, ale klikalny. Wysokosc liczy komponent,
  * bo tylko on wie, ile panelu zostalo nad krawedzia. Prawy gorny rog wolny na
  * przycisk menu.

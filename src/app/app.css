@@ -1391,7 +1391,10 @@
 .plantcam {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  /* nad arkuszami: patrz drabinka przy .jscreen. Dotąd 60, czyli POD nimi, i
+     ratowało to tylko tyle, że kamera otwiera się w trakcie wyprawy, a wtedy
+     arkusza miejsc i tak nie ma na ekranie */
+  z-index: 115;
   background: #050704;
   overflow: hidden;
 }
@@ -3520,6 +3523,29 @@
   -webkit-mask-image: linear-gradient(to top, #000 var(--from), transparent var(--to));
 }
 
+/*
+ * DRABINKA WARSTW, w jednym miejscu, bo poprzednio jej nie było i to się zemściło.
+ *
+ *    10-14  HUD na mapie (filtry, menu, styl mapy, „gdzie jestem")
+ *      100  arkusze (DS, bottomsheet.css)
+ *      110  ten ekran: wyprawa z dziennika, czyli poziom głębiej niż mapa
+ *      115  pełnoekranowa kamera do roślin
+ *      120  odtwarzanie wspomnienia
+ *      130  widok wspomnienia
+ *      140  pasek pobierania mapy: status globalny, widoczny nad wszystkim poza modalem
+ *      200  modale (DS, modal.css)
+ *
+ * Ten ekran miał 80, czyli POD arkuszami, i przez długi czas nikt tego nie
+ * widział, bo powłoka apki dostawała wtedy `transform`, a transform tworzy
+ * kontekst stosu: cała jej zawartość, razem z arkuszem o z-index 100, malowała
+ * się jako jedna warstwa pod tym ekranem. Gdy transform zniknął (bo psuł
+ * pozycjonowanie `fixed` na iOS, patrz docs/screen-edges.md), zła kolejność
+ * wyszła na wierzch: Jarek otworzył wyprawę z dziennika i zobaczył na niej
+ * arkusz „Wszystkie parki".
+ *
+ * Wniosek na przyszłość: kontekst stosu ukrywa błędy w kolejności, a nie ich
+ * naprawia. Numer musi być prawdziwy sam z siebie.
+ */
 .jscreen {
   position: fixed;
   top: 0;
@@ -3528,7 +3554,7 @@
   /* both edges pinned: the bottom does not depend on what vh means today */
   bottom: 0;
   min-height: max(var(--screen-h), 100dvh);
-  z-index: 80;
+  z-index: 110;
   background: var(--bg-page);
   /* a walk from the journal is one level deeper, so it arrives from the side */
   animation: jscreen-in 340ms var(--ease-screen);
