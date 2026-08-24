@@ -199,7 +199,8 @@ async function osrm(service, coords, extra = '') {
     .map((c) => `${c[0]},${c[1]}`)
     .join(';')}?overview=full&geometries=geojson${extra}`
   for (let attempt = 1; attempt <= 3; attempt++) {
-    await sleep(attempt * 900)
+    /* 1300 ms: bieg 2026-08-24 przy 900 ms skonczyl sie banem na routerze */
+    await sleep(attempt * 1300)
     try {
       const res = await fetch(url, { headers: UA, signal: AbortSignal.timeout(20000) })
       if (!res.ok) continue
@@ -700,7 +701,13 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
  * Progi na koniec, takze w trybie --prune: warianty policzone przy starszym
  * progu maja wypasc bez ponownego pytania sieci.
  */
-const MIN_M = 600
+/*
+ * 600 -> 400 przy zmianie "bez parkingu" (2026-08-25). Prog 600 powstal
+ * przeciw 200-metrowym przejsciom miedzy dwoma punktami. Po odcieciu dolotu
+ * z parkingu uczciwa petla malego parku (Solvay, Mlynowka, Jalu Kurka) ma
+ * 400-550 m i wypadala razem ze smieciami. 400 m to wciaz spacer, nie skok.
+ */
+const MIN_M = 400
 for (const [park, trails] of Object.entries(result)) {
   const kept = trails.filter((t) => t.kind === 'osm' || t.m >= MIN_M)
   const short = trails.length - kept.length

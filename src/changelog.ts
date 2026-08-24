@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.99.4'
+export const VERSION = '0.100.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.100.0',
+    date: '2026-08-25',
+    title: 'Routes without the parking detour',
+    tldr:
+      'Trasy nie zahaczają już o parking: zaczynają się przy pierwszym punkcie wyprawy. 22 miejsca mają nowe pętle i przejścia, reszta dojdzie.',
+    changes: [
+      ['changed', 'Generated routes start at the first quest point instead of the suggested parking, so the line on the map is the walk itself. Adding the car leg is your call: the pencil opens any route in the creator, where parking is a checkbox'],
+      ['added', 'New route shapes where the terrain earns them: "Przez cały park" walks end to end between the two farthest points (Zalew got one), the short loop now picks the three points closest to each other, and Park Krakowski and Strzelecki gained proper little loops'],
+      ['changed', '22 places carry the recomputed routes; the rest still show the old parking loops until the public router stops rate-limiting the batch. Data only, nothing breaks meanwhile'],
+      ['fixed', 'The minimum route length dropped from 600 to 400 metres: without the parking approach an honest small-park loop was falling through the floor'],
+    ],
+  },
   {
     version: '0.99.4',
     date: '2026-08-24',

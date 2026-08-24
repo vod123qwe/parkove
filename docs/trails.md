@@ -210,3 +210,26 @@ W aplikacji (TrailModal):
   kreatora (prefill picked): tam doklada sie parking checkboxem i uklada
   wlasna wersje. To jest ta "alternatywna opcja" z parkingiem; generator
   parkingu nie dotyka.
+
+
+### Stan pauzy 2026-08-25 (0.100.0)
+
+Przeliczone na v2 (22): zalew-nowohucki, kopiec-krakusa, zakrzowek,
+skalki-twardowskiego, park-jordana, planty, las-wolski, ogrod-botaniczny,
+lotnikow, blonia, jerzmanowskich, laki-nowohuckie, przylasek-rusiecki,
+aleksandry, zielony-jar, test-piltza, skawina-blonia, dolina-bolechowicka,
+skawina-pilsudskiego, krakowski, strzelecki, duchacki.
+
+DO DOCIAGNIECIA (stare trasy z parkingiem; router dlawil biegi):
+bagry, wyspianskiego, solvay, mlynowka, kopiec-kosciuszki, panienskie-skaly,
+jalu-kurka, wisniowy-sad, planty-bienczyckie, szwedzki, stacja-wisla,
+grzegorzecki, witkowice, reduta, szymborskiej, zaczarowanej-dorozki,
+bednarskiego, decjusza, kopiec-wandy, dolina-kobylanska, dolina-kluczwody,
+dolina-bedkowska, dolina-raclawki, dolina-eliaszowki, dolina-szklarki.
+
+Jak dociagnac: `node scripts/build-trails.mjs --points <id...>` po kilka
+sztuk. GOTCHA nr 1: komunikat "router nie odpowiada" idzie na STDERR, wiec
+wrapper, ktory grepuje stdout, uzna bieg za udany; sprawdzaj, czy wpis
+faktycznie sie zmienil. GOTCHA nr 2: publiczny OSRM po ~10 min ciaglego
+ruchu tnie polaczenia na kilkanascie minut; sleep 1300 ms juz ustawiony,
+i tak rob przerwy miedzy partiami.
