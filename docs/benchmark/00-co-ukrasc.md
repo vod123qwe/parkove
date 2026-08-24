@@ -160,3 +160,9 @@ Zasada po doświadczeniu z wyzwaniami: **wszystko liczone ze stanu, który apka 
 ma** — zero osobnych liczników, działa wstecz, niczego nie da się kupić.
 Odpowiada na pytanie, po co wyjść za dziesiątym razem, gdy nowość miejsc minęła.
 
+**Dopisek decyzji (2026-08-24, później):** Jarkowi podoba się też forma
+furtki-kodu i zagadki (makiety 3 i 4); wdrożenie przy przebudowie revealu.
+Do tego zamówione i narysowane: filtry z intencjami (12a, 12b, koncepcja w
+docs/filtry.md) oraz mapa odkryć pod chmurami w profilu (13a, 13b, koncepcja w
+docs/odkrycia.md).
+
