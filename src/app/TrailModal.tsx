@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Car, Check, Coffee, Footprints, Plus, Signpost, ToyBrick, Trash2 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Car, Check, Coffee, Footprints, Pencil, Plus, Signpost, ToyBrick, Trash2 } from 'lucide-react'
 import { Button, Modal, PlaceRow } from '../ds'
 import { TileMap } from './TileMap'
 import { COLOUR_PL, TRAIL_INK, trailsFor } from './data/trails'
@@ -10,8 +10,8 @@ import { plPunkty } from './naming'
 import { questForPark } from './data/quests'
 import { PARKING } from './data/parking'
 import { amenitiesFor, isFood } from './data/amenities'
-import { buildMyTrail, dropMyTrail, myTrailsFor } from './customtrail'
-import type { Stop } from './customtrail'
+import { buildMyTrail, dropMyTrail, myTrailsFor, routeMyTrail } from './customtrail'
+import type { RoutedTrip, Stop } from './customtrail'
 
 /**
  * Wybór szlaku dla miejsca, i układanie własnego.
@@ -28,6 +28,16 @@ import type { Stop } from './customtrail'
  * sieci, a potem trasa leży zapisana i działa offline jak każda inna. Ten sam
  * podział, co przy pobieraniu mapy.
  */
+
+/** pętla, gdy koniec linii wraca pod sam początek */
+function isLoop(t: Trail) {
+  const a = t.line[0]
+  const b = t.line[t.line.length - 1]
+  if (!a || !b) return false
+  const dx = (a[0] - b[0]) * 71500
+  const dy = (a[1] - b[1]) * 111300
+  return Math.hypot(dx, dy) < 120
+}
 
 function pillsFor(t: Trail) {
   const out = [formatDistance(t.m), `${t.min} min`]
@@ -86,6 +96,16 @@ export function TrailModal({
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState<string | null>(null)
 
+  /*
+   * Podgląd na żywo (uwaga Jarka): każda zmiana zaznaczenia po chwili pyta
+   * router i rysuje trasę na mapce nad listą. Debounce 600 ms, żeby seria
+   * tapnięć nie sypała zapytaniami; spóźniona odpowiedź starszego zapytania
+   * wypada po numerze biegu, więc mapka nigdy nie cofa się do starej trasy.
+   */
+  const [preview, setPreview] = useState<RoutedTrip | null>(null)
+  const [previewBusy, setPreviewBusy] = useState(false)
+  const previewRun = useRef(0)
+
   const toggle = (id: string) =>
     setPicked((was) => {
       const next = new Set(was)
@@ -97,11 +117,31 @@ export function TrailModal({
   const chosen = items.filter((i) => picked.has(i.id))
   const withParking = chosen.some((i) => i.kind === 'parking')
 
+  useEffect(() => {
+    if (!picking) return
+    const run = ++previewRun.current
+    if (chosen.length < 2) {
+      setPreview(null)
+      setPreviewBusy(false)
+      return
+    }
+    setPreviewBusy(true)
+    const timer = window.setTimeout(() => {
+      void routeMyTrail(chosen).then((out) => {
+        if (previewRun.current !== run) return
+        setPreviewBusy(false)
+        setPreview('error' in out ? null : out.trip)
+      })
+    }, 600)
+    return () => window.clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [picking, picked])
+
   const make = async () => {
     setBusy(true)
     setProblem(null)
     const n = mine.length + 1
-    const out = await buildMyTrail(parkId, chosen, `Moja trasa ${n}`)
+    const out = await buildMyTrail(parkId, chosen, `Moja trasa ${n}`, preview ?? undefined)
     setBusy(false)
     if ('error' in out) {
       setProblem(out.error)
@@ -117,9 +157,8 @@ export function TrailModal({
     <Modal open={open} onClose={onClose} title="Szlak" action="back" presentation="push">
       {/* wyjaśnienie raz, nad listą: w każdym kaflu były to same dwa zdania */}
       <p className="t-body-sm parking-lead">
-        Warianty przejścia przez <strong>{parkName}</strong>. Pętle liczymy ścieżkami od
-        sugerowanego parkingu, a szlaki znakowane bierzemy z terenu i przycinamy do granic miejsca.
-        Wybrany rysuje się na mapie i zostaje na wyprawę, a dotknięcie go jeszcze raz zdejmuje.
+        Trasy przez <strong>{parkName}</strong>. Dotknięcie wybiera, drugie zdejmuje.
+        Parking dokładasz sam: ołówek przy trasie otwiera ją w kreatorze.
       </p>
 
       {/*
@@ -141,10 +180,27 @@ export function TrailModal({
           ) : (
             <>
               <p className="t-body-sm mytrail__lead">
-                Zaznacz, co ma być na trasie. Router ułoży kolejność sam. Z zaznaczonym parkingiem
-                trasa wraca do niego, bo tam stoi auto; bez parkingu to przejście od pierwszego do
-                ostatniego punktu.
+                Zaznaczaj punkty, mapka rysuje trasę na żywo. Z parkingiem trasa wraca do niego;
+                bez niego idzie od pierwszego do ostatniego punktu.
               </p>
+              <div className={`mytrail__preview${previewBusy ? ' -busy' : ''}`}>
+                {preview ? (
+                  <TileMap
+                    parkId={parkId}
+                    line={preview.line}
+                    height={148}
+                    caption={`${formatDistance(preview.m)} · ${preview.min} min${previewBusy ? ' · liczę…' : ''}`}
+                  />
+                ) : (
+                  <p className="t-caption mytrail__previewhint">
+                    {chosen.length < 2
+                      ? 'Podgląd pokaże się od dwóch punktów.'
+                      : previewBusy
+                        ? 'Liczę trasę…'
+                        : 'Nie udało się policzyć podglądu. Sieć jest?'}
+                  </p>
+                )}
+              </div>
               <div className="mytrail__list">
                 {items.map((it) => {
                   const on = picked.has(it.id)
@@ -191,8 +247,7 @@ export function TrailModal({
                 </Button>
               </div>
               <p className="t-caption mytrail__note">
-                Układanie potrzebuje sieci, bo router jest w internecie. Gotowa trasa zostaje
-                zapisana i działa potem bez zasięgu.
+                Układanie potrzebuje sieci; zapisana trasa działa potem offline.
               </p>
             </>
           )}
@@ -217,7 +272,7 @@ export function TrailModal({
                   caption={
                     t.kind === 'osm'
                       ? `odcinek w granicach miejsca, ${formatDistance(t.m)}`
-                      : `pętla od parkingu, ${formatDistance(t.m)}`
+                      : `${isLoop(t) ? 'pętla' : 'przejście'}, ${formatDistance(t.m)}`
                   }
                 />
               }
@@ -228,7 +283,9 @@ export function TrailModal({
                   ? t.note
                   : own
                     ? t.note
-                    : 'Wraca w to samo miejsce, więc auto zostaje tam, gdzie stoi.'
+                    : isLoop(t)
+                      ? 'Pętla: kończy się tam, gdzie się zaczęła.'
+                      : 'Przejście przez park, bez powrotu na start.'
               }
               selected={on}
               onClick={() => {
@@ -237,22 +294,43 @@ export function TrailModal({
               }}
             />
           )
-          /* kosz obok wiersza, bo PlaceRow nie ma slotu na akcje: wlasna trasa
-             musi dac sie usunac, gotowa nie ma czego usuwac */
-          if (!own) return row
+          /*
+           * Akcje obok wiersza, bo PlaceRow nie ma slotu: własna trasa ma kosz,
+           * a gotowa trasa punktowa ma ołówek (uwaga Jarka: "żebym mógł
+           * edytować ścieżkę wybraną i np. dodać ręcznie parking").
+           * Ołówek wsypuje przystanki trasy do kreatora; tam dokładasz
+           * parking albo cokolwiek i układasz własną wersję.
+           */
+          const editable = !own && t.kind === 'points' && (t.stops?.length ?? 0) >= 2
+          if (!own && !editable) return row
           return (
             <div className="mytrail__row" key={t.id}>
               {row}
-              <button
-                className="mytrail__drop pk-press"
-                aria-label="Usuń moją trasę"
-                onClick={() => {
-                  dropMyTrail(parkId, t.id)
-                  setMine(myTrailsFor(parkId))
-                }}
-              >
-                <Trash2 size={16} />
-              </button>
+              {own ? (
+                <button
+                  className="mytrail__drop pk-press"
+                  aria-label="Usuń moją trasę"
+                  onClick={() => {
+                    dropMyTrail(parkId, t.id)
+                    setMine(myTrailsFor(parkId))
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              ) : (
+                <button
+                  className="mytrail__drop pk-press"
+                  aria-label={`Edytuj trasę ${t.name} w kreatorze`}
+                  onClick={() => {
+                    setPicked(new Set(t.stops ?? []))
+                    setPicking(true)
+                    setProblem(null)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
+                >
+                  <Pencil size={16} />
+                </button>
+              )}
             </div>
           )
         })}

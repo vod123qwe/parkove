@@ -5698,6 +5698,21 @@
   color: var(--content-secondary);
 }
 
+.mytrail__preview {
+  margin: 0 0 var(--sp-3);
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+
+.mytrail__preview.-busy {
+  opacity: 0.72;
+}
+
+.mytrail__previewhint {
+  padding: 18px 0;
+  color: var(--content-subtle);
+  text-align: center;
+}
+
 .mytrail__list {
   display: flex;
   flex-direction: column;

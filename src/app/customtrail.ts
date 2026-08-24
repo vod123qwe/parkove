@@ -59,11 +59,20 @@ export function dropMyTrail(parkId: string, id: string) {
  * pętlą od niego i do niego, bo tam stoi auto. Bez parkingu to zwykłe przejście
  * od pierwszego do ostatniego punktu i wtedy nie ma powodu wracać.
  */
-export async function buildMyTrail(
-  parkId: string,
-  stops: Stop[],
-  name: string,
-): Promise<{ trail: Trail } | { error: string }> {
+export type RoutedTrip = {
+  m: number
+  min: number
+  stops: string[]
+  line: Array<[number, number]>
+  parkingName: string | null
+}
+
+/**
+ * Samo ułożenie trasy, bez zapisu. Wydzielone, bo kreator pokazuje PODGLĄD
+ * na żywo (uwaga Jarka: "podgląd tego, jak się zmienia trasa, gdy dodaję
+ * konkretny punkt"), a zapis przychodzi dopiero z przyciskiem.
+ */
+export async function routeMyTrail(stops: Stop[]): Promise<{ trip: RoutedTrip } | { error: string }> {
   if (stops.length < 2) return { error: 'Zaznacz co najmniej dwa punkty.' }
   const parking = stops.find((s) => s.kind === 'parking')
   const rest = stops.filter((s) => s.kind !== 'parking')
@@ -78,7 +87,8 @@ export async function buildMyTrail(
     waypoints?: Array<{ waypoint_index: number }>
   }
   try {
-    const res = await fetch(url)
+    /* bez limitu jedno wiszące zapytanie trzymało podgląd w "liczę" bez końca */
+    const res = await fetch(url, { signal: AbortSignal.timeout(15000) })
     if (!res.ok) return { error: `Router odpowiedział ${res.status}. Spróbuj jeszcze raz.` }
     data = await res.json()
   } catch {
@@ -98,16 +108,36 @@ export async function buildMyTrail(
     .map((x) => x.stop)
     .filter((s) => s && s.kind !== 'parking')
 
+  return {
+    trip: {
+      m: Math.round(trip.distance),
+      // tempo takie samo, jak w generatorze danych: pieszo z dzieckiem, nie sportowo
+      min: Math.max(1, Math.round(trip.duration / 60)),
+      stops: order.map((s) => s.id),
+      line: trip.geometry.coordinates.map((c) => [c[0], c[1]] as [number, number]),
+      parkingName: parking?.name ?? null,
+    },
+  }
+}
+
+export async function buildMyTrail(
+  parkId: string,
+  stops: Stop[],
+  name: string,
+  ready?: RoutedTrip,
+): Promise<{ trail: Trail } | { error: string }> {
+  const routed = ready ? { trip: ready } : await routeMyTrail(stops)
+  if ('error' in routed) return routed
+  const t = routed.trip
   const trail: Trail = {
     id: `my-${Date.now().toString(36)}`,
     name,
     kind: 'points',
-    m: Math.round(trip.distance),
-    // tempo takie samo, jak w generatorze danych: pieszo z dzieckiem, nie sportowo
-    min: Math.max(1, Math.round(trip.duration / 60)),
-    stops: order.map((s) => s.id),
-    note: parking ? `Pętla od parkingu ${parking.name}` : 'Przejście, bez powrotu na start',
-    line: trip.geometry.coordinates.map((c) => [c[0], c[1]] as [number, number]),
+    m: t.m,
+    min: t.min,
+    stops: t.stops,
+    note: t.parkingName ? `Pętla od parkingu ${t.parkingName}` : 'Przejście, bez powrotu na start',
+    line: t.line,
   }
   const all = myTrails()
   all[parkId] = [trail, ...(all[parkId] ?? [])]

@@ -177,3 +177,36 @@ czyli trzy kwadranse za coś, co potrzebuje siedmiu pytań do routera. Gorszy je
 drugi powód: **nieudane pytanie o szlaki zastępuje wiersz miejsca wersją bez
 szlaków**, więc pełny bieg w kiepski dzień po cichu gubi dane, które już
 mieliśmy. Ten tryb nie rusza ani szlaków znakowanych, ani pętli przez punkty.
+
+
+---
+
+## Trasy v2: bez parkingu, ciekawsze ksztalty (2026-08-24)
+
+Jarek: "nie wlaczaj parkingu domyslnie (...) zrewiduj trasy, zeby byly
+ciekawe, nie zawsze najkrotsza droga (...) zrobi petle, albo poprowadzi
+sciezke przez caly park. Nie dodawaj sciezki do parkingu, to jest
+alternatywna opcja."
+
+Zmiany w build-trails.mjs:
+
+- **Start = pierwszy punkt wyprawy**, nie parking. readParkingStarts()
+  usuniete. Dotyczy tez recznych RINGS i trybu --rings.
+- **"Przez caly park"** (id `przez-park`): dwa najdalsze punkty wyprawy
+  jako konce (prog 550 m), reszta po drodze; OSRM trip
+  roundtrip=false&source=first&destination=last. Wchodzi od 800 m.
+- **Krotka petla**: trzy punkty najblizej SIEBIE (najciasniejsza trojka),
+  nie najblizsze parkingowi.
+- **Tryb --points**: przelicza wszystkie trasy `points` na cache, szlaki
+  OSM zostaja nietkniete (zero Overpass).
+- Kolejnosc na liscie: reczny ring / wokol > przez-park > punkty-wszystkie
+  > krotka > osm.
+
+W aplikacji (TrailModal):
+
+- Karta trasy mowi prawde z geometrii: "petla" gdy koniec wraca pod start
+  (<120 m), inaczej "przejscie". Zadnego "petla od parkingu".
+- **Olowek przy gotowej trasie punktowej** wsypuje jej przystanki do
+  kreatora (prefill picked): tam doklada sie parking checkboxem i uklada
+  wlasna wersje. To jest ta "alternatywna opcja" z parkingiem; generator
+  parkingu nie dotyka.

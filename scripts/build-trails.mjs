@@ -8,12 +8,17 @@
 // Warianty są GOTOWE, bez edycji w aplikacji (też decyzja Jarka): wszystko
 // policzone tutaj, zapisane w danych, więc w dolinie bez zasięgu i tak działa.
 //
-// Co powstaje dla jednego miejsca:
-//   1. „Wszystkie punkty"  - pętla od parkingu przez wszystkie punkty wyprawy
+// Co powstaje dla jednego miejsca (od 2026-08-24 BEZ parkingu w trasie,
+// decyzja Jarka: parking dokłada się ręcznie w kreatorze w aplikacji):
+//   1. pętla po parku      - punktami kierunkowymi z obrysu (compassVia),
+//                            brana tylko, gdy naprawdę jest pętlą (backtrack),
+//   2. „Przez cały park"   - przejście od krańca do krańca: dwa najdalsze
+//                            punkty wyprawy jako końce, reszta po drodze,
+//   3. „Wszystkie punkty"  - pętla od pierwszego punktu wyprawy przez resztę
 //                            (usługa trip OSRM sama układa kolejność),
-//   2. „Krótka pętla"      - tylko trzy punkty najbliższe parkingowi, gdy
-//                            miejsce ma co najmniej cztery punkty,
-//   3. szlaki znakowane    - relacje route=hiking/foot z OSM, przycięte do
+//   4. „Krótka pętla"      - trzy punkty leżące najbliżej SIEBIE, gdy pełna
+//                            pętla jest długa,
+//   5. szlaki znakowane    - relacje route=hiking/foot z OSM, przycięte do
 //                            obrysu miejsca, z nazwą i kolorem.
 //
 // Czego to NIE gwarantuje: że szlak jest wygodny, oznakowany w terenie tak,
@@ -24,6 +29,8 @@
 //   npm run trails                      wszystkie miejsca (dlugo: kilkadziesiat minut)
 //   npm run trails -- dolina-bedkowska  jedno miejsce, reszta zostaje z cache
 //   npm run trails -- --prune           bez sieci: przelicz same progi na cache
+//   npm run trails -- --points          przelicz TYLKO trasy points (bez Overpass);
+//                                       szlaki znakowane zostaja z cache
 //
 // Tryb --prune jest po to, zeby zmiana progu dlugosci nie kosztowala godziny
 // pytania Overpassa i OSRM o rzeczy, ktore juz mamy.
@@ -120,29 +127,6 @@ function readQuests() {
     }
   }
   for (const [k, v] of Object.entries(out)) out[k] = v.filter((x) => x.coords)
-  return out
-}
-
-/** pierwszy parking miejsca = sugerowany start */
-function readParkingStarts() {
-  const src = readFileSync(resolve(root, 'src/app/data/parking.ts'), 'utf8')
-  const out = {}
-  let park = null
-  let pending = false
-  for (const line of src.split('\n')) {
-    const p = line.match(/^  '?([a-z0-9-]+)'?: \[/)
-    if (p) {
-      park = p[1]
-      pending = true
-      continue
-    }
-    if (!park || !pending) continue
-    const c = line.match(/^\s+coords: \[(-?[\d.]+), (-?[\d.]+)\]/)
-    if (c) {
-      out[park] = [+c[1], +c[2]]
-      pending = false
-    }
-  }
   return out
 }
 
@@ -502,9 +486,14 @@ async function markedTrails(parkId) {
 /* ---------- główna pętla ---------- */
 
 const quests = readQuests()
-const starts = readParkingStarts()
 const argv = process.argv.slice(2)
 const pruneOnly = argv.includes('--prune')
+/*
+ * Tryb --points: przelicz same trasy liczone routerem (bez Overpass).
+ * Powstał przy zmianie strategii "bez parkingu": punktowe trasy trzeba było
+ * przełożyć wszystkim naraz, a szlaki znakowane nie miały się czego bać.
+ */
+const pointsOnly = argv.includes('--points')
 /*
  * Tryb --rings: policz SAME pętle i wmieszaj je w to, co już mamy.
  *
@@ -521,6 +510,54 @@ const parks =
     ? []
     : Object.keys(quests).filter((p) => (only.length ? only.includes(p) : true))
 
+/* najdalsza para punktów: końce przejścia przez cały park */
+function farthestPair(pois) {
+  let best = null
+  for (let i = 0; i < pois.length; i++)
+    for (let j = i + 1; j < pois.length; j++) {
+      const d = dist(pois[i].coords, pois[j].coords)
+      if (!best || d > best.d) best = { a: i, b: j, d }
+    }
+  return best
+}
+
+/* trójka punktów najbliżej SIEBIE: krótka pętla bez oglądania się na parking */
+function tightestTriple(pois) {
+  let best = null
+  for (let i = 0; i < pois.length; i++)
+    for (let j = i + 1; j < pois.length; j++)
+      for (let k = j + 1; k < pois.length; k++) {
+        const sum =
+          dist(pois[i].coords, pois[j].coords) +
+          dist(pois[j].coords, pois[k].coords) +
+          dist(pois[i].coords, pois[k].coords)
+        if (!best || sum < best.sum) best = { pts: [pois[i], pois[j], pois[k]], sum }
+      }
+  return best?.pts ?? null
+}
+
+/** przejście z krańca na kraniec: source i destination stałe, środek układa trip */
+async function walkAcross(pois) {
+  if (pois.length < 3) return null
+  const pair = farthestPair(pois)
+  if (!pair || pair.d < 550) return null
+  const ends = [pois[pair.a], pois[pair.b]]
+  const middle = pois.filter((_, i) => i !== pair.a && i !== pair.b)
+  const coords = [ends[0].coords, ...middle.map((p) => p.coords), ends[1].coords]
+  const r = await osrm('trip', coords, '&roundtrip=false&source=first&destination=last')
+  if (!r) return null
+  const order = r.waypoints
+    .map((w, i) => ({ i, at: w.waypoint_index }))
+    .sort((a, b) => a.at - b.at)
+    .map((w) => (w.i === 0 ? ends[0] : w.i === coords.length - 1 ? ends[1] : middle[w.i - 1]).id)
+  return {
+    m: Math.round(r.trip.distance),
+    min: Math.max(1, Math.round(r.trip.duration / 60)),
+    stops: order,
+    line: thin(r.trip.geometry.coordinates),
+  }
+}
+
 /*
  * Cache obok wyniku. Bieg dla jednego miejsca ma poprawic JEGO wiersze, a nie
  * wyczyscic wszystkie inne, i po zerwaniu polaczenia z Overpass nie chcemy
@@ -528,11 +565,16 @@ const parks =
  */
 const CACHE = resolve(root, 'scripts/.trails-cache.json')
 const result = existsSync(CACHE) ? JSON.parse(readFileSync(CACHE, 'utf8')) : {}
-for (const parkId of parks) {
+for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length ? only.includes(p) : true)) : parks) {
   const pois = quests[parkId]
   if (!pois?.length) continue
   const feature = parksData.features.find((f) => f.id === parkId)
-  const start = starts[parkId] ?? feature?.properties?.center ?? pois[0].coords
+  /*
+   * Start = PIERWSZY punkt wyprawy, nie parking (Jarek: "nie włączaj
+   * parkingu domyślnie"). Trasa zaczyna się tam, gdzie zaczyna się
+   * zwiedzanie; dojście z parkingu każdy dokłada w kreatorze, jeśli chce.
+   */
+  const start = pois[0].coords
   const trails = []
 
   /*
@@ -608,15 +650,44 @@ for (const parkId of parks) {
    * dostala w pierwszym biegu "krotka petle" na 200 m, co nie jest spacerem,
    * tylko przejsciem przez skwer.
    */
+  /*
+   * Przejście przez cały park: dwa najdalsze punkty jako końce, reszta po
+   * drodze. To odpowiedź na "nie zawsze najkrótsza droga, która połączy
+   * punkty": czasem najciekawiej jest przejść park wzdłuż, nie kręcić kółka.
+   * Wchodzi, gdy końce są naprawdę daleko (550 m+) i trasa ma sens (800 m+).
+   */
+  const across = await walkAcross(pois)
+  if (across && across.m >= 800) {
+    const afterRing = trails.findIndex((t) => t.id === 'punkty-wszystkie')
+    const row = { id: 'przez-park', name: 'Przez cały park', kind: 'points', ...across }
+    if (afterRing >= 0) trails.splice(afterRing, 0, row)
+    else trails.push(row)
+    console.log(`  przez-park: ${across.m} m, mija ${across.stops.length} punktów`)
+  }
+
   if (!ring && pois.length >= 4 && full && full.m > 2500) {
-    const near = [...pois].sort((a, b) => dist(start, a.coords) - dist(start, b.coords)).slice(0, 3)
-    const short = await loopThrough(start, near)
+    const near = tightestTriple(pois) ?? pois.slice(0, 3)
+    const short = await loopThrough(near[0].coords, near)
     if (short && short.m >= 700 && short.m < full.m * 0.7)
       trails.push({ id: 'punkty-krotka', name: 'Krótka pętla', kind: 'points', ...short })
   }
 
-  const marked = await markedTrails(parkId)
+  const marked = pointsOnly
+    ? (result[parkId] ?? []).filter((t) => t.kind === 'osm')
+    : await markedTrails(parkId)
   for (const t of marked) trails.push({ ...t, kind: 'osm' })
+
+  /*
+   * Router padł = ZOSTAW stary wpis. Bieg --points przy zapchanym OSRM
+   * potrafił wyzerować full/across/ring naraz i wtedy gałąź "else delete"
+   * WYMAZYWAŁA miejsce z cache (straciły tak botaniczny, lotników i
+   * bednarskiego, odtworzone potem z trails.ts). Brak odpowiedzi sieci to
+   * nie jest brak tras.
+   */
+  if (pointsOnly && !full) {
+    console.warn(`${parkId.padEnd(24)} router nie odpowiada, zostawiam stary wpis`)
+    continue
+  }
 
   if (trails.length) result[parkId] = trails
   else delete result[parkId]
@@ -652,7 +723,7 @@ if (ringsOnly) {
     if (RINGS[parkId]) continue // ręczna pętla ma pierwszeństwo nad zgadywaną
     const full = list.find((t) => t.id === 'punkty-wszystkie')
     if (!full) continue
-    const start = starts[parkId] ?? feature.properties?.center ?? pois[0].coords
+    const start = pois[0].coords
     const fullBack = backtrack(full.line)
     const via = await compassVia(feature)
     if (!via) {
@@ -709,8 +780,9 @@ const header = `// Szlaki i trasy spacerowe per miejsce.
 //
 // kind 'osm'    = prawdziwy szlak znakowany z OpenStreetMap, przycięty do
 //                 obrysu miejsca. Długość dotyczy odcinka W GRANICACH miejsca.
-// kind 'points' = trasa policzona routerem pieszym przez punkty wyprawy,
-//                 pętla od sugerowanego parkingu.
+// kind 'points' = trasa policzona routerem pieszym przez punkty wyprawy.
+//                 Zaczyna się przy pierwszym punkcie, BEZ parkingu: dojście
+//                 z parkingu dokłada się ręcznie w kreatorze (decyzja Jarka).
 //
 // Warianty są gotowe i nieedytowalne w aplikacji, żeby działały bez sieci.
 

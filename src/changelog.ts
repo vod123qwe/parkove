@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.99.3'
+export const VERSION = '0.99.4'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.99.4',
+    date: '2026-08-24',
+    title: 'Trail creator: live preview and editing',
+    tldr:
+      'Kreator trasy rysuje podgląd na żywo po każdym tapnięciu punktu, a ołówek przy gotowej trasie otwiera ją do edycji, np. żeby dopiąć parking.',
+    changes: [
+      ['added', 'The trail creator shows a live preview: every time you tick or untick a point, a small map redraws the routed line with its distance and minutes. Slow taps in a row only ask the router once'],
+      ['added', 'A pencil next to every ready-made point trail pours its stops into the creator, so you can tweak it: add the parking, drop a point, and save it as your own variant'],
+      ['changed', 'Trail screen copy cut to a third. The list explains itself; the essay is gone'],
+      ['fixed', 'A hanging router request could keep the preview saying "counting" forever; it now gives up after 15 seconds and says so'],
+    ],
+  },
   {
     version: '0.99.3',
     date: '2026-08-24',
