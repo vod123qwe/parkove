@@ -6,7 +6,7 @@ import type { PoiCategory } from './data/quests'
 
 /** 24x24 viewBox path data, taken from the Lucide icons used across the UI */
 const ICONS: Record<
-  PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note' | 'car',
+  PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note' | 'car' | 'park' | 'forest' | 'mound' | 'valley' | 'garden',
   string[]
 > = {
   // eye
@@ -39,11 +39,24 @@ const ICONS: Record<
   car: ['M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2', 'M9 17h6', 'M7 17a2 2 0 1 0 0 .01', 'M17 17a2 2 0 1 0 0 .01'],
   // sticky-note, a thought pinned to a place
   note: ['M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z', 'M15 3v6h6'],
+  // tree-deciduous: pojedynczy park miejski
+  park: ['M8 19a4 4 0 0 1-2.24-7.32A3.5 3.5 0 0 1 9 6.03V6a3 3 0 1 1 6 0v.04a3.5 3.5 0 0 1 3.24 5.65A4 4 0 0 1 16 19Z', 'M12 19v3'],
+  // trees: las
+  forest: ['M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z', 'M7 16v6', 'M13 19v3', 'M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5'],
+  // mountain: kopiec
+  mound: ['m8 3 4 8 5-5 5 15H2L8 3z'],
+  // litera V rysowana jak ikona: dolina
+  valley: ['m5 5 7 14L19 5'],
+  // flower: ogrod
+  garden: ['M12 7.5a4.5 4.5 0 1 1 4.5 4.5M12 7.5A4.5 4.5 0 1 0 7.5 12M12 7.5V9', 'M16.5 12a4.5 4.5 0 1 1-4.5 4.5M16.5 12H15', 'M12 16.5a4.5 4.5 0 1 1-4.5-4.5M12 16.5V15', 'M7.5 12H9', 'M9 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0'],
   // award, generic
   stamp: ['m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526', 'M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z'],
 }
 
 export type PinVariant =
+  | 'pfresh'
+  | 'pvisited'
+  | 'pdone'
   | 'open'
   | 'done'
   | 'active'
@@ -87,6 +100,16 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
     // gold now belongs to the collection alone
     audio: [colors.accentStrong, colors.accentStrong, colors.lime],
     note: [colors.paper, colors.accentStrong, colors.ink],
+    /*
+     * Piny PARKÓW mówią tym samym językiem co punkty na wspomnieniach
+     * (uwaga Jarka 2026-08-24): odwiedzony park wygląda dokładnie jak punkt
+     * trasy (ciemny krążek, biała obwódka, limonkowa ikona), domknięty nosi
+     * ten sam złoty ptaszek co zdobyty punkt, a nieodwiedzony jest odwrotką:
+     * jasny krążek z ciemną obwódką, czyli „jeszcze nie wypełniony".
+     */
+    pfresh: [colors.paper, colors.trailFill, colors.trailFill],
+    pvisited: [colors.trailFill, colors.paper, colors.trailIcon],
+    pdone: [colors.trailFill, colors.paper, colors.trailIcon],
   }
   /*
    * Jeden język dla całej mapy: ciemny krążek, biała obwódka, limonkowy znak.
@@ -109,7 +132,7 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   // a collected point wears a tick: gold alone did not read as "done"
   // ptaszek na złocie, bo złoto należy do kolekcji: to znak zdobycia
   const tick =
-    variant === 'done'
+    variant === 'done' || variant === 'pdone'
       ? `<g transform="translate(${SIZE - 30} 6)">
     <circle cx="12" cy="12" r="12" fill="${colors.gold}" stroke="${colors.paper}" stroke-width="2"/>
     <path d="M6.5 12.5l3.5 3.5 7-7" fill="none" stroke="${colors.onGold}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -229,146 +252,47 @@ export function pinColors() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Piny parków na głównej mapie (grill 2026-08-24).                    */
-/* Ikona mówi RODZAJ miejsca, kolor mówi STAN: jasny z konturem =      */
-/* jeszcze nie byliśmy, pełna zieleń = odwiedzone, złote = domknięte.  */
-/* Kolory są stałe (nie z motywu): te same co na ekranie odkryć.       */
+/* Piny parków na głównej mapie (grill 2026-08-24, restyling 0.98.1).  */
+/* Ta sama fabryka co punkty wyprawy i wspomnienia: pinSvg + Lucide.   */
+/* Ikona mówi RODZAJ miejsca, wariant mówi STAN.                       */
 /* ------------------------------------------------------------------ */
 
 export type ParkPinState = 'fresh' | 'visited' | 'done'
 export const parkPinImageId = (kind: string, state: ParkPinState) => `ppin-${kind}-${state}`
 
-const PARK_PIN_KINDS = ['park', 'valley', 'mound', 'forest', 'meadow', 'water', 'garden', 'nature']
-const PARK_PIN_STYLE: Record<ParkPinState, { bg: string; edge: string; glyph: string; ring?: string }> = {
-  fresh: { bg: '#fbfbf6', edge: '#b6bda9', glyph: '#33422a' },
-  visited: { bg: '#234a1f', edge: '#ffffff', glyph: '#c7f24e' },
-  done: { bg: '#fcf3d7', edge: '#e0b43c', glyph: '#a87d14', ring: 'rgba(224,180,60,0.35)' },
+const PARK_KIND_ICON: Record<string, keyof typeof ICONS> = {
+  park: 'park',
+  forest: 'forest',
+  mound: 'mound',
+  valley: 'valley',
+  meadow: 'meadow',
+  water: 'water',
+  garden: 'garden',
+  nature: 'nature',
 }
 
-function drawParkGlyph(ctx: CanvasRenderingContext2D, kind: string, u: number) {
-  ctx.lineCap = 'round'
-  ctx.lineJoin = 'round'
-  if (kind === 'park') {
-    ctx.beginPath()
-    ctx.arc(0, -1.1 * u, 2.9 * u, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.beginPath()
-    ctx.roundRect(-0.65 * u, 1.2 * u, 1.3 * u, 2.6 * u, 0.6 * u)
-    ctx.fill()
-  } else if (kind === 'forest') {
-    for (const [x0, k] of [
-      [-1.9 * u, 1],
-      [1.9 * u, 0.82],
-    ] as Array<[number, number]>) {
-      ctx.beginPath()
-      ctx.moveTo(x0 - 2.3 * u * k, 2.6 * u)
-      ctx.lineTo(x0 + 2.3 * u * k, 2.6 * u)
-      ctx.lineTo(x0, 2.6 * u - 5.2 * u * k)
-      ctx.closePath()
-      ctx.fill()
-    }
-  } else if (kind === 'mound') {
-    ctx.beginPath()
-    ctx.moveTo(-3.4 * u, 2.7 * u)
-    ctx.lineTo(3.4 * u, 2.7 * u)
-    ctx.lineTo(0, -3 * u)
-    ctx.closePath()
-    ctx.fill()
-  } else if (kind === 'valley') {
-    ctx.lineWidth = 1.9 * u
-    ctx.beginPath()
-    ctx.moveTo(-3.1 * u, -2.5 * u)
-    ctx.lineTo(0, 2.9 * u)
-    ctx.lineTo(3.1 * u, -2.5 * u)
-    ctx.stroke()
-  } else if (kind === 'water') {
-    ctx.lineWidth = 1.5 * u
-    for (const y of [-1.1 * u, 1.5 * u]) {
-      ctx.beginPath()
-      ctx.moveTo(-3.2 * u, y)
-      ctx.quadraticCurveTo(-1.6 * u, y - 1.7 * u, 0, y)
-      ctx.quadraticCurveTo(1.6 * u, y + 1.7 * u, 3.2 * u, y)
-      ctx.stroke()
-    }
-  } else if (kind === 'meadow') {
-    ctx.lineWidth = 1.1 * u
-    for (const [x, top] of [
-      [-2.2 * u, -1.2 * u],
-      [0, -2.6 * u],
-      [2.2 * u, -1.2 * u],
-    ] as Array<[number, number]>) {
-      ctx.beginPath()
-      ctx.moveTo(x, 3 * u)
-      ctx.lineTo(x, top)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.arc(x, top - 0.7 * u, 0.85 * u, 0, Math.PI * 2)
-      ctx.fill()
-    }
-  } else if (kind === 'garden') {
-    for (let i = 0; i < 5; i++) {
-      const a = (i / 5) * Math.PI * 2 - Math.PI / 2
-      ctx.beginPath()
-      ctx.arc(Math.cos(a) * 2.1 * u, -0.8 * u + Math.sin(a) * 2.1 * u, 1.35 * u, 0, Math.PI * 2)
-      ctx.fill()
-    }
-    ctx.lineWidth = 1.1 * u
-    ctx.beginPath()
-    ctx.moveTo(0, 1 * u)
-    ctx.lineTo(0, 3.2 * u)
-    ctx.stroke()
-  } else {
-    /* nature: liść z żyłką */
-    ctx.save()
-    ctx.rotate(-0.62)
-    ctx.beginPath()
-    ctx.ellipse(0, 0, 3.2 * u, 1.8 * u, 0, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.restore()
-  }
+const PARK_STATE_VARIANT: Record<ParkPinState, PinVariant> = {
+  fresh: 'pfresh',
+  visited: 'pvisited',
+  done: 'pdone',
 }
 
-/** 24 obrazki: 8 rodzajów × 3 stany, rysowane raz przy starcie mapy */
-export async function buildParkPinImages(): Promise<Array<[string, ImageData]>> {
+/** 24 obrazki: 8 rodzajów × 3 stany, w tym samym języku co reszta pinów */
+export async function buildParkPinImages(
+  colors: Record<string, string>,
+): Promise<Array<[string, ImageData]>> {
   const out: Array<[string, ImageData]> = []
-  const S = 88
-  /* glif mniejszy niz w pierwszym podejsciu: przy 26 px na mapie ciezki glif
-     zamienial jasny pin w ciemna krople, a cienki rim ginal na jasnych dachach */
-  const u = 3.8
-  for (const state of ['fresh', 'visited', 'done'] as ParkPinState[]) {
-    const st = PARK_PIN_STYLE[state]
-    for (const kind of PARK_PIN_KINDS) {
-      const cv = document.createElement('canvas')
-      cv.width = S
-      cv.height = S
-      const ctx = cv.getContext('2d')!
-      ctx.translate(S / 2, S / 2)
-      if (st.ring) {
-        ctx.beginPath()
-        ctx.arc(0, 0, 41, 0, Math.PI * 2)
-        ctx.fillStyle = st.ring
-        ctx.fill()
+  for (const [kind, iconKey] of Object.entries(PARK_KIND_ICON)) {
+    for (const state of ['fresh', 'visited', 'done'] as ParkPinState[]) {
+      try {
+        out.push([
+          parkPinImageId(kind, state),
+          await rasterise(pinSvg(ICONS[iconKey], PARK_STATE_VARIANT[state], colors)),
+        ])
+      } catch {
+        // pin, ktorego nie da sie narysowac, po prostu nie wchodzi na mape
       }
-      ctx.beginPath()
-      ctx.arc(0, 0, 33, 0, Math.PI * 2)
-      ctx.fillStyle = st.bg
-      ctx.fill()
-      ctx.lineWidth = state === 'fresh' ? 3 : 4
-      ctx.strokeStyle = st.edge
-      ctx.stroke()
-      /* miekki ciemny obrys zewnetrzny: odcina pin od jasnej ortofotomapy */
-      ctx.beginPath()
-      ctx.arc(0, 0, 35.5, 0, Math.PI * 2)
-      ctx.lineWidth = 2.5
-      ctx.strokeStyle = 'rgba(18, 24, 12, 0.28)'
-      ctx.stroke()
-      ctx.fillStyle = st.glyph
-      ctx.strokeStyle = st.glyph
-      drawParkGlyph(ctx, kind, u)
-      out.push([parkPinImageId(kind, state), ctx.getImageData(0, 0, S, S)])
     }
   }
   return out
 }
-
-

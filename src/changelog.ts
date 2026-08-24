@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.98.0'
+export const VERSION = '0.98.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.98.1',
+    date: '2026-08-24',
+    title: 'Park pins speak the memory language',
+    tldr:
+      'Piny parków przerysowane w języku wspomnień: ciemny krążek, biała obwódka, limonkowa ikona Lucide, złoty ptaszek za domknięcie.',
+    changes: [
+      ['changed', 'Park pins now come from the same factory as every other pin in the app, the one the memory replay uses: a round badge with a Lucide icon. A visited park looks exactly like a route point (dark disc, white rim, lime icon), a completed one wears the same golden tick a collected point does, and an unvisited one is the inverse, a light disc with a dark rim, not yet filled in'],
+      ['changed', 'Kind icons joined the shared icon library: deciduous tree for a park, trees for a forest, mountain for a mound, a V for a valley, waves for water, flowers for gardens and meadows, a leaf for nature. Far-out dots take their colours from the same design tokens instead of hardcoded hex'],
+      ['fixed', 'Pin size matched to the memory screen scale, so the same route reads as one app again, not two'],
+    ],
+  },
   {
     version: '0.98.0',
     date: '2026-08-24',

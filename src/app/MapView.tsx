@@ -596,7 +596,7 @@ export function MapView({
 
     const buildAppLayers = async (epoch: number) => {
       await addPinImages()
-      for (const [id, img] of await buildParkPinImages()) {
+      for (const [id, img] of await buildParkPinImages(pinColors())) {
         if (map.hasImage(id)) map.removeImage(id)
         map.addImage(id, img, { pixelRatio: 2 })
       }
@@ -659,6 +659,7 @@ export function MapView({
         type: 'geojson',
         data: parkPinFC(parkPinsRef.current, hidePinRef.current, showPinsRef.current) as never,
       })
+      const pinc = pinColors()
       map.addLayer({
         id: 'park-dots',
         type: 'circle',
@@ -670,18 +671,18 @@ export function MapView({
             'match',
             ['get', 'state'],
             'visited',
-            '#2a4a24',
+            pinc.trailFill,
             'done',
-            '#e0b43c',
-            '#f4f5ec',
+            pinc.gold,
+            pinc.paper,
           ] as never,
           'circle-stroke-width': 1.2,
           'circle-stroke-color': [
             'match',
             ['get', 'state'],
             'fresh',
-            '#8b937c',
-            '#ffffff',
+            pinc.trailFill,
+            pinc.paper,
           ] as never,
         },
       })
@@ -693,7 +694,7 @@ export function MapView({
         filter: ['!=', ['get', 'state'], 'done'] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.72, 14, 1] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.34, 14, 0.46] as never,
           'icon-allow-overlap': true,
         },
       })
@@ -706,7 +707,7 @@ export function MapView({
         filter: ['==', ['get', 'state'], 'done'] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.72, 14, 1] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.34, 14, 0.46] as never,
           'icon-allow-overlap': true,
         },
       })
