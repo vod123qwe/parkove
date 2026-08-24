@@ -257,10 +257,16 @@ const PARK_H = 124
  * te sama zloto co pieczatka. Ikona dalej mowi, CO to za miejsce.
  */
 function parkPinSvg(paths: string[], state: ParkPinState, colors: Record<string, string>) {
+  /*
+   * Odwiedzone-bez-kompletu nosi ZLOTA obwodke (Jarek: "tak odrozniaj"):
+   * bylismy, ale cos jeszcze zostalo. Komplet to cala zlota lezka.
+   */
   const [fill, stroke, icon] =
     state === 'done'
       ? [colors.gold, colors.paper, colors.onGold]
-      : [colors.trailFill, colors.paper, colors.trailIcon]
+      : state === 'visited'
+        ? [colors.trailFill, colors.gold, colors.trailIcon]
+        : [colors.trailFill, colors.paper, colors.trailIcon]
   const drop =
     'M43 103 C 33 88, 11 74, 11 44 A 37 37 0 1 1 85 44 C 85 74, 63 88, 53 103 A 6.5 6.5 0 0 1 43 103 Z'
   const iconScale = 2

@@ -238,14 +238,62 @@
 }
 
 .app-ftab.-on {
-  background: var(--bg-brand);
-  color: var(--content-on-brand);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+.app-searchrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.app-searchrow .app-search {
+  flex: 1;
+}
+
+/* okragly wlacznik arkusza progow, tej samej wysokosci co pole szukania */
+.app-fbtn {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: var(--sp-2) 0 var(--sp-4);
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--content-default);
+}
+
+.app-fbtn.-on {
+  background: var(--bg-primary);
+  box-shadow: none;
+  color: var(--content-on-primary);
 }
 
 .app-fselects {
   display: flex;
   gap: var(--sp-2);
   margin: 0 0 var(--sp-4);
+}
+
+/* w arkuszu progi stoja jeden pod drugim, wyzsze, na cala szerokosc */
+.app-fselects.-sheet {
+  flex-direction: column;
+  margin: var(--sp-2) 0 var(--sp-4);
+}
+
+.app-fselects.-sheet .app-fselect {
+  padding: 13px 16px;
+}
+
+.app-fsheet__foot {
+  display: flex;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
 }
 
 .app-fselect {
@@ -287,8 +335,8 @@
 
 .app-fselect.-on {
   border-color: transparent;
-  background: var(--bg-brand);
-  color: var(--content-on-brand);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
 }
 
 .app-fcount {
@@ -5833,8 +5881,8 @@
   padding: 8px 16px;
   border-radius: var(--radius-pill);
   corner-shape: var(--corner-smooth);
-  background: var(--bg-brand);
-  color: var(--content-on-brand);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
   white-space: nowrap;
   animation: pk-sheet-fade 400ms var(--ease-out);
 }

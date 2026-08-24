@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronDown, ChevronRight, Clock, CloudOff, Cloudy, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
+import { Award, Camera, ChevronDown, ChevronRight, Clock, CloudOff, SlidersHorizontal, Cloudy, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
@@ -141,6 +141,8 @@ export function App() {
   const [timeMax, setTimeMax] = useState(0)
   /** przedział kilometrów: '' = dowolny, '2'/'5' = najwyżej, '5plus' = od 5 */
   const [distBand, setDistBand] = useState<DistBand>('')
+  /** arkusz z progami; taby zostają na wierzchu, progi chowają się tu */
+  const [filtersOpen, setFiltersOpen] = useState(false)
   /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
    * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
@@ -1139,6 +1141,7 @@ export function App() {
           „Miejsca blisko Ciebie" stał tu zamiast tytułu i wypadł razem z
           powodem, dla którego istniał.
         */}
+        <div className="app-searchrow">
         <label className="app-search">
           <Search size={17} aria-hidden="true" />
           <input
@@ -1164,6 +1167,16 @@ export function App() {
             </button>
           )}
         </label>
+        {/* progi czasu i dystansu mieszkaja pod ta ikona (uwaga Jarka):
+            okragly przycisk swieci, gdy ktorys prog jest zalozony */}
+        <button
+          className={`app-fbtn pk-press${timeMax > 0 || distBand !== '' ? ' -on' : ''}`}
+          aria-label="Filtry czasu i dystansu"
+          onClick={() => setFiltersOpen(true)}
+        >
+          <SlidersHorizontal size={17} />
+        </button>
+        </div>
         {/* filtry nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
         {!needle && (
           <div className="app-ftabs" role="tablist" aria-label="Rodzaj miejsc">
@@ -1178,46 +1191,6 @@ export function App() {
                 {label}
               </button>
             ))}
-          </div>
-        )}
-        {!needle && (
-          <div className="app-fselects">
-            <label className={`app-fselect${timeMax > 0 ? ' -on' : ''}`}>
-              <Clock size={14} aria-hidden="true" />
-              <span className="app-fselect__label">
-                {TIME_OPTS.find((o) => o.v === timeMax)!.label}
-              </span>
-              <ChevronDown size={13} aria-hidden="true" />
-              <select
-                value={timeMax}
-                aria-label="Czas zwiedzania"
-                onChange={(e) => setTimeMax(Number(e.target.value))}
-              >
-                {TIME_OPTS.map((o) => (
-                  <option key={o.v} value={o.v}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={`app-fselect${distBand !== '' ? ' -on' : ''}`}>
-              <Footprints size={14} aria-hidden="true" />
-              <span className="app-fselect__label">
-                {DIST_OPTS.find((o) => o.v === distBand)!.label}
-              </span>
-              <ChevronDown size={13} aria-hidden="true" />
-              <select
-                value={distBand}
-                aria-label="Dystans do przejścia"
-                onChange={(e) => setDistBand(e.target.value as DistBand)}
-              >
-                {DIST_OPTS.map((o) => (
-                  <option key={o.v} value={o.v}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </label>
           </div>
         )}
         {!needle && filtersActive && (
@@ -1569,6 +1542,68 @@ export function App() {
         Lista miejsc zostaje tutaj mimo przycisku na mapie, bo w trakcie wyprawy
         ten przycisk nie istnieje i menu jest wtedy jedyna droga.
       */}
+      <BottomSheet open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filtry">
+        <div className="app-fselects -sheet">
+          <label className={`app-fselect${timeMax > 0 ? ' -on' : ''}`}>
+            <Clock size={15} aria-hidden="true" />
+            <span className="app-fselect__label">
+              {TIME_OPTS.find((o) => o.v === timeMax)!.label}
+            </span>
+            <ChevronDown size={14} aria-hidden="true" />
+            <select
+              value={timeMax}
+              aria-label="Czas zwiedzania"
+              onChange={(e) => setTimeMax(Number(e.target.value))}
+            >
+              {TIME_OPTS.map((o) => (
+                <option key={o.v} value={o.v}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={`app-fselect${distBand !== '' ? ' -on' : ''}`}>
+            <Footprints size={15} aria-hidden="true" />
+            <span className="app-fselect__label">
+              {DIST_OPTS.find((o) => o.v === distBand)!.label}
+            </span>
+            <ChevronDown size={14} aria-hidden="true" />
+            <select
+              value={distBand}
+              aria-label="Dystans do przejścia"
+              onChange={(e) => setDistBand(e.target.value as DistBand)}
+            >
+              {DIST_OPTS.map((o) => (
+                <option key={o.v} value={o.v}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {filtersActive && shownParks.length === 0 && (
+          <p className="t-caption app-fzero">Poluzuj czas albo dystans, najlepiej ostatni.</p>
+        )}
+        <div className="app-fsheet__foot">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setTimeMax(0)
+              setDistBand('')
+            }}
+          >
+            Wyczyść
+          </Button>
+          <Button full onClick={() => setFiltersOpen(false)}>
+            {shownParks.length === 0
+              ? 'Nic nie pasuje'
+              : `Pokaż ${shownParks.length} ${
+                  shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
+                }`}
+          </Button>
+        </div>
+      </BottomSheet>
+
       <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
         <p className="t-caption app-menu__head">Ty</p>
         <List className="app-menu">

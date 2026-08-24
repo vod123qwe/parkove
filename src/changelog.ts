@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.99.1'
+export const VERSION = '0.99.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.99.2',
+    date: '2026-08-24',
+    title: 'Filter button, gold rims, bigger pins',
+    tldr:
+      'Progi czasu i dystansu mieszkają pod okrągłym przyciskiem przy wyszukiwarce, odwiedzone łezki noszą złotą obwódkę, a wszystkie piny trochę urosną.',
+    changes: [
+      ['changed', 'The time and distance dropdowns moved off the list into a small Filters sheet, opened by a round icon button next to the search field. The button fills dark green while any threshold is set, and the sheet closes with a live "show N places" button'],
+      ['added', 'A place you visited but have not completed wears a gold rim on its teardrop (and on its far-away dot), so the map now tells apart "never been" from "been, but something left"'],
+      ['changed', 'All park pins grew a touch, on every zoom level'],
+      ['fixed', 'The active tab above the list was invisible since 0.99.0: the highlight pointed at a colour token that never existed. It points at the real one now, and so does the filter button'],
+    ],
+  },
   {
     version: '0.99.1',
     date: '2026-08-24',

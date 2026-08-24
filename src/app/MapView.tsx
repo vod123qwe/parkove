@@ -669,7 +669,7 @@ export function MapView({
           'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2.6, 11.6, 5.5] as never,
           'circle-color': ['match', ['get', 'state'], 'done', pinc.gold, pinc.trailFill] as never,
           'circle-stroke-width': 1.2,
-          'circle-stroke-color': pinc.paper,
+          'circle-stroke-color': ['match', ['get', 'state'], 'visited', pinc.gold, pinc.paper] as never,
         },
       })
       map.addLayer({
@@ -680,7 +680,7 @@ export function MapView({
         filter: ['!=', ['get', 'state'], 'done'] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.66, 14, 0.92] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.74, 14, 1.02] as never,
           'icon-allow-overlap': true,
           'icon-anchor': 'bottom',
         },
@@ -694,7 +694,7 @@ export function MapView({
         filter: ['==', ['get', 'state'], 'done'] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.66, 14, 0.92] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.74, 14, 1.02] as never,
           'icon-allow-overlap': true,
           'icon-anchor': 'bottom',
         },
