@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronRight, CloudOff, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
+import { Award, Camera, ChevronRight, CloudOff, Cloudy, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
@@ -45,6 +45,7 @@ import { REFRESH_FROM } from './refresh'
 import { VERSION, changesSince } from '../changelog'
 import { EndWalkSheet } from './EndWalkSheet'
 import { JourneyScreen } from './JourneyScreen'
+import { DiscoveriesScreen } from './DiscoveriesScreen'
 import { StampScreen } from './StampScreen'
 import { WalkSummary } from './WalkSummary'
 import { chooseTrail, stopExpedition, useGameState } from './state'
@@ -223,6 +224,7 @@ export function App() {
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
+  const [discOpen, setDiscOpen] = useState(false)
   /*
    * Jeden ekran wygladu (motyw + mapa) i jeden o aplikacji, zamiast czterech
    * wejsc rozsypanych po menu i profilu. Uwaga na nazwe: looksOpen nizej to
@@ -339,7 +341,14 @@ export function App() {
    * dotyczy chwili, w ktorej o nia poprosiles, a nie calej sesji.
    */
   const onScreen =
-    stampsOpen || journeysOpen || statsOpen || aboutOpen || looksModalOpen || pointsOpen || plantCam
+    stampsOpen ||
+    journeysOpen ||
+    statsOpen ||
+    aboutOpen ||
+    looksModalOpen ||
+    pointsOpen ||
+    plantCam ||
+    discOpen
   useEffect(() => {
     if (onScreen) setListWide(false)
   }, [onScreen])
@@ -1417,6 +1426,8 @@ export function App() {
         />
       )}
 
+      {discOpen && <DiscoveriesScreen onClose={() => setDiscOpen(false)} />}
+
       {journey && journeyPark && (
         <JourneyScreen
           journey={journey}
@@ -1683,6 +1694,16 @@ export function App() {
             Osiagniecie jest parasolem, pieczatka i wyzwanie sa jego rodzajami,
             i dlatego siedza w dwoch zakladkach, a nie jedno pod drugim.
           */}
+          <ListItem
+            icon={<Cloudy />}
+            title="Twoje odkrycia"
+            meta={`${visitedIds.size} z ${FEATURES.length - 1} miejsc wyszło spod chmur`}
+            trailing={<ChevronRight size={18} />}
+            onClick={() => {
+              setMenuOpen(false)
+              setDiscOpen(true)
+            }}
+          />
           <ListItem
             icon={<Award />}
             title="Osiągnięcia"

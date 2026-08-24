@@ -47,3 +47,22 @@ po prostu odkryte na zawsze. Jeden moment, żadnych powtórek i żadnego grindu.
 2. Roczne podsumowanie używa tego widoku jako tła (ekran „rok 2026").
 3. Pocztówka-mapa: eksport obrazka z aktualnym stanem odkryć do wysłania.
 4. Ewentualne progi w Leśniczówce (makieta 11) mogą czytać procent odkrycia.
+
+## Stan wdrożenia (0.97.0)
+
+Zbudowane zgodnie z koncepcją, z trzema świadomymi uproszczeniami:
+
+1. **Okna w mgle są kołami z promieniem z powierzchni miejsca**, nie maskami
+   dokładnych polygonów. Pod oknem i tak rysuje się prawdziwy obrys (fill +
+   ring na mapie), więc kształt widać, a koło daje miękką krawędź tanio.
+2. **Moment odkrycia odpala się przy pierwszym otwarciu ekranu** po nowej
+   wizycie (lista obejrzanych w localStorage), nie na końcu wyprawy. Wejście z
+   ekranu końca wyprawy można dodać później jednym przyciskiem.
+3. **Rozbicie na bloki-dzielnice poczeka na etap bloków** (makieta 8); karta na
+   dole pokazuje na razie licznik ogólny, złote i dolinki.
+
+Technika jak w koncepcie: dwie warstwy kafelków PNG (public/clouds), jeden
+canvas 2D, destination-out na okna, zarysy i znaki zapytania rysowane na mgle,
+paralaksa z map.project, pętla rAF żyje tylko na tym ekranie. Z daleka zarysy
+tylko dla miejsc od 9 ha, żeby mapa nie była tapetą z pytajników.
+

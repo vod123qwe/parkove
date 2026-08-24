@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.96.0'
+export const VERSION = '0.97.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.97.0',
+    date: '2026-08-24',
+    title: 'Your discoveries: the map under clouds',
+    tldr:
+      'Nowy ekran w menu Ty: mapa Krakowa pod dryfującymi chmurami, odkryte miejsca jako czyste okna, świeże odkrycie rozgania chmury raz.',
+    changes: [
+      ['added', 'Twoje odkrycia in the Ty menu: a full screen map of the city under drifting fog. Visited places are clear windows with their name, a lime ring, gold when the place is complete; unvisited ones sleep under the clouds with a barely visible dashed outline and a question mark. The outline says something is there, it does not say what'],
+      ['added', 'The clouds move: two tiled layers drift slowly in different directions and shift with a slight parallax as you pan. All of it is one 2D canvas over the map, alive only on this screen, so the battery does not pay for it anywhere else'],
+      ['added', 'A place discovered since you last looked gets its moment: the clouds part over it once, with a caption, and from then on that piece of the map is simply yours. State comes entirely from what the app already knows; there is nothing to earn twice'],
+      ['changed', 'From far out only larger hidden places show their outline, because fifty question marks at once turn a tease into wallpaper'],
+    ],
+  },
   {
     version: '0.96.0',
     date: '2026-08-24',

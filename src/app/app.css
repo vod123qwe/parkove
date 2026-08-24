@@ -3740,6 +3740,7 @@
  *    10-14  HUD na mapie (filtry, menu, styl mapy, „gdzie jestem")
  *      100  arkusze (DS, bottomsheet.css)
  *      110  ten ekran: wyprawa z dziennika, czyli poziom głębiej niż mapa
+ *      112  Twoje odkrycia: mapa pod chmurami
  *      115  pełnoekranowa kamera do roślin
  *      120  odtwarzanie wspomnienia
  *      130  widok wspomnienia
@@ -5867,3 +5868,102 @@
   color: var(--content-secondary);
   cursor: pointer;
 }
+
+/* Twoje odkrycia: pełny ekran, mapa pod płótnem mgły */
+.discscreen {
+  position: fixed;
+  inset: 0;
+  min-height: max(var(--screen-h), 100dvh);
+  z-index: 112;
+  background: #101408;
+  animation: jscreen-in 340ms var(--ease-screen);
+}
+
+.discscreen__map,
+.discscreen__fog {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.discscreen__fog {
+  pointer-events: none;
+}
+
+.discscreen__nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+}
+
+.discscreen__title {
+  position: absolute;
+  top: calc(var(--sa-top) + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  color: var(--content-default);
+  box-shadow: var(--elevation-1);
+}
+
+/* podpis świeżego odkrycia: chwila celebracji, potem znika z oczu sam */
+.discscreen__fresh {
+  position: absolute;
+  top: calc(var(--sa-top) + 64px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-brand);
+  color: var(--content-on-brand);
+  white-space: nowrap;
+  animation: pk-sheet-fade 400ms var(--ease-out);
+}
+
+.discscreen__card {
+  position: absolute;
+  left: var(--sp-4);
+  right: var(--sp-4);
+  bottom: calc(var(--sa-gap) + var(--sp-4));
+  z-index: 3;
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  box-shadow: var(--elevation-3);
+}
+
+.discscreen__count {
+  margin: 0;
+}
+
+.discscreen__track {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--bg-surface-sunken);
+  overflow: hidden;
+}
+
+.discscreen__fill {
+  height: 100%;
+  border-radius: 5px;
+  background: var(--bg-brand-accent, #b8e84e);
+}
+
+.discscreen__meta,
+.discscreen__rule {
+  margin: 0;
+  color: var(--content-subtle);
+}
+
