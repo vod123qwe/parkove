@@ -286,6 +286,23 @@ export function App() {
     [progress],
   )
 
+  /* piny miejsc na mapie: ikona rodzaju, kolor stanu (grill 2026-08-24) */
+  const parkPins = useMemo(
+    () =>
+      FEATURES.filter((f) => f.id !== 'test-piltza').map((f) => ({
+        id: f.id,
+        kind: f.properties.kind,
+        coords: f.properties.center as [number, number],
+        state: (completedIds.has(f.id)
+          ? 'done'
+          : progress[f.id]
+            ? 'visited'
+            : 'fresh') as 'fresh' | 'visited' | 'done',
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [progress, completedIds],
+  )
+
   const stampPins = useMemo(
     () =>
       FEATURES.filter((f) => completedIds.has(f.id)).map((f) => ({
@@ -942,6 +959,9 @@ export function App() {
         parking={parkingPins}
         onSelectParking={onSelectParking}
         onClearSelection={clearSelection}
+        parkPins={parkPins}
+        hideParkPinId={selected?.id ?? null}
+        showParkPins={!onWalk}
         focus={focus}
         quest={questOverlay}
         trail={filters.trail ? trailOverlay : null}

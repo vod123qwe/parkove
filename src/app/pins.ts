@@ -227,3 +227,148 @@ export function pinColors() {
     mapPlayIcon: v('--map-play-icon'),
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Piny parków na głównej mapie (grill 2026-08-24).                    */
+/* Ikona mówi RODZAJ miejsca, kolor mówi STAN: jasny z konturem =      */
+/* jeszcze nie byliśmy, pełna zieleń = odwiedzone, złote = domknięte.  */
+/* Kolory są stałe (nie z motywu): te same co na ekranie odkryć.       */
+/* ------------------------------------------------------------------ */
+
+export type ParkPinState = 'fresh' | 'visited' | 'done'
+export const parkPinImageId = (kind: string, state: ParkPinState) => `ppin-${kind}-${state}`
+
+const PARK_PIN_KINDS = ['park', 'valley', 'mound', 'forest', 'meadow', 'water', 'garden', 'nature']
+const PARK_PIN_STYLE: Record<ParkPinState, { bg: string; edge: string; glyph: string; ring?: string }> = {
+  fresh: { bg: '#fbfbf6', edge: '#b6bda9', glyph: '#33422a' },
+  visited: { bg: '#234a1f', edge: '#ffffff', glyph: '#c7f24e' },
+  done: { bg: '#fcf3d7', edge: '#e0b43c', glyph: '#a87d14', ring: 'rgba(224,180,60,0.35)' },
+}
+
+function drawParkGlyph(ctx: CanvasRenderingContext2D, kind: string, u: number) {
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  if (kind === 'park') {
+    ctx.beginPath()
+    ctx.arc(0, -1.1 * u, 2.9 * u, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.roundRect(-0.65 * u, 1.2 * u, 1.3 * u, 2.6 * u, 0.6 * u)
+    ctx.fill()
+  } else if (kind === 'forest') {
+    for (const [x0, k] of [
+      [-1.9 * u, 1],
+      [1.9 * u, 0.82],
+    ] as Array<[number, number]>) {
+      ctx.beginPath()
+      ctx.moveTo(x0 - 2.3 * u * k, 2.6 * u)
+      ctx.lineTo(x0 + 2.3 * u * k, 2.6 * u)
+      ctx.lineTo(x0, 2.6 * u - 5.2 * u * k)
+      ctx.closePath()
+      ctx.fill()
+    }
+  } else if (kind === 'mound') {
+    ctx.beginPath()
+    ctx.moveTo(-3.4 * u, 2.7 * u)
+    ctx.lineTo(3.4 * u, 2.7 * u)
+    ctx.lineTo(0, -3 * u)
+    ctx.closePath()
+    ctx.fill()
+  } else if (kind === 'valley') {
+    ctx.lineWidth = 1.9 * u
+    ctx.beginPath()
+    ctx.moveTo(-3.1 * u, -2.5 * u)
+    ctx.lineTo(0, 2.9 * u)
+    ctx.lineTo(3.1 * u, -2.5 * u)
+    ctx.stroke()
+  } else if (kind === 'water') {
+    ctx.lineWidth = 1.5 * u
+    for (const y of [-1.1 * u, 1.5 * u]) {
+      ctx.beginPath()
+      ctx.moveTo(-3.2 * u, y)
+      ctx.quadraticCurveTo(-1.6 * u, y - 1.7 * u, 0, y)
+      ctx.quadraticCurveTo(1.6 * u, y + 1.7 * u, 3.2 * u, y)
+      ctx.stroke()
+    }
+  } else if (kind === 'meadow') {
+    ctx.lineWidth = 1.1 * u
+    for (const [x, top] of [
+      [-2.2 * u, -1.2 * u],
+      [0, -2.6 * u],
+      [2.2 * u, -1.2 * u],
+    ] as Array<[number, number]>) {
+      ctx.beginPath()
+      ctx.moveTo(x, 3 * u)
+      ctx.lineTo(x, top)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(x, top - 0.7 * u, 0.85 * u, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  } else if (kind === 'garden') {
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2 - Math.PI / 2
+      ctx.beginPath()
+      ctx.arc(Math.cos(a) * 2.1 * u, -0.8 * u + Math.sin(a) * 2.1 * u, 1.35 * u, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.lineWidth = 1.1 * u
+    ctx.beginPath()
+    ctx.moveTo(0, 1 * u)
+    ctx.lineTo(0, 3.2 * u)
+    ctx.stroke()
+  } else {
+    /* nature: liść z żyłką */
+    ctx.save()
+    ctx.rotate(-0.62)
+    ctx.beginPath()
+    ctx.ellipse(0, 0, 3.2 * u, 1.8 * u, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+  }
+}
+
+/** 24 obrazki: 8 rodzajów × 3 stany, rysowane raz przy starcie mapy */
+export async function buildParkPinImages(): Promise<Array<[string, ImageData]>> {
+  const out: Array<[string, ImageData]> = []
+  const S = 88
+  /* glif mniejszy niz w pierwszym podejsciu: przy 26 px na mapie ciezki glif
+     zamienial jasny pin w ciemna krople, a cienki rim ginal na jasnych dachach */
+  const u = 3.8
+  for (const state of ['fresh', 'visited', 'done'] as ParkPinState[]) {
+    const st = PARK_PIN_STYLE[state]
+    for (const kind of PARK_PIN_KINDS) {
+      const cv = document.createElement('canvas')
+      cv.width = S
+      cv.height = S
+      const ctx = cv.getContext('2d')!
+      ctx.translate(S / 2, S / 2)
+      if (st.ring) {
+        ctx.beginPath()
+        ctx.arc(0, 0, 41, 0, Math.PI * 2)
+        ctx.fillStyle = st.ring
+        ctx.fill()
+      }
+      ctx.beginPath()
+      ctx.arc(0, 0, 33, 0, Math.PI * 2)
+      ctx.fillStyle = st.bg
+      ctx.fill()
+      ctx.lineWidth = state === 'fresh' ? 3 : 4
+      ctx.strokeStyle = st.edge
+      ctx.stroke()
+      /* miekki ciemny obrys zewnetrzny: odcina pin od jasnej ortofotomapy */
+      ctx.beginPath()
+      ctx.arc(0, 0, 35.5, 0, Math.PI * 2)
+      ctx.lineWidth = 2.5
+      ctx.strokeStyle = 'rgba(18, 24, 12, 0.28)'
+      ctx.stroke()
+      ctx.fillStyle = st.glyph
+      ctx.strokeStyle = st.glyph
+      drawParkGlyph(ctx, kind, u)
+      out.push([parkPinImageId(kind, state), ctx.getImageData(0, 0, S, S)])
+    }
+  }
+  return out
+}
+
+

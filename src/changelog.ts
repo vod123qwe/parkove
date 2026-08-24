@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.97.2'
+export const VERSION = '0.98.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.98.0',
+    date: '2026-08-24',
+    title: 'Park pins on the main map',
+    tldr:
+      'Piny wszystkich miejsc na głównej mapie: ikona rodzaju, kolor stanu; pin znika na czas zaznaczenia, na wyprawie znikają wszystkie.',
+    changes: [
+      ['added', 'Every place carries a pin on the main map (an idea from Jarek, shaped in a grill): the icon says the KIND (tree, valley, mound, forest, meadow, water, garden, nature) and the colour says the STATE, light with an outline for not yet visited, full green for visited, gold for completed. From far out pins shrink to small state dots; from zoom 11.6 the full icons appear'],
+      ['added', 'Tapping a pin selects the park exactly like tapping its outline, and the pin steps aside for the duration: the highlighted outline and the peek card take over, and the pin returns when you deselect. During a walk all park pins disappear, because that map is for the points in front of you'],
+      ['changed', 'Completed places hand the stage to their stamps up close: the golden pin shows only between zooms 11.6 and 12.5, where the stamp takes over'],
+      ['fixed', 'Pin artwork tuned for real size: a lighter glyph and a soft dark outer contour, because at 26 pixels a heavy glyph read as a dark blob on bright rooftops'],
+    ],
+  },
   {
     version: '0.97.2',
     date: '2026-08-24',

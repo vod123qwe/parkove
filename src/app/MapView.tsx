@@ -5,7 +5,8 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import parksData from './data/parks.json'
 import bordersData from './data/borders.json'
 import { circlePolygon, trackSegments } from './geo'
-import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
+import { buildParkPinImages, buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
+import type { ParkPinState } from './pins'
 import { asset } from './assets'
 import type { ResolvedStyle } from './data/mapstyles'
 
@@ -54,6 +55,28 @@ export type AmenityPin = {
   coords: [number, number]
 }
 
+const parkPinFC = (pins: ParkPin[], hideId: string | null, show: boolean) => ({
+  type: 'FeatureCollection',
+  features: !show
+    ? []
+    : pins
+        .filter((p) => p.id !== hideId)
+        .map((p) => ({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: p.coords },
+          properties: { id: p.id, state: p.state, icon: parkPinImageIdFor(p) },
+        })),
+})
+const parkPinImageIdFor = (p: ParkPin) => `ppin-${p.kind}-${p.state}`
+
+/** pin parku na głównej mapie: ikona rodzaju + kolor stanu (grill 2026-08-24) */
+export type ParkPin = {
+  id: string
+  kind: string
+  state: ParkPinState
+  coords: [number, number]
+}
+
 type Props = {
   visited: Set<string>
   onSelect: (id: string) => void
@@ -66,6 +89,14 @@ type Props = {
   onSelectParking: (id: string) => void
   /** tap on empty map: close peeks and selection */
   onClearSelection: () => void
+  /**
+   * Piny wszystkich miejsc. Pin wybranego parku znika na czas zaznaczenia
+   * (obrys + karta go zastępują), na wyprawie znikają wszystkie: mapa jest
+   * wtedy operacyjna. Oba przypadki załatwia builder kolekcji niżej.
+   */
+  parkPins: ParkPin[]
+  hideParkPinId: string | null
+  showParkPins: boolean
   focus: MapFocus | null
   /** quest points of the selected or walked park, null otherwise */
   quest: QuestOverlay | null
@@ -299,6 +330,9 @@ export function MapView({
   parking,
   onSelectParking,
   onClearSelection,
+  parkPins,
+  hideParkPinId,
+  showParkPins,
   focus,
   quest,
   trail,
@@ -329,6 +363,9 @@ export function MapView({
   const meRef = useRef(me)
   const followRef = useRef(followMe)
   const parkingRef = useRef(parking)
+  const parkPinsRef = useRef(parkPins)
+  const hidePinRef = useRef(hideParkPinId)
+  const showPinsRef = useRef(showParkPins)
   const stampPinsRef = useRef(stampPins)
   const focusRef = useRef(focusId ?? null)
   const amenityPinsRef = useRef(amenityPins)
@@ -348,11 +385,22 @@ export function MapView({
   meRef.current = me
   followRef.current = followMe
   parkingRef.current = parking
+  parkPinsRef.current = parkPins
+  hidePinRef.current = hideParkPinId
+  showPinsRef.current = showParkPins
   stampPinsRef.current = stampPins
   focusRef.current = focusId ?? null
   amenityPinsRef.current = amenityPins
   photoPinsRef.current = photoPins
   placingRef.current = placingPhoto
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !loadedRef.current) return
+    ;(map.getSource('park-pins') as { setData: (d: unknown) => void } | undefined)?.setData(
+      parkPinFC(parkPins, hideParkPinId, showParkPins),
+    )
+  }, [parkPins, hideParkPinId, showParkPins])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -476,6 +524,9 @@ export function MapView({
       'parks-fill',
       'parks-line',
       'parks-line-shared',
+      'park-dots',
+      'park-pins-layer',
+      'park-pins-done',
       'trail-casing',
       'trail-line',
       'track-casing',
@@ -497,6 +548,7 @@ export function MapView({
     ]
     const APP_SOURCES = [
       'parks',
+      'park-pins',
       'borders',
       'trail',
       'track',
@@ -544,6 +596,10 @@ export function MapView({
 
     const buildAppLayers = async (epoch: number) => {
       await addPinImages()
+      for (const [id, img] of await buildParkPinImages()) {
+        if (map.hasImage(id)) map.removeImage(id)
+        map.addImage(id, img, { pixelRatio: 2 })
+      }
       await addStampImages(stampPinsRef.current)
       // the base map changed under us: this style is on its way out anyway
       if (epoch !== styleEpoch.current || map.getSource('parks')) return
@@ -594,6 +650,67 @@ export function MapView({
           'line-dasharray': [2.4, 2.6],
         },
       })
+      /*
+       * Piny miejsc (grill 2026-08-24): z daleka kropki stanu, od zoomu 11,6
+       * pełne piny z ikoną rodzaju. Domknięte miejsca oddają scenę pieczątkom
+       * od zoomu 12,5, więc ich pin symbolowy ma na tym progu maxzoom.
+       */
+      map.addSource('park-pins', {
+        type: 'geojson',
+        data: parkPinFC(parkPinsRef.current, hidePinRef.current, showPinsRef.current) as never,
+      })
+      map.addLayer({
+        id: 'park-dots',
+        type: 'circle',
+        source: 'park-pins',
+        maxzoom: 11.6,
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2.6, 11.6, 5.5] as never,
+          'circle-color': [
+            'match',
+            ['get', 'state'],
+            'visited',
+            '#2a4a24',
+            'done',
+            '#e0b43c',
+            '#f4f5ec',
+          ] as never,
+          'circle-stroke-width': 1.2,
+          'circle-stroke-color': [
+            'match',
+            ['get', 'state'],
+            'fresh',
+            '#8b937c',
+            '#ffffff',
+          ] as never,
+        },
+      })
+      map.addLayer({
+        id: 'park-pins-layer',
+        type: 'symbol',
+        source: 'park-pins',
+        minzoom: 11.6,
+        filter: ['!=', ['get', 'state'], 'done'] as never,
+        layout: {
+          'icon-image': ['get', 'icon'] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.72, 14, 1] as never,
+          'icon-allow-overlap': true,
+        },
+      })
+      map.addLayer({
+        id: 'park-pins-done',
+        type: 'symbol',
+        source: 'park-pins',
+        minzoom: 11.6,
+        maxzoom: 12.5,
+        filter: ['==', ['get', 'state'], 'done'] as never,
+        layout: {
+          'icon-image': ['get', 'icon'] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.72, 14, 1] as never,
+          'icon-allow-overlap': true,
+        },
+      })
+
       /*
        * Szlak: dwie warstwy, bo jedna kolorowa linia na zdjeciu satelitarnym
        * gubi sie w lesie. Ciemna obwodka daje jej kontrast na kazdym tle.
@@ -931,6 +1048,11 @@ export function MapView({
         cb.onSelectStamp(String(stamp.properties.parkId))
         return
       }
+      const ppin = hit('park-pins-layer') ?? hit('park-pins-done') ?? hit('park-dots')
+      if (ppin?.properties?.id) {
+        cb.onSelect(String(ppin.properties.id))
+        return
+      }
       const park = hit('parks-fill')
       const parkId =
         (park?.properties as { id?: string } | undefined)?.id ??
@@ -941,7 +1063,7 @@ export function MapView({
       }
       cb.onClearSelection()
     })
-    for (const layer of ['parks-fill', 'quest-poi-hit', 'parking-hit', 'amenity-hit', 'stamp-pin-hit', 'walk-photo-hit']) {
+    for (const layer of ['parks-fill', 'park-pins-layer', 'park-pins-done', 'park-dots', 'quest-poi-hit', 'parking-hit', 'amenity-hit', 'stamp-pin-hit', 'walk-photo-hit']) {
       map.on('mouseenter', layer, () => {
         map.getCanvas().style.cursor = 'pointer'
       })
