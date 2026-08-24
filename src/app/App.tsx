@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronRight, CloudOff, Cloudy, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
+import { Award, Camera, ChevronDown, ChevronRight, Clock, CloudOff, Cloudy, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
@@ -36,8 +36,7 @@ import { RevealSheet } from './RevealSheet'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { hasPack, verifyPack } from './offline'
-import { D_HINTS, O_HINTS, getDO, dots as doDots, useDOVersion } from './data/difficulty'
-import { facetsFor } from './data/facets'
+import { fmtKm, fmtVisitMin, visitEstimate } from './data/visit'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
 import { useWakeLock } from './wakelock'
@@ -83,65 +82,32 @@ const FEATURES = parksData.features as unknown as ParkFeature[]
 const DOCK_PEEK = 290
 
 /*
- * Chipy filtrów nad listą (grill 2026-08-24). Zastąpiły zakładki
- * Wszystkie/Dolinki/Parki: rodzaje miejsc to zwykłe chipy w jednym rzędzie z
- * intencjami i fasetami, a rząd przewija się w bok.
- *
- * "rainy" i "stroller" to INTENCJE: jedna pigułka ustawia kilka warunków
- * naraz. Definicje siedzą w predykacie niżej i w docs/filtry.md; obie czytają
- * oceny D z difficulty.ts, więc działają tylko na miejscach już ocenionych.
+ * Filtry nad listą (uproszczenie, decyzja Jarka 2026-08-24): zakładki
+ * rodzaju miejsca plus dwa progi z natywnych dropdownów. Zero ocen i
+ * intencji: czas zwiedzania i kilometry liczą się z tras i powierzchni
+ * (data/visit.ts), więc działają dla każdego miejsca od pierwszego dnia.
+ * Progi wzięte z rozkładu danych: połowa miejsc mieści się w pół godziny,
+ * dolinki jurajskie zaczynają się od godziny i 4 km w górę.
  */
-type ChipId =
-  | 'dolinki'
-  | 'parki'
-  | 'rainy'
-  | 'stroller'
-  | 'play'
-  | 'icecream'
-  | 'allday'
-  | 'noauto'
-  | 'water'
-  | 'ringloop'
-  | 'parking'
-  | 'fresh'
-  | 'almostgold'
-  | 'longago'
-type ChipDef = { id: ChipId; label: string }
-const CHIP_DEFS: ChipDef[] = [
-  { id: 'dolinki', label: 'Dolinki' },
-  { id: 'parki', label: 'Parki' },
-  { id: 'rainy', label: '☔ Deszczowa sobota' },
-  { id: 'stroller', label: 'Z wózkiem' },
-  { id: 'play', label: '🛝 Plac zabaw' },
-  { id: 'icecream', label: '🍦 Lody' },
+type ParkTab = 'all' | 'parki' | 'dolinki'
+const TAB_DEFS: Array<[ParkTab, string]> = [
+  ['all', 'Wszystkie'],
+  ['parki', 'Parki'],
+  ['dolinki', 'Dolinki'],
 ]
-
-/*
- * Arkusz „Filtry" (etap 2 z grilla): pełny zestaw w czterech grupach. Chipy z
- * rzędu powtarzają się w arkuszu, bo to TEN SAM stan; arkusz tylko dokłada
- * resztę. Definicje intencji: docs/filtry.md.
- */
-const SHEET_INTENTS: ChipDef[] = [
-  { id: 'rainy', label: '☔ Deszczowa sobota' },
-  { id: 'allday', label: 'Cały dzień' },
-  { id: 'stroller', label: 'Z wózkiem' },
-  { id: 'noauto', label: '🚋 Bez auta' },
-]
-const SHEET_PLACE: ChipDef[] = [
-  { id: 'play', label: '🛝 Plac zabaw' },
-  { id: 'icecream', label: '🍦 Lody i kawa' },
-  { id: 'water', label: '💧 Woda' },
-  { id: 'ringloop', label: 'Pętla wokół' },
-  { id: 'parking', label: '🚗 Parking' },
-]
-const SHEET_COLLECTION: ChipDef[] = [
-  { id: 'fresh', label: 'Nowe dla nas' },
-  { id: 'almostgold', label: 'Prawie złote' },
-  { id: 'longago', label: 'Dawno nas nie było' },
-]
-/** chipy widoczne tylko w arkuszu: liczą się do plakietki na „Więcej" */
-const SHEET_ONLY: ChipId[] = ['allday', 'noauto', 'water', 'ringloop', 'parking', 'fresh', 'almostgold', 'longago']
-
+const TIME_OPTS = [
+  { v: 0, label: 'Czas: dowolny' },
+  { v: 30, label: 'do 30 min' },
+  { v: 60, label: 'do 1 godz.' },
+  { v: 120, label: 'do 2 godz.' },
+] as const
+const DIST_OPTS = [
+  { v: '', label: 'Dystans: dowolny' },
+  { v: '2', label: 'do 2 km' },
+  { v: '5', label: 'do 5 km' },
+  { v: '5plus', label: '5 km i więcej' },
+] as const
+type DistBand = (typeof DIST_OPTS)[number]['v']
 type PeekPage =
   | { t: 'park' }
   | { t: 'poi'; poi: QuestPoi }
@@ -169,31 +135,12 @@ export function App() {
    */
   const [listWide, setListWide] = useState(false)
   const [listDetent, setListDetent] = useState<'min' | 'auto' | 'full'>('min')
-  /** which collection the list shows: everything, the day trips, or the city */
-  const [chips, setChips] = useState<Set<ChipId>>(new Set())
-  const toggleChip = (id: ChipId) =>
-    setChips((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else {
-        // rodzaje wykluczają się nawzajem; oba naraz znaczyłyby "wszystko"
-        if (id === 'dolinki') next.delete('parki')
-        if (id === 'parki') next.delete('dolinki')
-        next.add(id)
-      }
-      return next
-    })
-  /* przerysowanie po każdym kliknięciu kropki w trybie ocen */
-  const doVersion = useDOVersion()
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  /*
-   * Progi trudności jako SUWAKI (uwaga Jarka: „może suwak, trudność lepiej
-   * oznaczana"). Wartość to górna granica osi, 0 = bez ograniczenia. Suwak
-   * mówi „nie trudniejsze niż", bo tak brzmi pytanie przed spacerem; szukanie
-   * wyzwań (co najmniej) odpuszczamy, aż będzie potrzebne.
-   */
-  const [dMax, setDMax] = useState(0)
-  const [oMax, setOMax] = useState(0)
+  /** którą zakładkę rodzaju miejsc pokazuje lista */
+  const [tab, setTab] = useState<ParkTab>('all')
+  /** górny próg czasu zwiedzania w minutach, 0 = bez ograniczenia */
+  const [timeMax, setTimeMax] = useState(0)
+  /** przedział kilometrów: '' = dowolny, '2'/'5' = najwyżej, '5plus' = od 5 */
+  const [distBand, setDistBand] = useState<DistBand>('')
   /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
    * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
@@ -336,13 +283,11 @@ export function App() {
    */
   const dockUp = !selected && !expedition
 
-  const sheetExtras =
-    SHEET_ONLY.filter((id) => chips.has(id)).length + (dMax > 0 ? 1 : 0) + (oMax > 0 ? 1 : 0)
-  const filtersActive = chips.size > 0 || dMax > 0 || oMax > 0
+  const filtersActive = tab !== 'all' || timeMax > 0 || distBand !== ''
   const clearFilters = () => {
-    setChips(new Set())
-    setDMax(0)
-    setOMax(0)
+    setTab('all')
+    setTimeMax(0)
+    setDistBand('')
   }
 
   /*
@@ -841,58 +786,18 @@ export function App() {
           plain(KIND_META[f.properties.kind]?.label ?? '').includes(needle),
       )
     }
-    if (chips.size === 0 && dMax === 0 && oMax === 0) return sortedParks
+    if (!filtersActive) return sortedParks
     return sortedParks.filter((f) => {
-      const fac = facetsFor(f.id)
-      const sc = getDO(f.id)
-      for (const c of chips) {
-        if (c === 'dolinki' || c === 'parki') {
-          if (groupOf(f) !== c) return false
-        } else if (c === 'play') {
-          if (!fac.playground) return false
-        } else if (c === 'icecream') {
-          if (!fac.food) return false
-        } else if (c === 'stroller') {
-          /* z wózkiem = teren D1 (rubryka: wózek przejedzie) + parking */
-          if (!(sc && sc.d === 1 && fac.parking)) return false
-        } else if (c === 'rainy') {
-          /* Deszczowa sobota = D ≤ 2 + pętla do 40 min + parking (grill) */
-          if (!(sc && sc.d <= 2 && fac.parking && fac.quickLoop)) return false
-        } else if (c === 'allday') {
-          /* cały dzień = duży teren, długa pętla albo wysoka para ocen */
-          const big =
-            f.properties.areaHa >= 30 ||
-            (fac.loopMin != null && fac.loopMin >= 90) ||
-            (sc != null && sc.d + sc.o >= 7)
-          if (!big) return false
-        } else if (c === 'noauto') {
-          if (!fac.transit) return false
-        } else if (c === 'water') {
-          if (!fac.water) return false
-        } else if (c === 'ringloop') {
-          if (!fac.ringLoop) return false
-        } else if (c === 'parking') {
-          if (!fac.parking) return false
-        } else if (c === 'fresh') {
-          if (progress[f.id]) return false
-        } else if (c === 'almostgold') {
-          /* zaczęte i blisko: brakuje najwyżej dwóch punktów do kompletu */
-          const p = progress[f.id]
-          const total = pointsTotal(f.id)
-          const earned = questForPark(f.id) ? (p?.points.length ?? 0) : p ? 1 : 0
-          if (!(p && !completedIds.has(f.id) && total > 0 && total - earned <= 2)) return false
-        } else if (c === 'longago') {
-          /* pół roku bez wizyty: miejsce prosi się o powrót */
-          const p = progress[f.id]
-          if (!(p && Date.now() - Date.parse(p.lastAt) > 183 * 86400000)) return false
-        }
-      }
-      if (dMax > 0 && !(sc && sc.d <= dMax)) return false
-      if (oMax > 0 && !(sc && sc.o <= oMax)) return false
+      if (tab !== 'all' && groupOf(f) !== tab) return false
+      const est = visitEstimate(f.id)
+      if (timeMax > 0 && !(est && est.min <= timeMax)) return false
+      if (distBand === '2' && !(est && est.km <= 2)) return false
+      if (distBand === '5' && !(est && est.km <= 5)) return false
+      if (distBand === '5plus' && !(est && est.km >= 5)) return false
       return true
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortedParks, chips, needle, doVersion, dMax, oMax, progress, completedIds])
+  }, [sortedParks, needle, filtersActive, tab, timeMax, distBand])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -1259,25 +1164,60 @@ export function App() {
             </button>
           )}
         </label>
-        {/* chipy nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
+        {/* filtry nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
         {!needle && (
-          <div className="app-fchips" role="group" aria-label="Filtry miejsc">
-            {CHIP_DEFS.map((c) => (
+          <div className="app-ftabs" role="tablist" aria-label="Rodzaj miejsc">
+            {TAB_DEFS.map(([id, label]) => (
               <button
-                key={c.id}
-                className={`app-fchip pk-press${chips.has(c.id) ? ' -on' : ''}`}
-                aria-pressed={chips.has(c.id)}
-                onClick={() => toggleChip(c.id)}
+                key={id}
+                role="tab"
+                aria-selected={tab === id}
+                className={`app-ftab pk-press${tab === id ? ' -on' : ''}`}
+                onClick={() => setTab(id)}
               >
-                {c.label}
+                {label}
               </button>
             ))}
-            <button
-              className={`app-fchip -more pk-press${sheetExtras > 0 ? ' -on' : ''}`}
-              onClick={() => setFiltersOpen(true)}
-            >
-              {sheetExtras > 0 ? `Więcej · ${sheetExtras}` : 'Więcej ⋯'}
-            </button>
+          </div>
+        )}
+        {!needle && (
+          <div className="app-fselects">
+            <label className={`app-fselect${timeMax > 0 ? ' -on' : ''}`}>
+              <Clock size={14} aria-hidden="true" />
+              <span className="app-fselect__label">
+                {TIME_OPTS.find((o) => o.v === timeMax)!.label}
+              </span>
+              <ChevronDown size={13} aria-hidden="true" />
+              <select
+                value={timeMax}
+                aria-label="Czas zwiedzania"
+                onChange={(e) => setTimeMax(Number(e.target.value))}
+              >
+                {TIME_OPTS.map((o) => (
+                  <option key={o.v} value={o.v}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={`app-fselect${distBand !== '' ? ' -on' : ''}`}>
+              <Footprints size={14} aria-hidden="true" />
+              <span className="app-fselect__label">
+                {DIST_OPTS.find((o) => o.v === distBand)!.label}
+              </span>
+              <ChevronDown size={13} aria-hidden="true" />
+              <select
+                value={distBand}
+                aria-label="Dystans do przejścia"
+                onChange={(e) => setDistBand(e.target.value as DistBand)}
+              >
+                {DIST_OPTS.map((o) => (
+                  <option key={o.v} value={o.v}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         )}
         {!needle && filtersActive && (
@@ -1293,12 +1233,7 @@ export function App() {
           </p>
         )}
         {!needle && filtersActive && shownParks.length === 0 && (
-          <p className="t-caption app-fzero">
-            {(chips.has('rainy') || chips.has('stroller') || dMax > 0 || oMax > 0) &&
-            !FEATURES.some((f) => getDO(f.id))
-              ? 'Ten filtr czyta oceny dojścia, a żadne miejsce nie jest jeszcze ocenione. Tryb ocen włączysz w O aplikacji.'
-              : 'Poluzuj któryś chip, najlepiej ostatni włączony.'}
-          </p>
+          <p className="t-caption app-fzero">Poluzuj czas albo dystans, najlepiej ostatni.</p>
         )}
         {needle && (
           <p className="t-caption app-search__count">
@@ -1339,18 +1274,15 @@ export function App() {
                             : 'jeszcze nieodkryte'
                     }
                     metaExtra={(() => {
-                      const sc = getDO(f.id)
-                      if (!sc && !hasPlay && !hasFood) return undefined
+                      const est = visitEstimate(f.id)
+                      if (!est && !hasPlay && !hasFood) return undefined
                       return (
                         <>
                           {hasPlay && <ToyBrick aria-label="plac zabaw" />}
                           {hasFood && <Coffee aria-label="kawa albo jedzenie" />}
-                          {sc && (
-                            <span
-                              className="app-dochip"
-                              aria-label={`dojście ${sc.d} na 5, odkrywanie ${sc.o} na 5`}
-                            >
-                              {'D ' + doDots(sc.d) + ' O ' + doDots(sc.o)}
+                          {est && (
+                            <span className="app-vchip">
+                              {fmtVisitMin(est.min)} · {fmtKm(est.km)}
                             </span>
                           )}
                         </>
@@ -1637,60 +1569,6 @@ export function App() {
         Lista miejsc zostaje tutaj mimo przycisku na mapie, bo w trakcie wyprawy
         ten przycisk nie istnieje i menu jest wtedy jedyna droga.
       */}
-      {/*
-        Arkusz wszystkich faset (etap 2). Chipy tutaj i chipy w rzędzie to TEN
-        SAM stan, więc arkusz niczego nie „zatwierdza": licznik na przycisku
-        żyje, a zamknięcie tylko chowa panel.
-      */}
-      <BottomSheet open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filtry">
-        {(
-          [
-            ['NA DZIŚ', SHEET_INTENTS],
-            ['CO NA MIEJSCU', SHEET_PLACE],
-            ['NASZA KOLEKCJA', SHEET_COLLECTION],
-          ] as const
-        ).map(([head, defs]) => (
-          <div key={head}>
-            <p className="t-caption app-fsheet__head">{head}</p>
-            <div className="app-fsheet__grid">
-              {defs.map((c) => (
-                <button
-                  key={c.id}
-                  className={`app-fchip pk-press${chips.has(c.id) ? ' -on' : ''}`}
-                  aria-pressed={chips.has(c.id)}
-                  onClick={() => toggleChip(c.id)}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-        <p className="t-caption app-fsheet__head">TRUDNOŚĆ · NIE WIĘCEJ NIŻ</p>
-        <DifficultySlider icon="🥾" label="Dojście" hints={D_HINTS} value={dMax} onChange={setDMax} />
-        <DifficultySlider icon="🔍" label="Odkrywanie" hints={O_HINTS} value={oMax} onChange={setOMax} />
-        {filtersActive && shownParks.length === 0 && (
-          <p className="t-caption app-fzero">
-            {(chips.has('rainy') || chips.has('stroller') || dMax > 0 || oMax > 0) &&
-            !FEATURES.some((f) => getDO(f.id))
-              ? 'Te filtry czytają oceny dojścia i odkrywania, a żadne miejsce nie jest jeszcze ocenione. Tryb ocen włączysz w O aplikacji.'
-              : 'Poluzuj któryś filtr, najlepiej ostatni włączony.'}
-          </p>
-        )}
-        <div className="app-fsheet__foot">
-          <Button variant="ghost" onClick={clearFilters}>
-            Wyczyść
-          </Button>
-          <Button full onClick={() => setFiltersOpen(false)}>
-            {shownParks.length === 0
-              ? 'Nic nie pasuje'
-              : `Pokaż ${shownParks.length} ${
-                  shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
-                }`}
-          </Button>
-        </div>
-      </BottomSheet>
-
       <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
         <p className="t-caption app-menu__head">Ty</p>
         <List className="app-menu">
@@ -1894,63 +1772,4 @@ export function App() {
   )
 }
 
-/*
- * Suwak progu trudności: pięć pól, po których można też PRZECIĄGNĄĆ palcem
- * (uwaga Jarka: „może suwak”). Wartość to górna granica; dotknięcie aktywnego
- * pola jeszcze raz zdejmuje ograniczenie. Podpis mówi słowami, co wybrałeś,
- * tym samym językiem co rubryka ocen.
- */
-function DifficultySlider({
-  icon,
-  label,
-  hints,
-  value,
-  onChange,
-}: {
-  icon: string
-  label: string
-  hints: string[]
-  value: number
-  onChange: (n: number) => void
-}) {
-  const pick = (n: number) => onChange(n === value ? 0 : n)
-  const fromPointer = (e: React.PointerEvent<HTMLDivElement>) => {
-    const box = e.currentTarget.getBoundingClientRect()
-    const n = Math.min(5, Math.max(1, Math.ceil(((e.clientX - box.left) / box.width) * 5)))
-    if (n !== value) onChange(n)
-  }
-  return (
-    <div className="app-dslider">
-      <div className="app-dslider__head">
-        <span className="app-dslider__name t-label">
-          {icon} {label}
-        </span>
-        <span className="t-caption app-dslider__desc">
-          {value === 0 ? 'bez ograniczenia' : `do ${'●'.repeat(value)}, ${hints[value - 1]}`}
-        </span>
-      </div>
-      <div
-        className="app-dslider__track"
-        onPointerDown={(e) => {
-          e.currentTarget.setPointerCapture(e.pointerId)
-          fromPointer(e)
-        }}
-        onPointerMove={(e) => {
-          if (e.buttons > 0) fromPointer(e)
-        }}
-      >
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            className={`app-dslider__dot${value >= n ? ' -on' : ''}`}
-            aria-label={`${label}: nie więcej niż ${n} na 5`}
-            onClick={() => pick(n)}
-          >
-            {value >= n ? '●' : '○'}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
 

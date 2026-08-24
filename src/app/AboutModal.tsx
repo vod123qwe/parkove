@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronRight, Component, FileClock, HardDrive, RefreshCw, Ruler, SlidersHorizontal, Smartphone } from 'lucide-react'
+import { ChevronRight, Component, FileClock, HardDrive, RefreshCw, Ruler, Smartphone } from 'lucide-react'
 import { List, ListItem, Modal } from '../ds'
 import { VERSION } from '../changelog'
-import { setRateMode } from './data/difficulty'
 import { refreshVersion } from './refresh'
 import { screenReport, toggleGroundDebug, toggleSimPhone } from './screen'
 import { dropAllPacks, fmtMB, storageReport } from './offline'
@@ -37,13 +36,6 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
   const [diag, setDiag] = useState<string | null>(null)
   const [sim, setSim] = useState(() => document.documentElement.dataset.pkSim === 'phone')
   const taps = useRef(0)
-  const [rate, setRate] = useState(() => {
-    try {
-      return localStorage.getItem('pk-rate') === 'on'
-    } catch {
-      return false
-    }
-  })
 
   return (
     <Modal open={open} onClose={onClose} title="O aplikacji" action="back" presentation="push">
@@ -116,16 +108,6 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
           title={sim ? 'Symulacja telefonu: włączona' : 'Symuluj telefon'}
           meta="Do sprawdzania na komputerze. Na telefonie doda wcięcia do tych, które już masz, więc treść się przesunie"
           onClick={() => setSim(toggleSimPhone())}
-        />
-        <ListItem
-          icon={<SlidersHorizontal />}
-          title={rate ? 'Tryb ocen D i O: włączony' : 'Tryb ocen D i O'}
-          meta="Na karcie miejsca klikasz kropki dojścia i odkrywania. Oceny zbierają się w telefonie; na końcu Kopiuj oceny i wyślij mi"
-          onClick={() => {
-            const next = !rate
-            setRate(next)
-            setRateMode(next)
-          }}
         />
         <ListItem
           icon={<Ruler />}

@@ -42,3 +42,13 @@ Decyzja z grilla 2026-08-24: **Jarek ocenia wszystkie 57 miejsc sam, w aplikacji
 
 Miejsce bez ocen po prostu nie pokazuje celek i wypada z intencji czytających D;
 zero-guard w liście mówi o tym wprost.
+
+---
+
+## WYCOFANE w 0.99.0 (2026-08-24)
+
+Jarek: "usun ocenianie d/o". Caly system (difficulty.ts, tryb ocen w
+O aplikacji, kropki na kartach i suwaki w filtrach) usuniety z kodu.
+Zastapstwo: szacowany czas zwiedzania i kilometry z danych (data/visit.ts),
+opisane w docs/filtry.md. Ten plik zostaje jako zapis rubryki, gdyby
+oceny mialy kiedys wrocic w innej formie.

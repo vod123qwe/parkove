@@ -694,8 +694,9 @@ export function MapView({
         filter: ['!=', ['get', 'state'], 'done'] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.34, 14, 0.46] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.66, 14, 0.92] as never,
           'icon-allow-overlap': true,
+          'icon-anchor': 'bottom',
         },
       })
       map.addLayer({
@@ -707,8 +708,9 @@ export function MapView({
         filter: ['==', ['get', 'state'], 'done'] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.34, 14, 0.46] as never,
+          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.66, 14, 0.92] as never,
           'icon-allow-overlap': true,
+          'icon-anchor': 'bottom',
         },
       })
 

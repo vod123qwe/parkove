@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.98.1'
+export const VERSION = '0.99.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.99.0',
+    date: '2026-08-24',
+    title: 'Teardrop pins and simpler filters',
+    tldr:
+      'Piny to teraz większe łezki z kolorem krajobrazu, a filtry to zakładki plus dwa progi: czas zwiedzania i kilometry. Oceny trudności zniknęły.',
+    changes: [
+      ['changed', 'Park pins are proper teardrops now: bigger, with a soft rounded tip instead of a spike. The pin colour tells the landscape family before you read the icon: green for parks, gardens and meadows, deep fir green for forests, blue for water, ochre for mounds and valleys. An unvisited place is an outline, a visited one is filled, a completed one wears the golden tick'],
+      ['changed', 'Filtering went back to basics: three tabs (All, Parks, Valleys) plus two dropdowns, visiting time and walking distance. The thresholds come from real data, not from hand ratings, so they work for every place from day one'],
+      ['added', 'Every list card and place sheet now shows an honest visiting estimate, like "ok. 45 min · 2,1 km". Places with a routed loop use its real minutes plus a short stop per quest point; places without one get a rough guess from their area'],
+      ['fixed', 'Difficulty ratings (D/O), the rating dev mode and the filter sheet are gone. Two sliders and a copy-my-ratings flow was a lot of machinery for a question two dropdowns answer better'],
+    ],
+  },
   {
     version: '0.98.1',
     date: '2026-08-24',

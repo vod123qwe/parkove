@@ -70,3 +70,27 @@ więc można je stroić bez wydania.
   odkrycia pod chmurami i przebudowa revealu.
 - Filtry są sesyjne: świeże otwarcie apki startuje bez aktywnych chipów.
 
+
+---
+
+## 0.99.0: uproszczenie (decyzja Jarka, 2026-08-24)
+
+Chipy intencji, arkusz Filtry i suwaki D/O poszly w calosci do kosza.
+Jarek: "usun ocenianie d/o i zmien filtrowanie na prostsze, czyli taby
+i czas podrozy (...) tez dropdown do km".
+
+Nowy model (App.tsx + data/visit.ts):
+
+- **Zakladki**: Wszystkie / Parki / Dolinki (pole `group` z parks.json).
+- **Czas zwiedzania** (dropdown): dowolny / do 30 min / do 1 godz. / do 2 godz.
+- **Dystans** (dropdown): dowolny / do 2 km / do 5 km / 5 km i wiecej.
+  Ostatnia opcja jest odwrotna (dla szukajacych dlugiej trasy) i lapie
+  dokladnie 3 dolinki: Bedkowska 14,9 km, Raclawki 12,1 km, Szklarki 6,6 km.
+
+Szacunek (visit.ts): trasa points -> minuty petli + 3 min na punkt wyprawy;
+bez trasy -> obwod 4*sqrt(A), 14 min/km, +8 min bazy. Progi dobrane z
+rozkladu: "do 30 min" lapie 36 z 57 miejsc.
+
+Skasowane pliki: data/difficulty.ts, data/facets.ts. Dropdowny to natywne
+selecty przebrane za pigulki (`.app-fselect`): telefon otwiera systemowy
+picker, wybrana opcje pokazuje span, bo select ma opacity 0.

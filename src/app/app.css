@@ -209,38 +209,83 @@
 }
 
 /*
- * Chipy filtrów nad listą. Rząd przewija się w bok bez suwaka; aktywny chip
- * odwraca kolory jak przycisk główny. Zamiennik zakładek, więc trzyma ich
- * miejsce w pionie (jeden rząd na wystawaniu doku).
+ * Zakladki rodzaju miejsc + dwa dropdowny progow (czas, kilometry).
+ * Zakladki to segment na calej szerokosci; dropdowny to natywne selecty
+ * przebrane za pigulki, wiec telefon otwiera systemowy picker.
  */
-.app-fchips {
+.app-ftabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 var(--sp-3);
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken, rgb(0 0 0 / 0.05));
+}
+
+.app-ftab {
+  flex: 1;
+  padding: 7px 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: transparent;
+  color: var(--content-subtle);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.app-ftab.-on {
+  background: var(--bg-brand);
+  color: var(--content-on-brand);
+}
+
+.app-fselects {
   display: flex;
   gap: var(--sp-2);
-  margin: 0 calc(-1 * var(--sp-6)) var(--sp-4);
-  padding: 2px var(--sp-6) 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  margin: 0 0 var(--sp-4);
 }
 
-.app-fchips::-webkit-scrollbar {
-  display: none;
-}
-
-.app-fchip {
-  flex: none;
-  padding: 8px 14px;
+.app-fselect {
+  position: relative;
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-pill);
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface-raised);
   color: var(--content-default);
+}
+
+.app-fselect select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
   font: inherit;
+}
+
+.app-fselect svg {
+  flex: none;
+  pointer-events: none;
+}
+
+.app-fselect__label {
+  overflow: hidden;
+  flex: 1;
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }
 
-.app-fchip.-on {
+.app-fselect.-on {
   border-color: transparent;
   background: var(--bg-brand);
   color: var(--content-on-brand);
@@ -270,153 +315,18 @@
 }
 
 /* arkusz Filtry: grupy chipów + progi trudności + stopka */
-.app-fsheet__head {
-  margin: var(--sp-5) 0 var(--sp-2);
-  color: var(--content-subtle);
-  letter-spacing: 0.08em;
-}
-
-.app-fsheet__head:first-child {
-  margin-top: 0;
-}
-
-.app-fsheet__grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.app-dslider {
-  margin-bottom: var(--sp-4);
-}
-
-.app-dslider__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-2);
-}
-
-.app-dslider__desc {
-  color: var(--content-subtle);
-  text-align: right;
-}
-
-/*
- * Tor suwaka: pięć równych pól w zagłębieniu, jak segmented. Wypełnienie
- * rośnie po przeciągnięciu palcem po torze albo po dotknięciu pola; aktywna
- * część ma kolor marki, więc wybór widać z metra.
- */
-.app-dslider__track {
-  display: flex;
-  gap: var(--sp-1);
-  padding: var(--sp-1);
-  border-radius: var(--radius-pill);
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-sunken);
-  touch-action: none;
-}
-
-.app-dslider__dot {
-  flex: 1;
-  height: 40px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: none;
-  color: var(--content-subtle);
-  font: inherit;
-  font-size: 15px;
-}
-
-.app-dslider__dot.-on {
-  background: var(--bg-brand);
-  color: var(--content-on-brand);
-}
-
-.app-fsheet__foot {
-  display: flex;
-  gap: var(--sp-3);
-  margin-top: var(--sp-5);
-}
-
-.app-fchip.-more {
-  border-style: dashed;
-}
-
-/* celki D/O w wierszu listy: gęsto, ale czytelnie, mniejszym stopniem */
-.app-dochip {
+/* czas i kilometry w wierszu listy: gesto, mniejszym stopniem */
+.app-vchip {
   font-size: 10.5px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
   color: var(--content-subtle);
   white-space: nowrap;
 }
 
-/* blok dwóch osi na karcie miejsca */
-.park-do {
-  display: grid;
-  gap: var(--sp-3);
-  margin: var(--sp-4) 0 var(--sp-2);
-  padding: var(--sp-4) var(--sp-5);
-  border-radius: 20px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-sunken);
-}
-
-.park-do__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-}
-
-.park-do__dots {
-  letter-spacing: 0.14em;
-  color: var(--content-default);
-}
-
-.park-do__hint {
-  margin: 2px 0 0;
+/* linijka czasu na karcie miejsca, zaraz pod meta */
+.park-visit {
+  margin: calc(-1 * var(--sp-2)) 0 var(--sp-4);
   color: var(--content-subtle);
-}
-
-.park-do__picks {
-  display: flex;
-  gap: 2px;
-}
-
-.park-do__pick {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 0;
-  border-radius: 10px;
-  background: none;
-  color: var(--content-subtle);
-  font-size: 15px;
-}
-
-.park-do__pick.-on {
-  color: var(--content-default);
-}
-
-.park-do__sentence {
-  margin: 0;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: 12px;
-  background: var(--bg-brand-subtle, rgb(200 235 130 / 0.35));
-  color: var(--content-default);
-}
-
-.park-do__copy {
-  justify-self: start;
-  padding: 8px 14px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-pill);
-  background: var(--bg-surface-raised);
-  color: var(--content-default);
-  font: inherit;
-  font-size: 13px;
 }
 
 /* trzy kubełki stanu: nagłówek mówi, na co patrzysz, licznik ile tego jest */
@@ -3887,6 +3797,14 @@
   /* a sticky note is canary yellow: near the gold of a stamp but its own thing */
   --paper-note: #fdf19b;
   --ink-note: #33301c;
+  /*
+   * Rodziny pinow parkow: kolor lezki mowi, JAKI to krajobraz, zanim
+   * przeczytasz ikone. Cztery rodziny wystarcza; osiem kolorow to szum.
+   */
+  --pin-green: #3a6b2d; /* parki, ogrody, laki */
+  --pin-forest: #1f4636; /* lasy i uroczyska */
+  --pin-water: #2e7396; /* woda */
+  --pin-earth: #8a6134; /* kopce i dolinki */
 }
 
 .memplay {

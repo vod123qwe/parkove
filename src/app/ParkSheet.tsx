@@ -37,18 +37,7 @@ import { distanceToParkM, formatDistance, pointInPark } from './geo'
 import type { ParkGeometry, Pt } from './geo'
 import { pointsTotal, questForPark, photosForPark } from './data/quests'
 import { trailById, trailsFor } from './data/trails'
-import {
-  D_HINTS,
-  O_HINTS,
-  axisValues,
-  doSentence,
-  dots,
-  draftScores,
-  getDO,
-  rateModeOn,
-  setDraftScore,
-  useDOVersion,
-} from './data/difficulty'
+import { fmtKm, fmtVisitMin, visitEstimate } from './data/visit'
 import type { QuestPoi } from './data/quests'
 import { plPunkty } from './naming'
 
@@ -217,7 +206,15 @@ export function ParkSheet({
         Zdjęcia dostały własny slider w marginesach strony, jedno na ekran.
       */}
       <p className="t-body-sm park-herometa">{heroMeta}</p>
-      <DOBlock parkId={park.id} />
+      {(() => {
+        const est = visitEstimate(park.id)
+        if (!est) return null
+        return (
+          <p className="t-caption park-visit">
+            Zwiedzanie zajmie {fmtVisitMin(est.min)}, do przejścia {fmtKm(est.km)}.
+          </p>
+        )
+      })()}
       <div className="park-gallery">
         <PhotoSlider
           images={gallery.map((p) => ({ src: asset(p.src) }))}
@@ -502,66 +499,3 @@ export function ParkSheet({
   )
 }
 
-/*
- * Dwie osie trudności na karcie miejsca (grill 2026-08-24).
- *
- * Zwykły widok: dwie linie z kropkami i podpisem poziomu, plus zdanie
- * składane z pary ocen. Tryb ocen (O aplikacji): te same kropki są
- * przyciskami; Jarek ocenia miejsca sam, w terenie albo z pamięci, a szkic
- * zbiera się w telefonie i wychodzi przyciskiem Kopiuj oceny.
- */
-function DOBlock({ parkId }: { parkId: string }) {
-  const version = useDOVersion()
-  const [copied, setCopied] = useState(false)
-  const rate = rateModeOn()
-  const v = axisValues(parkId)
-  const sc = getDO(parkId)
-  if (!rate && !sc) return null
-  const sentence = sc ? doSentence(sc) : null
-  const axis = (label: string, hints: string[], value: number, pick: (n: number) => void) => (
-    <div className="park-do__axis">
-      <div className="park-do__row">
-        <span className="t-label park-do__name">{label}</span>
-        {rate ? (
-          <span className="park-do__picks">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                className={`park-do__pick${n <= value ? ' -on' : ''}`}
-                aria-label={`${label}: ${n} na 5`}
-                onClick={() => pick(n)}
-              >
-                {n <= value ? '●' : '○'}
-              </button>
-            ))}
-          </span>
-        ) : (
-          <span className="park-do__dots">{dots(value)}</span>
-        )}
-      </div>
-      <p className="t-caption park-do__hint">
-        {value >= 1 ? hints[value - 1] : 'jeszcze nieocenione'}
-      </p>
-    </div>
-  )
-  const copyDraft = () => {
-    const draft = draftScores()
-    void navigator.clipboard?.writeText(JSON.stringify(draft, null, 1)).then(() => {
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 2000)
-    })
-  }
-  const ratedCount = Object.values(draftScores()).filter((x) => (x.d ?? 0) >= 1 && (x.o ?? 0) >= 1).length
-  return (
-    <div className="park-do" data-v={version}>
-      {axis('Dojście', D_HINTS, v.d, (n) => setDraftScore(parkId, { d: n }))}
-      {axis('Odkrywanie', O_HINTS, v.o, (n) => setDraftScore(parkId, { o: n }))}
-      {sentence && <p className="t-caption park-do__sentence">{sentence}</p>}
-      {rate && (
-        <button className="park-do__copy pk-press" onClick={copyDraft}>
-          {copied ? 'Skopiowane ✓' : `Kopiuj oceny (${ratedCount})`}
-        </button>
-      )}
-    </div>
-  )
-}

@@ -54,9 +54,6 @@ const ICONS: Record<
 }
 
 export type PinVariant =
-  | 'pfresh'
-  | 'pvisited'
-  | 'pdone'
   | 'open'
   | 'done'
   | 'active'
@@ -88,28 +85,6 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   const themed: Record<string, [string, string, string]> = {
     // parking mówi niebieskim, ale tym samym kształtem: ciemny krążek, biała obwódka
     parking: [colors.parkingFill, colors.paper, colors.parkingIcon],
-    /*
-     * Jedzenie i place zabaw dostały ten sam układ co parking. Wcześniej niosły
-     * pastele z kart (jasne tło, kolorowa obwódka), które na zdjęciu satelitarnym
-     * robiły się białymi plamkami bez tożsamości. Teraz krążek jest ciemny w swoim
-     * odcieniu, obwódka biała, znak jasny: amber dla jedzenia, magenta dla placów.
-     */
-    food: [colors.mapFoodFill, colors.paper, colors.mapFoodIcon],
-    playground: [colors.mapPlayFill, colors.paper, colors.mapPlayIcon],
-    // things you left yourself, told apart from the game and from the collection:
-    // gold now belongs to the collection alone
-    audio: [colors.accentStrong, colors.accentStrong, colors.lime],
-    note: [colors.paper, colors.accentStrong, colors.ink],
-    /*
-     * Piny PARKÓW mówią tym samym językiem co punkty na wspomnieniach
-     * (uwaga Jarka 2026-08-24): odwiedzony park wygląda dokładnie jak punkt
-     * trasy (ciemny krążek, biała obwódka, limonkowa ikona), domknięty nosi
-     * ten sam złoty ptaszek co zdobyty punkt, a nieodwiedzony jest odwrotką:
-     * jasny krążek z ciemną obwódką, czyli „jeszcze nie wypełniony".
-     */
-    pfresh: [colors.paper, colors.trailFill, colors.trailFill],
-    pvisited: [colors.trailFill, colors.paper, colors.trailIcon],
-    pdone: [colors.trailFill, colors.paper, colors.trailIcon],
   }
   /*
    * Jeden język dla całej mapy: ciemny krążek, biała obwódka, limonkowy znak.
@@ -132,7 +107,7 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
   // a collected point wears a tick: gold alone did not read as "done"
   // ptaszek na złocie, bo złoto należy do kolekcji: to znak zdobycia
   const tick =
-    variant === 'done' || variant === 'pdone'
+    variant === 'done'
       ? `<g transform="translate(${SIZE - 30} 6)">
     <circle cx="12" cy="12" r="12" fill="${colors.gold}" stroke="${colors.paper}" stroke-width="2"/>
     <path d="M6.5 12.5l3.5 3.5 7-7" fill="none" stroke="${colors.onGold}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -150,17 +125,17 @@ function pinSvg(paths: string[], variant: PinVariant, colors: Record<string, str
 export const pinImageId = (category: string, variant: PinVariant) => `pin-${category}-${variant}`
 
 /** SVG has to go through an <img> first: createImageBitmap cannot decode it */
-async function rasterise(svg: string) {
+async function rasterise(svg: string, w = SIZE, h = SIZE) {
   const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
-  const img = new Image(SIZE, SIZE)
+  const img = new Image(w, h)
   img.src = url
   await img.decode()
   const canvas = document.createElement('canvas')
-  canvas.width = SIZE
-  canvas.height = SIZE
+  canvas.width = w
+  canvas.height = h
   const ctx = canvas.getContext('2d')!
-  ctx.drawImage(img, 0, 0, SIZE, SIZE)
-  return ctx.getImageData(0, 0, SIZE, SIZE)
+  ctx.drawImage(img, 0, 0, w, h)
+  return ctx.getImageData(0, 0, w, h)
 }
 
 /** rasterise every pin the map needs; returns [imageId, ImageData] pairs */
@@ -233,6 +208,10 @@ export function pinColors() {
     onPrimary: v('--content-on-primary'),
     paper: v('--bg-surface'),
     ink: v('--content-primary'),
+    pinGreen: v('--pin-green'),
+    pinForest: v('--pin-forest'),
+    pinWater: v('--pin-water'),
+    pinEarth: v('--pin-earth'),
     parkingFill: v('--map-parking-fill'),
     parkingIcon: v('--map-parking-icon'),
     infoSubtle: v('--bg-info-subtle'),
@@ -260,6 +239,18 @@ export function pinColors() {
 export type ParkPinState = 'fresh' | 'visited' | 'done'
 export const parkPinImageId = (kind: string, state: ParkPinState) => `ppin-${kind}-${state}`
 
+/** rodzaj -> rodzina koloru: parkGreen / forest / water / earth */
+const PARK_KIND_FAMILY: Record<string, 'pinGreen' | 'pinForest' | 'pinWater' | 'pinEarth'> = {
+  park: 'pinGreen',
+  garden: 'pinGreen',
+  meadow: 'pinGreen',
+  forest: 'pinForest',
+  nature: 'pinForest',
+  water: 'pinWater',
+  mound: 'pinEarth',
+  valley: 'pinEarth',
+}
+
 const PARK_KIND_ICON: Record<string, keyof typeof ICONS> = {
   park: 'park',
   forest: 'forest',
@@ -271,13 +262,51 @@ const PARK_KIND_ICON: Record<string, keyof typeof ICONS> = {
   nature: 'nature',
 }
 
-const PARK_STATE_VARIANT: Record<ParkPinState, PinVariant> = {
-  fresh: 'pfresh',
-  visited: 'pvisited',
-  done: 'pdone',
+const PARK_W = 96
+const PARK_H = 124
+
+/*
+ * Lezka z MIEKKIM czubkiem (uwaga Jarka: za spiczaste). Dol konczy sie
+ * malym lukiem zamiast szpica, boki schodza lagodnymi krzywymi. Czubek i
+ * tak WSKAZUJE miejsce, wiec pin moze byc duzy i nie klamie o pozycji.
+ *
+ * Logika kolorow: KOLOR lezki = rodzina krajobrazu (zielen / las / woda /
+ * ziemia), IKONA = konkretny rodzaj, WYPELNIENIE = stan. Nieodwiedzone
+ * jest "niewypelnione": papier z kolorowa obwodka i kolorowa ikona.
+ * Odwiedzone jest pelne: kolor rodziny z jasna ikona. Domkniete nosi
+ * zlota plakietke z ptaszkiem, te sama co zdobyty punkt na wspomnieniach.
+ */
+function parkPinSvg(
+  paths: string[],
+  state: ParkPinState,
+  family: string,
+  colors: Record<string, string>,
+) {
+  const fam = colors[family] ?? colors.trailFill
+  const [fill, stroke, icon] =
+    state === 'fresh' ? [colors.paper, fam, fam] : [fam, colors.paper, colors.paper]
+  const drop =
+    'M43 103 C 33 88, 11 74, 11 44 A 37 37 0 1 1 85 44 C 85 74, 63 88, 53 103 A 6.5 6.5 0 0 1 43 103 Z'
+  const iconScale = 2
+  const off = 48 - 12 * iconScale
+  const tick =
+    state === 'done'
+      ? `<g transform="translate(${PARK_W - 32} 2)">
+    <circle cx="14" cy="14" r="13" fill="${colors.gold}" stroke="${colors.paper}" stroke-width="2.5"/>
+    <path d="M8 14.5l4 4 8-8" fill="none" stroke="${colors.onGold}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>`
+      : ''
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${PARK_W}" height="${PARK_H}" viewBox="0 0 ${PARK_W} ${PARK_H}">
+  <ellipse cx="48" cy="112" rx="10" ry="3.5" fill="rgba(10, 14, 6, 0.28)"/>
+  <path d="${drop}" fill="${fill}" stroke="${stroke}" stroke-width="5.5" stroke-linejoin="round"/>
+  <g transform="translate(${off} ${44 - 12 * iconScale}) scale(${iconScale})" fill="none" stroke="${icon}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    ${paths.map((d) => `<path d="${d}"/>`).join('')}
+  </g>
+  ${tick}
+</svg>`
 }
 
-/** 24 obrazki: 8 rodzajów × 3 stany, w tym samym języku co reszta pinów */
+/** 24 obrazki: 8 rodzajow x 3 stany, lezki w jezyku wspomnien */
 export async function buildParkPinImages(
   colors: Record<string, string>,
 ): Promise<Array<[string, ImageData]>> {
@@ -287,7 +316,7 @@ export async function buildParkPinImages(
       try {
         out.push([
           parkPinImageId(kind, state),
-          await rasterise(pinSvg(ICONS[iconKey], PARK_STATE_VARIANT[state], colors)),
+          await rasterise(parkPinSvg(ICONS[iconKey], state, PARK_KIND_FAMILY[kind] ?? 'pinGreen', colors), PARK_W, PARK_H),
         ])
       } catch {
         // pin, ktorego nie da sie narysowac, po prostu nie wchodzi na mape
