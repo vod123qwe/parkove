@@ -286,16 +286,52 @@
   gap: var(--sp-2);
 }
 
-.app-fsheet__tier {
+.app-dslider {
+  margin-bottom: var(--sp-4);
+}
+
+.app-dslider__head {
   display: flex;
-  align-items: center;
-  gap: var(--sp-2);
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
   margin-bottom: var(--sp-2);
 }
 
-.app-fsheet__tiername {
-  width: 96px;
-  flex: none;
+.app-dslider__desc {
+  color: var(--content-subtle);
+  text-align: right;
+}
+
+/*
+ * Tor suwaka: pięć równych pól w zagłębieniu, jak segmented. Wypełnienie
+ * rośnie po przeciągnięciu palcem po torze albo po dotknięciu pola; aktywna
+ * część ma kolor marki, więc wybór widać z metra.
+ */
+.app-dslider__track {
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-1);
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+  touch-action: none;
+}
+
+.app-dslider__dot {
+  flex: 1;
+  height: 40px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--content-subtle);
+  font: inherit;
+  font-size: 15px;
+}
+
+.app-dslider__dot.-on {
+  background: var(--bg-brand);
+  color: var(--content-on-brand);
 }
 
 .app-fsheet__foot {

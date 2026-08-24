@@ -20,9 +20,8 @@ export type ParkInfo = {
 export const PARK_INFO: Record<string, ParkInfo> = {
   'zalew-nowohucki': {
     photos: [
-      { src: '/photos/park-zalew-nowohucki-1.jpg', credit: 'Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons' },
-      { src: '/photos/park-zalew-nowohucki-2.jpg', credit: 'Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons' },
-      { src: '/photos/park-zalew-nowohucki-1-2.jpg', credit: 'Fot. sz.u. · CC BY-SA 2.0 · Wikimedia Commons' },
+      { src: '/photos/park-zalew-nowohucki-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-zalew-nowohucki-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       'Piętnaście hektarów parku wokół siedmiu hektarów wody, w środku Nowej Huty, dwadzieścia minut tramwajem od Rynku. Pętla brzegiem ma dwa i pół kilometra i nadaje się na spacer z wózkiem: asfalt, ławki co kilkadziesiąt metrów i cień od strony wschodniej.',
@@ -46,8 +45,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   blonia: {
     photos: [
-      { src: '/photos/park-blonia-1.jpg', credit: "Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-blonia-2.jpg', credit: "Fot. Kgbo · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-blonia-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Czterdzieści osiem hektarów łąki w środku miasta, dwadzieścia minut od Rynku. Największa taka przestrzeń w Polsce i jedyne miejsce w Krakowie, gdzie stajesz na trawie i nie masz przed sobą żadnego budynku.",
@@ -120,7 +118,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'park-jordana': {
     photos: [
-      { src: '/photos/park-jordana-widok.jpg', credit: "Fot. Januszk57 · CC BY-SA 3.0 pl · Wikimedia Commons" },
+      { src: '/photos/park-park-jordana-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-park-jordana-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park, od którego wzięły nazwę wszystkie ogrody jordanowskie w Polsce. Doktor Henryk Jordan założył go w 1889 roku na terenie wystawy rolniczo-przemysłowej i od początku był to park do ruchu, nie do spacerów: boiska, przyrządy gimnastyczne i place do zabaw. Jordan sam ustalał plan zajęć, dobierał przewodników grup i prowadził pogadanki o historii Polski.",
@@ -202,8 +201,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'laki-nowohuckie': {
     photos: [
-      { src: '/photos/park-laki-nowohuckie-1.jpg', credit: "Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-laki-nowohuckie-2.jpg', credit: "Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-laki-nowohuckie-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Pięćdziesiąt siedem hektarów dzikiej łąki tuż za blokami Nowej Huty. Rosną tu storczyki i mieczyk dachówkowaty, a wiosną słychać chór ptaków, jakiego nie usłyszysz w żadnym miejskim parku.",
@@ -218,7 +216,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   mlynowka: {
     photos: [
-      { src: '/photos/park-mlynowka-1.jpg', credit: "Fot. Bombka190 · CC BY-SA 3.0 · Wikimedia Commons" },
+      { src: '/photos/park-mlynowka-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park liniowy na śladzie Młynówki Królewskiej, kanału, który od średniowiecza prowadził wodę z Rudawy do młynów w mieście. Woda zniknęła w XX wieku, została zielona wstęga przez pół Krowodrzy.",
@@ -264,7 +262,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   aleksandry: {
     photos: [
-      { src: '/photos/park-aleksandry-1.jpg', credit: "Fot. Wuhazet Henryk Żychowski · CC BY 3.0 · Wikimedia Commons" },
+      { src: '/photos/park-aleksandry-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-aleksandry-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Największy park Bieżanowa i Prokocimia, piętnaście hektarów zieleni wciśniętych między osiedla. Nazwa pochodzi od ulicy Aleksandry, a ta od imienia, nie od żadnej historycznej postaci.",
@@ -279,9 +278,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   bednarskiego: {
     photos: [
-      { src: '/photos/park-bednarskiego-1.jpg', credit: "Fot. Andrzej Otrębski · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-bednarskiego-new.jpg', credit: 'Fot. Mariokol · domena publiczna · Wikimedia Commons' },
-      { src: '/photos/park-bednarskiego-2.jpg', credit: "Fot. Andrzej Otrębski · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-bednarskiego-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w wyrobisku kamieniołomu na Krzemionkach, otwarty w 1896 roku dzięki uporowi jednego człowieka: Wojciecha Bednarskiego, nauczyciela i radnego, który sam wyłożył pieniądze na pierwsze drzewa.",
@@ -296,7 +293,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   decjusza: {
     photos: [
-      { src: '/photos/park-decjusza-2.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-decjusza-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w stylu angielskim wokół renesansowej Villi Decius, letniej rezydencji sekretarza króla Zygmunta Starego. Starszy niż większość krakowskich parków, bo zaczynał jako ogród przy pałacu w XVI wieku.",
@@ -311,8 +308,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   duchacki: {
     photos: [
-      { src: '/photos/park-duchacki-1.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-duchacki-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-duchacki-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-duchacki-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park na Woli Duchackiej ze stawem i dworem, który pamięta czasy, gdy była to podkrakowska wieś. Nazwa pochodzi od zakonu duchaków, dawnych właścicieli tych ziem.",
@@ -327,8 +324,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   grzegorzecki: {
     photos: [
-      { src: '/photos/park-grzegorzecki-1.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-grzegorzecki-2.jpg', credit: "Fot. Igor123121 · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-grzegorzecki-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-grzegorzecki-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Grzegórzkach, zielony klin między blokami i ruchliwymi ulicami. Powstał wraz z osiedlami, na terenach, które wcześniej należały do zalewowej doliny Wisły.",
@@ -343,8 +340,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'jalu-kurka': {
     photos: [
-      { src: '/photos/park-jalu-kurka-1.jpg', credit: "Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-jalu-kurka-2.jpg', credit: "Fot. Sadads · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-jalu-kurka-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-jalu-kurka-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Mały park przy ul. Lubomirskiego, nazwany imieniem Jalu Kurka, pisarza i pierwszego polskiego futurysty. Trudno o lepszego patrona dla parku wciśniętego między kamienice i torowisko.",
@@ -359,7 +356,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   jerzmanowskich: {
     photos: [
-      { src: '/photos/park-jerzmanowskich-1.jpg', credit: "Fot. Wuhazet - Henryk Żychowski · CC BY 3.0 · Wikimedia Commons" },
+      { src: '/photos/park-jerzmanowskich-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Prokocimiu z pałacem Jerzmanowskich w środku, jeden z najładniejszych zespołów pałacowo-parkowych w Krakowie. Erazm Jerzmanowski, przemysłowiec i filantrop, zbił majątek w Ameryce na lampach gazowych i wrócił, żeby rozdać go na cele społeczne.",
@@ -374,8 +371,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   krakowski: {
     photos: [
-      { src: '/photos/park-krakowski-1.jpg', credit: "Fot. Aneta Lazurek · CC BY-SA 3.0 pl · Wikimedia Commons" },
-      { src: '/photos/park-krakowski-2.jpg', credit: "Fot. Aneta Lazurek · CC BY-SA 3.0 pl · Wikimedia Commons" },
+      { src: '/photos/park-krakowski-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park z 1885 roku, kiedyś modny salon Krakowa z mleczarnią, muszlą koncertową i stawem, po którym pływano łódkami. Z pierwotnych piętnastu hektarów zostało pięć, resztę zabrała rozbudowa miasta.",
@@ -390,8 +386,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   krowoderski: {
     photos: [
-      { src: '/photos/park-krowoderski-1.jpg', credit: "Fot. APN-PL · CC BY-SA 3.0 · Wikimedia Commons" },
-      { src: '/photos/park-krowoderski-2.jpg', credit: "Fot. Igor123121 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-krowoderski-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park powstały na miejscu dawnych ogrodów działkowych, jeden z młodszych w mieście i najbardziej sąsiedzki. Mieszkańcy Krowodrzy wywalczyli go zamiast kolejnej inwestycji.",
@@ -406,8 +401,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   kurdwanow: {
     photos: [
-      { src: '/photos/park-kurdwanow-1.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-kurdwanow-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-kurdwanow-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-kurdwanow-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park na Kurdwanowie, sześć hektarów zieleni z placami zabaw i boiskami, oaza w gęstej zabudowie osiedla. Powstał jako element planu dzielnicy, nie jako pałacowy ogród.",
@@ -437,8 +432,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'lilli-wenedy': {
     photos: [
-      { src: '/photos/park-lilli-wenedy-1.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-lilli-wenedy-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-lilli-wenedy-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park na Bieńczycach nazwany od bohaterki dramatu Słowackiego, dziesięć hektarów zieleni z alejkami i stawem. Powstał razem z osiedlami Nowej Huty, więc jego układ jest z tej samej epoki.",
@@ -453,8 +447,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   lotnikow: {
     photos: [
-      { src: '/photos/park-lotnikow-1.jpg', credit: "Fot. Velta · CC BY-SA 3.0 · Wikimedia Commons" },
-      { src: '/photos/park-lotnikow-2.jpg', credit: "Fot. Velta · CC BY-SA 3.0 · Wikimedia Commons" },
+      { src: '/photos/park-lotnikow-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Największy park Nowej Huty: pięćdziesiąt dwa hektary na terenie dawnego lotniska Rakowice-Czyżyny, z którego samoloty startowały jeszcze w latach sześćdziesiątych.",
@@ -469,8 +462,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'macka-i-doroty': {
     photos: [
-      { src: '/photos/park-macka-i-doroty-1.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-macka-i-doroty-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-macka-i-doroty-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Bieżanowie Nowym z nazwą, która brzmi jak z bajki, i taką też ma atmosferę: dużo trawy, sporo placów zabaw i osiedlowe życie na alejkach.",
@@ -485,8 +477,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   ratuszowy: {
     photos: [
-      { src: '/photos/park-ratuszowy-1.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-ratuszowy-2.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-ratuszowy-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-ratuszowy-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w samym środku Nowej Huty, przy placu Centralnym, założony razem z dzielnicą w latach pięćdziesiątych. Nazwa pochodzi od ratusza, który miał tu stanąć, ale nigdy nie powstał.",
@@ -501,8 +493,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   reduta: {
     photos: [
-      { src: '/photos/park-reduta-1.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-reduta-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-reduta-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-reduta-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Mistrzejowicach nazwany od ulicy, przy której leży, z rozległym trawnikiem i stawem. Powstał wraz z osiedlami, więc jego historia jest krótka, ale za to codzienna.",
@@ -517,8 +509,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   rzaka: {
     photos: [
-      { src: '/photos/park-rzaka-1.jpg', credit: "Fot. Igor123121 · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-rzaka-2.jpg', credit: "Fot. Igor123121 · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-rzaka-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-rzaka-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Prokocimiu z boiskami i szeroką przestrzenią, powstały na terenie dawnych pól. Nazwa pochodzi od Rżąki, dawnej wsi, którą wchłonął Kraków.",
@@ -533,7 +525,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   solvay: {
     photos: [
-      { src: '/photos/park-solvay-1.jpg', credit: "Fot. Kamil Czaiński · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-solvay-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park na terenie dawnych zakładów sodowych Solvay, w których w czasie okupacji pracował Karol Wojtyła. Z fabryki nie ma już śladu, została nazwa i zielony klin między Borkiem Fałęckim a Łagiewnikami.",
@@ -548,8 +540,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'stacja-wisla': {
     photos: [
-      { src: '/photos/park-stacja-wisla-1.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-stacja-wisla-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-stacja-wisla-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-stacja-wisla-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Najmniejszy park w kolekcji i jeden z najciekawszych pomysłowo: powstał przy dawnej stacji kolejowej, z której dziś zostały tory i klimat. Nazwa nie jest metaforą, to naprawdę była stacja.",
@@ -564,8 +556,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   strzelecki: {
     photos: [
-      { src: '/photos/park-strzelecki-1.jpg', credit: "Fot. Igor123121 · CC BY 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-strzelecki-2.jpg', credit: "Fot. Igor123121 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-strzelecki-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-strzelecki-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Najstarszy park spacerowy Krakowa poza Plantami, założony w 1837 roku przez Towarzystwo Strzeleckie. Nazwa nie jest przypadkowa: mieszczanie ćwiczyli tu strzelanie do kurka, a najlepszy zostawał królem kurkowym na rok.",
@@ -580,8 +572,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   szwedzki: {
     photos: [
-      { src: '/photos/park-szwedzki-1.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-szwedzki-2.jpg', credit: "Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-szwedzki-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-szwedzki-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Podgórzu, którego nazwa upamiętnia szwedzkie oblężenie miasta w XVII wieku. Niewielki, ale z prawdziwym starym drzewostanem i spokojnym układem alejek.",
@@ -596,7 +588,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   tysiaclecia: {
     photos: [
-      { src: '/photos/park-tysiaclecia-1.jpg', credit: "Fot. Original uploader was Kuba lucznik at pl · CC BY 2.5 · Wikimedia Commons" },
+      { src: '/photos/park-tysiaclecia-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-tysiaclecia-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park na Prądniku o nazwie od tysiąclecia państwa polskiego, dwanaście hektarów zieleni między blokami. Ma to, co w takich miejscach najcenniejsze: dużo drzew i mało asfaltu.",
@@ -611,8 +604,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   szymborskiej: {
     photos: [
-      { src: '/photos/park-szymborskiej-1.jpg', credit: "Fot. Kamil Czaiński · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-szymborskiej-2.jpg', credit: "Fot. Kamil Czaiński · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-szymborskiej-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-szymborskiej-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Najmłodszy i jeden z najmniejszych parków w centrum, otwarty w 2015 roku i nazwany imieniem noblistki, która mieszkała kilka minut stąd. Powstał na miejscu zaniedbanego skwerku przy ul. Karmelickiej.",
@@ -627,7 +620,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'wisniowy-sad': {
     photos: [
-      { src: '/photos/park-wisniowy-sad-1.jpg', credit: "Fot. Zygmuny Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-wisniowy-sad-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-wisniowy-sad-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Czyżynach o nazwie z Czechowa, powstały na terenie dawnych sadów, które faktycznie tu rosły. Nowy, jasny i zaprojektowany pod codzienne życie osiedla.",
@@ -642,8 +636,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   wyspianskiego: {
     photos: [
-      { src: '/photos/park-wyspianskiego-1.jpg', credit: "Fot. APN-PL · CC BY-SA 3.0 · Wikimedia Commons" },
-      { src: '/photos/park-wyspianskiego-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-wyspianskiego-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-wyspianskiego-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park nad Wisłą w Dębnikach, po drugiej stronie rzeki niż Wawel. Nazwany imieniem Stanisława Wyspiańskiego, który patrzył na tę okolicę z drugiego brzegu.",
@@ -674,13 +668,14 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   zakrzowek: {
     photos: [
-      { src: '/photos/park-zakrzowek-1.jpg', credit: "Fot. Wojciech Zabolotny · CC BY-SA 3.0 · Wikimedia Commons" },
-      { src: '/photos/park-zakrzowek-2.jpg', credit: "Fot. Wojciech Zabolotny · CC BY-SA 3.0 · Wikimedia Commons" },
+      { src: '/photos/park-zakrzowek-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-zakrzowek-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
   },
   'zielony-jar': {
     photos: [
-      { src: '/photos/park-zielony-jar-1.jpg', credit: "Fot. Zygmunt Put · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-zielony-jar-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-zielony-jar-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w jarze Wandy w Nowej Hucie, poprowadzony wzdłuż naturalnego obniżenia terenu. Sześć hektarów zieleni w miejscu, które przez lata było dzikim nieużytkiem.",
@@ -695,8 +690,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   zeromskiego: {
     photos: [
-      { src: '/photos/park-zeromskiego-1.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-zeromskiego-2.jpg', credit: "Fot. Dwxn · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-zeromskiego-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-zeromskiego-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Park w Podgórzu z aleją starych kasztanowców i podniszczonym urokiem dawnego miasta. Powstał na przełomie XIX i XX wieku, gdy Podgórze było jeszcze osobnym miastem z własnym ratuszem.",
@@ -711,8 +706,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   planty: {
     photos: [
-      { src: '/photos/park-planty-1.jpg', credit: "Fot. Pudelek (Marcin Szala) · CC BY-SA 3.0 · Wikimedia Commons" },
-      { src: '/photos/park-planty-2.jpg', credit: "Fot. Kgbo · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-planty-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-planty-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Zielony pierścień wokół Starego Miasta: cztery kilometry alejek dokładnie tam, gdzie stały mury obronne, zburzone na początku XIX wieku. Nazwa nie pochodzi od roślin, a od splantowania, czyli wyrównania gruzu po fortyfikacjach.",
@@ -727,8 +722,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'planty-bienczyckie': {
     photos: [
-      { src: '/photos/park-planty-bienczyckie-1.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-planty-bienczyckie-2.jpg', credit: "Fot. Mach240390 · CC BY 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-planty-bienczyckie-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-planty-bienczyckie-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Zielony pas przez środek Bieńczyc, siedemnaście hektarów alejek, trawników i starych drzew. Nazwa nawiązuje do krakowskich Plant, a układ do socrealistycznego planu dzielnicy.",
@@ -743,8 +738,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   'przylasek-rusiecki': {
     photos: [
-      { src: '/photos/park-przylasek-rusiecki-1.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-przylasek-rusiecki-2.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-przylasek-rusiecki-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-przylasek-rusiecki-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Zespół stawów na wschodnim skraju Krakowa, powstałych po wybieraniu żwiru. Woda, plaża, wędkarze i cisza, jakiej nie znajdziesz w żadnym parku w centrum.",
@@ -765,8 +760,8 @@ export const PARK_INFO: Record<string, ParkInfo> = {
   },
   bagry: {
     photos: [
-      { src: '/photos/park-bagry-1.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
-      { src: '/photos/park-bagry-2.jpg', credit: "Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons" },
+      { src: '/photos/park-bagry-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
+      { src: '/photos/park-bagry-zzm-2.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
     ],
     description: [
       "Krakowskie morze: trzydzieści hektarów wody w dawnym wyrobisku żwiru, z plażami, pomostami i przystanią żeglarską. W upalny weekend zalew wygląda jak nadmorski kurort, tylko bez soli w powietrzu.",

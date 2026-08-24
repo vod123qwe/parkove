@@ -36,7 +36,7 @@ import { RevealSheet } from './RevealSheet'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { hasPack, verifyPack } from './offline'
-import { getDO, dots as doDots, useDOVersion } from './data/difficulty'
+import { D_HINTS, O_HINTS, getDO, dots as doDots, useDOVersion } from './data/difficulty'
 import { facetsFor } from './data/facets'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
@@ -105,8 +105,6 @@ type ChipId =
   | 'fresh'
   | 'almostgold'
   | 'longago'
-/** prog na osi ocen w arkuszu: dowolny, łatwy (≤2), wymagający (≥4) */
-type Tier = 'any' | 'easy' | 'hard'
 type ChipDef = { id: ChipId; label: string }
 const CHIP_DEFS: ChipDef[] = [
   { id: 'dolinki', label: 'Dolinki' },
@@ -187,8 +185,14 @@ export function App() {
   /* przerysowanie po każdym kliknięciu kropki w trybie ocen */
   const doVersion = useDOVersion()
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [dTier, setDTier] = useState<Tier>('any')
-  const [oTier, setOTier] = useState<Tier>('any')
+  /*
+   * Progi trudności jako SUWAKI (uwaga Jarka: „może suwak, trudność lepiej
+   * oznaczana"). Wartość to górna granica osi, 0 = bez ograniczenia. Suwak
+   * mówi „nie trudniejsze niż", bo tak brzmi pytanie przed spacerem; szukanie
+   * wyzwań (co najmniej) odpuszczamy, aż będzie potrzebne.
+   */
+  const [dMax, setDMax] = useState(0)
+  const [oMax, setOMax] = useState(0)
   /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
    * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
@@ -314,12 +318,12 @@ export function App() {
   const dockUp = !selected && !expedition
 
   const sheetExtras =
-    SHEET_ONLY.filter((id) => chips.has(id)).length + (dTier !== 'any' ? 1 : 0) + (oTier !== 'any' ? 1 : 0)
-  const filtersActive = chips.size > 0 || dTier !== 'any' || oTier !== 'any'
+    SHEET_ONLY.filter((id) => chips.has(id)).length + (dMax > 0 ? 1 : 0) + (oMax > 0 ? 1 : 0)
+  const filtersActive = chips.size > 0 || dMax > 0 || oMax > 0
   const clearFilters = () => {
     setChips(new Set())
-    setDTier('any')
-    setOTier('any')
+    setDMax(0)
+    setOMax(0)
   }
 
   /*
@@ -811,7 +815,7 @@ export function App() {
           plain(KIND_META[f.properties.kind]?.label ?? '').includes(needle),
       )
     }
-    if (chips.size === 0 && dTier === 'any' && oTier === 'any') return sortedParks
+    if (chips.size === 0 && dMax === 0 && oMax === 0) return sortedParks
     return sortedParks.filter((f) => {
       const fac = facetsFor(f.id)
       const sc = getDO(f.id)
@@ -857,14 +861,12 @@ export function App() {
           if (!(p && Date.now() - Date.parse(p.lastAt) > 183 * 86400000)) return false
         }
       }
-      if (dTier === 'easy' && !(sc && sc.d <= 2)) return false
-      if (dTier === 'hard' && !(sc && sc.d >= 4)) return false
-      if (oTier === 'easy' && !(sc && sc.o <= 2)) return false
-      if (oTier === 'hard' && !(sc && sc.o >= 4)) return false
+      if (dMax > 0 && !(sc && sc.d <= dMax)) return false
+      if (oMax > 0 && !(sc && sc.o <= oMax)) return false
       return true
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortedParks, chips, needle, doVersion, dTier, oTier, progress, completedIds])
+  }, [sortedParks, chips, needle, doVersion, dMax, oMax, progress, completedIds])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -1263,7 +1265,7 @@ export function App() {
         )}
         {!needle && filtersActive && shownParks.length === 0 && (
           <p className="t-caption app-fzero">
-            {(chips.has('rainy') || chips.has('stroller') || dTier !== 'any' || oTier !== 'any') &&
+            {(chips.has('rainy') || chips.has('stroller') || dMax > 0 || oMax > 0) &&
             !FEATURES.some((f) => getDO(f.id))
               ? 'Ten filtr czyta oceny dojścia, a żadne miejsce nie jest jeszcze ocenione. Tryb ocen włączysz w O aplikacji.'
               : 'Poluzuj któryś chip, najlepiej ostatni włączony.'}
@@ -1633,35 +1635,12 @@ export function App() {
             </div>
           </div>
         ))}
-        <p className="t-caption app-fsheet__head">TRUDNOŚĆ</p>
-        {(
-          [
-            ['Dojście', dTier, setDTier],
-            ['Odkrywanie', oTier, setOTier],
-          ] as const
-        ).map(([label, tier, setTier]) => (
-          <div key={label} className="app-fsheet__tier">
-            <span className="t-label app-fsheet__tiername">{label}</span>
-            {(
-              [
-                ['any', 'Dowolne'],
-                ['easy', '≤ ●●'],
-                ['hard', '≥ ●●●●'],
-              ] as const
-            ).map(([val, lab]) => (
-              <button
-                key={val}
-                className={`app-fchip pk-press${tier === val ? ' -on' : ''}`}
-                onClick={() => setTier(val)}
-              >
-                {lab}
-              </button>
-            ))}
-          </div>
-        ))}
+        <p className="t-caption app-fsheet__head">TRUDNOŚĆ · NIE WIĘCEJ NIŻ</p>
+        <DifficultySlider icon="🥾" label="Dojście" hints={D_HINTS} value={dMax} onChange={setDMax} />
+        <DifficultySlider icon="🔍" label="Odkrywanie" hints={O_HINTS} value={oMax} onChange={setOMax} />
         {filtersActive && shownParks.length === 0 && (
           <p className="t-caption app-fzero">
-            {(chips.has('rainy') || chips.has('stroller') || dTier !== 'any' || oTier !== 'any') &&
+            {(chips.has('rainy') || chips.has('stroller') || dMax > 0 || oMax > 0) &&
             !FEATURES.some((f) => getDO(f.id))
               ? 'Te filtry czytają oceny dojścia i odkrywania, a żadne miejsce nie jest jeszcze ocenione. Tryb ocen włączysz w O aplikacji.'
               : 'Poluzuj któryś filtr, najlepiej ostatni włączony.'}
@@ -1873,3 +1852,64 @@ export function App() {
     </div>
   )
 }
+
+/*
+ * Suwak progu trudności: pięć pól, po których można też PRZECIĄGNĄĆ palcem
+ * (uwaga Jarka: „może suwak”). Wartość to górna granica; dotknięcie aktywnego
+ * pola jeszcze raz zdejmuje ograniczenie. Podpis mówi słowami, co wybrałeś,
+ * tym samym językiem co rubryka ocen.
+ */
+function DifficultySlider({
+  icon,
+  label,
+  hints,
+  value,
+  onChange,
+}: {
+  icon: string
+  label: string
+  hints: string[]
+  value: number
+  onChange: (n: number) => void
+}) {
+  const pick = (n: number) => onChange(n === value ? 0 : n)
+  const fromPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    const box = e.currentTarget.getBoundingClientRect()
+    const n = Math.min(5, Math.max(1, Math.ceil(((e.clientX - box.left) / box.width) * 5)))
+    if (n !== value) onChange(n)
+  }
+  return (
+    <div className="app-dslider">
+      <div className="app-dslider__head">
+        <span className="app-dslider__name t-label">
+          {icon} {label}
+        </span>
+        <span className="t-caption app-dslider__desc">
+          {value === 0 ? 'bez ograniczenia' : `do ${'●'.repeat(value)}, ${hints[value - 1]}`}
+        </span>
+      </div>
+      <div
+        className="app-dslider__track"
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId)
+          fromPointer(e)
+        }}
+        onPointerMove={(e) => {
+          if (e.buttons > 0) fromPointer(e)
+        }}
+      >
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            className={`app-dslider__dot${value >= n ? ' -on' : ''}`}
+            aria-label={`${label}: nie więcej niż ${n} na 5`}
+            onClick={() => pick(n)}
+          >
+            {value >= n ? '●' : '○'}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+

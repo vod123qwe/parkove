@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.95.0'
+export const VERSION = '0.96.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.96.0',
+    date: '2026-08-24',
+    title: 'ZZM photos for every city park, and difficulty gets real sliders',
+    tldr:
+      'Zdjęcia 36 parków prosto ze strony ZZM (60 nowych, każde obejrzane) i suwaki trudności zamiast chipów.',
+    changes: [
+      ['changed', 'City park photos now come from the ZZM Kraków page, the source Jarek pointed at: 36 parks swapped in one go, 60 photographs, each one reviewed on contact sheets before it went in (the Warsaw mill taught us that no filename filter replaces looking). Aerial shots of Jordana and Aleksandry, the beach at Bagry, the lagoon piers at Przylasek Rusiecki. Credit line says ZZM Kraków'],
+      ['changed', 'Old replaced photos were removed and the whole photo folder was re-optimized: 98 MB of originals became 39 MB on disk, with nothing over 1280 px wide'],
+      ['changed', 'The difficulty section in Filtry got proper sliders, after Jarek asked for better visuals: five fields per axis you can tap or drag a finger across, the active part in brand green, and a caption that says in words what you picked, in the same language as the rating rubric. Tapping the active field again removes the limit. The slider means not harder than; seeking hard places can come later if wanted'],
+      ['fixed', 'One park has no gallery on the ZZM page (Park Leśny Witkowice), so it keeps its previous photo instead of getting nothing'],
+    ],
+  },
   {
     version: '0.95.0',
     date: '2026-08-24',
