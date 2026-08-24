@@ -208,6 +208,142 @@
   margin: 0 0 var(--sp-4);
 }
 
+/*
+ * Chipy filtrów nad listą. Rząd przewija się w bok bez suwaka; aktywny chip
+ * odwraca kolory jak przycisk główny. Zamiennik zakładek, więc trzyma ich
+ * miejsce w pionie (jeden rząd na wystawaniu doku).
+ */
+.app-fchips {
+  display: flex;
+  gap: var(--sp-2);
+  margin: 0 calc(-1 * var(--sp-6)) var(--sp-4);
+  padding: 2px var(--sp-6) 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app-fchips::-webkit-scrollbar {
+  display: none;
+}
+
+.app-fchip {
+  flex: none;
+  padding: 8px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  color: var(--content-default);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.app-fchip.-on {
+  border-color: transparent;
+  background: var(--bg-brand);
+  color: var(--content-on-brand);
+}
+
+.app-fcount {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-3);
+  color: var(--content-subtle);
+}
+
+.app-fclear {
+  padding: 2px 10px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-sunken);
+  color: var(--content-default);
+  font: inherit;
+  font-size: 12px;
+}
+
+.app-fzero {
+  margin: 0 0 var(--sp-3);
+  color: var(--content-subtle);
+}
+
+/* celki D/O w wierszu listy: gęsto, ale czytelnie, mniejszym stopniem */
+.app-dochip {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--content-subtle);
+  white-space: nowrap;
+}
+
+/* blok dwóch osi na karcie miejsca */
+.park-do {
+  display: grid;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 var(--sp-2);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: 20px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken);
+}
+
+.park-do__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.park-do__dots {
+  letter-spacing: 0.14em;
+  color: var(--content-default);
+}
+
+.park-do__hint {
+  margin: 2px 0 0;
+  color: var(--content-subtle);
+}
+
+.park-do__picks {
+  display: flex;
+  gap: 2px;
+}
+
+.park-do__pick {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--content-subtle);
+  font-size: 15px;
+}
+
+.park-do__pick.-on {
+  color: var(--content-default);
+}
+
+.park-do__sentence {
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 12px;
+  background: var(--bg-brand-subtle, rgb(200 235 130 / 0.35));
+  color: var(--content-default);
+}
+
+.park-do__copy {
+  justify-self: start;
+  padding: 8px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-raised);
+  color: var(--content-default);
+  font: inherit;
+  font-size: 13px;
+}
+
 /* trzy kubełki stanu: nagłówek mówi, na co patrzysz, licznik ile tego jest */
 .app-listgroup + .app-listgroup {
   margin-top: var(--sp-6);

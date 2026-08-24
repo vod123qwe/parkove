@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.93.2'
+export const VERSION = '0.94.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.94.0',
+    date: '2026-08-24',
+    title: 'Two difficulty axes and intent chips instead of tabs',
+    tldr:
+      'Dwie osie trudności (Dojście i Odkrywanie) z trybem ocen, celki na liście i karcie, chipy intencji zamiast zakładek.',
+    changes: [
+      ['added', 'Every place can carry two separate ratings, an idea taken from Geocaching: Dojście (the ground under your feet and stroller wheels) and Odkrywanie (how hard the points are to earn), five dots each. The pair says things one number cannot: easy walk plus hard hunt equals a perfect rainy Saturday. The card shows both axes with a level caption and, for telling pairs, a one line hint sentence; the list shows a compact D and O dot pair in each row'],
+      ['added', 'A rating mode, because Jarek rates all 57 places himself: switch it on in O aplikacji, then tap the dots right on a place card. Ratings collect on the phone as a draft and one button copies them as JSON to send back; pasted into the data they become permanent for every device. The draft overrides the shipped data, so a correction made in the field shows up immediately'],
+      ['changed', 'The chips row above the list replaces the Wszystkie, Dolinki, Parki tabs. Kinds are now ordinary chips in one scrollable row together with intents and facets: Dolinki, Parki, Deszczowa sobota, Z wózkiem, Plac zabaw, Lody. One intent sets several conditions at once; Deszczowa sobota means Dojście of two dots or less, a loop under 40 minutes and a car park nearby'],
+      ['added', 'Filters never leave you staring at silence: an active filter shows a live count with a clear button, and an empty result explains itself, including the case where an intent reads Dojście ratings and no place is rated yet'],
+      ['fixed', 'Facets are computed once from data the app already has (amenities, parking, transit, generated loops), so adding a filter is one field in one file, not a change to the list screen'],
+    ],
+  },
   {
     version: '0.93.2',
     date: '2026-08-24',

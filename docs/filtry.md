@@ -49,3 +49,19 @@ więc można je stroić bez wydania.
    pokazać pustkę.
 2. **Filtr to nie wyszukiwarka.** Wyszukiwarka zostaje osobno, nad chipami,
    i działa zawsze na pełnej liście.
+
+## Decyzje z grilla (2026-08-24) i stan wdrożenia
+
+- **Rząd chipów (etap 1, WDROŻONE w 0.94.0):** Dolinki, Parki, ☔ Deszczowa
+  sobota, Z wózkiem, 🛝 Plac zabaw, 🍦 Lody. Rodzaje wykluczają się nawzajem,
+  reszta składa się przez I. Zakładki Wszystkie/Dolinki/Parki zniknęły.
+- **Definicja ☔:** D ≤ 2 + pętla do 40 min + parking. Miejsce bez policzonych
+  tras dostaje zapasowo próg powierzchni ≤ 12 ha (małe parki nie mają tras, a
+  spacer i tak jest krótki).
+- **Z wózkiem:** D = 1 + parking.
+- **Oceny D/O:** Jarek sam, w trybie ocen w apce (docs/oceny-do.md).
+- **Etap 2 (arkusz wszystkich faset)** czeka; po nim podmiana zdjęć ze strony
+  ZZM (wszystkie od razu, plus odświeżenie reszty z Commons), dopiero potem
+  odkrycia pod chmurami i przebudowa revealu.
+- Filtry są sesyjne: świeże otwarcie apki startuje bez aktywnych chipów.
+

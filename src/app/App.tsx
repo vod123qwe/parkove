@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Award, Camera, ChevronRight, CloudOff, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
+import { BottomSheet, Button, List, ListItem, PeekCard, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
 import { SpotCard } from './SpotCard'
@@ -36,6 +36,8 @@ import { RevealSheet } from './RevealSheet'
 import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { hasPack, verifyPack } from './offline'
+import { getDO, dots as doDots, useDOVersion } from './data/difficulty'
+import { facetsFor } from './data/facets'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
 import { useWakeLock } from './wakelock'
@@ -79,6 +81,25 @@ const FEATURES = parksData.features as unknown as ParkFeature[]
  */
 const DOCK_PEEK = 290
 
+/*
+ * Chipy filtrów nad listą (grill 2026-08-24). Zastąpiły zakładki
+ * Wszystkie/Dolinki/Parki: rodzaje miejsc to zwykłe chipy w jednym rzędzie z
+ * intencjami i fasetami, a rząd przewija się w bok.
+ *
+ * "rainy" i "stroller" to INTENCJE: jedna pigułka ustawia kilka warunków
+ * naraz. Definicje siedzą w predykacie niżej i w docs/filtry.md; obie czytają
+ * oceny D z difficulty.ts, więc działają tylko na miejscach już ocenionych.
+ */
+type ChipId = 'dolinki' | 'parki' | 'rainy' | 'stroller' | 'play' | 'icecream'
+const CHIP_DEFS: { id: ChipId; label: string }[] = [
+  { id: 'dolinki', label: 'Dolinki' },
+  { id: 'parki', label: 'Parki' },
+  { id: 'rainy', label: '☔ Deszczowa sobota' },
+  { id: 'stroller', label: 'Z wózkiem' },
+  { id: 'play', label: '🛝 Plac zabaw' },
+  { id: 'icecream', label: '🍦 Lody' },
+]
+
 type PeekPage =
   | { t: 'park' }
   | { t: 'poi'; poi: QuestPoi }
@@ -107,7 +128,21 @@ export function App() {
   const [listWide, setListWide] = useState(false)
   const [listDetent, setListDetent] = useState<'min' | 'auto' | 'full'>('min')
   /** which collection the list shows: everything, the day trips, or the city */
-  const [listTab, setListTab] = useState<'all' | 'dolinki' | 'parki'>('all')
+  const [chips, setChips] = useState<Set<ChipId>>(new Set())
+  const toggleChip = (id: ChipId) =>
+    setChips((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else {
+        // rodzaje wykluczają się nawzajem; oba naraz znaczyłyby "wszystko"
+        if (id === 'dolinki') next.delete('parki')
+        if (id === 'parki') next.delete('dolinki')
+        next.add(id)
+      }
+      return next
+    })
+  /* przerysowanie po każdym kliknięciu kropki w trybie ocen */
+  const doVersion = useDOVersion()
   /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
    * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
@@ -721,8 +756,29 @@ export function App() {
           plain(KIND_META[f.properties.kind]?.label ?? '').includes(needle),
       )
     }
-    return listTab === 'all' ? sortedParks : sortedParks.filter((f) => groupOf(f) === listTab)
-  }, [sortedParks, listTab, needle])
+    if (chips.size === 0) return sortedParks
+    return sortedParks.filter((f) => {
+      const fac = facetsFor(f.id)
+      const sc = getDO(f.id)
+      for (const c of chips) {
+        if (c === 'dolinki' || c === 'parki') {
+          if (groupOf(f) !== c) return false
+        } else if (c === 'play') {
+          if (!fac.playground) return false
+        } else if (c === 'icecream') {
+          if (!fac.food) return false
+        } else if (c === 'stroller') {
+          /* z wózkiem = teren D1 (rubryka: wózek przejedzie) + parking */
+          if (!(sc && sc.d === 1 && fac.parking)) return false
+        } else if (c === 'rainy') {
+          /* Deszczowa sobota = D ≤ 2 + pętla do 40 min + parking (grill) */
+          if (!(sc && sc.d <= 2 && fac.parking && fac.quickLoop)) return false
+        }
+      }
+      return true
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortedParks, chips, needle, doVersion])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -752,15 +808,6 @@ export function App() {
       done: rows.filter((r) => r.done).sort(order),
     }
   }, [shownParks, progress, completedIds, myFix])
-
-  const LIST_TABS = useMemo(
-    () => [
-      { value: 'all' as const, label: 'Wszystkie' },
-      { value: 'dolinki' as const, label: 'Dolinki' },
-      { value: 'parki' as const, label: 'Parki' },
-    ],
-    [],
-  )
 
   return (
     <div
@@ -1095,15 +1142,39 @@ export function App() {
             </button>
           )}
         </label>
-        {/* zakladki nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
+        {/* chipy nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
         {!needle && (
-          <Segmented
-            className="app-listtabs"
-            options={LIST_TABS}
-            value={listTab}
-            onChange={setListTab}
-            aria-label="Rodzaj miejsc"
-          />
+          <div className="app-fchips" role="group" aria-label="Filtry miejsc">
+            {CHIP_DEFS.map((c) => (
+              <button
+                key={c.id}
+                className={`app-fchip pk-press${chips.has(c.id) ? ' -on' : ''}`}
+                aria-pressed={chips.has(c.id)}
+                onClick={() => toggleChip(c.id)}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {!needle && chips.size > 0 && (
+          <p className="t-caption app-fcount">
+            {shownParks.length === 0
+              ? 'Nic nie pasuje.'
+              : `${shownParks.length} ${
+                  shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
+                } pasuje`}
+            <button className="app-fclear" onClick={() => setChips(new Set())}>
+              Wyczyść
+            </button>
+          </p>
+        )}
+        {!needle && chips.size > 0 && shownParks.length === 0 && (
+          <p className="t-caption app-fzero">
+            {(chips.has('rainy') || chips.has('stroller')) && !FEATURES.some((f) => getDO(f.id))
+              ? 'Ten filtr czyta oceny dojścia, a żadne miejsce nie jest jeszcze ocenione. Tryb ocen włączysz w O aplikacji.'
+              : 'Poluzuj któryś chip, najlepiej ostatni włączony.'}
+          </p>
         )}
         {needle && (
           <p className="t-caption app-search__count">
@@ -1143,14 +1214,24 @@ export function App() {
                             ? 'odwiedzone'
                             : 'jeszcze nieodkryte'
                     }
-                    metaExtra={
-                      hasPlay || hasFood ? (
+                    metaExtra={(() => {
+                      const sc = getDO(f.id)
+                      if (!sc && !hasPlay && !hasFood) return undefined
+                      return (
                         <>
                           {hasPlay && <ToyBrick aria-label="plac zabaw" />}
                           {hasFood && <Coffee aria-label="kawa albo jedzenie" />}
+                          {sc && (
+                            <span
+                              className="app-dochip"
+                              aria-label={`dojście ${sc.d} na 5, odkrywanie ${sc.o} na 5`}
+                            >
+                              {'D ' + doDots(sc.d) + ' O ' + doDots(sc.o)}
+                            </span>
+                          )}
                         </>
-                      ) : undefined
-                    }
+                      )
+                    })()}
                     /*
                      * Pogoda zamiast pierscienia postepu. Ten sam powod, co przy
                      * karcie podgladu: postep stoi obok slowami („2 z 5 punktow"),
