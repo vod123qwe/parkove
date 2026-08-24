@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.97.1'
+export const VERSION = '0.97.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.97.2',
+    date: '2026-08-24',
+    title: 'Clouds allowed to lean over the parks',
+    tldr:
+      'Chmury lekko nachodzą na odkryte parki, krawędź okna jest nieregularna per zatoka i bardzo powoli oddycha.',
+    changes: [
+      ['changed', 'The fog edge stopped standing stiffly next to the parks. Every vertex of the window outline now has its own amplitude, plus a slow radial component, so some bays of fog bite deeper into the window while others barely tremble; full breaths take a dozen seconds'],
+      ['changed', 'Clouds may lean over a discovered place: sparse wisps are drawn once more over the windows with a different offset, and each window carries two single puffs resting on its rim, wandering along it very slowly, a full lap in a few minutes'],
+    ],
+  },
   {
     version: '0.97.1',
     date: '2026-08-24',

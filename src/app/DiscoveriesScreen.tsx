@@ -88,6 +88,7 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
       pitchWithRotate: false,
     })
     map.touchZoomRotate.disableRotation()
+    if (import.meta.env.DEV) (window as unknown as { __pkDiscMap?: maplibregl.Map }).__pkDiscMap = map
 
     const visited = new Set(Object.keys(parks))
     const doneSet = new Set(FEATURES.filter((f) => isParkComplete(f.id, parks)).map((f) => f.id))
@@ -203,7 +204,7 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
         ref.x * 0.24 - t * 4.6 + Math.sin(t * 0.07) * 28,
         ref.y * 0.24 + t * 1.7 + Math.cos(t * 0.05) * 18,
       )
-      layer(pats[2], 0.4, ref.x * 0.4 + t * 8.5, ref.y * 0.4 - t * 1.1 + Math.sin(t * 0.11) * 12)
+      layer(pats[2], 0.32, ref.x * 0.4 + t * 8.5, ref.y * 0.4 - t * 1.1 + Math.sin(t * 0.11) * 12)
 
       /*
        * Okna nad odkrytymi mają KSZTAŁT PARKU (uwaga Jarka), lekko nieregularny:
@@ -243,10 +244,22 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
           let first = true
           for (let i = 0; i < ring.length; i += step) {
             const pt = map.project(ring[i] as [number, number])
-            const dx = Math.sin(t * 0.55 + i * 1.7 + wob) * 6
-            const dy = Math.cos(t * 0.45 + i * 2.3 + wob) * 6
-            const x = c.x + (pt.x - c.x) * scale + dx - 4096
-            const y = c.y + (pt.y - c.y) * scale + dy
+            /*
+             * Krawedz celowo nierowna (uwaga Jarka: „za sztywno"): kazdy
+             * wierzcholek ma WLASNA amplitude (pseudolosowa z indeksu), do tego
+             * skladowa wzdluz promienia z wolna, niska czestotliwoscia, wiec
+             * jedne zatoki mgly wchodza glebiej, inne ledwie drza. Ruch jest
+             * powolny: pelne oddechy co kilkanascie sekund.
+             */
+            const amp = 3 + ((i * 37 + wob * 11) % 17)
+            const dx = Math.sin(t * 0.32 + i * 1.3 + wob) * amp
+            const dy = Math.cos(t * 0.27 + i * 2.1 + wob) * amp
+            const bx = pt.x - c.x
+            const by = pt.y - c.y
+            const bl = Math.max(1, Math.hypot(bx, by))
+            const radial = Math.sin(t * 0.14 + i * 0.4 + wob * 0.6) * (5 + ((i * 13) % 9))
+            const x = c.x + bx * scale + (bx / bl) * radial + dx - 4096
+            const y = c.y + by * scale + (by / bl) * radial + dy
             if (first) {
               hctx.moveTo(x, y)
               first = false
@@ -262,6 +275,36 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
       ctx.drawImage(holes, 0, 0)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.globalCompositeOperation = 'source-over'
+
+      /*
+       * Chmury maja prawo LEKKO nachodzic na odkryte (uwaga Jarka: okna byly
+       * za czysto obok chmur). Dwa srodki: rzadkie smugi rysowane jeszcze raz
+       * NAD oknami, z innym przesunieciem niz warstwa pod spodem, oraz po dwa
+       * pojedyncze kleby oparte o krawedz kazdego okna, wedrujace po niej
+       * bardzo wolno (pelne okrazenie w kilka minut).
+       */
+      layer(pats[2], 0.3, ref.x * 0.4 + t * 8.5 + 211, ref.y * 0.4 - t * 1.1 + 97)
+      for (const f of FEATURES) {
+        if (!visited.has(f.id)) continue
+        const c = map.project(f.properties.center as [number, number])
+        const rr = windowRadiusPx(map, f)
+        if (c.x < -rr - 80 || c.y < -rr - 80 || c.x > w + rr + 80 || c.y > h + rr + 80) continue
+        const wob = (f.id.charCodeAt(0) * 7 + f.id.length * 13) % 97
+        for (let k = 0; k < 2; k++) {
+          const ang = wob * 0.7 + k * 2.7 + t * 0.015 * (k === 0 ? 1 : -1)
+          const px = c.x + Math.cos(ang) * rr * 0.92
+          const py = c.y + Math.sin(ang) * rr * 0.78
+          const br = Math.max(14, Math.min(34, rr * 0.22)) * (1 + 0.12 * Math.sin(t * 0.2 + k * 3 + wob))
+          const g = ctx.createRadialGradient(px, py, 0, px, py, br)
+          g.addColorStop(0, 'rgba(250,250,247,0.5)')
+          g.addColorStop(0.7, 'rgba(250,250,247,0.28)')
+          g.addColorStop(1, 'rgba(250,250,247,0)')
+          ctx.fillStyle = g
+          ctx.beginPath()
+          ctx.arc(px, py, br, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      }
 
       /*
        * Kreskowane zarysy ukrytych, NA mgle. Z daleka pokazujemy tylko wieksze
