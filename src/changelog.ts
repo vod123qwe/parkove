@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.94.0'
+export const VERSION = '0.95.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.95.0',
+    date: '2026-08-24',
+    title: 'The full filter sheet behind Więcej',
+    tldr:
+      'Arkusz wszystkich faset pod chipem Więcej: intencje, co na miejscu, progi trudności i nasza kolekcja, z żywym licznikiem.',
+    changes: [
+      ['added', 'The Więcej chip at the end of the row opens a Filtry sheet with four groups: Na dziś (intents), Co na miejscu (playground, food, water, a ring loop, parking), Trudność (thresholds on both axes: any, two dots or less, four dots or more) and Nasza kolekcja (new to us, almost golden, long unseen). Chips in the sheet and chips in the row are the same state, so nothing gets applied or confirmed; the count on the button is live'],
+      ['added', 'Three collection filters that read the game state: Nowe dla nas (never visited), Prawie złote (visited, at most two points short of the stamp) and Dawno nas nie było (no visit for half a year)'],
+      ['added', 'Facets for water places and hand made ring loops, computed from data the app already has. Cały dzień means a big area, a loop over ninety minutes or a demanding pair of ratings'],
+      ['changed', 'The Więcej chip shows a count of active sheet-only filters, and the empty state in both the sheet and the list now also explains the case where a difficulty threshold is set but no place is rated yet'],
+    ],
+  },
   {
     version: '0.94.0',
     date: '2026-08-24',

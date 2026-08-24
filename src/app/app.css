@@ -269,6 +269,45 @@
   color: var(--content-subtle);
 }
 
+/* arkusz Filtry: grupy chipów + progi trudności + stopka */
+.app-fsheet__head {
+  margin: var(--sp-5) 0 var(--sp-2);
+  color: var(--content-subtle);
+  letter-spacing: 0.08em;
+}
+
+.app-fsheet__head:first-child {
+  margin-top: 0;
+}
+
+.app-fsheet__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.app-fsheet__tier {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.app-fsheet__tiername {
+  width: 96px;
+  flex: none;
+}
+
+.app-fsheet__foot {
+  display: flex;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+.app-fchip.-more {
+  border-style: dashed;
+}
+
 /* celki D/O w wierszu listy: gęsto, ale czytelnie, mniejszym stopniem */
 .app-dochip {
   font-size: 10.5px;

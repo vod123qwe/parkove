@@ -60,7 +60,12 @@ więc można je stroić bez wydania.
   spacer i tak jest krótki).
 - **Z wózkiem:** D = 1 + parking.
 - **Oceny D/O:** Jarek sam, w trybie ocen w apce (docs/oceny-do.md).
-- **Etap 2 (arkusz wszystkich faset)** czeka; po nim podmiana zdjęć ze strony
+- **Etap 2 (arkusz wszystkich faset): WDROŻONY w 0.95.0.** Grupy: Na dziś,
+  Co na miejscu, Trudność (progi ≤ ●● i ≥ ●●●● na obu osiach), Nasza kolekcja
+  (Nowe dla nas; Prawie złote = brakuje ≤ 2 punktów; Dawno nas nie było =
+  pół roku bez wizyty). Cały dzień = ≥ 30 ha albo pętla ≥ 90 min albo D+O ≥ 7.
+  Chipy w arkuszu i w rzędzie to ten sam stan; licznik na przycisku żywy.
+  Następne wg kontraktu: podmiana zdjęć ze strony
   ZZM (wszystkie od razu, plus odświeżenie reszty z Commons), dopiero potem
   odkrycia pod chmurami i przebudowa revealu.
 - Filtry są sesyjne: świeże otwarcie apki startuje bez aktywnych chipów.

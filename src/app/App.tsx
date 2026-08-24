@@ -90,8 +90,25 @@ const DOCK_PEEK = 290
  * naraz. Definicje siedzą w predykacie niżej i w docs/filtry.md; obie czytają
  * oceny D z difficulty.ts, więc działają tylko na miejscach już ocenionych.
  */
-type ChipId = 'dolinki' | 'parki' | 'rainy' | 'stroller' | 'play' | 'icecream'
-const CHIP_DEFS: { id: ChipId; label: string }[] = [
+type ChipId =
+  | 'dolinki'
+  | 'parki'
+  | 'rainy'
+  | 'stroller'
+  | 'play'
+  | 'icecream'
+  | 'allday'
+  | 'noauto'
+  | 'water'
+  | 'ringloop'
+  | 'parking'
+  | 'fresh'
+  | 'almostgold'
+  | 'longago'
+/** prog na osi ocen w arkuszu: dowolny, łatwy (≤2), wymagający (≥4) */
+type Tier = 'any' | 'easy' | 'hard'
+type ChipDef = { id: ChipId; label: string }
+const CHIP_DEFS: ChipDef[] = [
   { id: 'dolinki', label: 'Dolinki' },
   { id: 'parki', label: 'Parki' },
   { id: 'rainy', label: '☔ Deszczowa sobota' },
@@ -99,6 +116,32 @@ const CHIP_DEFS: { id: ChipId; label: string }[] = [
   { id: 'play', label: '🛝 Plac zabaw' },
   { id: 'icecream', label: '🍦 Lody' },
 ]
+
+/*
+ * Arkusz „Filtry" (etap 2 z grilla): pełny zestaw w czterech grupach. Chipy z
+ * rzędu powtarzają się w arkuszu, bo to TEN SAM stan; arkusz tylko dokłada
+ * resztę. Definicje intencji: docs/filtry.md.
+ */
+const SHEET_INTENTS: ChipDef[] = [
+  { id: 'rainy', label: '☔ Deszczowa sobota' },
+  { id: 'allday', label: 'Cały dzień' },
+  { id: 'stroller', label: 'Z wózkiem' },
+  { id: 'noauto', label: '🚋 Bez auta' },
+]
+const SHEET_PLACE: ChipDef[] = [
+  { id: 'play', label: '🛝 Plac zabaw' },
+  { id: 'icecream', label: '🍦 Lody i kawa' },
+  { id: 'water', label: '💧 Woda' },
+  { id: 'ringloop', label: 'Pętla wokół' },
+  { id: 'parking', label: '🚗 Parking' },
+]
+const SHEET_COLLECTION: ChipDef[] = [
+  { id: 'fresh', label: 'Nowe dla nas' },
+  { id: 'almostgold', label: 'Prawie złote' },
+  { id: 'longago', label: 'Dawno nas nie było' },
+]
+/** chipy widoczne tylko w arkuszu: liczą się do plakietki na „Więcej" */
+const SHEET_ONLY: ChipId[] = ['allday', 'noauto', 'water', 'ringloop', 'parking', 'fresh', 'almostgold', 'longago']
 
 type PeekPage =
   | { t: 'park' }
@@ -143,6 +186,9 @@ export function App() {
     })
   /* przerysowanie po każdym kliknięciu kropki w trybie ocen */
   const doVersion = useDOVersion()
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [dTier, setDTier] = useState<Tier>('any')
+  const [oTier, setOTier] = useState<Tier>('any')
   /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
    * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
@@ -266,6 +312,15 @@ export function App() {
    * arkusz wraca sam.
    */
   const dockUp = !selected && !expedition
+
+  const sheetExtras =
+    SHEET_ONLY.filter((id) => chips.has(id)).length + (dTier !== 'any' ? 1 : 0) + (oTier !== 'any' ? 1 : 0)
+  const filtersActive = chips.size > 0 || dTier !== 'any' || oTier !== 'any'
+  const clearFilters = () => {
+    setChips(new Set())
+    setDTier('any')
+    setOTier('any')
+  }
 
   /*
    * Rozwiniecie listy jest PROSBA CHWILOWA, nie trybem.
@@ -756,7 +811,7 @@ export function App() {
           plain(KIND_META[f.properties.kind]?.label ?? '').includes(needle),
       )
     }
-    if (chips.size === 0) return sortedParks
+    if (chips.size === 0 && dTier === 'any' && oTier === 'any') return sortedParks
     return sortedParks.filter((f) => {
       const fac = facetsFor(f.id)
       const sc = getDO(f.id)
@@ -773,12 +828,43 @@ export function App() {
         } else if (c === 'rainy') {
           /* Deszczowa sobota = D ≤ 2 + pętla do 40 min + parking (grill) */
           if (!(sc && sc.d <= 2 && fac.parking && fac.quickLoop)) return false
+        } else if (c === 'allday') {
+          /* cały dzień = duży teren, długa pętla albo wysoka para ocen */
+          const big =
+            f.properties.areaHa >= 30 ||
+            (fac.loopMin != null && fac.loopMin >= 90) ||
+            (sc != null && sc.d + sc.o >= 7)
+          if (!big) return false
+        } else if (c === 'noauto') {
+          if (!fac.transit) return false
+        } else if (c === 'water') {
+          if (!fac.water) return false
+        } else if (c === 'ringloop') {
+          if (!fac.ringLoop) return false
+        } else if (c === 'parking') {
+          if (!fac.parking) return false
+        } else if (c === 'fresh') {
+          if (progress[f.id]) return false
+        } else if (c === 'almostgold') {
+          /* zaczęte i blisko: brakuje najwyżej dwóch punktów do kompletu */
+          const p = progress[f.id]
+          const total = pointsTotal(f.id)
+          const earned = questForPark(f.id) ? (p?.points.length ?? 0) : p ? 1 : 0
+          if (!(p && !completedIds.has(f.id) && total > 0 && total - earned <= 2)) return false
+        } else if (c === 'longago') {
+          /* pół roku bez wizyty: miejsce prosi się o powrót */
+          const p = progress[f.id]
+          if (!(p && Date.now() - Date.parse(p.lastAt) > 183 * 86400000)) return false
         }
       }
+      if (dTier === 'easy' && !(sc && sc.d <= 2)) return false
+      if (dTier === 'hard' && !(sc && sc.d >= 4)) return false
+      if (oTier === 'easy' && !(sc && sc.o <= 2)) return false
+      if (oTier === 'hard' && !(sc && sc.o >= 4)) return false
       return true
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortedParks, chips, needle, doVersion])
+  }, [sortedParks, chips, needle, doVersion, dTier, oTier, progress, completedIds])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -1155,23 +1241,30 @@ export function App() {
                 {c.label}
               </button>
             ))}
+            <button
+              className={`app-fchip -more pk-press${sheetExtras > 0 ? ' -on' : ''}`}
+              onClick={() => setFiltersOpen(true)}
+            >
+              {sheetExtras > 0 ? `Więcej · ${sheetExtras}` : 'Więcej ⋯'}
+            </button>
           </div>
         )}
-        {!needle && chips.size > 0 && (
+        {!needle && filtersActive && (
           <p className="t-caption app-fcount">
             {shownParks.length === 0
               ? 'Nic nie pasuje.'
               : `${shownParks.length} ${
                   shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
                 } pasuje`}
-            <button className="app-fclear" onClick={() => setChips(new Set())}>
+            <button className="app-fclear" onClick={clearFilters}>
               Wyczyść
             </button>
           </p>
         )}
-        {!needle && chips.size > 0 && shownParks.length === 0 && (
+        {!needle && filtersActive && shownParks.length === 0 && (
           <p className="t-caption app-fzero">
-            {(chips.has('rainy') || chips.has('stroller')) && !FEATURES.some((f) => getDO(f.id))
+            {(chips.has('rainy') || chips.has('stroller') || dTier !== 'any' || oTier !== 'any') &&
+            !FEATURES.some((f) => getDO(f.id))
               ? 'Ten filtr czyta oceny dojścia, a żadne miejsce nie jest jeszcze ocenione. Tryb ocen włączysz w O aplikacji.'
               : 'Poluzuj któryś chip, najlepiej ostatni włączony.'}
           </p>
@@ -1511,6 +1604,83 @@ export function App() {
         Lista miejsc zostaje tutaj mimo przycisku na mapie, bo w trakcie wyprawy
         ten przycisk nie istnieje i menu jest wtedy jedyna droga.
       */}
+      {/*
+        Arkusz wszystkich faset (etap 2). Chipy tutaj i chipy w rzędzie to TEN
+        SAM stan, więc arkusz niczego nie „zatwierdza": licznik na przycisku
+        żyje, a zamknięcie tylko chowa panel.
+      */}
+      <BottomSheet open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filtry">
+        {(
+          [
+            ['NA DZIŚ', SHEET_INTENTS],
+            ['CO NA MIEJSCU', SHEET_PLACE],
+            ['NASZA KOLEKCJA', SHEET_COLLECTION],
+          ] as const
+        ).map(([head, defs]) => (
+          <div key={head}>
+            <p className="t-caption app-fsheet__head">{head}</p>
+            <div className="app-fsheet__grid">
+              {defs.map((c) => (
+                <button
+                  key={c.id}
+                  className={`app-fchip pk-press${chips.has(c.id) ? ' -on' : ''}`}
+                  aria-pressed={chips.has(c.id)}
+                  onClick={() => toggleChip(c.id)}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+        <p className="t-caption app-fsheet__head">TRUDNOŚĆ</p>
+        {(
+          [
+            ['Dojście', dTier, setDTier],
+            ['Odkrywanie', oTier, setOTier],
+          ] as const
+        ).map(([label, tier, setTier]) => (
+          <div key={label} className="app-fsheet__tier">
+            <span className="t-label app-fsheet__tiername">{label}</span>
+            {(
+              [
+                ['any', 'Dowolne'],
+                ['easy', '≤ ●●'],
+                ['hard', '≥ ●●●●'],
+              ] as const
+            ).map(([val, lab]) => (
+              <button
+                key={val}
+                className={`app-fchip pk-press${tier === val ? ' -on' : ''}`}
+                onClick={() => setTier(val)}
+              >
+                {lab}
+              </button>
+            ))}
+          </div>
+        ))}
+        {filtersActive && shownParks.length === 0 && (
+          <p className="t-caption app-fzero">
+            {(chips.has('rainy') || chips.has('stroller') || dTier !== 'any' || oTier !== 'any') &&
+            !FEATURES.some((f) => getDO(f.id))
+              ? 'Te filtry czytają oceny dojścia i odkrywania, a żadne miejsce nie jest jeszcze ocenione. Tryb ocen włączysz w O aplikacji.'
+              : 'Poluzuj któryś filtr, najlepiej ostatni włączony.'}
+          </p>
+        )}
+        <div className="app-fsheet__foot">
+          <Button variant="ghost" onClick={clearFilters}>
+            Wyczyść
+          </Button>
+          <Button full onClick={() => setFiltersOpen(false)}>
+            {shownParks.length === 0
+              ? 'Nic nie pasuje'
+              : `Pokaż ${shownParks.length} ${
+                  shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
+                }`}
+          </Button>
+        </div>
+      </BottomSheet>
+
       <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
         <p className="t-caption app-menu__head">Ty</p>
         <List className="app-menu">
