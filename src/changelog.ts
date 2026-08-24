@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.99.2'
+export const VERSION = '0.99.3'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.99.3',
+    date: '2026-08-24',
+    title: 'Pins group into clusters',
+    tldr:
+      'Z daleka piny łączą się w kółka z liczbą miejsc; tapnięcie dosuwa mapę, aż grupa się rozpadnie. Małe kropki poszły do kosza.',
+    changes: [
+      ['changed', 'Far away the pins gather into clusters: a dark green circle with a lime count of places inside, with the same light rim the pins wear. When every place in a group is completed, the circle turns stamp gold. Tapping a group eases the map to the zoom where it falls apart'],
+      ['fixed', 'The tiny far-away dots are gone; a lone park keeps its teardrop at any distance, just smaller'],
+    ],
+  },
   {
     version: '0.99.2',
     date: '2026-08-24',

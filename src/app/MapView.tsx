@@ -524,7 +524,8 @@ export function MapView({
       'parks-fill',
       'parks-line',
       'parks-line-shared',
-      'park-dots',
+      'park-clusters',
+      'park-cluster-count',
       'park-pins-layer',
       'park-pins-done',
       'trail-casing',
@@ -655,32 +656,80 @@ export function MapView({
        * pełne piny z ikoną rodzaju. Domknięte miejsca oddają scenę pieczątkom
        * od zoomu 12,5, więc ich pin symbolowy ma na tym progu maxzoom.
        */
+      /*
+       * Z daleka piny sie GRUPUJA (uwaga Jarka: male kropki byly srednie).
+       * Klaster to kolo w jezyku punktow: ciemna zielen, jasna obwodka,
+       * limonkowa liczba miejsc; gdy CALA grupa jest zdobyta, kolo robi sie
+       * zlote jak pieczatka. clusterMaxZoom 10 znaczy: od zoomu 11 kazde
+       * miejsce stoi juz osobno, wiec lezki moga zyc od z11 w dol skali
+       * (mniejsze) zamiast dotychczasowych kropek. Tap w grupe dosuwa mape
+       * do zoomu, na ktorym grupa sie rozpada.
+       */
       map.addSource('park-pins', {
         type: 'geojson',
         data: parkPinFC(parkPinsRef.current, hidePinRef.current, showPinsRef.current) as never,
+        cluster: true,
+        clusterMaxZoom: 10,
+        clusterRadius: 46,
+        clusterProperties: {
+          doneCt: ['+', ['case', ['==', ['get', 'state'], 'done'], 1, 0]],
+        } as never,
       })
       const pinc = pinColors()
+      const allDone = ['==', ['get', 'doneCt'], ['get', 'point_count']]
       map.addLayer({
-        id: 'park-dots',
+        id: 'park-clusters',
         type: 'circle',
         source: 'park-pins',
-        maxzoom: 11.6,
+        filter: ['has', 'point_count'] as never,
         paint: {
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2.6, 11.6, 5.5] as never,
-          'circle-color': ['match', ['get', 'state'], 'done', pinc.gold, pinc.trailFill] as never,
-          'circle-stroke-width': 1.2,
-          'circle-stroke-color': ['match', ['get', 'state'], 'visited', pinc.gold, pinc.paper] as never,
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['get', 'point_count'],
+            2,
+            13,
+            12,
+            19,
+          ] as never,
+          'circle-color': ['case', allDone, pinc.gold, pinc.trailFill] as never,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': pinc.paper,
+        },
+      })
+      map.addLayer({
+        id: 'park-cluster-count',
+        type: 'symbol',
+        source: 'park-pins',
+        filter: ['has', 'point_count'] as never,
+        layout: {
+          'text-field': ['get', 'point_count_abbreviated'] as never,
+          'text-font': ['Noto Sans Bold'],
+          'text-size': 13,
+          'text-allow-overlap': true,
+        },
+        paint: {
+          'text-color': ['case', allDone, pinc.onGold, pinc.trailIcon] as never,
         },
       })
       map.addLayer({
         id: 'park-pins-layer',
         type: 'symbol',
         source: 'park-pins',
-        minzoom: 11.6,
-        filter: ['!=', ['get', 'state'], 'done'] as never,
+        filter: ['all', ['!', ['has', 'point_count']], ['!=', ['get', 'state'], 'done']] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.74, 14, 1.02] as never,
+          'icon-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            9,
+            0.44,
+            11.6,
+            0.74,
+            14,
+            1.02,
+          ] as never,
           'icon-allow-overlap': true,
           'icon-anchor': 'bottom',
         },
@@ -689,12 +738,21 @@ export function MapView({
         id: 'park-pins-done',
         type: 'symbol',
         source: 'park-pins',
-        minzoom: 11.6,
         maxzoom: 12.5,
-        filter: ['==', ['get', 'state'], 'done'] as never,
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'state'], 'done']] as never,
         layout: {
           'icon-image': ['get', 'icon'] as never,
-          'icon-size': ['interpolate', ['linear'], ['zoom'], 11.6, 0.74, 14, 1.02] as never,
+          'icon-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            9,
+            0.44,
+            11.6,
+            0.74,
+            14,
+            1.02,
+          ] as never,
           'icon-allow-overlap': true,
           'icon-anchor': 'bottom',
         },
@@ -1037,7 +1095,19 @@ export function MapView({
         cb.onSelectStamp(String(stamp.properties.parkId))
         return
       }
-      const ppin = hit('park-pins-layer') ?? hit('park-pins-done') ?? hit('park-dots')
+      const clu = hit('park-clusters')
+      if (clu) {
+        const src = map.getSource('park-pins') as unknown as {
+          getClusterExpansionZoom: (id: number) => Promise<number>
+        }
+        const cid = Number(clu.properties?.cluster_id)
+        const at = (clu.geometry as { coordinates: [number, number] }).coordinates
+        void src.getClusterExpansionZoom(cid).then((z) => {
+          map.easeTo({ center: at, zoom: Math.min(z + 0.3, 13), duration: 500 })
+        })
+        return
+      }
+      const ppin = hit('park-pins-layer') ?? hit('park-pins-done')
       if (ppin?.properties?.id) {
         cb.onSelect(String(ppin.properties.id))
         return
@@ -1052,7 +1122,7 @@ export function MapView({
       }
       cb.onClearSelection()
     })
-    for (const layer of ['parks-fill', 'park-pins-layer', 'park-pins-done', 'park-dots', 'quest-poi-hit', 'parking-hit', 'amenity-hit', 'stamp-pin-hit', 'walk-photo-hit']) {
+    for (const layer of ['parks-fill', 'park-pins-layer', 'park-pins-done', 'park-clusters', 'quest-poi-hit', 'parking-hit', 'amenity-hit', 'stamp-pin-hit', 'walk-photo-hit']) {
       map.on('mouseenter', layer, () => {
         map.getCanvas().style.cursor = 'pointer'
       })
