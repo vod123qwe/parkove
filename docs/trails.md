@@ -496,3 +496,37 @@ GOTCHA: przyciski zoomu z animacja (`duration: 220`) zmienialy zoom o
 0,01 poziomu i nic wiecej. Powod: ResizeObserver wola `map.resize()`, a
 resize PRZERYWA animacje easeTo. Zoom przyciskiem jest teraz
 natychmiastowy (`duration: 0`).
+
+### PRAWDZIWA przyczyna blednych pozycji znacznikow (0.105.2)
+
+Jarek trzy razy z rzedu: "punkty sie zle osadzaja", "zmieniaja pozycje po
+scrollu", "przenioslo punkty na inne miejsca". Dwie pierwsze poprawki
+(scale w animacji, scrollZoom) byly prawdziwymi bledami, ale NIE tym
+bledem. Wlasciwa przyczyna wyszla dopiero z pomiaru rozjazdu miedzy
+pozycja znacznika w DOM a `map.project(coords)`:
+
+    Glaz papieski   dx 0  dy 0
+    Ruiny fortu     dx 0  dy 32
+    Pomnik Kuznowicza dx 0 dy 64
+    Trattoria       dx 0  dy 96
+
+Rozjazd rosl DOKLADNIE o 32 px na kazdy kolejny znacznik, czyli o jego
+wlasna wysokosc. To nie blad projekcji, to znaczniki ustawione w kolumnie
+jak zwykle elementy w przeplywie.
+
+Powod: maplibre pozycjonuje znaczniki klasa
+`.maplibregl-marker { position: absolute }`, a nasz `app.css` laduje sie
+PO stylach maplibre, wiec `.tedit__dot { position: relative }` (dodane
+dla ptaszka w narozniku) wygrywalo kolejnoscia przy tej samej
+specyficznosci i odbieralo znacznikom pozycjonowanie absolutne.
+
+Naprawa: zadnej deklaracji `position` w `.tedit__dot`. Ptaszek dziala bez
+niej, bo pozycjonuje sie wzgledem znacznika, ktory absolutny jest od
+maplibre.
+
+LEKCJA: nie deklaruj `position` na elemencie, ktory oddajesz bibliotece
+mapowej jako marker. Jesli potrzebujesz kontekstu pozycjonowania, zrob go
+na elemencie WEWNATRZ.
+
+Kontrola po naprawie: rozjazd 0 px dla wszystkich 13 znacznikow Blon, i
+tak samo po przyblizeniu, oddaleniu, przesunieciu i skoku na zoom 11.

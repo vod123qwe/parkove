@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.105.1'
+export const VERSION = '0.105.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.105.2',
+    date: '2026-08-25',
+    title: 'Editor markers finally sit where they belong',
+    tldr:
+      'Znaczniki w edytorze ustawiały się w kolumnę zamiast na swoich miejscach: jedna linijka CSS odbierała im pozycjonowanie. Teraz trzymają się mapy co do piksela.',
+    changes: [
+      ['fixed', 'The editor markers were stacked in a column instead of standing on their places, which looked like they had wandered off across the city. The offset grew by exactly 32 pixels per marker, its own height: our stylesheet loads after the map library and its position rule was overriding the absolute positioning that markers need. Measured after the fix: zero pixels of drift for all thirteen markers, and the same after zooming, panning and jumping to a wide view'],
+    ],
+  },
   {
     version: '0.105.1',
     date: '2026-08-25',

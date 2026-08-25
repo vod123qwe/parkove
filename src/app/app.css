@@ -6116,7 +6116,20 @@
  * sam kolor tego nie mowil.
  */
 .tedit__dot {
-  position: relative;
+  /*
+   * ZADNEGO position tutaj.
+   *
+   * To byl PRAWDZIWY powod wszystkich skarg o "punkty w zlych miejscach" i
+   * "przemieszczaja sie po scrollu". Maplibre pozycjonuje znacznik klasa
+   * .maplibregl-marker { position: absolute }, a nasz app.css laduje sie
+   * pozniej, wiec .tedit__dot { position: relative } wygrywalo kolejnoscia i
+   * znaczniki stawaly sie elementami w normalnym przeplywie: ukladaly sie w
+   * kolumne co 32 px (dokladnie wysokosc znacznika) i nie mialy nic wspolnego
+   * z mapa. Pomiar to pokazal wprost: rozjazd 0, 32, 64, 96, 128 px.
+   *
+   * Ptaszek w narozniku i tak dziala, bo pozycjonuje sie wzgledem znacznika,
+   * ktory ma position: absolute od maplibre.
+   */
   display: grid;
   place-items: center;
   width: 32px;
