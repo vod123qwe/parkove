@@ -312,3 +312,70 @@ piec dolinek +wariant.
 Karta trasy: `shape()` w TrailModal czyta NAZWE, nie tylko domkniecie linii.
 Obejscie zawsze wraca na start, wiec sama geometria nie odrozni petli od
 spaceru; nazwe nadaje generator z miary zawracania.
+
+---
+
+## System v3: pokrycie, landmarki, warianty w kategoriach (2026-08-25, 0.103.0)
+
+Jarek: "wiele z nich to taka krotka sciezka, ktora idzie prosto i omija 80%
+parku (...) jedna to powinna byc jakas fajna petla pelna, inne jakies
+krotsze (...) sciezka po parku Bednarskiego dobrze to pokazuje, tam mozna
+byloby zrobic kolko wokol parku".
+
+### Trzecia miara: POKRYCIE
+
+`coverage(feature, line)`: siatka 30 m wewnatrz obrysu, komorka zaliczona,
+gdy trasa przechodzi blizej niz 60 m. Pomiar calego katalogu przed zmiana:
+srednie najlepsze pokrycie 56%, ponizej 50% bylo 24 z 44 miejsc. Trasy
+liczone z obrysu mialy 87 do 100%, trasy przez punkty 12 do 43%. Wartosc
+ladzie w danych (pole `cov`) i na pigulce karty ("81% parku").
+
+### Obwod wewnetrzny
+
+`perimeterVia`: obrys probkowany co 120 m, kazdy punkt cofniety 35 m DO
+WNETRZA, snapowany do sciezki, odrzucony gdy snap wypadl poza obrysem.
+
+Cofniecie jest cala roznica. Bez niego snap lapie chodnik za plotem:
+Bednarskiego dostawal wtedy trase o pokryciu 72%, z ktorej tylko 27%
+dlugosci lezalo w parku (kolko ulicami wokol Krzemionek). Z cofnieciem:
+94-96% pokrycia, 100% w obrysie.
+
+Pomiar na trzech parkach (zamowienie Jarka: najpierw pokaz):
+
+| park          | pokrycie przed | po  | trasa                     |
+|---------------|----------------|-----|---------------------------|
+| bednarskiego  | 43%            | 94% | kolko 1156 m              |
+| park-jordana  | 27%            | 81% | petla 2462 m, zawraca 18% |
+| zakrzowek     | 28%            | 56% | petla 4129 m              |
+
+### Landmarki
+
+`landmarks(parkId)`: Overpass w obrysie po `natural=water`, `leisure=pond`,
+`tourism=viewpoint`, `leisure=playground`, `out center`. Sluza jako DRUGI
+WARIANT duzej petli ("Przez stawy i placyki"), nie podmieniaja obwodowego,
+bo landmark w slepym zaulku wydluza trase i podnosi zawracanie.
+
+GOTCHA: w parku Jordana OSM zna tylko "Fontanne do zabawy dla dzieci".
+Stawu, o ktory pytal Jarek, w OSM NIE MA (najblizsza woda to sadzawka
+500 m dalej, juz w Parku Krakowskim). Jesli staw jest realny, trzeba go
+dopisac recznie; automat go nie wyczaruje.
+
+### Trzy kategorie, warianty do przeklikania
+
+Generator nadaje `role` ('petla' | 'punkty' | 'przejscie') i `variant`
+(krotka etykieta: Obwodem, Przez stawy i placyki, Skrotem przez srodek,
+Krotsza runda, Brzegiem). Petla moze miec DWA warianty, jesli roznia sie
+o wiecej niz 12% dlugosci albo 8 pp pokrycia; limit to 4 wiersze.
+
+Progi roli duzej petli: pokrycie >= 40%, w obrysie >= 60%, zawracanie
+< 65%, dlugosc >= MIN_M. Tolerancja zawracania jest tu wyzsza niz kiedys
+(65% zamiast 40%), bo w parku na zboczu alejki sie rozwidlaja: kolko
+Bednarskiego zawraca w 49% i mimo to pokazuje 94% terenu.
+
+UI (TrailModal): sekcje PETLE PO PARKU / PRZEZ PUNKTY WYPRAWY / PRZEJSCIE
+/ SZLAKI ZNAKOWANE / TWOJE UKLADY, w sekcji rzad pigulek wariantow i jedna
+karta. `roleOf()` wnioskuje role z id dla danych liczonych przed ta zmiana.
+
+DO ZROBIENIA: przelot nad reszta katalogu (41 miejsc, 25-35 min) oraz
+edycja trasy przez dodanie punktu RECZNIE NA MAPIE (dzis kreator przyjmuje
+tylko predefiniowane punkty i parkingi).

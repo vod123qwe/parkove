@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.102.0'
+export const VERSION = '0.103.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.103.0',
+    date: '2026-08-25',
+    title: 'Trails that actually show the park',
+    tldr:
+      'Nowy system ścieżek: kategorie z wariantami do przeklikania i miara pokrycia parku. Bednarskiego dostał kółko pokazujące 94% terenu zamiast 43%.',
+    changes: [
+      ['added', 'Trails are measured by how much of the park they actually show: a 30 metre grid inside the boundary, a cell counted when the route passes within 60 metres. The number sits on the card as "81% parku". Across the catalogue the old best routes averaged 56 percent, and 24 of 44 places were under half'],
+      ['added', 'A new generator walks the boundary from the inside: sampled every 120 metres, each point pulled 35 metres inward before snapping to a path. That inward pull is the whole trick, without it the route follows the pavement behind the fence. Bednarskiego went from showing 43 percent of the park to 94, Jordana from 27 to 81, Zakrówek from 28 to 56'],
+      ['added', 'The trail screen now has categories: loops, through the quest points, crossings, marked trails and your own. A category with more than one variant shows a row of pills, so you flick between "Obwodem" and "Przez stawy i placyki" instead of scrolling four maps'],
+      ['added', 'Ponds, viewpoints and playgrounds come from OpenStreetMap as landmarks and earn their own loop variant that passes them. Jordana gained one that visits the fountain and all three playgrounds'],
+      ['changed', 'The place tabs became a proper segmented picker: the indicator slides between segments. They also stopped pretending to be filters, so there is no count and no Clear next to them; those belong to the filter button'],
+    ],
+  },
   {
     version: '0.102.0',
     date: '2026-08-25',

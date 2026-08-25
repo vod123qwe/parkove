@@ -50,8 +50,51 @@ function shape(t: Trail): 'pętla' | 'spacer' | 'przejście' {
   return isLoop(t) ? 'pętla' : 'przejście'
 }
 
+/*
+ * Kategorie wyboru. Kolejnosc jest odpowiedzia na "co dzis robimy": najpierw
+ * petle (pokazuja park), potem zbieranie punktow (mechanika gry), potem
+ * przejscie, szlaki z terenu i wlasne uklady.
+ */
+/*
+ * Rola trasy, ktora moze jej brakowac: dane liczone przed 2026-08-25 nie maja
+ * pola role, a caly katalog przeliczymy dopiero przelotem. Do tego czasu
+ * wnioskujemy role z identyfikatora, zeby kategorie nie klamaly.
+ */
+function roleOf(t: Trail): string {
+  if (t.role) return t.role
+  if (t.kind === 'osm') return 'osm'
+  if (t.id.startsWith('my-')) return 'mine'
+  if (t.id === 'przez-park') return 'przejscie'
+  if (t.id.startsWith('petla') || t.id.startsWith('wokol')) return 'petla'
+  return 'punkty'
+}
+
+const GROUPS: Array<{ key: string; label: string; pick: (all: Trail[]) => Trail[] }> = [
+  { key: 'petla', label: 'PĘTLE PO PARKU', pick: (all) => all.filter((t) => roleOf(t) === 'petla') },
+  {
+    key: 'punkty',
+    label: 'PRZEZ PUNKTY WYPRAWY',
+    pick: (all) => all.filter((t) => roleOf(t) === 'punkty'),
+  },
+  { key: 'przejscie', label: 'PRZEJŚCIE', pick: (all) => all.filter((t) => roleOf(t) === 'przejscie') },
+  { key: 'osm', label: 'SZLAKI ZNAKOWANE', pick: (all) => all.filter((t) => roleOf(t) === 'osm') },
+  { key: 'mine', label: 'TWOJE UKŁADY', pick: (all) => all.filter((t) => roleOf(t) === 'mine') },
+]
+
+/** krotka etykieta na pigulke wariantu, gdy generator nie dal nazwy */
+function shortName(t: Trail) {
+  if (t.colour) return COLOUR_PL[t.colour] ?? t.name
+  return t.name.replace(/^Pętla |^Trasa |^Spacer /, '')
+}
+
 function pillsFor(t: Trail) {
   const out = [formatDistance(t.m), `${t.min} min`]
+  /*
+   * Pokrycie na pigulce, bo to jedyna liczba, ktora odpowiada na pytanie
+   * "czy zobaczymy park, czy przejdziemy skrajem" (Jarek 2026-08-25). Miara
+   * i progi: docs/trails.md.
+   */
+  if (t.cov != null && t.cov >= 25) out.push(`${t.cov}% parku`)
   if (t.kind === 'points' && t.stops?.length) out.push(`${t.stops.length} ${plPunkty(t.stops.length)}`)
   if (t.kind === 'osm') out.push('znakowany')
   return out
@@ -102,6 +145,11 @@ export function TrailModal({
     return out
   }, [parkId])
 
+  /*
+   * Ktory wariant pokazuje kategoria. Wybor jest lokalny dla ekranu: dopiero
+   * dotkniecie karty zapisuje trase na wyprawe.
+   */
+  const [variantAt, setVariantAt] = useState<Record<string, number>>({})
   const [picking, setPicking] = useState(false)
   const [picked, setPicked] = useState<Set<string>>(new Set())
   const [busy, setBusy] = useState(false)
@@ -162,6 +210,87 @@ export function TrailModal({
     setPicked(new Set())
     setPicking(false)
     chooseTrail(parkId, out.trail.id)
+  }
+
+  /* jeden wiersz trasy: mapka, nazwa, pigulki, akcje. Wspolny dla kategorii */
+  const renderRow = (t: Trail) => {
+    const on = chosenId === t.id
+    const own = t.id.startsWith('my-')
+    const ink = t.colour ? TRAIL_INK[t.colour] : undefined
+    const row = (
+      <PlaceRow
+        key={t.id}
+        icon={on ? <Check size={16} /> : t.kind === 'osm' ? <Signpost size={16} /> : <Footprints size={16} />}
+        map={
+          <TileMap
+            parkId={parkId}
+            line={t.line}
+            ink={ink}
+            height={148}
+            caption={
+              t.kind === 'osm'
+                ? `odcinek w granicach miejsca, ${formatDistance(t.m)}`
+                : `${shape(t)}, ${formatDistance(t.m)}`
+            }
+          />
+        }
+        title={t.name}
+        pills={own ? [...pillsFor(t), 'moja'] : pillsFor(t)}
+        note={
+          t.kind === 'osm'
+            ? t.note
+            : own
+              ? t.note
+              : shape(t) === 'pętla'
+                ? 'Pętla: kończy się tam, gdzie się zaczęła.'
+                : shape(t) === 'spacer'
+                  ? 'Wraca na start, ale część drogi pokonasz dwa razy.'
+                  : 'Przejście przez park, bez powrotu na start.'
+        }
+        selected={on}
+        onClick={() => {
+          chooseTrail(parkId, t.id)
+          onClose()
+        }}
+      />
+    )
+    /*
+     * Akcje obok wiersza, bo PlaceRow nie ma slotu: własna trasa ma kosz, a
+     * gotowa trasa punktowa ma ołówek (Jarek: "albo wziąć ją i edytować,
+     * dodając ręcznie punkt"). Ołówek wsypuje przystanki do kreatora.
+     */
+    const editable = !own && t.kind === 'points' && (t.stops?.length ?? 0) >= 2
+    if (!own && !editable) return row
+    return (
+      <div className="mytrail__row" key={t.id}>
+        {row}
+        {own ? (
+          <button
+            className="mytrail__drop pk-press"
+            aria-label="Usuń moją trasę"
+            onClick={() => {
+              dropMyTrail(parkId, t.id)
+              setMine(myTrailsFor(parkId))
+            }}
+          >
+            <Trash2 size={16} />
+          </button>
+        ) : (
+          <button
+            className="mytrail__drop pk-press"
+            aria-label={`Edytuj trasę ${t.name} w kreatorze`}
+            onClick={() => {
+              setPicked(new Set(t.stops ?? []))
+              setPicking(true)
+              setProblem(null)
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+          >
+            <Pencil size={16} />
+          </button>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -265,89 +394,43 @@ export function TrailModal({
         </div>
       )}
 
-      <div className="app-placelist">
-        {trails.map((t) => {
-          const on = chosenId === t.id
-          const own = t.id.startsWith('my-')
-          const ink = t.colour ? TRAIL_INK[t.colour] : undefined
-          const row = (
-            <PlaceRow
-              key={t.id}
-              icon={on ? <Check size={16} /> : t.kind === 'osm' ? <Signpost size={16} /> : <Footprints size={16} />}
-              map={
-                <TileMap
-                  parkId={parkId}
-                  line={t.line}
-                  ink={ink}
-                  height={148}
-                  caption={
-                    t.kind === 'osm'
-                      ? `odcinek w granicach miejsca, ${formatDistance(t.m)}`
-                      : `${shape(t)}, ${formatDistance(t.m)}`
-                  }
-                />
-              }
-              title={t.name}
-              pills={own ? [...pillsFor(t), 'moja'] : pillsFor(t)}
-              note={
-                t.kind === 'osm'
-                  ? t.note
-                  : own
-                    ? t.note
-                    : shape(t) === 'pętla'
-                      ? 'Pętla: kończy się tam, gdzie się zaczęła.'
-                      : shape(t) === 'spacer'
-                        ? 'Wraca na start, ale część drogi pokonasz dwa razy.'
-                        : 'Przejście przez park, bez powrotu na start.'
-              }
-              selected={on}
-              onClick={() => {
-                chooseTrail(parkId, t.id)
-                onClose()
-              }}
-            />
-          )
-          /*
-           * Akcje obok wiersza, bo PlaceRow nie ma slotu: własna trasa ma kosz,
-           * a gotowa trasa punktowa ma ołówek (uwaga Jarka: "żebym mógł
-           * edytować ścieżkę wybraną i np. dodać ręcznie parking").
-           * Ołówek wsypuje przystanki trasy do kreatora; tam dokładasz
-           * parking albo cokolwiek i układasz własną wersję.
-           */
-          const editable = !own && t.kind === 'points' && (t.stops?.length ?? 0) >= 2
-          if (!own && !editable) return row
-          return (
-            <div className="mytrail__row" key={t.id}>
-              {row}
-              {own ? (
-                <button
-                  className="mytrail__drop pk-press"
-                  aria-label="Usuń moją trasę"
-                  onClick={() => {
-                    dropMyTrail(parkId, t.id)
-                    setMine(myTrailsFor(parkId))
-                  }}
-                >
-                  <Trash2 size={16} />
-                </button>
-              ) : (
-                <button
-                  className="mytrail__drop pk-press"
-                  aria-label={`Edytuj trasę ${t.name} w kreatorze`}
-                  onClick={() => {
-                    setPicked(new Set(t.stops ?? []))
-                    setPicking(true)
-                    setProblem(null)
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                  }}
-                >
-                  <Pencil size={16} />
-                </button>
-              )}
-            </div>
-          )
-        })}
-      </div>
+      {/*
+        KATEGORIE, nie jedna dluga lista (Jarek 2026-08-25: "sekcja sciezki
+        moze sie dzielic na takie kategorie i moge wewnatrz nich wybrac
+        jedna"). W kategorii z kilkoma wariantami stoi rzad pigulek, a karta
+        pokazuje wybrany: porownanie jest przeklikaniem, nie przewijaniem
+        czterech mapek pod sobą.
+      */}
+      {GROUPS.map((g) => {
+        const items = g.pick(trails)
+        if (!items.length) return null
+        const idx = Math.min(variantAt[g.key] ?? 0, items.length - 1)
+        const shown = items[idx]
+        return (
+          <section key={g.key} className="trailgroup">
+            <p className="t-caption trailgroup__head">
+              {g.label}
+              {items.length > 1 && <span className="trailgroup__count">{items.length}</span>}
+            </p>
+            {items.length > 1 && (
+              <div className="trailgroup__variants" role="group" aria-label={`Warianty: ${g.label}`}>
+                {items.map((t, i) => (
+                  <button
+                    key={t.id}
+                    className={`trailgroup__variant pk-press${i === idx ? ' -on' : ''}`}
+                    aria-pressed={i === idx}
+                    onClick={() => setVariantAt((was) => ({ ...was, [g.key]: i }))}
+                  >
+                    {t.variant ?? shortName(t)}
+                  </button>
+                ))}
+              </div>
+            )}
+            {renderRow(shown)}
+          </section>
+        )
+      })}
+
       {trails.some((t) => t.colour) && (
         <p className="t-caption park-credits">
           Kolory szlaków i ich przebieg z OpenStreetMap. W terenie szukaj znaku w kolorze:{' '}

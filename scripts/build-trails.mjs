@@ -247,6 +247,49 @@ function backtrack(line) {
   return total > 0 ? twice / total : 1
 }
 
+/**
+ * POKRYCIE: ile parku trasa naprawde pokazuje.
+ *
+ * Trzecia miara jakosci, obok zawracania i udzialu w obrysie, i az do
+ * 2026-08-25 jej brakowalo. Bez niej generator nie wiedzial, ze trasa mija
+ * 80% terenu: Jarek zobaczyl to golym okiem ("krotka sciezka, ktora idzie
+ * prosto i omija 80% parku"), a pomiar to potwierdzil. Trasy liczone z
+ * obrysu mialy 87 do 100% pokrycia, trasy przez punkty 12 do 43%.
+ *
+ * Metoda: siatka 30 m wewnatrz obrysu, komorka zaliczona, gdy trasa
+ * przechodzi blizej niz 60 m (tyle widzisz w parku, nie wiecej).
+ */
+function coverage(feature, line) {
+  const rs = feature.geometry.type === 'Polygon'
+    ? feature.geometry.coordinates
+    : feature.geometry.coordinates.flat()
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const ring of rs)
+    for (const c of ring) {
+      minX = Math.min(minX, c[0]); maxX = Math.max(maxX, c[0])
+      minY = Math.min(minY, c[1]); maxY = Math.max(maxY, c[1])
+    }
+  const stepY = 30 / 111300
+  const stepX = 30 / (111300 * Math.cos(rad((minY + maxY) / 2)))
+  let cells = 0
+  let seen = 0
+  for (let y = minY; y <= maxY; y += stepY)
+    for (let x = minX; x <= maxX; x += stepX) {
+      if (!inPolygon([x, y], rs)) continue
+      cells++
+      for (const c of line)
+        if (dist([x, y], c) < 60) { seen++; break }
+    }
+  return cells ? seen / cells : 1
+}
+
+/** udzial dlugosci trasy wewnatrz obrysu miejsca */
+function insideShare(parkId, line) {
+  const rs = ringsFor(parkId)
+  if (!rs) return 1
+  return line.filter((c) => inPolygon(c, rs)).length / line.length
+}
+
 /** najblizszy punkt sieci pieszej: OSRM sam mowi, gdzie jest sciezka */
 async function snapToPath(pt) {
   try {
@@ -265,6 +308,48 @@ async function snapToPath(pt) {
 }
 
 /**
+ * OBWOD WEWNETRZNY: punkty kierunkowe z calego obrysu, cofniete do srodka.
+ *
+ * Rozni sie od compassVia jednym, ale decydujacym szczegolem. compassVia
+ * bierze szesc kierunkow z centroidu, wiec w parku o pokrecony ksztalcie
+ * wycina srodek. Tutaj idziemy PO OBRYSIE, co 120 m, wiec trasa musi objechac
+ * miejsce dookola.
+ *
+ * Cofniecie o 35 m do wnetrza jest tu cala roznica i widac to w pomiarze.
+ * Bez niego snap lapie CHODNIK ZA PLOTEM: Park Bednarskiego dostawal wtedy
+ * trase o pokryciu 72%, z ktorej tylko 27% dlugosci leżalo w parku (kolko
+ * ulicami wokol Krzemionek). Z cofnieciem: pokrycie 96%, w obrysie 100%,
+ * czyli kolko alejkami w srodku, dokladnie to, o co prosil Jarek.
+ *
+ * Kandydat, ktorego snap wypadl poza obrysem, leci: sciezka poza parkiem nie
+ * jest sciezka parku.
+ */
+async function perimeterVia(feature, parkId, step = 120, inset = 35, maxAway = 70) {
+  const rs = ringsFor(parkId)
+  const c = feature.properties?.center
+  if (!rs || !c) return null
+  const outer = rs.reduce((a, b) => (b.length > a.length ? b : a), rs[0])
+  const pts = []
+  let acc = step
+  for (let i = 1; i < outer.length; i++) {
+    acc += dist(outer[i - 1], outer[i])
+    if (acc >= step) { pts.push(outer[i]); acc = 0 }
+  }
+  const via = []
+  for (const pt of pts) {
+    const d = Math.max(1, dist(pt, c))
+    const k = Math.min(0.45, inset / d)
+    const inner = [pt[0] + (c[0] - pt[0]) * k, pt[1] + (c[1] - pt[1]) * k]
+    const snap = await snapToPath(inner)
+    if (!snap || snap.away > maxAway) continue
+    if (!inPolygon(snap.at, rs)) continue
+    const last = via[via.length - 1]
+    if (!last || dist(last, snap.at) > 60) via.push(snap.at)
+  }
+  return via.length >= 4 ? via : null
+}
+
+/**
  * Punkty kierunkowe z OBRYSU miejsca, PRZYKLEJONE do ścieżek.
  *
  * Sześć kierunków, każdy cofnięty do 75% drogi od środka do krawędzi, i każdy
@@ -276,7 +361,7 @@ async function snapToPath(pt) {
  * Kandydat, do którego najbliższa ścieżka jest dalej niż 150 m, wypada: nie ma
  * sensu ciągnąć tam trasy tylko po to, żeby kółko było okrągłe.
  */
-async function compassVia(feature) {
+async function compassVia(feature, reach = 0.75) {
   const c = feature.properties?.center
   const rings = feature.geometry?.coordinates
   if (!c || !rings) return null
@@ -295,7 +380,7 @@ async function compassVia(feature) {
       }
     }
     if (!best) continue
-    const raw = [c[0] + (best[0] - c[0]) * 0.75, c[1] + (best[1] - c[1]) * 0.75]
+    const raw = [c[0] + (best[0] - c[0]) * reach, c[1] + (best[1] - c[1]) * reach]
     const snap = await snapToPath(raw)
     if (snap && snap.away <= 150) via.push(snap.at)
   }
@@ -359,6 +444,61 @@ async function loopThrough(start, pois) {
     stops: order,
     line: thin(r.trip.geometry.coordinates),
   }
+}
+
+/* ---------- landmarki: co w parku warto minac ---------- */
+
+/*
+ * Rzeczy, ktore trasa POWINNA minac, choc nie sa punktami wyprawy.
+ *
+ * Jarek o parku Jordana: "nie dodales tam np. tego stawu". I slusznie: staw
+ * jest w parku, widac go z alejki, a w naszych danych nie istnial, wiec
+ * router nie mial powodu tam skrecac. Punkty wyprawy to tresc gry, a landmarki
+ * to KRAJOBRAZ: woda, punkt widokowy, plac zabaw. Bierzemy je z OSM, bo to
+ * jedyne zrodlo, ktore je zna dla wszystkich 47 miejsc naraz.
+ *
+ * Uzycie: dodatkowy WARIANT duzej petli, ktory ma je na trasie. Nie
+ * podmieniamy wariantu obwodowego, bo landmark w slepym zaulku wydluza trase
+ * i podnosi zawracanie; niech oba stana obok siebie do przeklikania.
+ */
+async function landmarks(parkId) {
+  const poly = polyFor(parkId)
+  if (!poly) return []
+  const q = `[out:json][timeout:25];
+(
+  way["natural"="water"](poly:"${poly}");
+  relation["natural"="water"](poly:"${poly}");
+  way["leisure"="pond"](poly:"${poly}");
+  node["tourism"="viewpoint"](poly:"${poly}");
+  way["leisure"="playground"](poly:"${poly}");
+);
+out center 40;`
+  const data = await overpass(q)
+  if (!data?.elements?.length) return []
+  const rings = ringsFor(parkId)
+  const out = []
+  for (const el of data.elements) {
+    const at = el.center ? [el.center.lon, el.center.lat] : el.lon != null ? [el.lon, el.lat] : null
+    if (!at) continue
+    if (rings && !inPolygon(at, rings)) continue
+    const kind =
+      el.tags?.natural === 'water' || el.tags?.leisure === 'pond'
+        ? 'woda'
+        : el.tags?.tourism === 'viewpoint'
+          ? 'widok'
+          : 'plac zabaw'
+    /* jeden landmark na okolice: dwa stawy 30 m od siebie to jeden przystanek */
+    if (out.some((o) => dist(o.at, at) < 90)) continue
+    out.push({ at, kind, name: el.tags?.name ?? null })
+  }
+  return out
+}
+
+/** ile landmarkow trasa naprawde mija (blizej niz 80 m) */
+function landmarksHit(line, marks) {
+  let n = 0
+  for (const m of marks) if (line.some((c) => dist(c, m.at) < 80)) n++
+  return n
 }
 
 /* ---------- szlaki znakowane z OSM ---------- */
@@ -602,146 +742,259 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
    * Pętla ułożona ręcznie idzie PIERWSZA, bo jest lepszą propozycją niż wynik
    * optymalizacji: prowadzi brzegiem i mija po drodze to, po co się tu przyszło.
    */
+  /*
+   * TRZY ROLE, nie jedna "najlepsza trasa" (decyzja Jarka 2026-08-25).
+   *
+   * Powod jest zmierzony. Stary uklad wybieral trase porownawczo ("czy lepsza
+   * niz tamta"), wiec dobre kolka wypadaly: Park Bednarskiego mial trase przez
+   * punkty pokazujaca 43% terenu, a jego obejscie parku (96% terenu) bylo
+   * odrzucane, bo zawracalo w 49%. Jarek: "jedna to powinna byc jakas fajna
+   * petla pelna, inne jakies krotsze (...) czasem wiekszy obszar jest dobrze
+   * przejsc i zobaczyc".
+   *
+   * Teraz kazde miejsce moze dostac do trzech tras, kazda odpowiada na inne
+   * pytanie, i kazda ma WLASNE progi zamiast konkursu miedzy nimi:
+   *
+   *   1. duze kolko        - maksymalne POKRYCIE parku, cale w srodku,
+   *   2. krotsza petla     - 40 do 65% dlugosci duzego, na godzine,
+   *   3. trasa po punktach - mechanika gry, zawsze gdy przekroczy prog.
+   *
+   * Pokrycie (funkcja coverage) jest tu pierwsza miara jakosci. Zawracanie
+   * zeszlo do roli nazwy: ponizej 40% mowimy "petla", wyzej "spacer", bo w
+   * parku na zboczu kolko z odnogami to nadal dobra trasa.
+   */
+  const cov = (line) => (feature ? coverage(feature, line) : 0)
+  const say = (label, r, extra = '') =>
+    console.log(
+      `  ${label}: ${
+        r
+          ? `${r.m} m, pokrycie ${Math.round(cov(r.line) * 100)}%, zawracanie ${Math.round(
+              backtrack(r.line) * 100,
+            )}%, w obrysie ${Math.round(insideShare(parkId, r.line) * 100)}%, mija ${r.stops.length}`
+          : 'brak'
+      }${extra}`,
+    )
+
+  /* ---------- kandydaci ---------- */
   const ring = RINGS[parkId]
+  let handRing = null
   if (ring) {
-    const r = await ringThrough(start, pois, ring)
-    if (r) {
-      trails.push({ id: ring.id, name: ring.name, kind: 'points', ...r })
-      console.log(`  ${ring.id}: ${r.m} m, mija ${r.stops.length} punktów (${r.stops.join(', ')})`)
-    }
+    handRing = await ringThrough(start, pois, ring)
+    say(ring.id, handRing)
   }
 
   const full = await loopThrough(start, pois)
+  say('punkty-wszystkie', full)
+
+  /*
+   * Duze kolko: dwa zrodla punktow kierunkowych, bierzemy lepsze pokrycie.
+   * Obwod wewnetrzny wygrywa w parkach o pokrecony ksztalcie, compassVia w
+   * zwartych, gdzie szesc kierunkow wystarcza i jest taniej o kilka zapytan.
+   */
+  const marks = ring || !feature ? [] : await landmarks(parkId)
+  if (marks.length) console.log(`  landmarki: ${marks.map((m) => m.name ?? m.kind).join(', ')}`)
+
+  const bigCandidates = []
+  if (!ring && feature) {
+    const perim = await perimeterVia(feature, parkId)
+    if (perim) {
+      const r = await ringThrough(start, pois, { via: perim, stopWithin: 90 })
+      if (r) {
+        say('obwod', r)
+        bigCandidates.push({ src: 'obwod', label: 'Obwodem', r })
+      }
+      /*
+       * Wariant z landmarkami: te same punkty obwodu plus woda, widok i placyk
+       * wpleciony w kolejnosc po najblizszym sasiedztwie. Robimy go tylko, gdy
+       * obwod naprawde je mija (inaczej nie ma czego dokladac).
+       */
+      const missed = marks.filter((m) => !bigCandidates[0]?.r.line.some((c) => dist(c, m.at) < 80))
+      if (missed.length) {
+        const withMarks = []
+        for (const v of perim) {
+          withMarks.push(v)
+          for (const m of missed)
+            if (dist(v, m.at) < 320 && !withMarks.some((w) => dist(w, m.at) < 40)) {
+              const snap = await snapToPath(m.at)
+              if (snap && snap.away <= 90) withMarks.push(snap.at)
+            }
+        }
+        if (withMarks.length > perim.length) {
+          const r2 = await ringThrough(start, pois, { via: withMarks, stopWithin: 90 })
+          if (r2) {
+            say('obwod+landmarki', r2, `  (mija ${landmarksHit(r2.line, marks)} z ${marks.length})`)
+            bigCandidates.push({ src: 'obwod+landmarki', label: 'Przez stawy i placyki', r: r2 })
+          }
+        }
+      }
+    }
+    const compass = await compassVia(feature)
+    if (compass) {
+      const r = await ringThrough(start, pois, { via: compass, stopWithin: 90 })
+      if (r) {
+        say('kompas', r)
+        bigCandidates.push({ src: 'kompas', label: 'Skrótem przez środek', r })
+      }
+    }
+  }
+
+  /* ---------- rola 1: duze kolko ---------- */
+  const water = feature?.properties?.kind === 'water'
+  let big = null
+  if (handRing) {
+    trails.push({
+      id: ring.id,
+      role: 'petla',
+      variant: 'Brzegiem',
+      name: ring.name,
+      kind: 'points',
+      cov: Math.round(cov(handRing.line) * 100),
+      ...handRing,
+    })
+    big = handRing
+  } else {
+    const scored = bigCandidates
+      .map((c) => ({
+        ...c,
+        cover: cov(c.r.line),
+        back: backtrack(c.r.line),
+        inside: insideShare(parkId, c.r.line),
+      }))
+      /*
+       * Progi roli, nie konkursu. Pokrycie 40% to minimum, ktore odroznia
+       * "obeszlismy park" od "przeszlismy skrajem"; obrys 60%, bo kolko po
+       * parku ma byc w parku; zawracanie 65%, bo w parku na zboczu alejki sie
+       * rozwidlaja i czesc drogi wraca sie ta sama (Bednarskiego ma 63%).
+       */
+      .filter((c) => c.cover >= 0.4 && c.inside >= 0.6 && c.back < 0.65 && c.r.m >= MIN_M)
+      .sort((a, b) => b.cover - a.cover)
+    /*
+     * WARIANTY, nie jeden zwyciezca (Jarek: "jak mamy petle, to mozemy robic
+     * warianty petli do wyboru, 2 albo 3, do przeklikania"). Bierzemy do
+     * dwoch, i tylko jesli druga naprawde rozni sie od pierwszej: mniej niz
+     * 12% roznicy dlugosci i podobny przebieg to ta sama trasa dwa razy.
+     */
+    const taken = []
+    for (const c of scored) {
+      if (taken.length >= 2) break
+      const twin = taken.some(
+        (t) => Math.abs(t.r.m - c.r.m) / Math.max(t.r.m, c.r.m) < 0.12 && Math.abs(t.cover - c.cover) < 0.08,
+      )
+      if (twin) continue
+      taken.push(c)
+    }
+    for (const [i, pick] of taken.entries()) {
+      const loopish = pick.back < 0.4
+      trails.push({
+        id: i === 0 ? 'petla-duza' : 'petla-duza-b',
+        role: 'petla',
+        variant: pick.label,
+        name: water ? 'Pętla brzegiem' : loopish ? 'Pętla po parku' : 'Spacer po całym parku',
+        kind: 'points',
+        cov: Math.round(pick.cover * 100),
+        marks: landmarksHit(pick.r.line, marks),
+        ...pick.r,
+      })
+      if (i === 0) big = pick.r
+      console.log(
+        `  -> petla ${i + 1}: ${pick.src}, ${pick.r.m} m, pokrycie ${Math.round(pick.cover * 100)}%`,
+      )
+    }
+    if (!taken.length && bigCandidates.length)
+      console.log('  -> duze kolko: brak (zaden kandydat nie przeszedl progow roli)')
+  }
+
+  /* ---------- rola 2: krotsza petla ---------- */
+  /*
+   * Kolko wewnetrzne: te same kierunki, ale cofniete blizej srodka, wiec
+   * wychodzi krotsza runda w sercu parku. Wchodzi tylko, gdy jest naprawde
+   * krotsza od duzego (do 65% jego dlugosci) i wciaz pokazuje kawal terenu.
+   */
+  if (feature && big && big.m >= 1600) {
+    const innerVia = await compassVia(feature, 0.42)
+    if (innerVia) {
+      const r = await ringThrough(start, pois, { via: innerVia, stopWithin: 90 })
+      if (r) {
+        const c2 = cov(r.line)
+        const ok =
+          r.m >= MIN_M &&
+          r.m <= big.m * 0.65 &&
+          c2 >= 0.3 &&
+          backtrack(r.line) < 0.55 &&
+          insideShare(parkId, r.line) >= 0.55
+        say('kolko-male', r, ok ? '  <- wziete' : '  <- odrzucone')
+        if (ok)
+          trails.push({
+            id: 'petla-mala',
+            role: 'petla',
+            variant: 'Krótsza runda',
+            name: 'Krótsza pętla',
+            kind: 'points',
+            cov: Math.round(c2 * 100),
+            ...r,
+          })
+      }
+    }
+  }
+
+  /* ---------- rola 3: trasa po punktach ---------- */
   if (full && full.m >= MIN_M)
     trails.push({
       id: 'punkty-wszystkie',
+      role: 'punkty',
       name: pois.length > 2 ? 'Pętla przez wszystkie punkty' : 'Trasa przez punkty',
       kind: 'points',
+      cov: Math.round(cov(full.line) * 100),
       ...full,
     })
 
   /*
-   * Próba pętli dla miejsc bez ręcznej: sześć punktów kierunkowych z obrysu,
-   * przyklejonych do ścieżek, i jedno pytanie do routera.
-   *
-   * Bierzemy wynik tylko wtedy, gdy jest WYRAŹNIE LEPSZY od pętli przez punkty,
-   * którą już mamy. To jedyny uczciwy powód, żeby dołożyć drugą trasę: nie
-   * „bo się udało policzyć", ale „bo tamta chodzi tam i z powrotem, a ta nie".
-   * Miejsce, w którym pętli nie ma, po prostu jej nie dostaje.
-   *
-   * Progi: zawracanie poniżej 40% (prawdziwa pętla ma 20 do 27%, trasa tam i z
-   * powrotem 89%), poprawa o co najmniej 15 punktów procentowych, i co najmniej
-   * 800 m, bo krótsze kółko nie jest spacerem.
-   *
-   * Ta trasa może nie mijać ŻADNEGO punktu i to jest w porządku: nad wodą obejście
-   * brzegiem jest tym, po co się przychodzi, a zbieranie punktów ma swoją własną
-   * pozycję na liście. Karta trasy nie pokazuje wtedy liczby punktów.
+   * Przejscie wzdluz: dla miejsc liniowych (Mlynowka to dawny kanal) petli nie
+   * ma i wlasciwa odpowiedzia jest przejscie od kranca do kranca. Wchodzi
+   * tylko, gdy lista jest jeszcze krotka.
    */
-  if (!ring && feature && full) {
-    const fullBack = backtrack(full.line)
-    const via = await compassVia(feature)
-    if (via) {
-      const r = await ringThrough(start, pois, { via, stopWithin: 90 })
-      const back = r ? backtrack(r.line) : 1
-      /*
-       * Dwa progi, bo to dwa rozne pytania. Gdy petla przez punkty JUZ jest,
-       * obejscie parku musi byc wyraznie lepsze i dluzsze niz 800 m, inaczej
-       * tylko dubluje wybor. Gdy przez punkty nic nie wyszlo (male parki po
-       * odcieciu parkingu), obejscie jest JEDYNA szansa miejsca na trase i
-       * wtedy wystarczy, ze jest petla i ma ponad prog ogolny.
-       */
-      const sole = !full || full.m < MIN_M
-      /*
-       * Prog zawracania tez zalezy od stawki. Obok istniejacej petli bierzemy
-       * tylko prawdziwa petle (ponizej 40%, kalibracja: brzeg zalewu 20 do 27%,
-       * tam i z powrotem 89%). Gdy to JEDYNA szansa miejsca na trase, bierzemy
-       * do 55% i mowimy o niej uczciwie: 45% to nie petla, to spacer z
-       * odnogami do punktow. Park Decjusza i Reduta (po 8 ha) wolа taki spacer
-       * niz zadnej propozycji.
-       */
-      const ringOk = back < 0.4
-      /*
-       * Trzeci przypadek, z Witkowic: trasa przez punkty zawraca w 97% (czyli
-       * chodzi tam i z powrotem), a obejscie ma 51%. To nie petla, ale jest
-       * DRAMATYCZNIE lepsze od tego, co miejsce ma, wiec wchodzi jako spacer.
-       * Prog 30 punktow procentowych poprawy, zeby nie wpuszczac remisow.
-       */
-      const muchBetter = back < 0.55 && back < fullBack - 0.3
-      /*
-       * Trasa "po parku" ma byc W PARKU. Panienskie Skaly dostaly obejscie,
-       * ktore w 59% biegnie poza obrysem rezerwatu (po Lesie Wolskim obok):
-       * spacer sensowny, ale nazwa klamie, a dlugosc mowi o czym innym niz
-       * miejsce. Prog 55% dlugosci wewnatrz obrysu.
-       */
-      const rs = ringsFor(parkId)
-      const inside = r && rs ? r.line.filter((c) => inPolygon(c, rs)).length / r.line.length : 1
-      /*
-       * Prog obrysu tez zalezy od stawki. Obok istniejacej trasy zadamy 55%:
-       * druga propozycja ma byc o TYM miejscu. Jako jedyna trasa wystarczy 40%,
-       * bo waskie miejsca (Zielony Jar, wawóz) z geometrii maja obejscie
-       * czesciowo po krawedzi, a mapka na karcie i tak pokazuje obrys, wiec
-       * nikt nie jest wprowadzony w blad. Ponizej 40% to juz inne miejsce:
-       * Przylasek Rusiecki dostal obejscie z 13% w obrysie i takie leci.
-       */
-      const minInside = sole ? 0.4 : 0.55
-      /*
-       * Dlugosc: PRAWDZIWA petla (ponizej 40% zawracania) wystarczy na MIN_M,
-       * bo maly park ma mala petle, a kopiec Krakusa pokazal, ze 706-metrowe
-       * kolko wokol kopca (zawracanie 30%, w obrysie 93%) bije trase przez
-       * punkty zawracajaca w 78%. Prog 800 m zostaje tam, gdzie kandydat jest
-       * slabszy: spacer dokladany OBOK istniejacej trasy.
-       */
-      const minLen = sole || ringOk ? MIN_M : 800
-      const better =
-        r &&
-        inside >= minInside &&
-        (sole ? back < 0.55 : ringOk ? back < fullBack - 0.15 : muchBetter) &&
-        r.m >= minLen
-      if (better) {
-        const water = feature.properties?.kind === 'water'
-        trails.unshift({
-          id: 'wokol',
-          name: ringOk ? (water ? 'Pętla brzegiem' : 'Pętla po parku') : 'Spacer po parku',
+  if (trails.filter((t) => t.kind === 'points').length < 3) {
+    const across = await walkAcross(pois)
+    if (across && across.m >= MIN_M) {
+      const c3 = cov(across.line)
+      if (c3 >= 0.25 && insideShare(parkId, across.line) >= 0.5) {
+        trails.push({
+          id: 'przez-park',
+          role: 'przejscie',
+          name: 'Przez cały park',
           kind: 'points',
-          ...r,
+          cov: Math.round(c3 * 100),
+          ...across,
         })
+        say('przez-park', across)
       }
-      console.log(
-        `  wokol: ${better ? 'wzięte' : 'odrzucone'} (${r?.m ?? 0} m, zawracanie ${Math.round(
-          back * 100,
-        )}%, przez punkty ${Math.round(fullBack * 100)}%, w obrysie ${Math.round(
-          inside * 100,
-        )}%, mija ${r?.stops.length ?? 0})`,
-      )
     }
   }
 
   /*
-   * Krotszy wariant tylko wtedy, gdy pelna petla jest naprawde dluga. Skawina
-   * dostala w pierwszym biegu "krotka petle" na 200 m, co nie jest spacerem,
-   * tylko przejsciem przez skwer.
+   * Limit trzech tras liczonych (decyzja Jarka): wybor bez przewijania.
+   * Priorytet: duze kolko, potem punkty, potem krotsza petla, potem przejscie.
    */
+  const PRIORITY = [
+    'wokol-wody',
+    'petla-duza',
+    'petla-duza-b',
+    'punkty-wszystkie',
+    'petla-mala',
+    'przez-park',
+    'punkty-krotka',
+  ]
   /*
-   * Przejście przez cały park: dwa najdalsze punkty jako końce, reszta po
-   * drodze. To odpowiedź na "nie zawsze najkrótsza droga, która połączy
-   * punkty": czasem najciekawiej jest przejść park wzdłuż, nie kręcić kółka.
-   * Wchodzi, gdy końce są naprawdę daleko (550 m+) i trasa ma sens (800 m+).
+   * Trzy KATEGORIE (petla, punkty, przejscie), a nie trzy trasy: w kategorii
+   * petla moga stac dwa warianty do przeklikania, wiec limit to 4 wiersze.
    */
-  const across = await walkAcross(pois)
-  if (across && across.m >= Math.max(MIN_M, 800)) {
-    const afterRing = trails.findIndex((t) => t.id === 'punkty-wszystkie')
-    const row = { id: 'przez-park', name: 'Przez cały park', kind: 'points', ...across }
-    if (afterRing >= 0) trails.splice(afterRing, 0, row)
-    else trails.push(row)
-    console.log(`  przez-park: ${across.m} m, mija ${across.stops.length} punktów`)
-  }
+  const pointTrails = trails
+    .filter((t) => t.kind === 'points')
+    .sort((a, b) => PRIORITY.indexOf(a.id) - PRIORITY.indexOf(b.id))
+    .slice(0, 4)
+  trails.length = 0
+  trails.push(...pointTrails)
 
-  if (!ring && pois.length >= 4 && full && full.m > 2500) {
-    const near = tightestTriple(pois) ?? pois.slice(0, 3)
-    const short = await loopThrough(near[0].coords, near)
-    if (short && short.m >= 700 && short.m < full.m * 0.7)
-      trails.push({ id: 'punkty-krotka', name: 'Krótka pętla', kind: 'points', ...short })
-  }
 
   const marked = pointsOnly
     ? (result[parkId] ?? []).filter((t) => t.kind === 'osm')
@@ -835,6 +1088,10 @@ const body = Object.entries(result)
           `min: ${t.min}`,
         ]
         if (t.colour) bits.push(`colour: '${t.colour}'`)
+        if (t.cov != null) bits.push(`cov: ${t.cov}`)
+        if (t.role) bits.push(`role: '${t.role}'`)
+        if (t.variant) bits.push(`variant: '${esc(t.variant)}'`)
+        if (t.marks) bits.push(`marks: ${t.marks}`)
         if (t.stops?.length) bits.push(`stops: [${t.stops.map((s) => `'${s}'`).join(', ')}]`)
         if (t.note) bits.push(`note: '${esc(t.note)}'`)
         bits.push(`line: [${t.line.map((c) => `[${c[0]},${c[1]}]`).join(',')}]`)
@@ -870,6 +1127,18 @@ export type Trail = {
   colour?: string
   /** kolejność punktów wyprawy, tak jak ułożył ją router */
   stops?: string[]
+  /**
+   * ile procent parku trasa pokazuje: siatka 30 m w obrysie, komórka zaliczona,
+   * gdy trasa przechodzi bliżej niż 60 m. Miara dodana, bo bez niej generator
+   * nie wiedział, że trasa mija większość terenu (docs/trails.md).
+   */
+  cov?: number
+  /** kategoria w wyborze ścieżek: pętla, punkty, przejście */
+  role?: 'petla' | 'punkty' | 'przejscie'
+  /** nazwa wariantu wewnątrz kategorii, do przeklikania */
+  variant?: string
+  /** ile landmarków (woda, widok, plac zabaw) trasa mija */
+  marks?: number
   note?: string
   line: Array<[number, number]>
 }

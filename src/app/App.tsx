@@ -144,6 +144,23 @@ export function App() {
   /** arkusz z progami; taby zostają na wierzchu, progi chowają się tu */
   const [filtersOpen, setFiltersOpen] = useState(false)
   /*
+   * Pozycja wskaznika segmentu. Mierzymy DOM, bo szerokosci zakladek zaleza
+   * od dlugosci slow, a nie od podzialu na rowne czesci; pomiar powtarzamy po
+   * zmianie zakladki i po zmianie szerokosci arkusza.
+   */
+  const tabsRef = useRef<HTMLDivElement>(null)
+  const [thumb, setThumb] = useState({ x: 0, w: 0 })
+  useEffect(() => {
+    const measure = () => {
+      const el = tabsRef.current?.querySelector<HTMLElement>('.app-ftab.-on')
+      if (el) setThumb({ x: el.offsetLeft, w: el.offsetWidth })
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    if (tabsRef.current) ro.observe(tabsRef.current)
+    return () => ro.disconnect()
+  }, [tab, listWide, listDetent])
+  /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
    * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
    * celu jest jednym spojrzeniem, a nie otwieraniem pieciu kart po kolei.
@@ -285,9 +302,16 @@ export function App() {
    */
   const dockUp = !selected && !expedition
 
-  const filtersActive = tab !== 'all' || timeMax > 0 || distBand !== ''
+  /*
+   * Zakladki to NIE filtry (uwaga Jarka 2026-08-25). Filtry siedza pod
+   * okraglym przyciskiem i tylko one dostaja licznik z Wyczysc; zmiana
+   * zakladki jest zwyklym przelaczeniem widoku, a liczby stoja w naglowkach
+   * grup. Predykat listy musi jednak widziec oba, stad dwie zmienne.
+   */
+  const filtersOn = timeMax > 0 || distBand !== ''
+  const listNarrowed = tab !== 'all' || filtersOn
+  /* czysci progi, nie zakladke: zakladka nie jest filtrem */
   const clearFilters = () => {
-    setTab('all')
     setTimeMax(0)
     setDistBand('')
   }
@@ -788,7 +812,7 @@ export function App() {
           plain(KIND_META[f.properties.kind]?.label ?? '').includes(needle),
       )
     }
-    if (!filtersActive) return sortedParks
+    if (!listNarrowed) return sortedParks
     return sortedParks.filter((f) => {
       if (tab !== 'all' && groupOf(f) !== tab) return false
       const est = visitEstimate(f.id)
@@ -799,7 +823,7 @@ export function App() {
       return true
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortedParks, needle, filtersActive, tab, timeMax, distBand])
+  }, [sortedParks, needle, listNarrowed, tab, timeMax, distBand])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -1179,13 +1203,20 @@ export function App() {
         </div>
         {/* filtry nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
         {!needle && (
-          <div className="app-ftabs" role="tablist" aria-label="Rodzaj miejsc">
+          <div className="app-ftabs" role="tablist" aria-label="Rodzaj miejsc" ref={tabsRef}>
+            {/* wskaznik jedzie pod przyciskami, wiec przelaczenie jest ruchem,
+                nie przeskokiem koloru (uwaga Jarka: segmented picker) */}
+            <span
+              className="app-ftabs__thumb"
+              aria-hidden="true"
+              style={{ transform: `translateX(${thumb.x}px)`, width: thumb.w }}
+            />
             {TAB_DEFS.map(([id, label]) => (
               <button
                 key={id}
                 role="tab"
                 aria-selected={tab === id}
-                className={`app-ftab pk-press${tab === id ? ' -on' : ''}`}
+                className={`app-ftab${tab === id ? ' -on' : ''}`}
                 onClick={() => setTab(id)}
               >
                 {label}
@@ -1193,7 +1224,7 @@ export function App() {
             ))}
           </div>
         )}
-        {!needle && filtersActive && (
+        {!needle && filtersOn && (
           <p className="t-caption app-fcount">
             {shownParks.length === 0
               ? 'Nic nie pasuje.'
@@ -1205,7 +1236,7 @@ export function App() {
             </button>
           </p>
         )}
-        {!needle && filtersActive && shownParks.length === 0 && (
+        {!needle && filtersOn && shownParks.length === 0 && (
           <p className="t-caption app-fzero">Poluzuj czas albo dystans, najlepiej ostatni.</p>
         )}
         {needle && (
@@ -1581,7 +1612,7 @@ export function App() {
             </select>
           </label>
         </div>
-        {filtersActive && shownParks.length === 0 && (
+        {filtersOn && shownParks.length === 0 && (
           <p className="t-caption app-fzero">Poluzuj czas albo dystans, najlepiej ostatni.</p>
         )}
         <div className="app-fsheet__foot">
