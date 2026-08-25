@@ -6,7 +6,12 @@
   z-index: 2;
   /* full bleed: it has to reach the edges to read as a bar, not as a row */
   margin: var(--sp-6) calc(-1 * var(--sp-6)) calc(-1 * (var(--sa-gap) + var(--sp-6)));
-  padding: var(--sp-5) var(--sp-6) calc(var(--sa-gap) + var(--sp-4));
+  /*
+   * Dolny zapas nad strefa gestu: sp-2, nie sp-4 (Jarek 2026-08-25: "bottom
+   * bar ma duzy spacing na dole ekranu"). sa-gap chroni przed wskaznikiem
+   * domu i musi zostac w calosci; ekstra oddech wystarczy osmiopikselowy.
+   */
+  padding: var(--sp-5) var(--sp-6) calc(var(--sa-gap) + var(--sp-2));
 }
 
 /*

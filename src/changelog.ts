@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.109.2'
+export const VERSION = '0.109.3'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.109.3',
+    date: '2026-08-25',
+    title: 'Action bar hugs the bottom closer',
+    tldr:
+      'Pasek ze Start wyprawy trzyma się bliżej dołu ekranu: własny zapas zszedł z 16 do 8 pikseli, strefa gestu systemowego zostaje nietknięta.',
+    changes: [
+      ['changed', 'The bottom action bar kept sixteen pixels of its own air on top of the system gesture area, which pushed the button and the content above it visibly up. Its own share is eight pixels now, everywhere the bar appears; the system area itself stays untouched, that part belongs to the home gesture'],
+    ],
+  },
   {
     version: '0.109.2',
     date: '2026-08-25',
