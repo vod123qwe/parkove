@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.104.0'
+export const VERSION = '0.105.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.105.0',
+    date: '2026-08-25',
+    title: 'Editor that snaps to paths, and a second router',
+    tldr:
+      'Punkty w edytorze mają ikony i ptaszki, kafle ze zdjęciami, a twój punkt przykleja się do najbliższej ścieżki. Doszedł drugi router, więc trasa liczy się nawet gdy pierwszy milczy.',
+    changes: [
+      ['added', 'Your own point now snaps to the nearest path, both when you tap the map and after every drag, and a line tells you how far it jumped. A point dropped on a lawn had no way into the road graph, which is why routes so often refused to compute'],
+      ['added', 'A second router. Measured today: the OSRM instance timed out on every single request while Valhalla answered the same route in 246 milliseconds. Valhalla now goes first, OSRM stays as the backup, and both are used for snapping too'],
+      ['changed', 'Markers and the point list wear the same icons as the pins on the map, a selected point carries a tick in its top right corner, and the list became tiles with a photo of the place when it has one'],
+      ['fixed', 'Markers sat next to their places and drifted: the entry animation scaled the screen by 1.5 percent and the map measured itself mid-animation. The animation only fades now, and the map recomputes its size on the first frame and on every container resize'],
+      ['fixed', 'Tapping the map used to close the whole editor. It was rendered inside the trail sheet, so the tap hit the sheet backdrop; it hangs on its own layer now'],
+    ],
+  },
   {
     version: '0.104.0',
     date: '2026-08-25',

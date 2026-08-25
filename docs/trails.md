@@ -422,3 +422,58 @@ na "a rondem z lawkami".
 
 Efekt nowego punktu na trasy Jordana: trasa przez punkty 690 m -> 1275 m,
 pokrycie 27% -> 59%; petla z landmarkami 2074 m, pokrycie 71%.
+
+---
+
+## Edytor v2: ikony, kafle, przyklejanie, DWA routery (2026-08-25, 0.105.0)
+
+Uwagi Jarka po pierwszym podejsciu i co z nich wyszlo.
+
+**"Ikonki sa nieoczywiste"** -> znaczniki na mapie i kafle nosza te same
+ikony, co piny miejsc (`ICONS` i `iconSvg` wyeksportowane z pins.ts).
+Ikona mowi rodzaj: pomnik, fale, ksiazka, kubek, litera P.
+
+**"Wybrane punkty powinny byc check"** -> ptaszek w PRAWYM GORNYM rogu,
+i na znaczniku (`.tedit__tick`), i na kaflu (`.tedit__tiletick`). Kolor
+sam nie mowil, ze punkt jest na trasie.
+
+**"Kwadratowe boxy z ew. malymi zdjeciami"** -> kafle 78x78 z miniatura
+zdjecia POI (pole `photo`), a gdy zdjecia nie ma, z ikona rodzaju.
+
+**"Jezeli punkt jest gdzies, gdzie nie ma sciezki, dodaj sciezke w
+najblizszym miejscu, gdzie jest chodnik"** -> `snapToPath` przykleja
+kazdy wlasny punkt: po dotknieciu mapy i po kazdym przeciagnieciu.
+Komunikat mowi, o ile metrow punkt przeskoczyl.
+
+**"Trasa czesto sie nie wylicza"** -> mialo DWIE przyczyny.
+
+1. Punkt postawiony na trawniku nie ma jak wejsc do grafu drog i usluga
+   trip odpowiada bledem. Rozwiazuje to przyklejanie wyzej.
+2. Router bywa niedostepny. Pomiar 2026-08-25: OSRM
+   (routing.openstreetmap.de) odpowiadal timeoutem na KAZDE zapytanie,
+   a Valhalla FOSSGIS liczyla te sama trase w 246 ms.
+   Dlatego sa teraz DWA routery: **Valhalla pierwsza**
+   (`valhalla1.openstreetmap.de/route`, costing pedestrian, shape jako
+   polyline6 dekodowany w `decodePoly6`), OSRM jako zapas z trzema
+   probami. Snap tez najpierw przez Valhalla `/locate`
+   (`correlated_lat`/`correlated_lon`), potem OSRM `/nearest`.
+   ROZNICA: OSRM ma trip (uklada kolejnosc przystankow), Valhalla nie,
+   wiec przy niej trasa idzie w kolejnosci zaznaczania.
+
+**"Punkty sie zle osadzaja i zmieniaja pozycje po scrollu"** -> dwie
+przyczyny, obie naprawione:
+
+- animacja wejscia miala `transform: scale(0.985)`, a maplibre mierzy
+  kontener przez getBoundingClientRect W TRAKCIE animacji, wiec
+  zapamietywal rozmiar mniejszy o 1,5%; znaczniki ladowaly obok swoich
+  miejsc, tym dalej, im blizej krawedzi. Animacja jest teraz tylko na
+  przezroczystosci;
+- `map.resize()` po pierwszej klatce, ResizeObserver na kontenerze i
+  reakcja na orientationchange, plus `min-height` z `--screen-h`
+  usuniete (kontener ma byc dokladnie kadrem).
+
+GOTCHA ARCHITEKTURY: edytor renderuje sie przez `createPortal` do body.
+Pierwsza wersja byla dzieckiem modalu Szlak i dotkniecie mapy trafialo w
+zaslone modalu, ktory zamykal sie i zabieral edytor ze soba. Ta sama
+lekcja, co przy `.jscreen`: kontekst stosu rodzica sprawia, ze z-index
+dziecka nie znaczy tego, co myslisz.

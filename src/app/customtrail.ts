@@ -20,6 +20,81 @@
 import type { Trail } from './data/trails'
 
 const OSRM = 'https://routing.openstreetmap.de/routed-foot'
+/*
+ * DRUGI ROUTER, i to nie z ostroznosci, a z pomiaru.
+ *
+ * Jarek 2026-08-25: "trasa czesto sie nie wylicza". Sprawdzone tego samego
+ * dnia: OSRM (routing.openstreetmap.de) odpowiadal timeoutem na kazde
+ * zapytanie, a Valhalla FOSSGIS liczyla te sama trase w 246 ms. Jeden
+ * publiczny router to jeden punkt awarii, wiec teraz sa dwa: Valhalla
+ * pierwsza, bo szybsza i ma /locate (przyklejanie punktu do sciezki),
+ * OSRM jako zapas.
+ *
+ * Roznica, o ktorej trzeba wiedziec: OSRM ma usluge trip, ktora sama uklada
+ * KOLEJNOSC przystankow (problem komiwojazera). Valhalla tego nie robi, wiec
+ * przy niej trasa idzie w kolejnosci zaznaczania. W edytorze to nawet lepiej,
+ * bo kolejnosc jest przewidywalna i sam nia sterujesz.
+ */
+const VALHALLA = 'https://valhalla1.openstreetmap.de'
+
+/** polyline6 Valhalli: ten sam algorytm co u Google, tylko dokladnosc 1e6 */
+function decodePoly6(str: string): Array<[number, number]> {
+  const out: Array<[number, number]> = []
+  let index = 0
+  let lat = 0
+  let lng = 0
+  while (index < str.length) {
+    let b = 0
+    let shift = 0
+    let result = 0
+    do {
+      b = str.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    lat += result & 1 ? ~(result >> 1) : result >> 1
+    shift = 0
+    result = 0
+    do {
+      b = str.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    lng += result & 1 ? ~(result >> 1) : result >> 1
+    out.push([lng / 1e6, lat / 1e6])
+  }
+  return out
+}
+
+async function valhallaRoute(pts: Array<[number, number]>) {
+  try {
+    const res = await fetch(`${VALHALLA}/route`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        locations: pts.map(([lon, lat]) => ({ lat, lon })),
+        costing: 'pedestrian',
+        directions_options: { units: 'kilometers' },
+      }),
+      signal: AbortSignal.timeout(15000),
+    })
+    if (!res.ok) return null
+    const d = (await res.json()) as {
+      trip?: { summary?: { length: number; time: number }; legs?: Array<{ shape: string }> }
+    }
+    const t = d.trip
+    if (!t?.legs?.length || !t.summary) return null
+    const line = t.legs.flatMap((l) => decodePoly6(l.shape))
+    if (line.length < 2) return null
+    return {
+      m: Math.round(t.summary.length * 1000),
+      min: Math.max(1, Math.round(t.summary.time / 60)),
+      line,
+    }
+  } catch {
+    return null
+  }
+}
 
 const KEY = 'pk-mytrails'
 
@@ -29,6 +104,60 @@ export type Stop = {
   name: string
   coords: [number, number]
   kind: 'parking' | 'poi' | 'play' | 'food'
+  /** klucz ikony z pins.ts: mowi, CO to za miejsce */
+  icon?: string
+  /** miniatura na kaflu w edytorze, gdy punkt ma zdjecie */
+  photo?: string
+}
+
+/**
+ * Najblizszy punkt sieci pieszej.
+ *
+ * Jarek 2026-08-25: "jezeli punkt gdzies jest, gdzie nie ma sciezki, to dodaj
+ * sciezke w najblizszym miejscu, gdzie jest chodnik". Router odpowiada na to
+ * wprost: pytamy /nearest, ktory zwraca punkt lezacy NA sciezce, i tam
+ * przenosimy znacznik. To takze glowna przyczyna "trasa sie nie wylicza":
+ * punkt postawiony na srodku trawnika albo na dachu nie ma jak wejsc do
+ * grafu i usluga trip odpowiada bledem.
+ */
+export async function snapToPath(
+  at: [number, number],
+  maxAway = 200,
+): Promise<[number, number] | null> {
+  /* Valhalla /locate: correlated_lat i lon to punkt LEZACY na krawedzi grafu */
+  try {
+    const res = await fetch(`${VALHALLA}/locate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        locations: [{ lat: at[1], lon: at[0] }],
+        costing: 'pedestrian',
+        verbose: true,
+      }),
+      signal: AbortSignal.timeout(9000),
+    })
+    if (res.ok) {
+      const d = (await res.json()) as Array<{
+        edges?: Array<{ correlated_lat?: number; correlated_lon?: number; distance?: number }>
+      }>
+      const e = d[0]?.edges?.[0]
+      if (e?.correlated_lat != null && e.correlated_lon != null && (e.distance ?? 0) <= maxAway)
+        return [e.correlated_lon, e.correlated_lat]
+    }
+  } catch {
+    /* zapas niżej */
+  }
+  try {
+    const r = await fetch(`${OSRM}/nearest/v1/foot/${at[0]},${at[1]}?number=1`, {
+      signal: AbortSignal.timeout(9000),
+    })
+    if (!r.ok) return null
+    const w = (await r.json()).waypoints?.[0]
+    if (!w || w.distance > maxAway) return null
+    return [w.location[0], w.location[1]]
+  } catch {
+    return null
+  }
 }
 
 export function myTrails(): Record<string, Trail[]> {
@@ -79,30 +208,74 @@ export async function routeMyTrail(stops: Stop[]): Promise<{ trip: RoutedTrip } 
   const ordered = parking ? [parking, ...rest] : stops
   const coords = ordered.map((s) => `${s.coords[0]},${s.coords[1]}`).join(';')
   const roundtrip = Boolean(parking)
+
+  /*
+   * Najpierw Valhalla: szybsza i dostepna wtedy, gdy OSRM milczy. Kolejnosc
+   * przystankow jest ta, ktora zaznaczyles, a z parkingiem trasa wraca do
+   * niego, bo tam stoi auto.
+   */
+  const viaValhalla = await valhallaRoute(
+    roundtrip
+      ? [...ordered.map((s) => s.coords), ordered[0].coords]
+      : ordered.map((s) => s.coords),
+  )
+  if (viaValhalla)
+    return {
+      trip: {
+        ...viaValhalla,
+        stops: ordered
+          .filter((s) => s.kind !== 'parking' && !s.id.startsWith('own-'))
+          .map((s) => s.id),
+        parkingName: parking?.name ?? null,
+      },
+    }
   const url =
     `${OSRM}/trip/v1/foot/${coords}?overview=full&geometries=geojson` +
     `&roundtrip=${roundtrip}&source=first${roundtrip ? '' : '&destination=last'}`
-  let data: {
-    trips?: Array<{ distance: number; duration: number; geometry: { coordinates: number[][] } }>
-    waypoints?: Array<{ waypoint_index: number }>
+  let data:
+    | {
+        trips?: Array<{ distance: number; duration: number; geometry: { coordinates: number[][] } }>
+        waypoints?: Array<{ waypoint_index: number }>
+      }
+    | undefined
+  /*
+   * Trzy proby, bo publiczny router czasem odpowiada 429 albo milczy przez
+   * kilka sekund, a wtedy edytor pokazywal "nie udalo sie policzyc" mimo ze
+   * wystarczylo zapytac ponownie. Przerwy rosna: 0, 700, 1800 ms.
+   */
+  let lastErr = 'Nie udało się połączyć z routerem. Trasę układa się z zasięgiem.'
+  let ok = false
+  for (const wait of [0, 700, 1800]) {
+    if (wait) await new Promise((r) => setTimeout(r, wait))
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(15000) })
+      if (!res.ok) {
+        lastErr =
+          res.status === 429
+            ? 'Router jest chwilowo przeciążony. Chwilę poczekaj i dotknij mapy jeszcze raz.'
+            : `Router odpowiedział ${res.status}. Spróbuj jeszcze raz.`
+        continue
+      }
+      data = await res.json()
+      ok = true
+      break
+    } catch {
+      lastErr = 'Nie udało się połączyć z routerem. Trasę układa się z zasięgiem.'
+    }
   }
-  try {
-    /* bez limitu jedno wiszące zapytanie trzymało podgląd w "liczę" bez końca */
-    const res = await fetch(url, { signal: AbortSignal.timeout(15000) })
-    if (!res.ok) return { error: `Router odpowiedział ${res.status}. Spróbuj jeszcze raz.` }
-    data = await res.json()
-  } catch {
-    return { error: 'Nie udało się połączyć z routerem. Trasę układa się z zasięgiem.' }
-  }
-  const trip = data.trips?.[0]
-  if (!trip) return { error: 'Router nie znalazł drogi między tymi punktami.' }
+  if (!ok) return { error: lastErr }
+  const trip = data!.trips?.[0]
+  if (!trip)
+    return {
+      error: 'Router nie znalazł drogi między tymi punktami. Przenieś punkt bliżej alejki.',
+    }
 
   /*
    * `waypoint_index` mówi, w jakiej kolejności router odwiedza punkty, a nie w
    * jakiej je podaliśmy. Bez tego lista przystanków w karcie kłamałaby o
    * kolejności, w której je zobaczysz.
    */
-  const order = (data.waypoints ?? [])
+  const order = (data!.waypoints ?? [])
     .map((w, i) => ({ at: w.waypoint_index, stop: ordered[i] }))
     .sort((a, b) => a.at - b.at)
     .map((x) => x.stop)

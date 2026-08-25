@@ -5,7 +5,12 @@
 import type { PoiCategory } from './data/quests'
 
 /** 24x24 viewBox path data, taken from the Lucide icons used across the UI */
-const ICONS: Record<
+/*
+ * Biblioteka ikon jest wspolna dla pinow na mapie i dla kafli w edytorze
+ * trasy (uwaga Jarka 2026-08-25: "ikonki sa nieoczywiste"), dlatego wychodzi
+ * na zewnatrz razem z helperem, ktory sklada z niej gotowy SVG.
+ */
+export const ICONS: Record<
   PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note' | 'car' | 'park' | 'forest' | 'mound' | 'valley' | 'garden',
   string[]
 > = {
@@ -190,6 +195,14 @@ export async function buildPhotoImage(blob: Blob, ring: string) {
 }
 
 /** pin colours read from the live tokens, so both maps draw the same artwork */
+/** gotowy SVG jednej ikony, do wstawienia w innerHTML znacznika albo kafla */
+export function iconSvg(key: keyof typeof ICONS, size = 15, stroke = 'currentColor') {
+  const paths = ICONS[key] ?? ICONS.stamp
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${paths
+    .map((d) => `<path d="${d}"/>`)
+    .join('')}</svg>`
+}
+
 export function pinColors() {
   const cs = getComputedStyle(document.documentElement)
   const v = (n: string) => cs.getPropertyValue(n).trim()

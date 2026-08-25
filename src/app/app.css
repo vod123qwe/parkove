@@ -6050,20 +6050,28 @@
   left: 0;
   right: 0;
   bottom: 0;
-  min-height: max(var(--screen-h), 100dvh);
+  /* bez min-height: kontener mapy ma byc DOKLADNIE kadrem, inaczej maplibre
+     liczy pozycje wzgledem obszaru wiekszego niz to, co widzisz */
   z-index: 205;
   background: #0f1a0d;
   animation: tedit-in 300ms var(--ease-screen);
 }
 
+/*
+ * TYLKO przezroczystosc, zadnego scale.
+ *
+ * Pierwsza wersja wjezdzala ze scale(0.985) i to psulo mape: maplibre mierzy
+ * kontener przez getBoundingClientRect, a w trakcie animacji rect jest
+ * PRZESKALOWANY, wiec mapa zapamietywala rozmiar mniejszy o 1,5%. Znaczniki
+ * ladowaly wtedy obok swoich miejsc, tym dalej, im blizej krawedzi (uwaga
+ * Jarka: "punkty sie zle osadzaja i zmieniaja pozycje po scrollu").
+ */
 @keyframes tedit-in {
   from {
     opacity: 0;
-    transform: scale(0.985);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
 
@@ -6102,26 +6110,51 @@
   text-shadow: 0 1px 6px rgb(10 18 8 / 0.6);
 }
 
-/* punkty na mapie: kropka miejsca i kropka twoja, ta druga z numerem */
+/*
+ * Znaczniki na mapie. Ikona mowi, CO to za miejsce (uwaga Jarka: "ikonki sa
+ * nieoczywiste"), a ptaszek w prawym gornym rogu, ze punkt JEST na trasie:
+ * sam kolor tego nie mowil.
+ */
 .tedit__dot {
-  width: 26px;
-  height: 26px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: 2.5px solid var(--bg-surface);
   border-radius: 50%;
   background: #2a4a24;
   color: #eaffdc;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
-  box-shadow: 0 2px 6px rgb(8 14 6 / 0.45);
+  box-shadow: 0 2px 7px rgb(8 14 6 / 0.5);
   cursor: pointer;
 }
 
 .tedit__dot.-on {
   background: var(--bg-gold);
   border-color: #fff;
+  color: #2c2205;
+}
+
+.tedit__tick {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border: 2px solid var(--bg-surface);
+  border-radius: 50%;
+  background: #1b6b2a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .tedit__dot.-parking {
@@ -6158,39 +6191,116 @@
   color: var(--content-subtle);
 }
 
-.tedit__chips {
+/*
+ * KAFLE punktow (uwaga Jarka: "kwadratowe boxy z ew. malymi zdjeciami").
+ * Zdjecie rozpoznaje sie szybciej niz nazwe, wiec miniatura jest glowna
+ * trescia kafla, a nazwa podpisem pod nia. Rzad przewija sie w bok.
+ */
+.tedit__tiles {
   display: flex;
   gap: var(--sp-2);
   margin: 0 calc(-1 * var(--sp-4)) var(--sp-3);
-  padding: 2px var(--sp-4) 4px;
+  padding: 2px var(--sp-4) 6px;
   overflow-x: auto;
   scrollbar-width: none;
 }
 
-.tedit__chips::-webkit-scrollbar {
+.tedit__tiles::-webkit-scrollbar {
   display: none;
 }
 
-.tedit__chip {
+.tedit__tile {
+  position: relative;
   flex: none;
-  max-width: 46vw;
-  overflow: hidden;
-  padding: 8px 13px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-pill);
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface);
+  width: 78px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--content-default);
   font: inherit;
-  font-size: 12.5px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  text-align: left;
 }
 
-.tedit__chip.-on {
-  border-color: transparent;
+.tedit__thumb {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  margin-bottom: 5px;
+  border-radius: 14px;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-sunken, rgb(0 0 0 / 0.06));
+  background-position: center;
+  background-size: cover;
+  box-shadow: inset 0 0 0 2px transparent;
+  color: var(--content-subtle);
+  transition: box-shadow var(--motion-fast) var(--ease-out);
+}
+
+.tedit__tile.-on .tedit__thumb {
+  box-shadow: inset 0 0 0 2.5px var(--bg-primary);
+}
+
+.tedit__thumbicon {
+  display: grid;
+  place-items: center;
+}
+
+.tedit__tilename {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 11.5px;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tedit__tile.-on .tedit__tilename {
+  font-weight: 600;
+}
+
+/* ptaszek na kaflu w tym samym miejscu, co na znaczniku: prawy gorny rog */
+.tedit__tiletick {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   background: var(--bg-primary);
   color: var(--content-on-primary);
+  box-shadow: 0 1px 4px rgb(8 14 6 / 0.4);
+}
+
+/* komunikat o przyklejeniu punktu do sciezki: nad karta, gasnie sam */
+.tedit__note {
+  /* pod paskiem z nazwa, nie nad karta: karta ma zmienna wysokosc, wiec
+     kotwiczenie do jej gory znaczyloby liczenie pikseli w dwoch miejscach */
+  position: absolute;
+  top: calc(var(--safe-top, 0px) + 58px);
+  left: var(--sp-4);
+  right: var(--sp-4);
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: rgb(18 41 12 / 0.9);
+  color: #eaffdc;
+  text-align: center;
+  animation: tedit-note 260ms var(--ease-out);
+}
+
+@keyframes tedit-note {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .tedit__foot {
