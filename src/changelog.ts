@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.1'
+export const VERSION = '0.110.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.2',
+    date: '2026-08-25',
+    title: 'Bottom gap: the real model at last',
+    tldr:
+      'Dolna przerwa rozgryziona do końca: na iPhonie przybite elementy kończą się 47 px nad ekranem, więc wcięcie systemowe trzeba od tego ODJĄĆ, nie dodać. Przyciski siadają wreszcie nisko.',
+    changes: [
+      ['fixed', 'The fresh install test and one screenshot settled it: pinned elements on the phone end 47 pixels above the physical bottom, and the system inset describes a zone they cannot even reach. Adding the inset inside pinned bars pushed buttons about 90 points up in total. The app now measures that shortfall and subtracts it from the inset, so buttons sit right at the window edge, just above the home indicator, like native apps'],
+      ['changed', 'The screen diagnostic verdict tells this story straight: how many pixels iOS keeps for itself and that the app compensates for it'],
+    ],
+  },
   {
     version: '0.110.1',
     date: '2026-08-25',

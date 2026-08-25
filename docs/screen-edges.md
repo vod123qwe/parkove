@@ -266,3 +266,27 @@ Diagnostyka ekranu (O aplikacji) stawia teraz WERDYKT wprost:
 - standalone + okno nizsze od ekranu o 20-96 px + safe=0
   -> "instalacja sprzed pelnego ekranu, przeinstaluj ikone",
 - standalone + safe>0 + okno=ekran -> "uklad zdrowy".
+
+### Sprostowanie nagrobka: bleed byl PRAWDZIWY, tylko rola odwrotna (0.110.2)
+
+Swieza instalacja u Jarka obalila teorie zamrozonych met: okno 797 przy
+ekranie 844, safe 34, fixed-dol 797, magenta debug WEWNATRZ ekranu.
+
+Prawdziwy model (potwierdzony zrzutem):
+- w tym trybie iOS PRZYBITE elementy koncza sie 47 px nad fizycznym dolem
+  ekranu (fixed viewport 797); pas 47 umie pomalowac tylko tlo dokumentu;
+- env(safe-area-inset-bottom)=34 dotyczy DOKUMENTU, nie fixed: wskaznik
+  domu lezy w pasie, do ktorego fixed i tak nie siega;
+- wiec dodawanie 34 wewnatrz fixed odsuwalo przyciski o 47+34+zapas od
+  dolu ekranu. Wciecie trzeba o bleed POMNIEJSZYC:
+  --sa-gap: max(0px, calc(var(--sa-bottom) - var(--sa-bleed))).
+
+U Jarka: gap=0, przycisk 8 px nad dolem okna = ~55 pt nad dolem ekranu,
+tuz nad wskaznikiem. Na zdrowych viewportach bleed=0 i zostaje czyste 34.
+
+Trzy akty tej sagi (dodawanie bleed -> nagrobek -> odejmowanie) sa opisane
+przy --sa-gap w ds.css. LEKCJA: fixed-dol z diagnostyki to najwazniejsza
+liczba; env() nie opisuje fixed viewportu na iOS.
+
+"Portfel na pelna wysokosc" to zludzenie dobrze zgranego tla dokumentu,
+nie inny viewport: te same mety, ten sam telefon.

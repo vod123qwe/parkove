@@ -24,12 +24,19 @@ export function trackScreenHeight() {
     root.style.setProperty('--screen-h', `${Math.round(window.innerHeight)}px`)
 
     /*
-     * Nagrobek pomiaru „bleed" (2026-08-25): tu stało liczenie
-     * screen.height − innerHeight i wpychanie wyniku w --sa-bleed. Wycięte,
-     * bo zawyżało każdy dolny odstęp o ~13 px (pełny wywód: ds.css przy
-     * --sa-gap). --screen-h wyżej zostaje: ten pomiar jest zdrowy i trzyma
-     * ekrany pełnej wysokości w ryzach, gdy vh i dvh się kłócą.
+     * Pomiar „bleed" wraca (0.110.2), w POPRAWIONEJ roli. screen−inner w
+     * standalone mierzy, ile fixed viewport traci u dołu ekranu; ds.css
+     * ODEJMUJE to od dolnego wcięcia (pełny wywód przy --sa-gap). Werdykt z
+     * telefonu: okno 797 · ekran 844 · safe 34 · fixed-dol 797.
      */
+    const nav = navigator as Navigator & { standalone?: boolean }
+    const isStandalone =
+      nav.standalone === true || window.matchMedia('(display-mode: standalone)').matches
+    const gap = Math.round(window.screen.height - window.innerHeight)
+    const bleed = isStandalone && gap > 0 && gap <= 96 ? gap : 0
+    /* w symulacji wartość ma pochodzić z reguły w ds.css, nie z pomiaru */
+    if (root.dataset.pkSim === 'phone') root.style.removeProperty('--sa-bleed')
+    else root.style.setProperty('--sa-bleed', `${bleed}px`)
   }
   apply()
   window.addEventListener('resize', apply)
@@ -131,10 +138,10 @@ export function screenReport() {
    * i Portfela (świeża, pełny ekran) u Jarka.
    */
   const gap = screenH - inner
-  if (standalone && gap >= 20 && gap <= 96 && safe === 0)
+  if (standalone && gap >= 20 && gap <= 96)
     return (
       facts +
-      ' · WERDYKT: ta instalacja działa w oknie sprzed pełnego ekranu. Usuń ikonę Parkove z ekranu głównego i dodaj ją ponownie z Safari, to jedyna naprawa.'
+      ` · WERDYKT: iOS trzyma przybite elementy ${gap} px nad dołem ekranu; aplikacja odejmuje to od dolnego wcięcia, więc przyciski siadają przy dolnej krawędzi okna.`
     )
   if (standalone && safe > 0 && gap === 0)
     return facts + ' · WERDYKT: pełny ekran i systemowe wcięcia działają, układ jest zdrowy.'

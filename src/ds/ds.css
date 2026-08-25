@@ -23,21 +23,29 @@
    * (zmierzone: 34 zgłoszone, 47 brakujące).
    */
   /*
-   * Ile treść ma trzymać się od dolnej krawędzi: DOKŁADNIE tyle, ile zgłasza
-   * system, ani piksela więcej.
+   * Ile treść ma trzymać się od dolnej krawędzi PRZYBITEGO elementu.
    *
-   * Nagrobek teorii „bleed" (2026-08-25). Przez wiele wersji doliczaliśmy tu
-   * zmierzoną różnicę ekran−okno (844−797=47) w przekonaniu, że dolne piksele
-   * są obcinane. Rozstrzygnął to Jarek porównaniem z własną apką: Portfel na
-   * TYM SAMYM telefonie stoi na pełną wysokość z samym env(), a 47 px to
-   * niemal na pewno GÓRNY pasek statusu iPhone'a z pomiaru sprzed poprawnych
-   * met (viewport-fit=cover, black-translucent), doliczony omyłkowo do dołu.
-   * Skutek: KAŻDY dolny odstęp (pasek akcji, arkusze, modale, toast, peek)
-   * był o 13 px za duży i to była ta „przerwa nad wskaźnikiem", która wracała
-   * w zgłoszeniach. Jeśli na urządzeniu kiedyś naprawdę zabraknie dołu,
-   * mierzyć visualViewport przy dolnej krawędzi, nie screen.height.
+   * Historia w trzech aktach, bo to wracało tygodniami:
+   *
+   * 1. Akt „bleed dodawany": zmierzone okno 797 przy ekranie 844 czytaliśmy
+   *    jako „dolne piksele obcięte" i DODAWALIŚMY 47 do odstępów. Za dużo.
+   * 2. Akt „nagrobek" (0.110.0): uznaliśmy 47 za górny pasek statusu i
+   *    wycięliśmy pomiar w ogóle. Też źle: świeża instalacja u Jarka dalej
+   *    miała okno 797 i magenta świeciła W oknie.
+   * 3. Prawda (0.110.2, zrzut z telefonu: okno 797 · ekran 844 · safe 34 ·
+   *    fixed-dol 797): w tym trybie iOS PRZYBITE elementy kończą się 47 px
+   *    nad fizycznym dołem ekranu, a env() i tak każe zostawić 34 na
+   *    wskaźnik. Wskaźnik leży w pasie, do którego fixed NIE SIĘGA, więc
+   *    dodawanie 34 wewnątrz fixed odsuwało przycisk o 47+34+zapas od dołu
+   *    ekranu. Wcięcie trzeba o zmierzone 47 POMNIEJSZYĆ:
+   *    max(0, safe − bleed). U Jarka: max(0, 34−47) = 0, przycisk siada na
+   *    dole fixed, czyli i tak 47 nad ekranem, idealnie ponad wskaźnikiem.
+   *    Na zdrowych viewportach bleed=0 i zostaje czyste safe.
+   *    Pas 47 pod fixed umie pomalować wyłącznie tło dokumentu (html), stąd
+   *    data-pk-light i ciemny domysł niżej w tym pliku.
    */
-  --sa-gap: var(--sa-bottom);
+  --sa-bleed: 0px;
+  --sa-gap: max(0px, calc(var(--sa-bottom) - var(--sa-bleed)));
   --sa-left: env(safe-area-inset-left, 0px);
   --sa-right: env(safe-area-inset-right, 0px);
 }
@@ -54,6 +62,8 @@
 html[data-pk-sim='phone'] {
   --sa-top: 59px;
   --sa-bottom: 34px;
+  /* 47: tyle fixed viewport traci u dolu na telefonie Jarka (844-797) */
+  --sa-bleed: 47px;
 }
 
 html[data-pk-sim='phone'] body::before,
@@ -79,8 +89,8 @@ html[data-pk-sim='phone'] body::before {
 
 html[data-pk-sim='phone'] body::after {
   bottom: 0;
-  /* pas wskaźnika domu: dokładnie systemowe 34, bo tyle realnie chroni iOS */
-  height: var(--sa-bottom);
+  /* pas pokazuje strefe, do ktorej fixed nie siega (bleed), nie samo safe */
+  height: var(--sa-bleed);
 }
 
 *,
