@@ -6,9 +6,19 @@
  * krawedzi. Na duzym ekranie kolumna stoi na srodku i udaje telefon.
  */
 .cat {
-  min-height: 100dvh;
+  /*
+   * ds.css przybija body do okna (position: fixed, overflow: hidden), bo
+   * APLIKACJA posiada ekran i dokument nie moze scrollowac. Katalog zyje w
+   * tym samym rezimie, wiec przewija sie sam: ten kontener jest jedynym
+   * scrollem strony. Bez tego katalog stal jak wryty (uwaga Jarka:
+   * "nie moge scrollowac").
+   */
+  height: 100dvh;
   max-width: 640px;
   margin: 0 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-page);
 }
 
@@ -24,6 +34,48 @@
   height: 10px;
   border-radius: var(--radius-pill);
   background: var(--bg-primary);
+}
+
+/*
+ * FAB "Spis": plywajaca pigulka na dole ekranu, wycentrowana, z labelka
+ * (uwaga Jarka: "ikonka menu powinna byc floating i przyklejona na dole
+ * ekranu, wycentrowana z labelka, po scrollu w dol powinna znikac,
+ * bounceback"). Scroll w dol chowa ja pod krawedz, scroll w gore przywraca
+ * ze sprezynka (przestrzelenie i powrot robi cubic-bezier z przeciagiem).
+ */
+.cat-fab {
+  position: fixed;
+  bottom: calc(var(--safe-bottom, 0px) + 18px);
+  left: 50%;
+  z-index: 55;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  box-shadow: 0 8px 24px rgb(10 18 8 / 0.35);
+  transform: translateX(-50%);
+  transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cat-fab.-hidden {
+  /* w dol bez sprezynki: znikanie ma byc ciche, wracanie zauwazalne */
+  transform: translateX(-50%) translateY(calc(100% + var(--safe-bottom, 0px) + 26px));
+  transition: transform 220ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-fab,
+  .cat-fab.-hidden {
+    transition: none;
+  }
 }
 
 /* ------------------------------------------------------------- drawer */
@@ -555,7 +607,9 @@
 
 @media (max-width: 760px) {
   .cat-main {
-    padding: var(--sp-6) var(--sp-5) var(--sp-9);
+    /* UWAGA: --sp-9 NIE istnieje (skala: 6, 8, 10). Jedna nieistniejaca
+       zmienna uniewaznia CALA deklaracje i padding wychodzil 0 na telefonie */
+    padding: var(--sp-6) var(--sp-5) var(--sp-10);
   }
 
   .cat-typerow {

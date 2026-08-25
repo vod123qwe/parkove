@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   Award,
@@ -331,7 +331,9 @@ export function Catalog() {
   }, [])
   useEffect(() => {
     document.title = `${LABEL_OF.get(active) ?? 'Parkove'} · Parkove DS`
-    window.scrollTo({ top: 0 })
+    /* przewija KONTENER: window w tym rezimie nie scrolluje wcale */
+    shellRef.current?.scrollTo({ top: 0 })
+    setFabHidden(false)
   }, [active])
   const [navQuery, setNavQuery] = useState('')
 
@@ -345,6 +347,28 @@ export function Catalog() {
    * dokladnie jak Storybook na telefonie.
    */
   const [drawerOpen, setDrawerOpen] = useState(false)
+  /*
+   * FAB chowa sie przy scrollu W DOL i wraca przy scrollu w gore. Nasluch
+   * siedzi na kontenerze .cat, bo to ON przewija (body jest przybity przez
+   * ds.css); window.scroll nigdy by tu nie strzelil.
+   */
+  const [fabHidden, setFabHidden] = useState(false)
+  const shellRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = shellRef.current
+    if (!el) return
+    let last = el.scrollTop
+    const onScroll = () => {
+      const y = el.scrollTop
+      const dy = y - last
+      if (y < 40) setFabHidden(false)
+      else if (dy > 6) setFabHidden(true)
+      else if (dy < -6) setFabHidden(false)
+      last = y
+    }
+    el.addEventListener('scroll', onScroll, { passive: true })
+    return () => el.removeEventListener('scroll', onScroll)
+  }, [])
   /* zagniezdzenie: rozwiniety tylko dzial, w ktorym stoi aktywna sekcja */
   const [openGroups, setOpenGroups] = useState<Set<string>>(
     () => new Set([GROUP_OF.get(normalise(window.location.hash)) ?? 'Fundamenty']),
@@ -403,7 +427,7 @@ export function Catalog() {
   }
 
   return (
-    <div className="cat">
+    <div className="cat" ref={shellRef}>
       {/*
         Gorny pasek jak w aplikacji: wstecz wychodzi do Parkove (katalog
         otwiera sie z jej menu), tytul mowi, na ktorej sekcji stoisz, a
@@ -415,14 +439,23 @@ export function Catalog() {
         variant="back"
         scrolled
         onAction={() => {
-          window.location.href = '/'
+          /*
+           * BASE_URL, nie '/': na GitHub Pages aplikacja mieszka pod
+           * /parkove/, wiec goly '/' prowadzil na korzen domeny i 404
+           * (uwaga Jarka: "jak klikam back, to widze 404 github").
+           */
+          window.location.href = import.meta.env.BASE_URL
         }}
-        trailing={
-          <IconButton aria-label="Spis katalogu" variant="tonal" onClick={() => setDrawerOpen(true)}>
-            <Menu size={18} />
-          </IconButton>
-        }
       />
+
+      <button
+        className={`cat-fab pk-press${fabHidden ? ' -hidden' : ''}`}
+        aria-label="Otwórz spis katalogu"
+        onClick={() => setDrawerOpen(true)}
+      >
+        <Menu size={17} />
+        Spis
+      </button>
 
       <div className={`catdrawer${drawerOpen ? ' -open' : ''}`} aria-hidden={!drawerOpen}>
         <button

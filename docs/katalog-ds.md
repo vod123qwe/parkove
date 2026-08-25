@@ -88,3 +88,25 @@ GOTCHA TESTOWA: `location.href = '...#hash'` NIE przeladowuje strony,
 gdy rozni sie tylko hashem. Test "stanu po reloadzie" ogladal wtedy stary
 stan komponentu i wygladalo, jakby wszystkie dzialy byly rozwiniete na
 starcie. Prawdziwy swiezy start wymusza sie zmiana query stringa.
+
+### Poprawki po pierwszym kontakcie (0.108.1)
+
+Cztery zgloszenia Jarka z telefonu, cztery rozne przyczyny:
+
+1. **"Nie ma paddingow"**: w mobilnym media query stalo
+   `padding: var(--sp-6) var(--sp-5) var(--sp-9)`, a **--sp-9 nie
+   istnieje** (skala 4px idzie 6, 8, 10). Jedna nieistniejaca zmienna
+   uniewaznia CALA deklaracje padding, wiec telefon dostawal 0.
+   LEKCJA: po dopisaniu stylow grepnij uzyte tokeny o skale.
+2. **"Nie moge scrollowac"**: ds.css przybija body do okna
+   (position: fixed + overflow: hidden), bo aplikacja posiada ekran.
+   Katalog musi przewijac WLASNYM kontenerem: `.cat { height: 100dvh;
+   overflow-y: auto }`. Z tego samego powodu scroll-listenery i
+   scrollTo ida na `.cat`, nigdy na window.
+3. **"Back to 404 GitHub"**: `window.location.href = '/'` prowadzi na
+   korzen DOMENY, a na GitHub Pages apka mieszka pod /parkove/.
+   Zawsze `import.meta.env.BASE_URL`.
+4. **FAB "Spis"**: plywajaca pigulka z ikona menu i labelka, fixed na
+   dole, wycentrowana; scroll w dol chowa (cicho, 220 ms), scroll w
+   gore przywraca ze sprezynka cubic-bezier(0.34, 1.56, 0.64, 1);
+   przy zmianie sekcji wraca. Hamburger zniknal z gornego paska.

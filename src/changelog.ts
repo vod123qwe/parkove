@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.108.0'
+export const VERSION = '0.108.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.108.1',
+    date: '2026-08-25',
+    title: 'Catalogue breathes, scrolls and comes back home',
+    tldr:
+      'Katalog odzyskał marginesy i przewijanie, wstecz wraca do aplikacji zamiast na 404, a spis otwiera pływający przycisk, który chowa się przy scrollu.',
+    changes: [
+      ['fixed', 'The catalogue had no margins on the phone: one padding rule used a spacing token that does not exist, and a single unknown variable voids the whole declaration. It also refused to scroll, because the app pins the page to the window and the catalogue never got its own scroller; it has one now'],
+      ['fixed', 'The back button led to a GitHub 404: it pointed at the domain root, and on GitHub Pages the app lives under its own folder. It goes back to Parkove now'],
+      ['added', 'The table of contents opens from a floating "Spis" pill, centered at the bottom of the screen. Scrolling down tucks it away quietly, scrolling up springs it back'],
+    ],
+  },
   {
     version: '0.108.0',
     date: '2026-08-25',
