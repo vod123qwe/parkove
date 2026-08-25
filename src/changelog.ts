@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.109.3'
+export const VERSION = '0.110.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.0',
+    date: '2026-08-25',
+    title: 'The gap above the home indicator, solved for real',
+    tldr:
+      'Znaleziona prawdziwa przyczyna przerwy nad wskaznikiem domu: doliczaliśmy do dołu 13 px, które należały do górnego paska statusu. Teraz liczy się dokładnie systemowy odstęp.',
+    changes: [
+      ['fixed', 'Every bottom offset (action bar, sheets, modals, toast, peek card) was 13 pixels too tall. For weeks the app added a measured "missing bottom" to the system inset; comparing with the Portfel app on the same phone proved the measurement wrong, and the 47 pixels were almost certainly the top status bar counted into the bottom. The system inset alone rules now, and in the phone simulation the button sits eight pixels above the home indicator line with the bar background filling the zone to the very edge'],
+    ],
+  },
   {
     version: '0.109.3',
     date: '2026-08-25',

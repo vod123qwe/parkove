@@ -22,17 +22,22 @@
    * `env(safe-area-inset-bottom)` na iOS podaje mniej, niż realnie brakuje
    * (zmierzone: 34 zgłoszone, 47 brakujące).
    */
-  --sa-bleed: 0px;
   /*
-   * Ile treść ma trzymać się od dolnej krawędzi. Większe z dwóch: zgłaszanego
-   * wcięcia i zmierzonej różnicy między ekranem i widokiem.
+   * Ile treść ma trzymać się od dolnej krawędzi: DOKŁADNIE tyle, ile zgłasza
+   * system, ani piksela więcej.
    *
-   * Powód jest praktyczny. Tych ostatnich pikseli nie da się pomalować (widok je
-   * obcina), ale można w nie nie wchodzić. Na telefonie Jarka system zgłasza 34,
-   * a realnie ubywa 47, więc przycisk odsunięty o 34 stał 13 px za nisko i
-   * wyglądał, jakby był przycięty krawędzią, która wzrokowo biegnie dalej.
+   * Nagrobek teorii „bleed" (2026-08-25). Przez wiele wersji doliczaliśmy tu
+   * zmierzoną różnicę ekran−okno (844−797=47) w przekonaniu, że dolne piksele
+   * są obcinane. Rozstrzygnął to Jarek porównaniem z własną apką: Portfel na
+   * TYM SAMYM telefonie stoi na pełną wysokość z samym env(), a 47 px to
+   * niemal na pewno GÓRNY pasek statusu iPhone'a z pomiaru sprzed poprawnych
+   * met (viewport-fit=cover, black-translucent), doliczony omyłkowo do dołu.
+   * Skutek: KAŻDY dolny odstęp (pasek akcji, arkusze, modale, toast, peek)
+   * był o 13 px za duży i to była ta „przerwa nad wskaźnikiem", która wracała
+   * w zgłoszeniach. Jeśli na urządzeniu kiedyś naprawdę zabraknie dołu,
+   * mierzyć visualViewport przy dolnej krawędzi, nie screen.height.
    */
-  --sa-gap: max(var(--sa-bottom), var(--sa-bleed));
+  --sa-gap: var(--sa-bottom);
   --sa-left: env(safe-area-inset-left, 0px);
   --sa-right: env(safe-area-inset-right, 0px);
 }
@@ -49,8 +54,6 @@
 html[data-pk-sim='phone'] {
   --sa-top: 59px;
   --sa-bottom: 34px;
-  /* 47, czyli tyle, ile realnie brakowało na telefonie Jarka: 844 minus 797 */
-  --sa-bleed: 47px;
 }
 
 html[data-pk-sim='phone'] body::before,
@@ -76,8 +79,8 @@ html[data-pk-sim='phone'] body::before {
 
 html[data-pk-sim='phone'] body::after {
   bottom: 0;
-  /* pas pokazuje to, czego realnie brakuje, a nie to, co system zglasza */
-  height: var(--sa-bleed);
+  /* pas wskaźnika domu: dokładnie systemowe 34, bo tyle realnie chroni iOS */
+  height: var(--sa-bottom);
 }
 
 *,

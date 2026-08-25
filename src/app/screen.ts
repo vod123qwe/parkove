@@ -24,35 +24,12 @@ export function trackScreenHeight() {
     root.style.setProperty('--screen-h', `${Math.round(window.innerHeight)}px`)
 
     /*
-     * Ile brakuje widokowi do ekranu, ZMIERZONE, a nie zapytane.
-     *
-     * Diagnostyka z telefonu Jarka rozstrzygnęła sprawę, która wracała cztery
-     * razy: „okno 797 · ekran 844 · safe 34". Widok ma 797, ekran 844, a iOS
-     * przyznaje się do wcięcia 34. Brakuje 47. Czyli `env(safe-area-inset-bottom)`
-     * NIE OPISUJE tej przestrzeni, i dlatego żadna liczba pikseli dopisana do
-     * odstępu nie mogła jej domknąć: element kończący się na krawędzi widoku
-     * kończy się 47 px nad fizycznym dołem ekranu.
-     *
-     * Więc liczymy różnicę sami i pozwalamy powierzchniom WYLAĆ SIĘ o tyle w dół.
-     * To ta sama sztuczka, która zadziałała u góry: nie kończyć się przed
-     * systemowym elementem, tylko wejść pod niego.
-     *
-     * Dwa zabezpieczenia, bo `screen.height` to nie to samo, co okno przeglądarki:
-     * liczy się tylko w aplikacji z ekranu domowego (`standalone`), i tylko gdy
-     * różnica jest wielkości wcięcia. Na komputerze różnica to setki pikseli, a w
-     * poziomie iOS podaje `screen.height` z pionu; jedno i drugie odpada jako
-     * bezsens i wtedy wylewki nie ma.
+     * Nagrobek pomiaru „bleed" (2026-08-25): tu stało liczenie
+     * screen.height − innerHeight i wpychanie wyniku w --sa-bleed. Wycięte,
+     * bo zawyżało każdy dolny odstęp o ~13 px (pełny wywód: ds.css przy
+     * --sa-gap). --screen-h wyżej zostaje: ten pomiar jest zdrowy i trzyma
+     * ekrany pełnej wysokości w ryzach, gdy vh i dvh się kłócą.
      */
-    const nav = navigator as Navigator & { standalone?: boolean }
-    const gap = Math.round(window.screen.height - window.innerHeight)
-    const bleed = nav.standalone === true && gap > 0 && gap <= 96 ? gap : 0
-    /*
-     * W symulacji NIE nadpisujemy: wartość ma wtedy pochodzić z reguły w
-     * ds.css, a styl liniowy bije regułę, więc pomiar z komputera (zero)
-     * wygrywałby z symulowanymi 47 i symulacja nie symulowałaby niczego.
-     */
-    if (root.dataset.pkSim === 'phone') root.style.removeProperty('--sa-bleed')
-    else root.style.setProperty('--sa-bleed', `${bleed}px`)
   }
   apply()
   window.addEventListener('resize', apply)

@@ -214,3 +214,33 @@ rysowanie.
 która pojawia się BEZ dotknięcia użytkownika, nie ma animacji wejścia. Ruch
 zostaje tam, gdzie zawsze poprzedza go dotknięcie: przy zmianie zatrzasku i przy
 arkuszach modalnych.
+
+---
+
+## Nagrobek teorii "bleed" (2026-08-25, 0.110.0)
+
+Przerwa nad wskaznikiem domu wracala w zgloszeniach od tygodni. Rozstrzygnal
+ja Jarek jednym porownaniem: **Portfel (wallet) na tym samym telefonie stoi
+na pelna wysokosc** z samym `env(safe-area-inset-bottom)`.
+
+Co bylo nie tak: `--sa-gap = max(sa-bottom, sa-bleed)`, gdzie sa-bleed to
+zmierzone `screen.height - innerHeight` (844-797=47). Interpretowalismy 47
+jako "dolne piksele, ktorych nie widac". Niemal na pewno bylo odwrotnie:
+**47 to wysokosc GORNEGO paska statusu iPhone'a z wyspa**, zmierzona zanim
+mety (viewport-fit=cover, black-translucent) byly poprawne, i doliczona
+omylkowo do DOLU. Skutek: kazdy dolny odstep (pasek akcji, arkusze, modale,
+peek, toast) byl o 13 px za duzy.
+
+Naprawa: `--sa-gap: var(--sa-bottom)` i koniec. Pomiar bleed wyciety ze
+screen.ts (zostaje --screen-h, ktory jest zdrowy). Pas w symulacji telefonu
+pokazuje systemowe 34, nie wymyslone 47.
+
+Pomiar w symulacji po naprawie: przycisk paska akcji konczy sie 8 px nad
+linia wskaznika, tlo paska wypelnia strefe 34 px do samego dolu.
+
+GDYBY na jakims urzadzeniu naprawde brakowalo dolu: mierzyc pozycje dolnej
+krawedzi przez visualViewport (offsetTop+height vs innerHeight), NIGDY przez
+screen.height, bo ta wartosc nie wie nic o orientacji, zoomie i paskach.
+
+Czego symulacja NIE pokrywa (uczciwie): dynamiczne kurczenie dvh w Safari,
+pierwsza klatka po starcie standalone, rubber-banding. Final judge = telefon.
