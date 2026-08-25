@@ -31,9 +31,26 @@ export function trackScreenHeight() {
      */
     const nav = navigator as Navigator & { standalone?: boolean }
     const isStandalone =
-      nav.standalone === true || window.matchMedia('(display-mode: standalone)').matches
-    const gap = Math.round(window.screen.height - window.innerHeight)
-    const bleed = isStandalone && gap > 0 && gap <= 96 ? gap : 0
+      nav.standalone === true ||
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches
+    /*
+     * DWA pomiary niedoboru, bo saga nauczyła nas, że każdy tryb okna psuje
+     * co innego:
+     *  - screen − inner: okno krótsze od ekranu (stary tryb, 844−797=47),
+     *  - inner − sonda fixed: PRZYBITE elementy kończą się nad dołem okna
+     *    (możliwe w nowym trybie; to jest ta liczba, która naprawdę boli,
+     *    bo od niej zależy, gdzie staje pasek akcji).
+     * Bierzemy większe. Sonda jest tania: pusty div na jedną klatkę.
+     */
+    const gapScreen = Math.round(window.screen.height - window.innerHeight)
+    const probe = document.createElement('div')
+    probe.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:0;pointer-events:none;'
+    document.body.appendChild(probe)
+    const gapFixed = Math.round(window.innerHeight - probe.getBoundingClientRect().bottom)
+    probe.remove()
+    const plausible = (g: number) => (g > 0 && g <= 96 ? g : 0)
+    const bleed = isStandalone ? Math.max(plausible(gapScreen), plausible(gapFixed)) : 0
     /* w symulacji wartość ma pochodzić z reguły w ds.css, nie z pomiaru */
     if (root.dataset.pkSim === 'phone') root.style.removeProperty('--sa-bleed')
     else root.style.setProperty('--sa-bleed', `${bleed}px`)

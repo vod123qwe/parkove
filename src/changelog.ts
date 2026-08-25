@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.4'
+export const VERSION = '0.110.5'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.5',
+    date: '2026-08-25',
+    title: 'Bottom shortfall measured two ways',
+    tldr:
+      'Niedobór dołu mierzony jest teraz dwiema metodami naraz (okno kontra ekran i sonda przybitych elementów), więc kompensacja działa w obu trybach okna.',
+    changes: [
+      ['fixed', 'The bottom compensation now measures the shortfall two ways and takes the larger: window versus screen, and a probe of where pinned elements actually end. Whichever window mode iOS picks, the action bar lands just above the home indicator instead of swinging between too high and too high differently'],
+    ],
+  },
   {
     version: '0.110.4',
     date: '2026-08-25',
