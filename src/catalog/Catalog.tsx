@@ -4,6 +4,8 @@ import {
   Award,
   Bird,
   Camera,
+  ChevronDown,
+  Menu,
   Compass,
   Crown,
   Flag,
@@ -25,10 +27,10 @@ import {
   ActionBar,
   BottomSheet,
   Button,
+  IconButton,
   Carousel,
   Chip,
   Collapsible,
-  IconButton,
   List,
   ListItem,
   MediaHero,
@@ -333,6 +335,61 @@ export function Catalog() {
   }, [active])
   const [navQuery, setNavQuery] = useState('')
 
+  /*
+   * SPIS jako drawer (uwaga Jarka 2026-08-25: "nawigacja jest bardzo webowa,
+   * pomysl o tym jak o storybooku w aplikacji mobilnej (...) menu na
+   * sidebarze po swipe"). Rozwazylem tez drill-down jak w Ustawieniach
+   * (home -> dzial -> sekcja), ale katalog jest narzedziem referencyjnym:
+   * glowna czynnosc to SKAKANIE miedzy sekcjami, a stack kosztuje 3-4
+   * tapniecia na kazdy skok. Drawer: 2 tapniecia i cale drzewo naraz,
+   * dokladnie jak Storybook na telefonie.
+   */
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  /* zagniezdzenie: rozwiniety tylko dzial, w ktorym stoi aktywna sekcja */
+  const [openGroups, setOpenGroups] = useState<Set<string>>(
+    () => new Set([GROUP_OF.get(normalise(window.location.hash)) ?? 'Fundamenty']),
+  )
+  useEffect(() => {
+    const g = GROUP_OF.get(active)
+    if (g) setOpenGroups((was) => (was.has(g) ? was : new Set([...was, g])))
+  }, [active])
+  useEffect(() => {
+    if (!drawerOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDrawerOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    const was = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = was
+    }
+  }, [drawerOpen])
+  /* swipe od lewej krawedzi otwiera, swipe w lewo na panelu zamyka */
+  useEffect(() => {
+    let at: { x: number; y: number; edge: boolean } | null = null
+    const start = (e: TouchEvent) => {
+      const t = e.touches[0]
+      at = { x: t.clientX, y: t.clientY, edge: t.clientX < 28 }
+    }
+    const end = (e: TouchEvent) => {
+      if (!at) return
+      const t = e.changedTouches[0]
+      const dx = t.clientX - at.x
+      const dy = Math.abs(t.clientY - at.y)
+      if (at.edge && dx > 48 && dy < 60) setDrawerOpen(true)
+      else if (drawerOpen && dx < -48 && dy < 60) setDrawerOpen(false)
+      at = null
+    }
+    document.addEventListener('touchstart', start, { passive: true })
+    document.addEventListener('touchend', end, { passive: true })
+    return () => {
+      document.removeEventListener('touchstart', start)
+      document.removeEventListener('touchend', end)
+    }
+  }, [drawerOpen])
+
   const [sheetOpen, setSheetOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [chips, setChips] = useState({ quests: true, water: false, mounds: false })
@@ -347,60 +404,132 @@ export function Catalog() {
 
   return (
     <div className="cat">
+      {/*
+        Gorny pasek jak w aplikacji: wstecz wychodzi do Parkove (katalog
+        otwiera sie z jej menu), tytul mowi, na ktorej sekcji stoisz, a
+        hamburger po prawej otwiera spis. Ten sam NavBar z DS, zero forka.
+      */}
       <NavBar
-        className="cat-mobilenav"
-        title="Parkove DS"
+        className="cat-topbar"
+        title={LABEL_OF.get(active)}
         variant="back"
+        scrolled
         onAction={() => {
           window.location.href = '/'
         }}
+        trailing={
+          <IconButton aria-label="Spis katalogu" variant="tonal" onClick={() => setDrawerOpen(true)}>
+            <Menu size={18} />
+          </IconButton>
+        }
       />
-      <aside className="cat-side">
-        <div className="cat-brand">
-          <span className="cat-brand__dot" />
-          <span className="cat-brand__name">Parkove DS</span>
-          <a className="cat-brand__ver t-caption" href="#whatsnew" title="Co zmieniło się w wersjach">
-            v{VERSION}
-          </a>
-        </div>
-        <input
-          className="cat-navsearch"
-          type="search"
-          value={navQuery}
-          placeholder="Szukaj w katalogu"
-          aria-label="Szukaj w katalogu"
-          onChange={(e) => setNavQuery(e.target.value)}
+
+      <div className={`catdrawer${drawerOpen ? ' -open' : ''}`} aria-hidden={!drawerOpen}>
+        <button
+          className="catdrawer__scrim"
+          aria-label="Zamknij spis"
+          tabIndex={drawerOpen ? 0 : -1}
+          onClick={() => setDrawerOpen(false)}
         />
-        <nav className="cat-nav">
-          {GROUPS.map((g) => {
-            const items = g.items.filter(([, label]) =>
-              label.toLowerCase().includes(navQuery.trim().toLowerCase()),
-            )
-            if (!items.length) return null
-            return (
-              <div key={g.group} className="cat-navgroup">
-                <p className="cat-navgroup__head t-caption">{g.group}</p>
-                {items.map(([id, label]) => (
-                  <a key={id} href={`#${id}`} className={active === id ? '-on' : undefined}>
+        <div className="catdrawer__panel" role="dialog" aria-modal="true" aria-label="Spis katalogu">
+          <div className="catdrawer__brand">
+            <span className="cat-brand__dot" />
+            <span className="catdrawer__name">Parkove DS</span>
+            <a
+              className="catdrawer__ver t-caption"
+              href="#whatsnew"
+              onClick={() => setDrawerOpen(false)}
+            >
+              v{VERSION}
+            </a>
+          </div>
+          <input
+            className="cat-navsearch"
+            type="search"
+            value={navQuery}
+            placeholder="Szukaj w katalogu"
+            aria-label="Szukaj w katalogu"
+            onChange={(e) => setNavQuery(e.target.value)}
+          />
+          <nav className="catdrawer__tree">
+            {navQuery.trim() ? (
+              /* szukanie splaszcza drzewo: wynik to lista trafien */
+              <div className="catdrawer__hits">
+                {ALL_ITEMS.filter(([, label]) =>
+                  label.toLowerCase().includes(navQuery.trim().toLowerCase()),
+                ).map(([id, label]) => (
+                  <a
+                    key={id}
+                    href={`#${id}`}
+                    className={`catdrawer__leaf${active === id ? ' -on' : ''}`}
+                    onClick={() => setDrawerOpen(false)}
+                  >
                     {label}
+                    <span className="catdrawer__crumb t-caption">{GROUP_OF.get(id)}</span>
                   </a>
                 ))}
               </div>
-            )
-          })}
-        </nav>
-        <Segmented
-          className="cat-themeseg"
-          aria-label="Theme"
-          options={[
-            { value: 'auto', label: 'auto' },
-            { value: 'light', label: 'light' },
-            { value: 'dark', label: 'dark' },
-          ]}
-          value={theme}
-          onChange={(t) => pickTheme(t as Theme)}
-        />
-      </aside>
+            ) : (
+              GROUPS.map((g) => {
+                const open = openGroups.has(g.group)
+                return (
+                  <div key={g.group} className="catdrawer__group">
+                    <button
+                      className="catdrawer__grouphead"
+                      aria-expanded={open}
+                      onClick={() =>
+                        setOpenGroups((was) => {
+                          const next = new Set(was)
+                          if (next.has(g.group)) next.delete(g.group)
+                          else next.add(g.group)
+                          return next
+                        })
+                      }
+                    >
+                      <ChevronDown size={15} className={`catdrawer__chev${open ? ' -open' : ''}`} />
+                      <span>{g.group}</span>
+                      <span className="catdrawer__count t-caption">{g.items.length}</span>
+                    </button>
+                    {open && (
+                      <div className="catdrawer__leaves">
+                        {g.items.map(([id, label]) => (
+                          <a
+                            key={id}
+                            href={`#${id}`}
+                            className={`catdrawer__leaf${active === id ? ' -on' : ''}`}
+                            onClick={() => setDrawerOpen(false)}
+                          >
+                            {label}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            )}
+          </nav>
+          {/*
+            Motyw pod dropdownem, nie wielkim przelacznikiem na wierzchu
+            (uwaga Jarka: "wybieralka do kolorow niech bedzie pod jakims
+            dropdownem"). Natywny select = systemowa wybieralka na telefonie.
+          */}
+          <label className="cat-theme">
+            <span className="t-caption">Motyw</span>
+            <span className="cat-theme__pill">
+              <span className="cat-theme__label">
+                {theme === 'auto' ? 'Systemowy' : theme === 'light' ? 'Jasny' : 'Ciemny'}
+              </span>
+              <ChevronDown size={13} aria-hidden="true" />
+              <select value={theme} onChange={(e) => pickTheme(e.target.value as Theme)}>
+                <option value="auto">Systemowy</option>
+                <option value="light">Jasny</option>
+                <option value="dark">Ciemny</option>
+              </select>
+            </span>
+          </label>
+        </div>
+      </div>
 
       <main className="cat-main">
         <ActiveSection.Provider value={active}>

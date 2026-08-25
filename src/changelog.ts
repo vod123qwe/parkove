@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.107.0'
+export const VERSION = '0.108.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.108.0',
+    date: '2026-08-25',
+    title: 'The catalogue got a drawer, like a mobile storybook',
+    tldr:
+      'Katalog DS działa jak mobilny storybook: spis wysuwa się z lewej po hamburgerze albo swipe, działy się zwijają, a motyw siedzi pod dropdownem.',
+    changes: [
+      ['changed', 'The web sidebar is gone. Content fills the screen like an app, the top bar names the section you are on, and the table of contents slides in from the left after the menu button or a swipe from the edge, the way a mobile storybook does it'],
+      ['changed', 'Sections in the drawer collapse and expand, only the one holding the current page starts open, and its entries are indented with a line so the nesting is visible. Searching flattens the tree into hits labelled with their section'],
+      ['changed', 'The theme switcher moved to the bottom of the drawer as a dropdown, so it opens the system picker on a phone instead of taking up space as a three way switch'],
+    ],
+  },
   {
     version: '0.107.0',
     date: '2026-08-25',

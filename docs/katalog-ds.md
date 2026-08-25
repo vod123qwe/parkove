@@ -49,3 +49,42 @@ Zrodlo: `src/changelog.ts`. Kazde wydanie dopisuje sie tam razem z bumpem
 
 GOTCHA: apostrof w tekscie wpisu changeloga LAMIE BUILD (dwa razy nas to
 przewrocilo, wersje 0.93.2 i 0.102.0). Pisz "the place" zamiast "place's".
+
+
+## Przebudowa 2: mobilny storybook z drawerem (2026-08-25, 0.108.0)
+
+Jarek o wersji z sidebar em: "nawigacja jest bardzo webowa, pomysl o tym
+jak o storybooku w aplikacji mobilnej z odpowiednimi zagniezdzonymi
+nawigacjami, zrob to od nowa" + "wybieralka do kolorow niech bedzie pod
+jakims dropdownem, te menu bardziej zagniezdzone albo w menu na sidebarze
+po swipe" + "zastanow sie".
+
+DECYZJA (rozwazone dwa modele):
+
+- drill-down stack jak Ustawienia iOS (home -> dzial -> sekcja, back w
+  pasku): ODRZUCONY. Katalog to narzedzie referencyjne, glowna czynnosc to
+  skakanie miedzy sekcjami, a stack kosztuje 3-4 tapniecia na kazdy skok
+  i gubi kontekst calosci;
+- DRAWER jak Storybook mobile: tresc na pelnym ekranie, spis wysuwany z
+  lewej (hamburger albo swipe od krawedzi), w spisie zagniezdzone dzialy.
+  WYBRANY: 2 tapniecia na skok, cale drzewo naraz.
+
+Elementy:
+
+- shell to jedna kolumna max 640 px (na desktopie stoi na srodku i udaje
+  telefon), NavBar z DS na sticky gorze: wstecz wychodzi do aplikacji,
+  tytul = aktywna sekcja, hamburger w trailing otwiera spis;
+- drawer: panel min(84vw, 330px), scrim, Escape i tap w scrim zamykaja,
+  swipe od lewej krawedzi (<28 px, dx>48) otwiera, swipe w lewo zamyka,
+  body overflow hidden gdy otwarty;
+- dzialy ZWIJANE (chevron; na starcie rozwiniety tylko dzial aktywnej
+  sekcji, useEffect dorozwija przy zmianie), pozycje z wcieciem i kreska
+  po lewej = widoczne zagniezdzenie; aktywna pozycja wypelniona;
+- szukajka splaszcza drzewo do listy trafien z okruszkiem dzialu;
+- motyw NA DOLE drawera pod dropdownem (natywny select w pigulce, na
+  telefonie otwiera systemowa wybieralke): Systemowy / Jasny / Ciemny.
+
+GOTCHA TESTOWA: `location.href = '...#hash'` NIE przeladowuje strony,
+gdy rozni sie tylko hashem. Test "stanu po reloadzie" ogladal wtedy stary
+stan komponentu i wygladalo, jakby wszystkie dzialy byly rozwiniete na
+starcie. Prawdziwy swiezy start wymusza sie zmiana query stringa.
