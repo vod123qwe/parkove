@@ -33,7 +33,11 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
     if (!open) return
     void storageReport().then(setStore)
   }, [open, wiped])
-  const [diag, setDiag] = useState<string | null>(null)
+  /* stan z dokumentu, nie z zera: magenta przezywa restarty przez localStorage
+     i przelacznik ma to pokazywac od wejscia */
+  const [diag, setDiag] = useState<string | null>(() =>
+    document.documentElement.dataset.pkGround === 'debug' ? screenReport() : null,
+  )
   const [sim, setSim] = useState(() => document.documentElement.dataset.pkSim === 'phone')
   const taps = useRef(0)
 
@@ -111,8 +115,17 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
         />
         <ListItem
           icon={<Ruler />}
-          title="Diagnostyka ekranu"
-          meta="Maluje tło dokumentu na magentę i wypisuje wymiary"
+          /*
+           * Stan przelacznika w tytule (2026-08-25): magenta zostawala
+           * wlaczona po pomiarach i różowy pas na dole został odczytany jako
+           * "znowu straciliśmy dół". Debug ma się przedstawiać.
+           */
+          title={diag ? 'Diagnostyka ekranu: WŁĄCZONA' : 'Diagnostyka ekranu'}
+          meta={
+            diag
+              ? 'Różowy pas na dole to znacznik strefy poza aplikacją, nie błąd. Dotknij, żeby wyłączyć'
+              : 'Maluje tło dokumentu na magentę i wypisuje wymiary'
+          }
           onClick={() => {
             taps.current += 1
             setDiag(toggleGroundDebug() ? screenReport() : null)

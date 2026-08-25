@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.5'
+export const VERSION = '0.110.6'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.6',
+    date: '2026-08-25',
+    title: 'The debug band introduces itself',
+    tldr:
+      'Różowy pas diagnostyczny przedstawia się teraz z imienia: przełącznik mówi, że jest włączony, co oznacza pas i jak go zgasić.',
+    changes: [
+      ['fixed', 'The screen diagnostic stayed on after measuring and its magenta band at the bottom was read as a layout loss. The toggle now announces its state, explains that the pink band is a marker of the zone outside the app, tells you a tap turns it off, and remembers being on across restarts'],
+    ],
+  },
   {
     version: '0.110.5',
     date: '2026-08-25',
