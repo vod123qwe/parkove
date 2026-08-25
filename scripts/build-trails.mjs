@@ -486,6 +486,21 @@ async function markedTrails(parkId) {
 
 /* ---------- główna pętla ---------- */
 
+/*
+ * Najkrotsza trasa, ktora chcemy pokazac.
+ *
+ * 600 -> 400 przy zmianie "bez parkingu" (2026-08-25). Prog 600 powstal
+ * przeciw 200-metrowym przejsciom miedzy dwoma punktami. Po odcieciu dolotu
+ * z parkingu uczciwa petla malego parku (Solvay, Mlynowka, Jalu Kurka) ma
+ * 400-550 m i wypadala razem ze smieciami. 400 m to wciaz spacer, nie skok.
+ *
+ * UWAGA: ten prog musi byc JEDEN. Do 2026-08-25 istnialy dwa (600 przy
+ * dodawaniu trasy, 400 przy koncowym czyszczeniu) i Park Bednarskiego wpadl
+ * w szczeline: trasa 400-600 m nie zostala dodana, wiec nie bylo czego
+ * zachowac.
+ */
+const MIN_M = 400
+
 const quests = readQuests()
 const argv = process.argv.slice(2)
 const pruneOnly = argv.includes('--prune')
@@ -597,7 +612,7 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
   }
 
   const full = await loopThrough(start, pois)
-  if (full && full.m >= 600)
+  if (full && full.m >= MIN_M)
     trails.push({
       id: 'punkty-wszystkie',
       name: pois.length > 2 ? 'Pętla przez wszystkie punkty' : 'Trasa przez punkty',
@@ -628,12 +643,48 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
     if (via) {
       const r = await ringThrough(start, pois, { via, stopWithin: 90 })
       const back = r ? backtrack(r.line) : 1
-      const better = back < 0.4 && back < fullBack - 0.15 && r && r.m >= 800
+      /*
+       * Dwa progi, bo to dwa rozne pytania. Gdy petla przez punkty JUZ jest,
+       * obejscie parku musi byc wyraznie lepsze i dluzsze niz 800 m, inaczej
+       * tylko dubluje wybor. Gdy przez punkty nic nie wyszlo (male parki po
+       * odcieciu parkingu), obejscie jest JEDYNA szansa miejsca na trase i
+       * wtedy wystarczy, ze jest petla i ma ponad prog ogolny.
+       */
+      const sole = !full || full.m < MIN_M
+      /*
+       * Prog zawracania tez zalezy od stawki. Obok istniejacej petli bierzemy
+       * tylko prawdziwa petle (ponizej 40%, kalibracja: brzeg zalewu 20 do 27%,
+       * tam i z powrotem 89%). Gdy to JEDYNA szansa miejsca na trase, bierzemy
+       * do 55% i mowimy o niej uczciwie: 45% to nie petla, to spacer z
+       * odnogami do punktow. Park Decjusza i Reduta (po 8 ha) wolа taki spacer
+       * niz zadnej propozycji.
+       */
+      const ringOk = back < 0.4
+      /*
+       * Trzeci przypadek, z Witkowic: trasa przez punkty zawraca w 97% (czyli
+       * chodzi tam i z powrotem), a obejscie ma 51%. To nie petla, ale jest
+       * DRAMATYCZNIE lepsze od tego, co miejsce ma, wiec wchodzi jako spacer.
+       * Prog 30 punktow procentowych poprawy, zeby nie wpuszczac remisow.
+       */
+      const muchBetter = back < 0.55 && back < fullBack - 0.3
+      /*
+       * Trasa "po parku" ma byc W PARKU. Panienskie Skaly dostaly obejscie,
+       * ktore w 59% biegnie poza obrysem rezerwatu (po Lesie Wolskim obok):
+       * spacer sensowny, ale nazwa klamie, a dlugosc mowi o czym innym niz
+       * miejsce. Prog 55% dlugosci wewnatrz obrysu.
+       */
+      const rs = ringsFor(parkId)
+      const inside = r && rs ? r.line.filter((c) => inPolygon(c, rs)).length / r.line.length : 1
+      const better =
+        r &&
+        inside >= 0.55 &&
+        (sole ? back < 0.55 : ringOk ? back < fullBack - 0.15 : muchBetter) &&
+        r.m >= (sole ? MIN_M : 800)
       if (better) {
         const water = feature.properties?.kind === 'water'
         trails.unshift({
           id: 'wokol',
-          name: water ? 'Pętla brzegiem' : 'Pętla po parku',
+          name: ringOk ? (water ? 'Pętla brzegiem' : 'Pętla po parku') : 'Spacer po parku',
           kind: 'points',
           ...r,
         })
@@ -641,7 +692,9 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
       console.log(
         `  wokol: ${better ? 'wzięte' : 'odrzucone'} (${r?.m ?? 0} m, zawracanie ${Math.round(
           back * 100,
-        )}%, przez punkty ${Math.round(fullBack * 100)}%, mija ${r?.stops.length ?? 0})`,
+        )}%, przez punkty ${Math.round(fullBack * 100)}%, w obrysie ${Math.round(
+          inside * 100,
+        )}%, mija ${r?.stops.length ?? 0})`,
       )
     }
   }
@@ -658,7 +711,7 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
    * Wchodzi, gdy końce są naprawdę daleko (550 m+) i trasa ma sens (800 m+).
    */
   const across = await walkAcross(pois)
-  if (across && across.m >= 800) {
+  if (across && across.m >= Math.max(MIN_M, 800)) {
     const afterRing = trails.findIndex((t) => t.id === 'punkty-wszystkie')
     const row = { id: 'przez-park', name: 'Przez cały park', kind: 'points', ...across }
     if (afterRing >= 0) trails.splice(afterRing, 0, row)
@@ -686,7 +739,8 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
    * nie jest brak tras.
    */
   if (pointsOnly && !full) {
-    console.warn(`${parkId.padEnd(24)} router nie odpowiada, zostawiam stary wpis`)
+    // console.log, nie warn: wrapper czyta STDOUT i po warn uznawal bieg za udany
+    console.log(`${parkId.padEnd(24)} router nie odpowiada, zostawiam stary wpis`)
     continue
   }
 
@@ -699,15 +753,8 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
 
 /*
  * Progi na koniec, takze w trybie --prune: warianty policzone przy starszym
- * progu maja wypasc bez ponownego pytania sieci.
+ * progu maja wypasc bez ponownego pytania sieci. Ten sam MIN_M, co wyzej.
  */
-/*
- * 600 -> 400 przy zmianie "bez parkingu" (2026-08-25). Prog 600 powstal
- * przeciw 200-metrowym przejsciom miedzy dwoma punktami. Po odcieciu dolotu
- * z parkingu uczciwa petla malego parku (Solvay, Mlynowka, Jalu Kurka) ma
- * 400-550 m i wypadala razem ze smieciami. 400 m to wciaz spacer, nie skok.
- */
-const MIN_M = 400
 for (const [park, trails] of Object.entries(result)) {
   const kept = trails.filter((t) => t.kind === 'osm' || t.m >= MIN_M)
   const short = trails.length - kept.length

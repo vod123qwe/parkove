@@ -233,3 +233,45 @@ wrapper, ktory grepuje stdout, uzna bieg za udany; sprawdzaj, czy wpis
 faktycznie sie zmienil. GOTCHA nr 2: publiczny OSRM po ~10 min ciaglego
 ruchu tnie polaczenia na kilkanascie minut; sleep 1300 ms juz ustawiony,
 i tak rob przerwy miedzy partiami.
+
+
+---
+
+## Dociagniete: caly katalog na v2 (2026-08-25, 0.101.0)
+
+Wszystkie 47 miejsc z punktami wyprawy przeliczone bez parkingu.
+44 miejsca maja trasy (bylo 37), tras `points` razem 63.
+
+Progi po tej rundzie (wszystkie w build-trails.mjs):
+
+- `MIN_M = 400` i to JEDEN prog. Wczesniej istnialy dwa (600 przy
+  dodawaniu trasy, 400 przy koncowym czyszczeniu) i Park Bednarskiego
+  wpadl w szczeline: trasa 584 m nie zostala dodana, wiec czyszczenie
+  nie mialo czego zachowac. To byl cichy blad, nie decyzja.
+- Obejscie parku (`wokol`) ma dwa progi, bo odpowiada na dwa pytania.
+  Obok istniejacej petli przez punkty: min 800 m, zawracanie < 40%,
+  poprawa >= 15 pp. Jako JEDYNA trasa miejsca: min 400 m, zawracanie
+  < 55%.
+- Trzeci przypadek (Witkowice): trasa przez punkty zawraca w 97%,
+  obejscie w 51%. Nie petla, ale dramatycznie lepsze, wiec wchodzi,
+  gdy poprawa >= 30 pp.
+- Nazwa mowi prawde: zawracanie < 40% to „Petla po parku" (albo
+  „Petla brzegiem" nad woda), powyzej „Spacer po parku".
+- Trasa „po parku" musi miec >= 55% dlugosci W OBRYSIE miejsca.
+  Panienskie Skaly dostaly obejscie biegnace w 59% po Lesie Wolskim
+  obok rezerwatu: odrzucone, miejsce zostaje przy szlaku znakowanym.
+
+Zyskaly trase (12): dolina-kobylanska, dolina-kluczwody,
+dolina-bedkowska, dolina-raclawki, dolina-szklarki, szwedzki,
+wyspianskiego, kopiec-kosciuszki, zaczarowanej-dorozki, decjusza,
+reduta, wisniowy-sad.
+
+Bez tras (uczciwie, brak sensownej petli): kopiec-wandy (zawracanie
+63%), stacja-wisla (84%), szymborskiej (brak punktow kierunkowych),
+plus male skwery bez punktow wyprawy.
+
+DO ROZWAZENIA: 22 miejsca z wydania 0.100.0 liczone byly jeszcze przy
+starym progu 600 i starych regulach obejscia. Nic nie stracily, ale
+moglyby zyskac dodatkowy „Spacer po parku" tam, gdzie ich trasa przez
+punkty zawraca. Pelny przelot `--points` nad calym katalogiem to
+15 do 30 minut.

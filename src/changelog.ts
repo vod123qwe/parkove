@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.100.0'
+export const VERSION = '0.101.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.101.0',
+    date: '2026-08-25',
+    title: 'Every place recomputed, twelve gained a walk',
+    tldr:
+      'Cały katalog przeliczony bez parkingu: 44 miejsca mają trasy, dwanaście dostało je pierwszy raz, m.in. Decjusza, Reduta i kopiec Kościuszki.',
+    changes: [
+      ['added', 'Twelve places got a walking route for the first time: Decjusza, Reduta, Wiśniowy Sad, kopiec Kościuszki, Zaczarowanej Dorożki, Szwedzki, Wyspiańskiego, and five of the Jurassic valleys gained a second variant'],
+      ['changed', 'A route is now named for what it really is: under 40 percent doubling back it is a loop, above that an honest "Spacer po parku". Witkowice show why it matters: their point-to-point route walks the same path back 97 percent of the way, so the 2.4 km walk around the park replaced it at the top'],
+      ['fixed', 'Two different minimum lengths were fighting in the generator (600 metres when adding a route, 400 when cleaning up). Park Bednarskiego fell through the gap and lost its route entirely; there is one threshold now'],
+      ['fixed', 'A route called "around the park" has to stay in the park: at least 55 percent of its length inside the boundary. Panieńskie Skały were being given a walk that ran mostly through the neighbouring forest, so they keep their marked trail instead'],
+    ],
+  },
   {
     version: '0.100.0',
     date: '2026-08-25',
