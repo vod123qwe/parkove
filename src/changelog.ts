@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.6'
+export const VERSION = '0.110.7'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.7',
+    date: '2026-08-25',
+    title: 'Nothing hides behind the system bars anymore',
+    tldr:
+      'Edytor trasy, dziennik i katalog liczyły odstępy od nieistniejących zmiennych, więc ich kontrolki wjeżdżały pod pasek statusu i wskaźnik domu. Naprawione u źródła.',
+    changes: [
+      ['fixed', 'Jarek split the problem correctly: spacing taste is one thing, content hiding behind the status bar or the home indicator is a bug. Seven fresh screens (trail editor top bar and save card, journal list, catalogue drawer and its floating button) measured their gaps from safe-area variables that never existed, so they resolved to zero. They use the real tokens now: controls never start under system zones, while the map and scrolling content still run edge to edge beneath them, transparently, the way it should be'],
+    ],
+  },
   {
     version: '0.110.6',
     date: '2026-08-25',

@@ -5940,7 +5940,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: calc(var(--safe-top, 0px) + var(--sp-3)) var(--sp-4) var(--sp-3);
+  padding: calc(var(--sa-top) + var(--sp-3)) var(--sp-4) var(--sp-3);
   background: linear-gradient(to bottom, rgb(10 18 8 / 0.7), transparent);
   pointer-events: none;
 }
@@ -6044,7 +6044,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: var(--sp-4) var(--sp-4) calc(var(--safe-bottom, 0px) + var(--sp-4));
+  padding: var(--sp-4) var(--sp-4) calc(var(--sa-gap) + var(--sp-4));
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface-raised);
@@ -6147,7 +6147,7 @@
   /* pod paskiem z nazwa, nie nad karta: karta ma zmienna wysokosc, wiec
      kotwiczenie do jej gory znaczyloby liczenie pikseli w dwoch miejscach */
   position: absolute;
-  top: calc(var(--safe-top, 0px) + 58px);
+  top: calc(var(--sa-top) + 58px);
   left: var(--sp-4);
   right: var(--sp-4);
   margin: 0;
@@ -6384,7 +6384,7 @@
 
 .jrnl__body {
   flex: 1;
-  padding: 0 var(--sp-6) calc(var(--safe-bottom, 0px) + var(--sp-8));
+  padding: 0 var(--sp-6) calc(var(--sa-gap) + var(--sp-8));
   overflow-y: auto;
   overscroll-behavior: contain;
 }
