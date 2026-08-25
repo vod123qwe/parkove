@@ -210,3 +210,36 @@ DS zgłaszał zatrzask przy **każdym renderze**, a nie przy zmianie, bo wołaj�
 podaje funkcję tworzoną w locie. Cokolwiek wołający na tej podstawie ustawiał,
 kasowało się w następnej klatce. Każda prośba o rozwinięcie ginęła cicho.
 Zdarzenie zmiany musi się dziać przy zmianie: w DS pilnuje tego referencja.
+
+---
+
+## Menu jako pelny ekran profilu (2026-08-25, 0.109.0)
+
+Jarek: "moglby byc full screen, gdzie u gory sa jakies podstawowe info o
+mnie, najwazniejsze, a pod spodem odpowiednio podzielone linki (...)
+normalne cellki: ikonka i tekst i chevron, z wiekszymi spacerami".
+
+- **ProfileScreen.tsx**: Modal push "Ty". U gory pierscien postepu
+  (odkryte/56) + linia "X z 56 miejsc odkrytych" + StatGrid 3: wyprawy,
+  km w nogach, zlote. Nizej sekcje Ty / Miejsca / Ustawienia jako
+  ListItemy z chevronem (klasa .prof-cells podbija pion do 15 px).
+- Wejscia do modalow NIE zamykaja profilu: wstecz z Moich liczb wraca do
+  profilu, nie na mape. Wyjatek: Wszystkie parki (zamyka i rozklada liste).
+- **JournalScreen.tsx**: "Wyprawy i odkrycia" pod jednym dachem,
+  Segmented u gory. Wyprawy = lista sladow (przeniesiona z JourneysModal,
+  plik skasowany) + StatGrid podsumowania (wypraw, km razem, w drodze).
+  Odkrycia = DiscoveriesScreen z propem `embedded` (bez wlasnego NavBara
+  i tytulu, position absolute w rodzicu).
+- **LooksModal**: radiowiersze (ikona po lewej, kolko po prawej) zamiast
+  kafli z rysowanymi podgladami; ThemeArt/MapArt skasowane.
+
+GOTCHA (drabina z-index, znowu): JournalScreen renderowany w .app-shell
+z z-index 210 i tak ladowal POD modalem profilu (200), bo **.app-shell ma
+position: fixed, a Chromium robi z fixed kontekst stosu** - 210 liczylo
+sie tylko wewnatrz shella. Kazdy pelnoekranowy widok otwierany nad
+modalami MUSI isc przez createPortal(document.body) (tak jak edytor
+trasy). Zmierzone elementFromPoint przed i po.
+
+Druga wpadka dnia: sprzatanie CSS w 0.106 przypadkiem wycielo style
+.app-searchrow i .app-fbtn (okragly przycisk filtrow przy wyszukiwarce);
+przywrocone tutaj.

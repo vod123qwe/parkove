@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.108.1'
+export const VERSION = '0.109.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.109.0',
+    date: '2026-08-25',
+    title: 'Menu becomes your profile',
+    tldr:
+      'Menu to teraz pełny ekran profilu: u góry pierścień i liczby, niżej zwykłe wiersze. Wyprawy i odkrycia mieszkają razem pod przełącznikiem, a Wygląd to proste radio.',
+    changes: [
+      ['changed', 'The menu sheet grew into a full profile screen. The top says what matters: a progress ring with places discovered, then trips, kilometres walked and golden stamps. Below it plain rows with an icon, text and a chevron, with more breathing room, grouped into You, Places and Settings'],
+      ['changed', 'Trips and discoveries live together now, with a switcher on top: the list of your tracks on one side, the cloud map on the other. The trips side gained a summary of everything walked, and going back returns to the profile, not to the map'],
+      ['changed', 'The appearance screen is a simple radio list: an icon on the left, a dot on the right, no more preview tiles. The change applies instantly anyway, so the best preview is the screen itself'],
+      ['fixed', 'The round filter button had lost its styling in an earlier cleanup and sat under the search field as a bare square. It is back beside the search, round as intended'],
+    ],
+  },
   {
     version: '0.108.1',
     date: '2026-08-25',

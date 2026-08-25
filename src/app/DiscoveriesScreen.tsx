@@ -59,7 +59,18 @@ function windowRadiusPx(map: maplibregl.Map, f: ParkFeature): number {
   return Math.min(170, Math.max(30, rPx * 1.25))
 }
 
-export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
+/**
+ * embedded: ekran zyje w JournalScreen pod wspolnym paskiem i przelacznikiem
+ * (Jarek 2026-08-25: polaczyc wyprawy z odkryciami), wiec nie rysuje wlasnego
+ * NavBara ani tytulu i wypelnia rodzica zamiast calego okna.
+ */
+export function DiscoveriesScreen({
+  onClose,
+  embedded = false,
+}: {
+  onClose: () => void
+  embedded?: boolean
+}) {
   const { parks } = useGameState()
   useLightChrome(false)
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -350,11 +361,13 @@ export function DiscoveriesScreen({ onClose }: { onClose: () => void }) {
   }, [])
 
   return (
-    <div className="discscreen" ref={wrapRef}>
+    <div className={`discscreen${embedded ? ' -embedded' : ''}`} ref={wrapRef}>
       <div className="discscreen__map" ref={mapRef} />
       <canvas className="discscreen__fog" ref={fogRef} />
-      <NavBar transparent variant="back" onAction={onClose} className="discscreen__nav" />
-      <div className="discscreen__title t-label">Twoje odkrycia</div>
+      {!embedded && (
+        <NavBar transparent variant="back" onAction={onClose} className="discscreen__nav" />
+      )}
+      {!embedded && <div className="discscreen__title t-label">Twoje odkrycia</div>}
       {freshName && (
         <div className="discscreen__fresh t-label">Chmury się rozeszły: {freshName}</div>
       )}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Award, Camera, ChevronDown, ChevronRight, Clock, CloudOff, SlidersHorizontal, Cloudy, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
+import { Camera, ChevronDown, Clock, CloudOff, SlidersHorizontal, Coffee, Compass, Crosshair, Footprints, Layers, LocateFixed, Menu, RefreshCw, Search, Sparkles, ToyBrick, X } from 'lucide-react'
 import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
@@ -14,7 +14,8 @@ import { ParkingModal } from './ParkingModal'
 import { TrailModal } from './TrailModal'
 import { TrailPicker } from './TrailPicker'
 import { LooksModal } from './LooksModal'
-import { JourneysModal } from './JourneysModal'
+import { JournalScreen } from './JournalScreen'
+import { ProfileScreen } from './ProfileScreen'
 import { StatsModal } from './StatsModal'
 import { AboutModal } from './AboutModal'
 import { MapFilters } from './MapFilters'
@@ -44,7 +45,6 @@ import { REFRESH_FROM } from './refresh'
 import { VERSION, changesSince } from '../changelog'
 import { EndWalkSheet } from './EndWalkSheet'
 import { JourneyScreen } from './JourneyScreen'
-import { DiscoveriesScreen } from './DiscoveriesScreen'
 import { StampScreen } from './StampScreen'
 import { WalkSummary } from './WalkSummary'
 import { chooseTrail, stopExpedition, useGameState } from './state'
@@ -53,7 +53,7 @@ import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import { DownloadStatus } from './DownloadStatus'
 import { KIND_META } from './kinds'
-import { CHALLENGES, challengeStates } from './data/challenges'
+import { challengeStates } from './data/challenges'
 import type { MapStyleId } from './data/mapstyles'
 import { PARKING } from './data/parking'
 import { amenitiesFor, isFood } from './data/amenities'
@@ -61,7 +61,7 @@ import type { ParkingInfo } from './data/parking'
 import { pointsTotal, questForPark, photosForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 import parksData from './data/parks.json'
-import { plMiejsca, plNaklejki, plPunkty, plWyprawy, plZapisane } from './naming'
+import { plPunkty } from './naming'
 import './app.css'
 
 const FEATURES = parksData.features as unknown as ParkFeature[]
@@ -174,7 +174,8 @@ export function App() {
   const [poiCard, setPoiCard] = useState<{ parkId: string; poi: QuestPoi } | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [stampsOpen, setStampsOpen] = useState(false)
-  const [discOpen, setDiscOpen] = useState(false)
+  /* jeden ekran wypraw i odkryc (Jarek: polaczyc); null = zamkniety */
+  const [journalOpen, setJournalOpen] = useState(false)
   /*
    * Jeden ekran wygladu (motyw + mapa) i jeden o aplikacji, zamiast czterech
    * wejsc rozsypanych po menu i profilu. Uwaga na nazwe: looksOpen nizej to
@@ -183,7 +184,6 @@ export function App() {
   const [looksModalOpen, setLooksModalOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [statsOpen, setStatsOpen] = useState(false)
-  const [journeysOpen, setJourneysOpen] = useState(false)
   /** the quick switch on the map itself, for comparing looks in place */
   const [looksOpen, setLooksOpen] = useState(false)
   const [celebrate, setCelebrate] = useState<{ id: string; name: string } | null>(null)
@@ -273,7 +273,6 @@ export function App() {
     for (const id of completedIds) if (!prev.has(id)) pendingStamps.current.push(id)
   }, [completedIds])
 
-  const visitedCount = FEATURES.filter((f) => visitedIds.has(f.id)).length
 
   const selected = FEATURES.find((f) => f.id === selectedId) ?? null
 
@@ -314,13 +313,13 @@ export function App() {
    */
   const onScreen =
     stampsOpen ||
-    journeysOpen ||
+    journalOpen ||
     statsOpen ||
     aboutOpen ||
     looksModalOpen ||
     pointsOpen ||
     plantCam ||
-    discOpen
+    false
   useEffect(() => {
     if (onScreen) setListWide(false)
   }, [onScreen])
@@ -565,7 +564,7 @@ export function App() {
       setListWide(false)
       setJourneyId(null)
       setStatsOpen(false)
-      setJourneysOpen(false)
+      setJournalOpen(false)
       selectParkFromMapRef.current?.(id)
     },
     [],
@@ -1359,7 +1358,16 @@ export function App() {
         />
       )}
 
-      {discOpen && <DiscoveriesScreen onClose={() => setDiscOpen(false)} />}
+      {journalOpen && (
+        <JournalScreen
+          onClose={() => setJournalOpen(false)}
+          onOpenJourney={(id) => {
+            setJournalOpen(false)
+            clearSelection()
+            setJourneyId(id)
+          }}
+        />
+      )}
 
       {journey && journeyPark && (
         <JourneyScreen
@@ -1612,111 +1620,25 @@ export function App() {
         </div>
       </BottomSheet>
 
-      <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu">
-        <p className="t-caption app-menu__head">Ty</p>
-        <List className="app-menu">
-          <ListItem
-            icon={<Route />}
-            leadTone="accent"
-            title="Moje liczby"
-            meta={`${completedIds.size} ${plNaklejki(completedIds.size)}, ${journeys.length} ${plWyprawy(
-              journeys.length,
-            )}, ${visitedCount} ${plMiejsca(visitedCount)}`}
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setStatsOpen(true)
-            }}
-          />
-          {/*
-            "Osiagniecia", po drodze przez "Pieczatki", "Album" i "Wyzwania"
-            (Jarek, 2026-08-22). Ostatnia nazwa byla zla z tego samego powodu, co
-            pierwsza: mowila o JEDNYM rodzaju, a w srodku sa dwa rowne sobie.
-            Osiagniecie jest parasolem, pieczatka i wyzwanie sa jego rodzajami,
-            i dlatego siedza w dwoch zakladkach, a nie jedno pod drugim.
-          */}
-          <ListItem
-            icon={<Cloudy />}
-            title="Twoje odkrycia"
-            meta={`${visitedIds.size} z ${FEATURES.length - 1} miejsc wyszło spod chmur`}
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setDiscOpen(true)
-            }}
-          />
-          <ListItem
-            icon={<Award />}
-            title="Osiągnięcia"
-            meta={`${completedIds.size} ${
-              completedIds.size === 1 ? 'pieczątka' : completedIds.size < 5 ? 'pieczątki' : 'pieczątek'
-            }, ${challengeDone} z ${CHALLENGES.length} wyzwań`}
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setStampsOpen(true)
-            }}
-          />
-          <ListItem
-            icon={<Footprints />}
-            title="Moje wyprawy"
-            meta={
-              journeys.length
-                ? `${journeys.length} ${plZapisane(journeys.length)}, każda ze swoim śladem`
-                : 'Jeszcze żadnej, zapisują się same po zakończeniu'
-            }
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setJourneysOpen(true)
-            }}
-          />
-        </List>
-
-        {/*
-          Polka "Miejsca", nie "Wyprawy" (Jarek, 2026-08-23: „moje wyprawy niech
-          beda w sekcji Ty"). Po przeniesieniu wypraw zostalo tu jedno wejscie i
-          jest ono o miejscach, nie o wyprawach, wiec nazwa polki poszla za
-          trescia.
-        */}
-        <p className="t-caption app-menu__head">Miejsca</p>
-        <List className="app-menu">
-          <ListItem
-            icon={<ListIcon />}
-            title="Wszystkie parki"
-            meta={`${FEATURES.length - 1} miejsc, ${completedIds.size} zdobytych`}
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setListWide(true)
-            }}
-          />
-        </List>
-
-        <p className="t-caption app-menu__head">Ustawienia</p>
-        <List className="app-menu">
-          <ListItem
-            icon={<Palette />}
-            title="Wygląd"
-            meta="Motyw i styl mapy, z podglądem"
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setLooksModalOpen(true)
-            }}
-          />
-          <ListItem
-            icon={<Info />}
-            title="O aplikacji"
-            meta={`Wersja ${VERSION}, odświeżanie, katalog`}
-            trailing={<ChevronRight size={18} />}
-            onClick={() => {
-              setMenuOpen(false)
-              setAboutOpen(true)
-            }}
-          />
-        </List>
-      </BottomSheet>
+      {/*
+        Menu jako pelny ekran profilu (Jarek 2026-08-25). Wejscia do modalow
+        NIE zamykaja profilu: wstecz z Moich liczb wraca tutaj, a nie na mape,
+        bo to profil jest domem tych ekranow.
+      */}
+      <ProfileScreen
+        open={menuOpen}
+        challengeDone={challengeDone}
+        onClose={() => setMenuOpen(false)}
+        onStats={() => setStatsOpen(true)}
+        onAchievements={() => setStampsOpen(true)}
+        onJournal={() => setJournalOpen(true)}
+        onAllParks={() => {
+          setMenuOpen(false)
+          setListWide(true)
+        }}
+        onLooks={() => setLooksModalOpen(true)}
+        onAbout={() => setAboutOpen(true)}
+      />
 
       <StatsModal
         open={statsOpen}
@@ -1724,15 +1646,6 @@ export function App() {
         onOpenPark={(id) => {
           setStatsOpen(false)
           showOnMap(id)
-        }}
-      />
-      <JourneysModal
-        open={journeysOpen}
-        onClose={() => setJourneysOpen(false)}
-        onOpenJourney={(id) => {
-          setJourneysOpen(false)
-          clearSelection()
-          setJourneyId(id)
         }}
       />
       <LooksModal
