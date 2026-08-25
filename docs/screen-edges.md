@@ -303,3 +303,26 @@ Naprawa: jeden <meta name="theme-color">, sterowany z updateChromeColor()
 w ds/useLightChrome, sprzezony z tym samym licznikiem jasnych ekranow, co
 tlo dokumentu: jasna karta na wierzchu -> #f6f8f5, mapa/ciemne -> #0b1207.
 Gorny pas i dolny pas zyja teraz z jednego stanu.
+
+---
+
+## TEMAT ZAMKNIETY przez Jarka (2026-08-25, 23:40)
+
+"Sytuacja ta sama, zamykamy temat, imo nic z tym nie zrobisz, krecimy
+sie w miejscu." Slusznie: doszlismy do sufitu web appki.
+
+STAN KONCOWY (nie ruszac bez nowego faktu):
+- kompensacja dolna mierzy niedobor dwiema metodami (screen-inner oraz
+  sonda fixed) i odejmuje go od wciecia; dziala w obu trybach okna,
+- theme-color dynamiczny (jasny/ciemny za ekranem), gorne wciecie z env,
+- diagnostyka z werdyktem i jawnie wlaczanym debugiem magenty.
+
+CZEGO WEB NIE PRZESKOCZY na tym iOS: tryb okna instalacji bywa rozny
+miedzy ikonami (797 vs 844 przy TYCH SAMYCH metach), a pas poza oknem
+umie przyjac wylacznie kolor tla dokumentu. To decyzje systemu
+podejmowane przy dodawaniu ikony, bez API.
+
+DEFINITYWNE ROZWIAZANIE, gdy przyjdzie pora: natywna powloka
+(Capacitor -> TestFlight). WKWebView dostaje pelny ekran bez negocjacji,
+caly ten dokument staje sie historia. Jarek juz pytal o TestFlight,
+Live Activity i Apple Watch; plan etapowy opisany w rozmowie 2026-08-25.
