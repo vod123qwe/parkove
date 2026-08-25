@@ -6174,6 +6174,30 @@
   color: #12290c;
 }
 
+/* przyciski zoomu, skoro scroll nie steruje mapa */
+.tedit__zoom {
+  position: absolute;
+  top: calc(var(--safe-top, 0px) + 58px);
+  right: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+  border-radius: 12px;
+  corner-shape: var(--corner-smooth);
+  box-shadow: 0 2px 10px rgb(8 14 6 / 0.35);
+}
+
+.tedit__zoombtn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 36px;
+  border: 0;
+  background: var(--bg-surface);
+  color: var(--content-default);
+}
+
 .tedit__card {
   position: absolute;
   bottom: 0;
@@ -6197,6 +6221,9 @@
  * trescia kafla, a nazwa podpisem pod nia. Rzad przewija sie w bok.
  */
 .tedit__tiles {
+  /* przewijanie kafli nie wychodzi na mape ani na strone pod spodem */
+  overscroll-behavior: contain;
+  touch-action: pan-x;
   display: flex;
   gap: var(--sp-2);
   margin: 0 calc(-1 * var(--sp-4)) var(--sp-3);

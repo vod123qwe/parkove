@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.105.0'
+export const VERSION = '0.105.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.105.1',
+    date: '2026-08-25',
+    title: 'Scrolling no longer moves the editor map',
+    tldr:
+      'W edytorze przewijanie nie zoomuje już mapy, więc punkty stoją tam, gdzie mają. Zoom robią przyciski albo szczypanie.',
+    changes: [
+      ['fixed', 'Scrolling in the trail editor zoomed the map out, sometimes to half of the region, which made every point pile up in one spot and looked like the markers were moving. The map ignores the scroll wheel now; zoom is a pinch or the plus and minus buttons next to the frame'],
+      ['fixed', 'A double tap no longer zooms, because a double tap is how you remove your own point and one gesture was doing three things at once'],
+      ['fixed', 'The zoom buttons moved the map by a hundredth of a level: the resize observer kept interrupting the animation. They jump straight to the next level instead'],
+    ],
+  },
   {
     version: '0.105.0',
     date: '2026-08-25',

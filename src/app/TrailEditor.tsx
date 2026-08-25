@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import maplibregl from 'maplibre-gl'
-import { Check, Undo2, X } from 'lucide-react'
+import { Check, Minus, Plus, Undo2, X } from 'lucide-react'
 import { Button } from '../ds'
 import { resolveMapStyle } from './data/mapstyles'
 import { PARKING } from './data/parking'
@@ -164,7 +164,20 @@ export function TrailEditor({
       pitchWithRotate: false,
     })
     map.touchZoomRotate.disableRotation()
+    /*
+     * SCROLL NIE RUSZA MAPY (uwaga Jarka: "jak scrolluje, to punkty sie
+     * przemieszczaja"). Punkty stały w miejscu, to mapa oddalała się na cały
+     * region, bo kółko myszy i gest przewijania sterowały zoomem. W edytorze
+     * przewijanie należy do karty z kaflami, więc mapa go nie dostaje;
+     * zoom robi się szczypaniem albo przyciskami obok kadru.
+     *
+     * Dwuklik też nie zoomuje, bo służy do usuwania własnego punktu, a przy
+     * włączonym zoomie jedno takie dotknięcie robiło trzy rzeczy naraz.
+     */
+    map.scrollZoom.disable()
+    map.doubleClickZoom.disable()
     mapRef.current = map
+    if (import.meta.env.DEV) (window as unknown as { __pkEditMap?: maplibregl.Map }).__pkEditMap = map
 
     map.on('load', () => {
       /* styl niesie własną kamerę, więc kadr miejsca wymuszamy po załadowaniu */
@@ -393,6 +406,24 @@ export function TrailEditor({
           <X size={18} />
         </button>
         <p className="t-label tedit__name">{parkName}</p>
+      </div>
+      <div className="tedit__zoom">
+        <button
+          className="tedit__zoombtn pk-press"
+          aria-label="Przybliż mapę"
+          /* bez animacji: obserwator rozmiaru wolal resize, a resize przerywal easeTo
+             i zoom konczyl sie na 0,01 poziomu */
+          onClick={() => mapRef.current?.zoomIn({ duration: 0 })}
+        >
+          <Plus size={17} />
+        </button>
+        <button
+          className="tedit__zoombtn pk-press"
+          aria-label="Oddal mapę"
+          onClick={() => mapRef.current?.zoomOut({ duration: 0 })}
+        >
+          <Minus size={17} />
+        </button>
       </div>
       {note && (
         <p className="t-caption tedit__note" role="status">

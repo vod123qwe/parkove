@@ -477,3 +477,22 @@ Pierwsza wersja byla dzieckiem modalu Szlak i dotkniecie mapy trafialo w
 zaslone modalu, ktory zamykal sie i zabieral edytor ze soba. Ta sama
 lekcja, co przy `.jscreen`: kontekst stosu rodzica sprawia, ze z-index
 dziecka nie znaczy tego, co myslisz.
+
+### Scroll nie steruje mapa (0.105.1)
+
+Jarek: "dalej jak scrolluje, to punkty sie przemieszczaja". Zrzuty
+pokazaly co innego niz brzmi skarga: punkty stały w miejscu, to MAPA
+oddalala sie na caly region (na drugim zrzucie widac pol Malopolski),
+wiec wszystkie punkty Skalek zbily sie w jedna kupke. Winowajca byl
+scrollZoom: kolko myszy i gest przewijania sterowaly zoomem mapy.
+
+W edytorze przewijanie nalezy do karty z kaflami, wiec mapa go nie
+dostaje: `map.scrollZoom.disable()`. Zoom robi sie szczypaniem albo
+przyciskami plus i minus obok kadru. `map.doubleClickZoom.disable()`
+przy okazji, bo dwuklik usuwa wlasny punkt, a przy wlaczonym zoomie
+jedno dotkniecie robilo trzy rzeczy naraz.
+
+GOTCHA: przyciski zoomu z animacja (`duration: 220`) zmienialy zoom o
+0,01 poziomu i nic wiecej. Powod: ResizeObserver wola `map.resize()`, a
+resize PRZERYWA animacje easeTo. Zoom przyciskiem jest teraz
+natychmiastowy (`duration: 0`).
