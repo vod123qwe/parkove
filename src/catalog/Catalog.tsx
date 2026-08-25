@@ -809,6 +809,27 @@ export function Catalog() {
                 trailing={<ProgressRing value={100} size="sm" />}
                 onClick={() => {}}
               />
+              <ListItem
+                icon={<Footprints />}
+                leadTone="sky"
+                title="Ton sky"
+                meta="Informacyjny niebieski, np. wyprawy"
+                onClick={() => {}}
+              />
+              <ListItem
+                icon={<Landmark />}
+                leadTone="clay"
+                title="Ton clay"
+                meta="Ciepły ceglasty, np. miejsca"
+                onClick={() => {}}
+              />
+              <ListItem
+                icon={<Sparkles />}
+                leadTone="plum"
+                title="Ton plum"
+                meta="Fiolet zabawy, np. wygląd"
+                onClick={() => {}}
+              />
             </List>
           </div>
           <div className="cat-spec cat-list">

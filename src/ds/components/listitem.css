@@ -75,6 +75,22 @@ button.pk-listitem:hover {
   color: var(--content-on-gold);
 }
 
+/* tony semantyczne: te same pary, ktorych uzywaja piny na mapie */
+.pk-listitem__lead.-sky {
+  background: var(--bg-info-subtle);
+  color: var(--content-info);
+}
+
+.pk-listitem__lead.-clay {
+  background: var(--bg-food-subtle);
+  color: var(--content-food);
+}
+
+.pk-listitem__lead.-plum {
+  background: var(--bg-play-subtle);
+  color: var(--content-play);
+}
+
 .pk-listitem__text {
   display: flex;
   flex-direction: column;

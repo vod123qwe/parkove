@@ -6241,6 +6241,21 @@
   margin-bottom: var(--sp-4);
 }
 
+/* w profilu kreski maja byc widoczne, nie ledwo obecne */
+.prof-cells.pk-list.-divided > * + *::before {
+  background: var(--border-default);
+}
+
+/*
+ * Gruby pas miedzy sekcjami profilu (Jarek: "jeszcze wieksze dividery").
+ * Pelny przelew przez ujemny margines rowny paddingowi modala (sp-6).
+ */
+.prof-sep {
+  height: 8px;
+  margin: var(--sp-2) calc(-1 * var(--sp-6)) 0;
+  background: var(--bg-surface-sunken);
+}
+
 /*
  * WYGLAD jako radiowiersze (0.109.0): ikona po lewej, kolko po prawej.
  * Kafle z rysowanymi podgladami wylecialy; zmiana motywu i stylu dziala od

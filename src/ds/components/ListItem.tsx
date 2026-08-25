@@ -5,7 +5,13 @@ import './listitem.css'
 export type ListItemProps = {
   icon?: ReactNode
   /** leading disc tone; accent for visited things, gold for completed */
-  leadTone?: 'neutral' | 'accent' | 'gold'
+  /**
+   * Ton krążka ikony. Poza stanami gry (accent, gold) są trzy tony
+   * SEMANTYCZNE z istniejącej palety HCT: sky (info), clay (jedzenie),
+   * plum (zabawa). Każdy ma parę tło+znak w obu motywach, więc pokolorowana
+   * lista (np. profil) nie wymaga żadnych nowych tokenów.
+   */
+  leadTone?: 'neutral' | 'accent' | 'gold' | 'sky' | 'clay' | 'plum'
   /** square photo slot instead of the icon disc */
   photo?: { src: string; alt?: string }
   title: string

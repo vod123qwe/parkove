@@ -87,6 +87,7 @@ export function ProfileScreen({
         />
         <ListItem
           icon={<Award />}
+          leadTone="gold"
           title="Osiągnięcia"
           meta={`${golden} ${golden === 1 ? 'pieczątka' : golden < 5 ? 'pieczątki' : 'pieczątek'}, ${challengeDone} z ${CHALLENGES.length} wyzwań`}
           trailing={<ChevronRight size={18} />}
@@ -94,6 +95,7 @@ export function ProfileScreen({
         />
         <ListItem
           icon={<Footprints />}
+          leadTone="sky"
           title="Wyprawy i odkrycia"
           meta={
             journeys.length
@@ -105,10 +107,12 @@ export function ProfileScreen({
         />
       </List>
 
+      <div className="prof-sep" aria-hidden="true" />
       <ListHead>Miejsca</ListHead>
       <List inset={false} className="prof-cells">
         <ListItem
           icon={<ListIcon />}
+          leadTone="clay"
           title="Wszystkie parki"
           meta={`${FEATURE_COUNT} miejsc, ${golden} zdobytych`}
           trailing={<ChevronRight size={18} />}
@@ -116,10 +120,12 @@ export function ProfileScreen({
         />
       </List>
 
+      <div className="prof-sep" aria-hidden="true" />
       <ListHead>Ustawienia</ListHead>
       <List inset={false} className="prof-cells">
         <ListItem
           icon={<Palette />}
+          leadTone="plum"
           title="Wygląd"
           meta="Motyw i styl mapy"
           trailing={<ChevronRight size={18} />}

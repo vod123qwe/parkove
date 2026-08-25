@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.109.1'
+export const VERSION = '0.109.2'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.109.2',
+    date: '2026-08-25',
+    title: 'Profile gets colour and weight',
+    tldr:
+      'Ikony w profilu dostały kolory (złoto, błękit, cegła, fiolet), kreski są wyraźniejsze, a między sekcjami stoją grube pasy na całą szerokość.',
+    changes: [
+      ['added', 'Row icons carry colour now: three new semantic tones (sky, clay, plum) joined accent and gold, drawn from the palette the map pins already use, with both themes covered. Achievements are gold, trips are sky blue, places are warm clay, appearance is plum'],
+      ['changed', 'Dividers grew up: hairlines in the profile use the stronger border colour, and sections are separated by a full-width 8 pixel band, the way a settings screen groups things'],
+    ],
+  },
   {
     version: '0.109.1',
     date: '2026-08-25',
