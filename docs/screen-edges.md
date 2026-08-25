@@ -290,3 +290,16 @@ liczba; env() nie opisuje fixed viewportu na iOS.
 
 "Portfel na pelna wysokosc" to zludzenie dobrze zgranego tla dokumentu,
 nie inny viewport: te same mety, ten sam telefon.
+
+### Nowe okno dziala; gora idzie za theme-color (0.110.4)
+
+Eksperyment 0.110.3 WYGRAL dol: po reinstalacji ikony okno ma pelna
+wysokosc. Natychmiast odezwala sie gora ("czyli te elementy sa polaczone"
+- Jarek): w nowym trybie okna iOS maluje pas statusu KOLOREM theme-color,
+a statyczny jasny wariant z eksperymentu robil jasna przerwe nad ciemna
+mapa.
+
+Naprawa: jeden <meta name="theme-color">, sterowany z updateChromeColor()
+w ds/useLightChrome, sprzezony z tym samym licznikiem jasnych ekranow, co
+tlo dokumentu: jasna karta na wierzchu -> #f6f8f5, mapa/ciemne -> #0b1207.
+Gorny pas i dolny pas zyja teraz z jednego stanu.

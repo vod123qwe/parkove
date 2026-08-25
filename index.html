@@ -19,8 +19,13 @@
       dalej ma 797, to limit systemu i wracamy do malowania pasa kolorem.
     -->
     <meta name="apple-mobile-web-app-title" content="Parkove" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f8f5" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b1207" />
+    <!--
+      theme-color STEROWANY z kodu (updateChromeColor w ds/useLightChrome):
+      w nowym trybie okna iOS maluje nim pas statusu, wiec kolor musi isc za
+      aktualnym ekranem (ciemna mapa vs jasna karta), nie za motywem systemu.
+      Statyczny jasny wariant zrobil "przerwe pod status barem" nad mapa.
+    -->
+    <meta name="theme-color" content="#0b1207" />
     <!-- black-translucent = tresc wchodzi POD pasek statusu, mapa jest pelnoekranowa -->
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

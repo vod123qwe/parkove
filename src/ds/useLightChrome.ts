@@ -9,6 +9,18 @@ import { useEffect } from 'react'
  */
 let open = 0
 
+/*
+ * Kolor okna systemowego = kolor pasa statusu (i wszystkiego, co system
+ * maluje wokol aplikacji) w nowym trybie okna iOS. Idzie za tym samym
+ * licznikiem, co tlo dokumentu: jasny ekran na wierzchu -> jasny pas.
+ */
+function updateChromeColor() {
+  const meta = document.querySelector('meta[name="theme-color"]')
+  if (!meta) return
+  const light = document.documentElement.dataset.pkLight === 'on'
+  meta.setAttribute('content', light ? '#f6f8f5' : '#0b1207')
+}
+
 /**
  * „Ten ekran jest jasny i zajmuje cały ekran".
  *
@@ -35,12 +47,14 @@ export function useLightChrome(active: boolean) {
     if (!active) return
     open += 1
     document.documentElement.dataset.pkLight = 'on'
+    updateChromeColor()
     return () => {
       open -= 1
       if (open <= 0) {
         open = 0
         delete document.documentElement.dataset.pkLight
       }
+      updateChromeColor()
     }
   }, [active])
 }

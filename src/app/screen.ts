@@ -115,6 +115,9 @@ export function screenReport() {
   document.body.appendChild(probe)
   const safe = Math.round(probe.getBoundingClientRect().height)
   const fixedBottom = Math.round(probe.getBoundingClientRect().bottom)
+  probe.style.cssText =
+    'position:fixed;left:0;top:0;width:1px;height:env(safe-area-inset-top,0px);pointer-events:none;'
+  const safeTop = Math.round(probe.getBoundingClientRect().height)
   probe.remove()
   const dpr = window.devicePixelRatio || 1
   const standalone =
@@ -131,6 +134,7 @@ export function screenReport() {
     `okno ${inner}`,
     `ekran ${screenH}`,
     `widok ${Math.round(window.visualViewport?.height ?? 0)}`,
+    `safe-góra ${safeTop}`,
     `safe ${safe}`,
     `fixed-dol ${fixedBottom}`,
     `dpr ${dpr}`,

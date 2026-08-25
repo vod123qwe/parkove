@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.3'
+export const VERSION = '0.110.4'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.4',
+    date: '2026-08-25',
+    title: 'Full window won, status bar follows the screen',
+    tldr:
+      'Doł odzyskany na dobre, a pas statusu bierze teraz kolor z ekranu, który jest na wierzchu: ciemny nad mapą, jasny nad kartami.',
+    changes: [
+      ['fixed', 'The experiment won the bottom back, and the top answered immediately: in the new window mode the system paints the status bar with the declared theme colour, and the static light one made a bright gap over the dark map. The colour is driven by the app now, from the same switch that tints the document: dark over the map, light over cards'],
+    ],
+  },
   {
     version: '0.110.3',
     date: '2026-08-25',
