@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Car, Check, Coffee, Footprints, Pencil, Plus, Signpost, ToyBrick, Trash2 } from 'lucide-react'
-import { Button, Modal, PlaceRow } from '../ds'
+import { Button, Modal, PlaceRow, Segmented } from '../ds'
 import { TileMap } from './TileMap'
 import { COLOUR_PL, TRAIL_INK, trailsFor } from './data/trails'
 import type { Trail } from './data/trails'
@@ -414,18 +414,14 @@ export function TrailModal({
               {items.length > 1 && <span className="trailgroup__count">{items.length}</span>}
             </p>
             {items.length > 1 && (
-              <div className="trailgroup__variants" role="group" aria-label={`Warianty: ${g.label}`}>
-                {items.map((t, i) => (
-                  <button
-                    key={t.id}
-                    className={`trailgroup__variant pk-press${i === idx ? ' -on' : ''}`}
-                    aria-pressed={i === idx}
-                    onClick={() => setVariantAt((was) => ({ ...was, [g.key]: i }))}
-                  >
-                    {t.variant ?? shortName(t)}
-                  </button>
-                ))}
-              </div>
+              /* ten sam Segmented, co przy zakladkach miejsc i na Osiagnieciach */
+              <Segmented
+                className="trailgroup__variants"
+                aria-label={`Warianty: ${g.label}`}
+                options={items.map((t, i) => ({ value: String(i), label: t.variant ?? shortName(t) }))}
+                value={String(idx)}
+                onChange={(v) => setVariantAt((was) => ({ ...was, [g.key]: Number(v) }))}
+              />
             )}
             {renderRow(shown)}
           </section>

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.105.2'
+export const VERSION = '0.106.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.106.0',
+    date: '2026-08-25',
+    title: 'One switcher for the whole app',
+    tldr:
+      'Zakładki i warianty tras korzystają z komponentu przelacznika z design systemu, tego samego co Osiągnięcia. Przewijanie w edytorze wróciło do normy.',
+    changes: [
+      ['changed', 'The place tabs and the trail variant switcher now use the design system Segmented component, the same one the achievements screen and the point card already used. My hand rolled copy went away with sixty lines of styling and its own measuring logic'],
+      ['fixed', 'Scrolling zooms the editor map again. Blocking it was a wrong guess while hunting the marker positions bug, whose real cause was a stylesheet rule; the plus and minus buttons are gone with it. A double tap still does not zoom, because that is how you remove your own point'],
+    ],
+  },
   {
     version: '0.105.2',
     date: '2026-08-25',

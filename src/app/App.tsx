@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Award, Camera, ChevronDown, ChevronRight, Clock, CloudOff, SlidersHorizontal, Cloudy, Coffee, Compass, Crosshair, Footprints, Info, Layers, List as ListIcon, LocateFixed, Menu, Palette, RefreshCw, Route, Search, Sparkles, ToyBrick, X } from 'lucide-react'
-import { BottomSheet, Button, List, ListItem, PeekCard, Toast } from '../ds'
+import { BottomSheet, Button, List, ListItem, PeekCard, Segmented, Toast } from '../ds'
 import { heroPhoto } from './data/parkinfo'
 import { MapView } from './MapView'
 import { SpotCard } from './SpotCard'
@@ -143,23 +143,7 @@ export function App() {
   const [distBand, setDistBand] = useState<DistBand>('')
   /** arkusz z progami; taby zostają na wierzchu, progi chowają się tu */
   const [filtersOpen, setFiltersOpen] = useState(false)
-  /*
-   * Pozycja wskaznika segmentu. Mierzymy DOM, bo szerokosci zakladek zaleza
-   * od dlugosci slow, a nie od podzialu na rowne czesci; pomiar powtarzamy po
-   * zmianie zakladki i po zmianie szerokosci arkusza.
-   */
-  const tabsRef = useRef<HTMLDivElement>(null)
-  const [thumb, setThumb] = useState({ x: 0, w: 0 })
-  useEffect(() => {
-    const measure = () => {
-      const el = tabsRef.current?.querySelector<HTMLElement>('.app-ftab.-on')
-      if (el) setThumb({ x: el.offsetLeft, w: el.offsetWidth })
-    }
-    measure()
-    const ro = new ResizeObserver(measure)
-    if (tabsRef.current) ro.observe(tabsRef.current)
-    return () => ro.disconnect()
-  }, [tab, listWide, listDetent])
+
   /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
    * za nie tylko wtedy, gdy lista jest otwarta. Dzieki temu wybor niedzielnego
@@ -1202,27 +1186,20 @@ export function App() {
         </button>
         </div>
         {/* filtry nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
+        {/*
+          Segmented z DS, nie wlasna kopia (uwaga Jarka 2026-08-25:
+          "powinnismy korzystac z tego, co mamy w DS"). Ten sam komponent stoi
+          na Osiagnieciach i w karcie punktu, wiec przelacznik wszedzie
+          zachowuje sie identycznie: wskaznik jedzie, a nie przeskakuje.
+        */}
         {!needle && (
-          <div className="app-ftabs" role="tablist" aria-label="Rodzaj miejsc" ref={tabsRef}>
-            {/* wskaznik jedzie pod przyciskami, wiec przelaczenie jest ruchem,
-                nie przeskokiem koloru (uwaga Jarka: segmented picker) */}
-            <span
-              className="app-ftabs__thumb"
-              aria-hidden="true"
-              style={{ transform: `translateX(${thumb.x}px)`, width: thumb.w }}
-            />
-            {TAB_DEFS.map(([id, label]) => (
-              <button
-                key={id}
-                role="tab"
-                aria-selected={tab === id}
-                className={`app-ftab${tab === id ? ' -on' : ''}`}
-                onClick={() => setTab(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <Segmented
+            className="app-ftabs"
+            aria-label="Rodzaj miejsc"
+            options={TAB_DEFS.map(([value, label]) => ({ value, label }))}
+            value={tab}
+            onChange={setTab}
+          />
         )}
         {!needle && filtersOn && (
           <p className="t-caption app-fcount">

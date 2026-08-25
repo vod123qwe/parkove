@@ -530,3 +530,26 @@ na elemencie WEWNATRZ.
 
 Kontrola po naprawie: rozjazd 0 px dla wszystkich 13 znacznikow Blon, i
 tak samo po przyblizeniu, oddaleniu, przesunieciu i skoku na zoom 11.
+
+### Segmented z DS + scroll wraca (0.106.0)
+
+Jarek: "zostaw scroll jak byl wczesniej i zobacz, jaki tam jest tabbar,
+powinnismy korzystac z tego, co mamy w DS (np. podstrona moje liczby /
+osiagniecia)".
+
+1. `map.scrollZoom` znowu wlaczony. Blokowalem go, szukajac powodu
+   blednych pozycji znacznikow, ale powod byl inny (regula CSS odbierala
+   im position: absolute). Przyciski plus i minus usuniete, bo ich powod
+   zniknal. `doubleClickZoom` zostaje wylaczony: dwuklik usuwa wlasny
+   punkt.
+2. Wlasny segmented picker (`.app-ftabs` z recznym wskaznikiem i
+   ResizeObserverem) zastapiony komponentem **`Segmented` z DS**, tym
+   samym, co na Osiagnieciach i w karcie punktu. Tak samo warianty tras
+   w TrailModal. Skasowane: 60 linii CSS i 15 linii logiki pomiaru.
+
+GOTCHA TESTOWA: w ukrytym panelu przegladarki klatki nie leca, wiec
+`getComputedStyle` pokazuje transform wskaznika ZAMROZONY na wartosci
+startowej, mimo poprawnego inline style (`translateX(343px)`). Objaw
+wyglada jak "wskaznik nie jedzie". Sprawdzenie: `thumb.getAnimations()`
+pokazuje CSSTransition z `currentTime: 0`; po `a.finish()` computed
+zgadza sie z offsetem przycisku. To samo dotyczy animacji zoomu mapy.

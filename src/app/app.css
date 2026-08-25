@@ -213,94 +213,13 @@
  * Zakladki to segment na calej szerokosci; dropdowny to natywne selecty
  * przebrane za pigulki, wiec telefon otwiera systemowy picker.
  */
-.app-ftabs {
-  position: relative;
-  display: flex;
-  gap: 4px;
-  margin: 0 0 var(--sp-3);
-  padding: 3px;
-  border-radius: var(--radius-pill);
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-sunken, rgb(0 0 0 / 0.05));
-}
-
 /*
- * Wskaznik segmentu: jeden element, ktory JEDZIE pod przyciskami. Ruch niesie
- * informacje o kierunku (uwaga Jarka: segmented picker ma chodzic plynnie),
- * czego przeskok koloru nie robil. Sprezynka lekka, zeby nie bylo zabawkowo.
+ * Zakladki i warianty korzystaja z komponentu Segmented z DS, wiec zostaje
+ * tu tylko odstep. Wlasna kopia (wskaznik, przyciski, media query) poszla do
+ * kosza: DS ma to samo, razem z rola radiogroup i pomiarem szerokosci.
  */
-.app-ftabs__thumb {
-  position: absolute;
-  top: 3px;
-  bottom: 3px;
-  left: 0;
-  border-radius: var(--radius-pill);
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-primary);
-  transition:
-    transform 320ms cubic-bezier(0.32, 0.72, 0, 1),
-    width 320ms cubic-bezier(0.32, 0.72, 0, 1);
-  pointer-events: none;
-}
-
-.app-ftab {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  padding: 7px 0;
-  border: 0;
-  border-radius: var(--radius-pill);
-  corner-shape: var(--corner-smooth);
-  background: transparent;
-  color: var(--content-subtle);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  /* kolor napisu dogania wskaznik: krotko, zeby nie bylo szarej klatki */
-  transition: color 180ms var(--ease-out);
-}
-
-.app-ftab.-on {
-  color: var(--content-on-primary);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-ftabs__thumb {
-    transition: none;
-  }
-}
-
-.app-searchrow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-}
-
-.app-searchrow .app-search {
-  flex: 1;
-}
-
-/* okragly wlacznik arkusza progow, tej samej wysokosci co pole szukania */
-.app-fbtn {
-  position: relative;
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  margin: var(--sp-2) 0 var(--sp-4);
-  border: 0;
-  border-radius: 50%;
-  background: var(--bg-surface);
-  box-shadow: inset 0 0 0 1px var(--border-default);
-  color: var(--content-default);
-}
-
-.app-fbtn.-on {
-  background: var(--bg-primary);
-  box-shadow: none;
-  color: var(--content-on-primary);
+.app-ftabs {
+  margin: 0 0 var(--sp-3);
 }
 
 .app-fselects {
@@ -5758,36 +5677,7 @@
 }
 
 .trailgroup__variants {
-  display: flex;
-  gap: var(--sp-2);
-  margin: 0 calc(-1 * var(--sp-6)) var(--sp-3);
-  padding: 2px var(--sp-6) 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.trailgroup__variants::-webkit-scrollbar {
-  display: none;
-}
-
-.trailgroup__variant {
-  flex: none;
-  padding: 7px 13px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-pill);
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-surface-raised);
-  color: var(--content-default);
-  font: inherit;
-  font-size: 12.5px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.trailgroup__variant.-on {
-  border-color: transparent;
-  background: var(--bg-primary);
-  color: var(--content-on-primary);
+  margin: 0 0 var(--sp-3);
 }
 
 .mytrail__preview {
@@ -6185,30 +6075,6 @@
   background: #7ce93f;
   border-color: #12290c;
   color: #12290c;
-}
-
-/* przyciski zoomu, skoro scroll nie steruje mapa */
-.tedit__zoom {
-  position: absolute;
-  top: calc(var(--safe-top, 0px) + 58px);
-  right: var(--sp-4);
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  overflow: hidden;
-  border-radius: 12px;
-  corner-shape: var(--corner-smooth);
-  box-shadow: 0 2px 10px rgb(8 14 6 / 0.35);
-}
-
-.tedit__zoombtn {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 36px;
-  border: 0;
-  background: var(--bg-surface);
-  color: var(--content-default);
 }
 
 .tedit__card {
