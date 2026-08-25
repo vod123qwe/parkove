@@ -675,11 +675,28 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
        */
       const rs = ringsFor(parkId)
       const inside = r && rs ? r.line.filter((c) => inPolygon(c, rs)).length / r.line.length : 1
+      /*
+       * Prog obrysu tez zalezy od stawki. Obok istniejacej trasy zadamy 55%:
+       * druga propozycja ma byc o TYM miejscu. Jako jedyna trasa wystarczy 40%,
+       * bo waskie miejsca (Zielony Jar, wawóz) z geometrii maja obejscie
+       * czesciowo po krawedzi, a mapka na karcie i tak pokazuje obrys, wiec
+       * nikt nie jest wprowadzony w blad. Ponizej 40% to juz inne miejsce:
+       * Przylasek Rusiecki dostal obejscie z 13% w obrysie i takie leci.
+       */
+      const minInside = sole ? 0.4 : 0.55
+      /*
+       * Dlugosc: PRAWDZIWA petla (ponizej 40% zawracania) wystarczy na MIN_M,
+       * bo maly park ma mala petle, a kopiec Krakusa pokazal, ze 706-metrowe
+       * kolko wokol kopca (zawracanie 30%, w obrysie 93%) bije trase przez
+       * punkty zawracajaca w 78%. Prog 800 m zostaje tam, gdzie kandydat jest
+       * slabszy: spacer dokladany OBOK istniejacej trasy.
+       */
+      const minLen = sole || ringOk ? MIN_M : 800
       const better =
         r &&
-        inside >= 0.55 &&
+        inside >= minInside &&
         (sole ? back < 0.55 : ringOk ? back < fullBack - 0.15 : muchBetter) &&
-        r.m >= (sole ? MIN_M : 800)
+        r.m >= minLen
       if (better) {
         const water = feature.properties?.kind === 'water'
         trails.unshift({

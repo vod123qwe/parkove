@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.101.0'
+export const VERSION = '0.102.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.102.0',
+    date: '2026-08-25',
+    title: 'One pass, one set of rules, seventeen better routes',
+    tldr:
+      'Cały katalog policzony jednymi regułami: 68 tras w 44 miejscach, siedemnaście miejsc dostało lepszą albo dodatkową ścieżkę.',
+    changes: [
+      ['added', 'Seventeen places gained a route or a better one. The prettiest are small: a 706 m circle around kopiec Krakusa that doubles back only 30 percent of the way, and a 923 m loop in park Grzegórzecki that never repeats a single step'],
+      ['changed', 'Route thresholds now depend on what is at stake. As the only route a place has a walk may double back up to 55 percent and stay 40 percent inside the boundary; offered next to an existing route it has to be a real loop, inside 55 percent, and either short and genuine or long and clearly better'],
+      ['fixed', 'Zielony Jar and Panieńskie Skały are narrow places whose walk naturally runs along the rim, so a flat boundary rule left them with nothing. They have their walks back. Przylasek Rusiecki keeps losing its, because that one ran 87 percent outside the place'],
+      ['fixed', 'A route card no longer calls a walk a loop. Every generated walk returns to its start, so the geometry alone could not tell them apart; the card reads the name the generator gave it and says plainly that part of the way is walked twice'],
+    ],
+  },
   {
     version: '0.101.0',
     date: '2026-08-25',

@@ -39,6 +39,17 @@ function isLoop(t: Trail) {
   return Math.hypot(dx, dy) < 120
 }
 
+/*
+ * Ksztalt trasy jednym slowem. Generator odroznia petle od spaceru miara
+ * zawracania (docs/trails.md) i zapisuje to w NAZWIE, bo geometria konca
+ * tego nie powie: obejscie parku zawsze wraca na start, tylko spacer robi
+ * to czesciowo ta sama sciezka. Dlatego czytamy nazwe, nie tylko domkniecie.
+ */
+function shape(t: Trail): 'pętla' | 'spacer' | 'przejście' {
+  if (t.name.startsWith('Spacer')) return 'spacer'
+  return isLoop(t) ? 'pętla' : 'przejście'
+}
+
 function pillsFor(t: Trail) {
   const out = [formatDistance(t.m), `${t.min} min`]
   if (t.kind === 'points' && t.stops?.length) out.push(`${t.stops.length} ${plPunkty(t.stops.length)}`)
@@ -272,7 +283,7 @@ export function TrailModal({
                   caption={
                     t.kind === 'osm'
                       ? `odcinek w granicach miejsca, ${formatDistance(t.m)}`
-                      : `${isLoop(t) ? 'pętla' : 'przejście'}, ${formatDistance(t.m)}`
+                      : `${shape(t)}, ${formatDistance(t.m)}`
                   }
                 />
               }
@@ -283,9 +294,11 @@ export function TrailModal({
                   ? t.note
                   : own
                     ? t.note
-                    : isLoop(t)
+                    : shape(t) === 'pętla'
                       ? 'Pętla: kończy się tam, gdzie się zaczęła.'
-                      : 'Przejście przez park, bez powrotu na start.'
+                      : shape(t) === 'spacer'
+                        ? 'Wraca na start, ale część drogi pokonasz dwa razy.'
+                        : 'Przejście przez park, bez powrotu na start.'
               }
               selected={on}
               onClick={() => {

@@ -275,3 +275,40 @@ starym progu 600 i starych regulach obejscia. Nic nie stracily, ale
 moglyby zyskac dodatkowy „Spacer po parku" tam, gdzie ich trasa przez
 punkty zawraca. Pelny przelot `--points` nad calym katalogiem to
 15 do 30 minut.
+
+---
+
+## Pelny przelot i progi zaleznie od stawki (2026-08-25, 0.102.0)
+
+Caly katalog policzony JEDNYMI regulami (wczesniej 22 miejsca z 0.100.0
+mialy stare progi). 44 miejsca, 68 tras `points` (bylo 63).
+
+Kazdy prog obejscia parku (`wokol`) ma dwie wartosci, bo odpowiada na dwa
+rozne pytania. "Jedyna trasa miejsca" (sole) to przypadek, gdy trasa przez
+punkty nie przeszla progu dlugosci:
+
+| prog          | jako jedyna trasa | obok istniejacej trasy |
+|---------------|-------------------|------------------------|
+| zawracanie    | < 55%             | < 40% (albo < 55% przy poprawie >= 30 pp) |
+| dlugosc       | >= 400 m          | >= 400 m gdy petla, >= 800 m gdy spacer |
+| w obrysie     | >= 40%            | >= 55%                 |
+
+Dlaczego tak:
+
+- **Dlugosc petli.** Kopiec Krakusa: kolko wokol kopca ma 706 m, zawracanie
+  30%, w obrysie 93%, i bije trase przez punkty zawracajaca w 78%. Prog
+  800 m odrzucal je bez powodu. Maly park ma mala petle.
+- **Obrys.** Zielony Jar (wawoz) i Panienskie Skaly (rezerwat w Lesie
+  Wolskim) z geometrii maja obejscie czesciowo poza obrysem: 45% i 41%.
+  Jako ich jedyna trasa to nadal lepsze niz nic, a mapka na karcie pokazuje
+  obrys, wiec nikt nie jest wprowadzony w blad. Ponizej 40% to juz inne
+  miejsce: Przylasek Rusiecki dostal obejscie z 13% w obrysie i takie leci
+  (stracil je swiadomie, zostaje przy trasie przez punkty).
+
+Nowe petle z tego przelotu: Krakusa 706 m (30% zawracania), Grzegorzecki
+923 m (0% zawracania, idealne kolko), Lotnikow 2,9 km, Blonia +wariant,
+piec dolinek +wariant.
+
+Karta trasy: `shape()` w TrailModal czyta NAZWE, nie tylko domkniecie linii.
+Obejscie zawsze wraca na start, wiec sama geometria nie odrozni petli od
+spaceru; nazwe nadaje generator z miary zawracania.
