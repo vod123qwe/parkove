@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   Award,
@@ -45,9 +45,12 @@ import {
   StatGrid,
   Toast,
 } from '../ds'
-import { VERSION } from '../changelog'
-import { ChangelogSheet } from './ChangelogSheet'
+import { CHANGELOG, VERSION } from '../changelog'
+import type { ChangeType } from '../changelog'
 import './catalog.css'
+import './changelog.css'
+
+const TAG: Record<ChangeType, string> = { added: 'NOWE', changed: 'ZMIANA', fixed: 'POPRAWKA' }
 
 type Theme = 'auto' | 'light' | 'dark'
 const THEME_KEY = 'pk-theme'
@@ -62,33 +65,80 @@ export function initTheme() {
   applyTheme((localStorage.getItem(THEME_KEY) as Theme) ?? 'light')
 }
 
-const NAV = [
-  ['colors', 'Colors'],
-  ['typography', 'Typography'],
-  ['spacing', 'Spacing'],
-  ['shape', 'Shape and elevation'],
-  ['icons', 'Icons'],
-  ['buttons', 'Buttons'],
-  ['chips', 'Chips'],
-  ['badges', 'Park badges'],
-  ['progress', 'Progress'],
-  ['cards', 'Cards'],
-  ['lists', 'List items'],
-  ['placerow', 'Place row'],
-  ['hero', 'Media hero'],
-  ['slider', 'Photo slider'],
-  ['collapsible', 'Collapsible'],
-  ['carousel', 'Carousel'],
-  ['sheet', 'Bottom sheet'],
-  ['modal', 'Modal'],
-  ['navbar', 'Nav bar'],
-  ['peek', 'Peek card'],
-  ['toast', 'Toast'],
-  ['actionbar', 'Action bar'],
-  ['segmented', 'Segmented'],
-  ['switch', 'Switch'],
-  ['stats', 'Stats'],
-] as const
+/*
+ * Nawigacja w GRUPACH i jedna sekcja na ekran (uwaga Jarka 2026-08-25:
+ * "przygotuj strukture pod appke, bo teraz dziwnie to wyglada").
+ *
+ * Wczesniej katalog byl plaska lista 25 pozycji i jedna strona dlugosci
+ * kilometra: zeby zobaczyc Switcha, trzeba bylo przewinac cala typografie i
+ * wszystkie karty. Teraz dziala jak aplikacja: po lewej dzialy, po prawej
+ * jeden ekran, adres pamieta miejsce (#colors, #switch, #whatsnew).
+ */
+const GROUPS: Array<{ group: string; items: Array<readonly [string, string]> }> = [
+  {
+    group: 'Fundamenty',
+    items: [
+      ['colors', 'Kolory'],
+      ['typography', 'Typografia'],
+      ['spacing', 'Odstępy'],
+      ['shape', 'Kształt i cień'],
+      ['icons', 'Ikony'],
+    ],
+  },
+  {
+    group: 'Elementy',
+    items: [
+      ['buttons', 'Przyciski'],
+      ['chips', 'Chipy'],
+      ['badges', 'Odznaki miejsc'],
+      ['progress', 'Postęp'],
+      ['segmented', 'Przełącznik'],
+      ['switch', 'Włącznik'],
+      ['stats', 'Liczby'],
+    ],
+  },
+  {
+    group: 'Treść',
+    items: [
+      ['cards', 'Karty'],
+      ['lists', 'Wiersze listy'],
+      ['placerow', 'Wiersz miejsca'],
+      ['hero', 'Nagłówek ze zdjęciem'],
+      ['slider', 'Slider zdjęć'],
+      ['collapsible', 'Rozwijane'],
+      ['carousel', 'Karuzela'],
+    ],
+  },
+  {
+    group: 'Warstwy i nawigacja',
+    items: [
+      ['navbar', 'Pasek górny'],
+      ['sheet', 'Arkusz dolny'],
+      ['modal', 'Modal'],
+      ['peek', 'Karta podglądu'],
+      ['toast', 'Toast'],
+      ['actionbar', 'Pasek akcji'],
+    ],
+  },
+  {
+    group: 'Wydania',
+    items: [['whatsnew', 'Co nowego']],
+  },
+]
+
+const ALL_ITEMS = GROUPS.flatMap((g) => g.items)
+const LABEL_OF = new Map(ALL_ITEMS)
+const GROUP_OF = new Map(GROUPS.flatMap((g) => g.items.map(([id]) => [id, g.group] as const)))
+
+/** aplikacja linkuje catalog.html#changelog, wiec stary adres musi dzialac */
+const normalise = (hash: string) => {
+  const id = hash.replace(/^#/, '')
+  if (id === 'changelog') return 'whatsnew'
+  return LABEL_OF.has(id) ? id : 'colors'
+}
+
+/* aktywna sekcja jedzie kontekstem, zeby nie przepisywac 25 wywolan Section */
+const ActiveSection = createContext('colors')
 
 const COLOR_GROUPS: Array<[string, string[]]> = [
   [
@@ -187,6 +237,8 @@ function Section({
   lead: string
   children: ReactNode
 }) {
+  const active = useContext(ActiveSection)
+  if (active !== id) return null
   return (
     <section id={id} className="cat-section">
       <h2 className="t-headline">{title}</h2>
@@ -196,13 +248,93 @@ function Section({
   )
 }
 
+/*
+ * Changelog jako STRONA, nie arkusz. Wersje sa produktem tej pracy, wiec maja
+ * wlasny dzial, a nie okienko schowane pod numerkiem. Kazde wydanie pokazuje
+ * date, tytul, jednozdaniowe streszczenie po polsku (to samo, ktore apka
+ * pokazuje po odswiezeniu) i liste zmian z tagiem rodzaju.
+ */
+function WhatsNew() {
+  const [only, setOnly] = useState<'all' | ChangeType>('all')
+  /* 150 wydan na jednej stronie to kilometr przewijania: pokazujemy 20 */
+  const [limit, setLimit] = useState(20)
+  const matching = useMemo(
+    () =>
+      CHANGELOG.map((r) => ({
+        ...r,
+        changes: only === 'all' ? r.changes : r.changes.filter(([t]) => t === only),
+      })).filter((r) => r.changes.length),
+    [only],
+  )
+  const releases = matching.slice(0, limit)
+  const hidden = matching.length - releases.length
+  return (
+    <div className="clog">
+      <Segmented
+        className="clog-filter"
+        aria-label="Rodzaj zmian"
+        options={[
+          { value: 'all', label: 'wszystko' },
+          { value: 'added', label: 'nowe' },
+          { value: 'changed', label: 'zmiany' },
+          { value: 'fixed', label: 'poprawki' },
+        ]}
+        value={only}
+        onChange={(v) => setOnly(v as 'all' | ChangeType)}
+      />
+      <p className="cat-lead t-body-sm">
+        {matching.length} wydań w historii, najnowsze u góry. Kursywą stoi ta sama jedna linijka,
+        którą aplikacja pokazuje po odświeżeniu wersji.
+      </p>
+      {releases.map((rel) => (
+        <section key={rel.version} className="clog-release">
+          <header className="clog-head">
+            <div className="clog-head__row">
+              <span className="clog-version t-title">v{rel.version}</span>
+              <span className="clog-date t-caption">{rel.date}</span>
+              {rel.version === VERSION && <span className="clog-now t-caption">teraz</span>}
+            </div>
+            <p className="clog-title t-body-strong">{rel.title}</p>
+            {rel.tldr && <p className="clog-tldr t-body-sm">{rel.tldr}</p>}
+          </header>
+          <ul className="clog-list">
+            {rel.changes.map(([type, text], i) => (
+              <li key={i} className="clog-item">
+                <code className={`clog-tag -${type}`}>{TAG[type]}</code>
+                <span className="clog-text">{text}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+      {hidden > 0 && (
+        <button className="clog-more" onClick={() => setLimit((n) => n + 30)}>
+          Pokaż starsze wydania ({hidden})
+        </button>
+      )}
+    </div>
+  )
+}
+
 export function Catalog() {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(THEME_KEY) as Theme) ?? 'light',
   )
+  /* aktywna sekcja siedzi w adresie, wiec odswiezenie i wstecz dzialaja */
+  const [active, setActive] = useState(() => normalise(window.location.hash))
+  useEffect(() => {
+    const onHash = () => setActive(normalise(window.location.hash))
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+  useEffect(() => {
+    document.title = `${LABEL_OF.get(active) ?? 'Parkove'} · Parkove DS`
+    window.scrollTo({ top: 0 })
+  }, [active])
+  const [navQuery, setNavQuery] = useState('')
+
   const [sheetOpen, setSheetOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
-  const [changelogOpen, setChangelogOpen] = useState(false)
   const [chips, setChips] = useState({ quests: true, water: false, mounds: false })
   const [segDemo, setSegDemo] = useState('auto')
   const [swDemo, setSwDemo] = useState(true)
@@ -227,21 +359,35 @@ export function Catalog() {
         <div className="cat-brand">
           <span className="cat-brand__dot" />
           <span className="cat-brand__name">Parkove DS</span>
-          <button
-            className="cat-brand__ver t-caption"
-            onClick={() => setChangelogOpen(true)}
-            title="What changed in each version"
-          >
+          <a className="cat-brand__ver t-caption" href="#whatsnew" title="Co zmieniło się w wersjach">
             v{VERSION}
-          </button>
+          </a>
         </div>
-        <ChangelogSheet open={changelogOpen} onClose={() => setChangelogOpen(false)} />
+        <input
+          className="cat-navsearch"
+          type="search"
+          value={navQuery}
+          placeholder="Szukaj w katalogu"
+          aria-label="Szukaj w katalogu"
+          onChange={(e) => setNavQuery(e.target.value)}
+        />
         <nav className="cat-nav">
-          {NAV.map(([id, label]) => (
-            <a key={id} href={`#${id}`}>
-              {label}
-            </a>
-          ))}
+          {GROUPS.map((g) => {
+            const items = g.items.filter(([, label]) =>
+              label.toLowerCase().includes(navQuery.trim().toLowerCase()),
+            )
+            if (!items.length) return null
+            return (
+              <div key={g.group} className="cat-navgroup">
+                <p className="cat-navgroup__head t-caption">{g.group}</p>
+                {items.map(([id, label]) => (
+                  <a key={id} href={`#${id}`} className={active === id ? '-on' : undefined}>
+                    {label}
+                  </a>
+                ))}
+              </div>
+            )
+          })}
         </nav>
         <Segmented
           className="cat-themeseg"
@@ -257,12 +403,12 @@ export function Catalog() {
       </aside>
 
       <main className="cat-main">
+        <ActiveSection.Provider value={active}>
         <header className="cat-hero">
-          <h1 className="t-display">Parkove design system</h1>
-          <p className="t-body cat-hero__sub">
-            Tokens and components for the Kraków park quest app. Color comes from one HCT seed
-            (forest green, hue 140). The app composes these parts and never restyles them.
+          <p className="cat-hero__crumb t-caption">
+            Parkove DS <span aria-hidden="true">·</span> {GROUP_OF.get(active)}
           </p>
+          <h1 className="t-display">{LABEL_OF.get(active)}</h1>
         </header>
 
         <Section
@@ -817,6 +963,14 @@ export function Catalog() {
             </StatGrid>
           </div>
         </Section>
+        <Section
+          id="whatsnew"
+          title="Co nowego"
+          lead="Historia wydań, od najnowszego. Ta sama treść, którą aplikacja pokazuje po odświeżeniu wersji."
+        >
+          <WhatsNew />
+        </Section>
+        </ActiveSection.Provider>
       </main>
     </div>
   )

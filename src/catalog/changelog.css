@@ -77,3 +77,45 @@
   color: var(--content-error);
   background: var(--bg-error-subtle);
 }
+
+/*
+ * Changelog jako STRONA katalogu (2026-08-25), nie arkusz pod numerkiem wersji.
+ * Wydanie czyta sie jak wpis: numer i data, tytul, jednozdaniowe streszczenie
+ * po polsku (to samo, ktore apka mowi po odswiezeniu), potem lista zmian.
+ */
+.clog-filter {
+  margin: 0 0 var(--sp-4);
+}
+
+.clog-tldr {
+  margin: 4px 0 0;
+  color: var(--content-secondary);
+  font-style: italic;
+}
+
+.clog-now {
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.clog-release + .clog-release {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.clog-more {
+  margin-top: var(--sp-6);
+  padding: 11px 18px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--content-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}

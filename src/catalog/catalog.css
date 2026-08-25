@@ -74,6 +74,63 @@
   color: var(--content-primary);
 }
 
+/*
+ * Dzialy w nawigacji (2026-08-25). Plaska lista 25 pozycji nie mowila, co jest
+ * fundamentem, a co komponentem; naglowki dziela ja na cztery kubelki plus
+ * wydania. Aktywna pozycja jest wypelniona, bo katalog pokazuje teraz JEDEN
+ * ekran i trzeba widziec, ktory.
+ */
+.cat-navgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cat-navgroup + .cat-navgroup {
+  margin-top: var(--sp-4);
+}
+
+.cat-navgroup__head {
+  margin: 0 0 2px var(--sp-3);
+  color: var(--content-tertiary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cat-nav a.-on {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+.cat-nav a.-on:hover {
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+.cat-navsearch {
+  margin: 0 0 var(--sp-4);
+  padding: 9px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--content-primary);
+  font: inherit;
+  font-size: 13.5px;
+}
+
+.cat-navsearch:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+
+/* okruszek nad tytulem dzialu: gdzie jestem w katalogu */
+.cat-hero__crumb {
+  margin: 0 0 4px;
+  color: var(--content-tertiary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .cat-themeseg {
   margin-top: auto;
 }
@@ -394,9 +451,47 @@
     border-bottom: 1px solid var(--border-subtle);
   }
 
+  /*
+   * Na telefonie dzialy leza jeden pod drugim, a pozycje kazdego dzialu jada
+   * w bok w swoim rzedzie: zawijanie wszystkiego w jedna chmure pozycji
+   * gubilo podzial, ktory na desktopie robi cala robote.
+   */
   .cat-nav {
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  .cat-navgroup {
     flex-direction: row;
-    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: 0 calc(-1 * var(--sp-5));
+    padding: 0 var(--sp-5) 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cat-navgroup::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cat-navgroup + .cat-navgroup {
+    margin-top: 0;
+  }
+
+  .cat-navgroup__head {
+    flex: none;
+    align-self: center;
+    margin: 0;
+    min-width: 74px;
+  }
+
+  .cat-nav a {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .cat-navsearch {
+    margin-bottom: var(--sp-3);
   }
 
   .cat-themeseg {

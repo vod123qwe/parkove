@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.106.0'
+export const VERSION = '0.107.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.107.0',
+    date: '2026-08-25',
+    title: 'The catalogue reads like an app',
+    tldr:
+      'Katalog design systemu ma teraz działy i jedną sekcję na ekran, a historia wydań dostała własną stronę z filtrem i streszczeniami.',
+    changes: [
+      ['changed', 'The design system catalogue works like an app instead of one endless page: five sections in the sidebar (foundations, elements, content, layers and navigation, releases), one screen at a time, and the address remembers where you were. A search box filters the list, and on a phone each section scrolls sideways in its own row'],
+      ['changed', 'Release history moved out of a sheet hidden behind the version number into its own page. Every release shows its date, a badge on the current one, the one sentence summary the app tells you after a refresh, and its changes tagged as new, change or fix. You can filter by tag, and it starts with the twenty newest of a hundred and fifty'],
+    ],
+  },
   {
     version: '0.106.0',
     date: '2026-08-25',
