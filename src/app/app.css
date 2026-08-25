@@ -6232,8 +6232,13 @@
 }
 
 .prof-cells .pk-listitem {
-  padding-top: 15px;
-  padding-bottom: 15px;
+  /* 18 px pionu (Jarek: "wieksze odstepy"): profil ma byc spokojny, nie gesty */
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.prof-cells {
+  margin-bottom: var(--sp-4);
 }
 
 /*

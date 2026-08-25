@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.109.0'
+export const VERSION = '0.109.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.109.1',
+    date: '2026-08-25',
+    title: 'Profile polish, section head becomes a component',
+    tldr:
+      'Dividery w profilu idą na całą szerokość, wiersze mają więcej powietrza, a nagłówek sekcji listy to teraz komponent design systemu.',
+    changes: [
+      ['changed', 'Profile dividers run edge to edge, rows breathe with more vertical room, and section headings got a step smaller with more space above'],
+      ['added', 'The section heading is a design system component now (ListHead), and List learned full-bleed dividers with inset off. Both documented in the catalogue, so every grouped list in the app speaks with one voice'],
+    ],
+  },
   {
     version: '0.109.0',
     date: '2026-08-25',

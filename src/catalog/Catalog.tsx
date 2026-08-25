@@ -32,6 +32,7 @@ import {
   Chip,
   Collapsible,
   List,
+  ListHead,
   ListItem,
   MediaHero,
   PhotoSlider,
@@ -780,10 +781,11 @@ export function Catalog() {
         <Section
           id="lists"
           title="List items"
-          lead="Rows for the parks list. The leading disc tone tells the state: neutral, visited (accent), completed (gold). Wrap them in List for hairline dividers, inset past the icon."
+          lead="Rows for the parks list. The leading disc tone tells the state: neutral, visited (accent), completed (gold). Wrap them in List for hairline dividers: inset past the icon by default, full-bleed with inset={false}. ListHead labels a group of rows, like the profile sections."
         >
           <div className="cat-spec cat-list">
-            <List>
+            <ListHead>Sekcja z nagłówkiem</ListHead>
+            <List inset={false}>
               <ListItem
                 icon={<Trees />}
                 title="Park Bednarskiego"

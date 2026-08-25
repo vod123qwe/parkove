@@ -1,5 +1,5 @@
 import { Award, ChevronRight, Footprints, Info, List as ListIcon, Palette, Route } from 'lucide-react'
-import { List, ListItem, Modal, ProgressRing, Stat, StatGrid } from '../ds'
+import { List, ListHead, ListItem, Modal, ProgressRing, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
 import { isParkComplete } from './progress'
 import parksData from './data/parks.json'
@@ -75,8 +75,8 @@ export function ProfileScreen({
         <Stat icon={<Award size={16} />} value={String(golden)} label="złotych" />
       </StatGrid>
 
-      <p className="t-caption app-menu__head">Ty</p>
-      <List className="prof-cells">
+      <ListHead>Ty</ListHead>
+      <List inset={false} className="prof-cells">
         <ListItem
           icon={<Route />}
           leadTone="accent"
@@ -105,8 +105,8 @@ export function ProfileScreen({
         />
       </List>
 
-      <p className="t-caption app-menu__head">Miejsca</p>
-      <List className="prof-cells">
+      <ListHead>Miejsca</ListHead>
+      <List inset={false} className="prof-cells">
         <ListItem
           icon={<ListIcon />}
           title="Wszystkie parki"
@@ -116,8 +116,8 @@ export function ProfileScreen({
         />
       </List>
 
-      <p className="t-caption app-menu__head">Ustawienia</p>
-      <List className="prof-cells">
+      <ListHead>Ustawienia</ListHead>
+      <List inset={false} className="prof-cells">
         <ListItem
           icon={<Palette />}
           title="Wygląd"

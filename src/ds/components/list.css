@@ -22,3 +22,28 @@
 .pk-list.-divided.-inset > * + *::before {
   left: calc(var(--sp-3) + 40px + var(--sp-4));
 }
+
+/*
+ * Bez -inset kreska idzie OD KRAWĘDZI DO KRAWĘDZI (Jarek: „dividery na całą
+ * szerokość"). Wcześniej i tak nikt nie używał inset={false}, więc pełny
+ * przelew mógł bezpiecznie przejąć to znaczenie.
+ */
+.pk-list.-divided:not(.-inset) > * + *::before {
+  left: 0;
+  right: 0;
+}
+
+/* nagłówek sekcji listy: mniejszy stopień niż caption, więcej powietrza */
+.pk-listhead {
+  margin: var(--sp-8) var(--sp-2) var(--sp-3);
+  color: var(--content-tertiary);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.pk-listhead:first-of-type {
+  margin-top: var(--sp-5);
+}
