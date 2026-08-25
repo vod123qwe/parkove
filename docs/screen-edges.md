@@ -244,3 +244,25 @@ screen.height, bo ta wartosc nie wie nic o orientacji, zoomie i paskach.
 
 Czego symulacja NIE pokrywa (uczciwie): dynamiczne kurczenie dvh w Safari,
 pierwsza klatka po starcie standalone, rubber-banding. Final judge = telefon.
+
+### Ostatni element ukladanki: iOS ZAMRAZA mety przy instalacji (0.110.1)
+
+Jarek porownal trzy nasze apki na jednym telefonie:
+
+- Portfel: pelna wysokosc, wszystko dobrze (swieza instalacja, poprawne mety),
+- Velo: dol dobry, ale STATUS BAR lezy na tresci (translucent jest, brakuje
+  padding-top: env(safe-area-inset-top) w tamtej apce),
+- Parkove: dol wciaz z przerwa mimo poprawnych met w kodzie.
+
+Wyjasnienie: iOS zapisuje `apple-mobile-web-app-status-bar-style` (i spolke)
+W CHWILI DODANIA IKONY do ekranu glownego. Instalacja Parkove u Jarka jest
+sprzed black-translucent, wiec jej okno ma 797 pkt zamiast 844: system
+trzyma na dole pas, ktorego zadna zmiana w kodzie nie zamaluje. Dawny
+"bleed 47" leczyl objaw dokladnie tej instalacji, psujac swieze.
+
+JEDYNA naprawa: usunac ikone z ekranu glownego i dodac ja ponownie z Safari.
+
+Diagnostyka ekranu (O aplikacji) stawia teraz WERDYKT wprost:
+- standalone + okno nizsze od ekranu o 20-96 px + safe=0
+  -> "instalacja sprzed pelnego ekranu, przeinstaluj ikone",
+- standalone + safe>0 + okno=ekran -> "uklad zdrowy".

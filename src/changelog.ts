@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.0'
+export const VERSION = '0.110.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.1',
+    date: '2026-08-25',
+    title: 'The screen diagnostic now gives a verdict',
+    tldr:
+      'Diagnostyka ekranu mówi wprost, czy Twoja instalacja PWA pamięta stare ustawienia paska statusu i czy trzeba ponownie dodać ikonę.',
+    changes: [
+      ['added', 'iOS freezes the status bar settings the moment you add the icon to the home screen, so an old installation keeps an old, shorter window no matter what the code says, and that was the last piece of the bottom gap puzzle. The screen diagnostic in About now says it outright: either "this installation predates full screen, remove the icon and add it again from Safari" or "full screen and system insets work, the layout is healthy"'],
+    ],
+  },
   {
     version: '0.110.0',
     date: '2026-08-25',

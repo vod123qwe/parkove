@@ -110,13 +110,33 @@ export function screenReport() {
   const fixedBottom = Math.round(probe.getBoundingClientRect().bottom)
   probe.remove()
   const dpr = window.devicePixelRatio || 1
-  return [
-    `okno ${Math.round(window.innerHeight)}`,
-    `ekran ${Math.round(window.screen.height)}`,
+  const standalone = window.matchMedia('(display-mode: standalone)').matches
+  const inner = Math.round(window.innerHeight)
+  const screenH = Math.round(window.screen.height)
+  const facts = [
+    `okno ${inner}`,
+    `ekran ${screenH}`,
     `widok ${Math.round(window.visualViewport?.height ?? 0)}`,
     `safe ${safe}`,
     `fixed-dol ${fixedBottom}`,
     `dpr ${dpr}`,
-    `standalone ${window.matchMedia('(display-mode: standalone)').matches ? 'tak' : 'nie'}`,
+    `standalone ${standalone ? 'tak' : 'nie'}`,
   ].join(' · ')
+  /*
+   * WERDYKT, nie same liczby (2026-08-25). Okno niższe od ekranu o wysokość
+   * paska statusu przy safe=0 znaczy: ta instalacja PWA pamięta mety sprzed
+   * black-translucent, bo iOS zamraża je w chwili dodania ikony. Żadna
+   * zmiana w kodzie tego nie naprawi; naprawia je ponowne dodanie ikony.
+   * Tak właśnie różniły się telefonowe instalacje Parkove (stara, okno 797)
+   * i Portfela (świeża, pełny ekran) u Jarka.
+   */
+  const gap = screenH - inner
+  if (standalone && gap >= 20 && gap <= 96 && safe === 0)
+    return (
+      facts +
+      ' · WERDYKT: ta instalacja działa w oknie sprzed pełnego ekranu. Usuń ikonę Parkove z ekranu głównego i dodaj ją ponownie z Safari, to jedyna naprawa.'
+    )
+  if (standalone && safe > 0 && gap === 0)
+    return facts + ' · WERDYKT: pełny ekran i systemowe wcięcia działają, układ jest zdrowy.'
+  return facts
 }
