@@ -379,3 +379,46 @@ karta. `roleOf()` wnioskuje role z id dla danych liczonych przed ta zmiana.
 DO ZROBIENIA: przelot nad reszta katalogu (41 miejsc, 25-35 min) oraz
 edycja trasy przez dodanie punktu RECZNIE NA MAPIE (dzis kreator przyjmuje
 tylko predefiniowane punkty i parkingi).
+
+---
+
+## Edytor trasy na pelnym ekranie + punkt w Jordanie (2026-08-25, 0.104.0)
+
+Jarek: "edycja trasy powinna uruchamiac sie chyba w osobnym ekranie, tak
+zeby mapa byla wieksza i byly tylko selektory, ew. dodawanie palcem na
+mapie punktow albo dodawanie i przenoszenie palcem swoich punktow".
+
+`src/app/TrailEditor.tsx` (z-index 205, NAD modalami DS 200, bo otwiera
+sie z modalu Szlak). Mapa bierze caly kadr, sterowanie w karcie u dolu:
+
+- markery punktow miejsca (punkty wyprawy, parkingi, placyki, kawa),
+  dotkniecie wlacza i wylacza z trasy; te same punkty jako pigulki w karcie,
+- dotkniecie MAPY dodaje wlasny punkt tam, gdzie stuknales,
+- wlasny punkt: przeciagniecie przenosi (maplibre Marker draggable),
+  DWA dotkniecia usuwaja, plus przycisk Cofnij punkt.
+
+GOTCHA, wazna: usuwanie wlasnego punktu bylo najpierw na JEDNO dotkniecie
+i to byl blad. Przeciaganie i tapniecie zaczynaja sie identycznie, wiec
+kazde drgniecie palca przy przenoszeniu kasowalo punkt. Stad dwuklik.
+
+Trasa liczy sie na zywo: `routeMyTrail` z debounce 600 ms i tokenem biegu
+(spozniona odpowiedz starszego pytania wypada). Zapis przez `buildMyTrail`
+z gotowym `trip`, wiec nie pyta routera drugi raz. Wlasne punkty (id
+`own-*`) NIE licza sie do `stops`, bo nie sa punktami wyprawy.
+
+### Park Jordana: wodny plac zabaw
+
+Nowy punkt wyprawy `wodny-plac` (19.91347, 50.06207), category `water`.
+Zrodlo wspolrzednych: OSM way amenity=fountain + natural=water "Fontanna
+do zabawy dla dzieci", potwierdzone na zdjeciu satelitarnym (niebieska
+misa w poludniowo-zachodnim narozniku parku).
+
+STAWU W PARKU JORDANA NIE MA. Sprawdzone dwoma sposobami: Overpass w
+bboxie parku i 500 m wokol (jedyna woda to ta fontanna oraz sadzawka
+500 m dalej, juz w Parku Krakowskim) oraz zdjecie satelitarne calego
+parku. Nasz wlasny findHint pomnika Jordana mowil "miedzy wejsciem od
+al. 3 Maja a stawem" i to stad bralo sie przekonanie o stawie; poprawione
+na "a rondem z lawkami".
+
+Efekt nowego punktu na trasy Jordana: trasa przez punkty 690 m -> 1275 m,
+pokrycie 27% -> 59%; petla z landmarkami 2074 m, pokrycie 71%.

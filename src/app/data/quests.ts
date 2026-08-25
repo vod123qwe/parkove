@@ -734,6 +734,29 @@ const KRAKOW_QUESTS: Quest[] = [
     parkId: 'park-jordana',
     pois: [
       {
+        id: 'wodny-plac',
+        category: 'water',
+        name: 'Wodny plac zabaw',
+        teaser: 'Płaska misa z dyszami: woda tryska z ziemi, brodzika nie ma.',
+        description: [
+          'To nie basen i nie fontanna do patrzenia, tylko plac zabaw, w którym zabawką jest woda. Dysze siedzą równo z posadzką i strzelają w górę, więc nie ma tu głębokości ani schodków do zejścia: dziecko wchodzi po prostu z alejki.',
+          'Taki plac rozwiązuje problem, który każdy rodzic zna z lipca: w parku jest cień i są huśtawki, ale nie ma jak się schłodzić. Woda krąży w obiegu i jest uzdatniana, a brak zbiornika oznacza brak ryzyka utonięcia, dlatego takie place zastępują dziś brodziki w miejskich parkach.',
+          'Działa sezonowo i tylko przy cieplejszej pogodzie, więc w chłodny dzień zobaczysz samą posadzkę z kratkami. Wtedy warto wiedzieć, czego się patrzy: rysunek dysz na płycie mówi, gdzie za miesiąc będzie najwięcej wrzasku.',
+        ],
+        findHint: 'Południowo-zachodni narożnik parku, obok dużego placu zabaw i toru dla rolek.',
+        reveal:
+          'Woda tryska tu wprost z posadzki, bez zbiornika i bez głębokości, więc plac jest bezpieczny i sezonowy. Krąży w obiegu zamkniętym i jest uzdatniana.',
+        dilemma: {
+          question:
+            'Wodne place zabaw zużywają wodę i prąd na pompy, ale w upał realnie chłodzą dzieciom lato. Czy miasto powinno je stawiać w kolejnych parkach?',
+          options: ['Tak, upały będą częstsze', 'Nie, woda jest za cenna', 'Tylko z obiegiem zamkniętym'],
+          counterpoint:
+            'Obieg zamknięty zużywa dużo mniej wody niż brodzik wymieniany co kilka dni, a w upał plac wodny bywa jedynym miejscem w okolicy, gdzie dziecko z bloku może się ochłodzić bez biletu. Z drugiej strony pompy i uzdatnianie chodzą na prądzie przez cały sezon, także wtedy, gdy nikt nie przychodzi.',
+        },
+        coords: [19.91347, 50.06207],
+        radius: 30,
+      },
+      {
         id: 'pomnik-jordana',
         category: 'monument',
         name: 'Pomnik Henryka Jordana',
@@ -743,7 +766,7 @@ const KRAKOW_QUESTS: Quest[] = [
           'Jordan nie był sponsorem-figurantem: osobiście dobierał przewodników zabaw, organizował grupy i prowadził dzieciom pogadanki o polskiej historii, w czasach, gdy Polski nie było na mapie.',
           'Pomnik twórcy stanął w parku w 1914 roku i patrzy na główną aleję do dziś. Od nazwiska doktora pochodzą "ogródki jordanowskie", które znasz z każdego polskiego miasta.',
         ],
-        findHint: 'Główna aleja, w połowie drogi między wejściem od al. 3 Maja a stawem.',
+        findHint: 'Główna aleja, w połowie drogi między wejściem od al. 3 Maja a rondem z ławkami.',
         reveal:
                     'Jordan, lekarz i społecznik, stworzył pionierski w Europie park zabaw. Osobiście dobierał przewodników i prowadził dzieciom pogadanki o polskiej historii. Wstęp od początku był bezpłatny.',
         dilemma: {

@@ -6032,3 +6032,193 @@
   color: var(--content-subtle);
 }
 
+
+/*
+ * EDYTOR TRASY (pełny ekran, 0.104.0).
+ *
+ * Jarek: „edycja trasy powinna uruchamiać się w osobnym ekranie, tak żeby mapa
+ * była większa". Dlatego mapa bierze cały kadr, a sterowanie schodzi do karty
+ * u dołu i jednego przycisku u góry.
+ *
+ * z-index 205: NAD modalami DS (200), bo edytor otwiera się z modalu Szlak i
+ * musi go zasłonić. Numer jest prawdziwy sam z siebie, bez liczenia na
+ * konteksty stosu (lekcja z .jscreen wyżej).
+ */
+.tedit {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: max(var(--screen-h), 100dvh);
+  z-index: 205;
+  background: #0f1a0d;
+  animation: tedit-in 300ms var(--ease-screen);
+}
+
+@keyframes tedit-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tedit__map {
+  position: absolute;
+  inset: 0;
+}
+
+.tedit__top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: calc(var(--safe-top, 0px) + var(--sp-3)) var(--sp-4) var(--sp-3);
+  background: linear-gradient(to bottom, rgb(10 18 8 / 0.7), transparent);
+  pointer-events: none;
+}
+
+.tedit__back {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--content-default);
+  pointer-events: auto;
+}
+
+.tedit__name {
+  color: #f2f6ec;
+  text-shadow: 0 1px 6px rgb(10 18 8 / 0.6);
+}
+
+/* punkty na mapie: kropka miejsca i kropka twoja, ta druga z numerem */
+.tedit__dot {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 2.5px solid var(--bg-surface);
+  border-radius: 50%;
+  background: #2a4a24;
+  color: #eaffdc;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgb(8 14 6 / 0.45);
+  cursor: pointer;
+}
+
+.tedit__dot.-on {
+  background: var(--bg-gold);
+  border-color: #fff;
+}
+
+.tedit__dot.-parking {
+  background: #3b4a5a;
+}
+
+.tedit__dot.-food,
+.tedit__dot.-play {
+  background: #4a3a24;
+}
+
+.tedit__dot.-own {
+  width: 30px;
+  height: 30px;
+  background: #7ce93f;
+  border-color: #12290c;
+  color: #12290c;
+}
+
+.tedit__card {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--sp-4) var(--sp-4) calc(var(--safe-bottom, 0px) + var(--sp-4));
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface-raised);
+  box-shadow: 0 -10px 30px rgb(8 14 6 / 0.35);
+}
+
+.tedit__hint {
+  margin: 0 0 var(--sp-3);
+  color: var(--content-subtle);
+}
+
+.tedit__chips {
+  display: flex;
+  gap: var(--sp-2);
+  margin: 0 calc(-1 * var(--sp-4)) var(--sp-3);
+  padding: 2px var(--sp-4) 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tedit__chips::-webkit-scrollbar {
+  display: none;
+}
+
+.tedit__chip {
+  flex: none;
+  max-width: 46vw;
+  overflow: hidden;
+  padding: 8px 13px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  corner-shape: var(--corner-smooth);
+  background: var(--bg-surface);
+  color: var(--content-default);
+  font: inherit;
+  font-size: 12.5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tedit__chip.-on {
+  border-color: transparent;
+  background: var(--bg-primary);
+  color: var(--content-on-primary);
+}
+
+.tedit__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.tedit__sum {
+  flex: 1;
+  color: var(--content-default);
+}
+
+.tedit__acts {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.tedit__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--content-subtle);
+  font: inherit;
+  font-size: 12.5px;
+}

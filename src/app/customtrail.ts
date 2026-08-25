@@ -106,7 +106,9 @@ export async function routeMyTrail(stops: Stop[]): Promise<{ trip: RoutedTrip } 
     .map((w, i) => ({ at: w.waypoint_index, stop: ordered[i] }))
     .sort((a, b) => a.at - b.at)
     .map((x) => x.stop)
-    .filter((s) => s && s.kind !== 'parking')
+    /* wlasne punkty z edytora nie sa punktami wyprawy, wiec nie licza sie do
+       liczby punktow na karcie; parking tez nie, bo jest dojsciem */
+    .filter((s) => s && s.kind !== 'parking' && !s.id.startsWith('own-'))
 
   return {
     trip: {

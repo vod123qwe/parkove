@@ -11,6 +11,7 @@ import { questForPark } from './data/quests'
 import { PARKING } from './data/parking'
 import { amenitiesFor, isFood } from './data/amenities'
 import { buildMyTrail, dropMyTrail, myTrailsFor, routeMyTrail } from './customtrail'
+import { TrailEditor } from './TrailEditor'
 import type { RoutedTrip, Stop } from './customtrail'
 
 /**
@@ -150,6 +151,11 @@ export function TrailModal({
    * dotkniecie karty zapisuje trase na wyprawe.
    */
   const [variantAt, setVariantAt] = useState<Record<string, number>>({})
+  /*
+   * Edytor otwiera sie jako OSOBNY EKRAN (Jarek 2026-08-25: "zeby mapa byla
+   * wieksza"). Trzymamy tu tylko przystanki, od ktorych ma zaczac.
+   */
+  const [editorFrom, setEditorFrom] = useState<string[] | null>(null)
   const [picking, setPicking] = useState(false)
   const [picked, setPicked] = useState<Set<string>>(new Set())
   const [busy, setBusy] = useState(false)
@@ -278,13 +284,8 @@ export function TrailModal({
         ) : (
           <button
             className="mytrail__drop pk-press"
-            aria-label={`Edytuj trasę ${t.name} w kreatorze`}
-            onClick={() => {
-              setPicked(new Set(t.stops ?? []))
-              setPicking(true)
-              setProblem(null)
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
+            aria-label={`Edytuj trasę ${t.name} na mapie`}
+            onClick={() => setEditorFrom(t.stops ?? [])}
           >
             <Pencil size={16} />
           </button>
@@ -439,6 +440,20 @@ export function TrailModal({
             .join(', ')}
           .
         </p>
+      )}
+      {editorFrom && (
+        <TrailEditor
+          parkId={parkId}
+          parkName={parkName}
+          initialStops={editorFrom}
+          onClose={() => setEditorFrom(null)}
+          onSaved={(id) => {
+            setEditorFrom(null)
+            setMine(myTrailsFor(parkId))
+            chooseTrail(parkId, id)
+            onClose()
+          }}
+        />
       )}
     </Modal>
   )

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.103.0'
+export const VERSION = '0.104.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.104.0',
+    date: '2026-08-25',
+    title: 'Trail editor on its own screen',
+    tldr:
+      'Edycja trasy dzieje się teraz na pełnym ekranie: duża mapa, punkty dotknięciem, własne punkty palcem. Park Jordana dostał wodny plac zabaw.',
+    changes: [
+      ['added', 'Editing a route opens a full screen with a big map instead of a sheet inside a sheet. Tap a marker or a pill to put a place on the route, tap the map to drop your own point, drag it with a finger to move it, double tap to remove it. Distance and time recount as you go and the line redraws'],
+      ['added', 'Park Jordana got a new quest point: the water playground, the flat basin where water shoots out of the pavement. Adding it pulled the point route across the park, from 690 to 1275 metres and from 27 to 59 percent coverage'],
+      ['fixed', 'The pond that a hint in Jordana talked about does not exist. OpenStreetMap knows only the fountain, the nearest water is 500 metres away in Park Krakowski, and the satellite photo shows no pond either. The hint now points at the ring of benches instead'],
+      ['fixed', 'Removing your own point took one tap, which meant a finger that drifted while dragging deleted the point instead of moving it. Two taps remove, and there is an undo for the last one'],
+    ],
+  },
   {
     version: '0.103.0',
     date: '2026-08-25',
