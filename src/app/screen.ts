@@ -117,7 +117,14 @@ export function screenReport() {
   const fixedBottom = Math.round(probe.getBoundingClientRect().bottom)
   probe.remove()
   const dpr = window.devicePixelRatio || 1
-  const standalone = window.matchMedia('(display-mode: standalone)').matches
+  const standalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches
+  const displayMode = window.matchMedia('(display-mode: fullscreen)').matches
+    ? 'fullscreen'
+    : window.matchMedia('(display-mode: standalone)').matches
+      ? 'standalone'
+      : 'przeglądarka'
   const inner = Math.round(window.innerHeight)
   const screenH = Math.round(window.screen.height)
   const facts = [
@@ -127,7 +134,7 @@ export function screenReport() {
     `safe ${safe}`,
     `fixed-dol ${fixedBottom}`,
     `dpr ${dpr}`,
-    `standalone ${standalone ? 'tak' : 'nie'}`,
+    `tryb ${displayMode}`,
   ].join(' · ')
   /*
    * WERDYKT, nie same liczby (2026-08-25). Okno niższe od ekranu o wysokość

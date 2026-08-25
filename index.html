@@ -4,16 +4,24 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
     />
     <title>Parkove</title>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./favicon.png" sizes="64x64" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!--
+      EKSPERYMENT 0.110.3 (odzyskanie dolnych 47 px): legacy meta
+      apple-mobile-web-app-capable i ...-status-bar-style USUNIETE.
+      Hipoteza: ich obecnosc wpycha PWA w stary tryb viewportu (okno 797
+      z 844 mimo viewport-fit=cover). Tryb standalone zapewnia manifest
+      (display + display_override). Jesli po reinstalacji ikony okno
+      dalej ma 797, to limit systemu i wracamy do malowania pasa kolorem.
+    -->
     <meta name="apple-mobile-web-app-title" content="Parkove" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f8f5" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b1207" />
     <!-- black-translucent = tresc wchodzi POD pasek statusu, mapa jest pelnoekranowa -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

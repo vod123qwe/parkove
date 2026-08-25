@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.2'
+export const VERSION = '0.110.3'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.110.3',
+    date: '2026-08-25',
+    title: 'Experiment: reclaim the bottom 47 pixels',
+    tldr:
+      'Eksperyment o odzyskanie dolnych 47 pikseli: stare deklaracje Apple wyleciały, tryb pełnoekranowy zgłasza manifest. Rozstrzyga jedna reinstalacja ikony.',
+    changes: [
+      ['changed', 'The legacy Apple meta tags are gone and the manifest now also declares fullscreen. The hypothesis: those old tags push the installed app into an old viewport that ends 47 pixels above the screen. The verdict needs one icon reinstall; the screen diagnostic will say okno 844 if the space is won, and it now also names the display mode'],
+    ],
+  },
   {
     version: '0.110.2',
     date: '2026-08-25',
