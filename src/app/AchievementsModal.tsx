@@ -8,6 +8,7 @@ import { GROUP_LABEL, challengeStates } from './data/challenges'
 import type { ChallengeGroup, ChallengeState } from './data/challenges'
 import parksData from './data/parks.json'
 import type { ParkFeature } from './ParkSheet'
+import { kindIcon } from './kinds'
 
 const FEATURES = parksData.features as unknown as ParkFeature[]
 
@@ -96,6 +97,7 @@ export function AchievementsModal({
                 name={f.properties.name}
                 parkId={f.id}
                 earned={isParkComplete(f.id, parks)}
+                fallback={kindIcon(f.properties.kind)}
                 onClick={onPick ? () => onPick(f.id) : undefined}
               />
             ))}

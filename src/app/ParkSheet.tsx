@@ -10,7 +10,6 @@ import {
   MapPin,
   Square,
   ToyBrick,
-  Trees,
 } from 'lucide-react'
 import {
   ActionBar,
@@ -21,7 +20,7 @@ import {
   PhotoSlider,
   Stamp,
 } from '../ds'
-import { KIND_META } from './kinds'
+import { KIND_META, kindIcon } from './kinds'
 import { suggestedParking } from './data/parking'
 import { PhotoButton } from './PhotoButton'
 import { WeatherStrip } from './WeatherStrip'
@@ -224,7 +223,7 @@ export function ParkSheet({
           images={gallery.map((p) => ({ src: asset(p.src) }))}
           ratio="16:9"
           showCredit={false}
-          fallback={<Trees strokeWidth={1.5} />}
+          fallback={kindIcon(park.properties.kind)}
           aria-label={`Zdjęcia: ${park.properties.name}`}
         />
       </div>
@@ -240,7 +239,7 @@ export function ParkSheet({
             name={park.properties.name}
             earned={hasStamp}
             size="lg"
-            fallback={<Trees />}
+            fallback={kindIcon(park.properties.kind)}
           />
           {hasStamp && total > 0 && (
             <span className={`park-progress__badge t-caption${earned >= total ? ' -full' : ''}`}>
