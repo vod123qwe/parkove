@@ -1,5 +1,14 @@
-import { Award, ChevronRight, Footprints, Info, List as ListIcon, Palette, Route } from 'lucide-react'
-import { List, ListHead, ListItem, Modal, ProgressRing, Stat, StatGrid } from '../ds'
+import {
+  Award,
+  BookOpen,
+  ChevronRight,
+  Footprints,
+  Info,
+  List as ListIcon,
+  Palette,
+  Route,
+} from 'lucide-react'
+import { List, ListHead, ListItem, Modal, Stat, StatGrid } from '../ds'
 import { useGameState } from './state'
 import { isParkComplete } from './progress'
 import parksData from './data/parks.json'
@@ -7,20 +16,11 @@ import { CHALLENGES } from './data/challenges'
 import { VERSION } from '../changelog'
 import { plMiejsca, plNaklejki, plWyprawy } from './naming'
 
-/**
- * Menu jako PEŁNY EKRAN PROFILU (Jarek 2026-08-25: „mógłby być full screen,
- * gdzie u góry są jakieś podstawowe info o mnie, najważniejsze, a pod spodem
- * odpowiednio podzielone linki").
- *
- * U góry stoi to, co w tej grze naprawdę jest „o nas": ile Krakowa wyszło
- * spod chmur (pierścień), plus trzy liczby drogi: wyprawy, kilometry i złote
- * pieczątki. Linki niżej to zwykłe wiersze: ikona, tekst, chevron, z większym
- * oddechem niż w arkuszach (klasa prof-cells).
- */
-
 const FEATURE_COUNT =
-  (parksData as { features: Array<{ id: string }> }).features.filter((f) => f.id !== 'test-piltza')
+  (parksData as { features: Array<{ id: string }> }).features.filter((feature) => feature.id !== 'test-piltza')
     .length
+
+const TARGETS = [1, 3, 5, 10, 15, 20, 30, 40, FEATURE_COUNT]
 
 export function ProfileScreen({
   open,
@@ -34,7 +34,6 @@ export function ProfileScreen({
   onAbout,
 }: {
   open: boolean
-  /** policzone w App, bo wymaga pelnego stanu gry (odpowiedzi, znaczniki) */
   challengeDone: number
   onClose: () => void
   onStats: () => void
@@ -49,22 +48,43 @@ export function ProfileScreen({
   const golden = Object.keys(parks).filter(
     (id) => id !== 'test-piltza' && isParkComplete(id, parks),
   ).length
-  const totalKm = journeys.reduce((s, j) => s + j.distanceM, 0) / 1000
-  const points = Object.values(parks).reduce((s, p) => s + p.points.length, 0)
+  const totalKm = journeys.reduce((sum, journey) => sum + journey.distanceM, 0) / 1000
+  const points = Object.values(parks).reduce((sum, park) => sum + park.points.length, 0)
+  const percent = Math.min(100, Math.round((visited / FEATURE_COUNT) * 100))
+  const nextTarget = TARGETS.find((target) => target > visited) ?? FEATURE_COUNT
+  const toNext = Math.max(0, nextTarget - visited)
 
   return (
     <Modal open={open} onClose={onClose} title="Ty" action="close" presentation="push">
-      <div className="prof-hero">
-        <ProgressRing value={(visited / FEATURE_COUNT) * 100} size="lg" label={String(visited)} />
-        <div className="prof-hero__text">
-          <p className="t-title prof-hero__line">
-            {visited} z {FEATURE_COUNT} {plMiejsca(FEATURE_COUNT)} odkrytych
-          </p>
-          <p className="t-caption prof-hero__sub">
-            {points} punktów wypraw · {golden} {plNaklejki(golden)}
-          </p>
+      <section className="prof-progress" aria-label="Postęp odkrywania Krakowa">
+        <div className="prof-progress__top">
+          <span className="t-caption">Twój Kraków</span>
+          <span className="t-caption prof-progress__percent">{percent}%</span>
         </div>
-      </div>
+        <div className="prof-progress__score">
+          <strong>{visited}</strong>
+          <span>
+            z {FEATURE_COUNT}<br />
+            miejsc odkrytych
+          </span>
+        </div>
+        <div
+          className="prof-progress__track"
+          role="progressbar"
+          aria-label="Odkryte miejsca"
+          aria-valuemin={0}
+          aria-valuemax={FEATURE_COUNT}
+          aria-valuenow={visited}
+        >
+          <span style={{ width: `${percent}%` }} />
+        </div>
+        <p className="t-caption prof-progress__next">
+          {visited >= FEATURE_COUNT
+            ? 'Kraków odkryty. Teraz możesz wracać po własne historie.'
+            : `${toNext} ${plMiejsca(toNext)} do kolejnego celu: ${nextTarget}`}
+        </p>
+      </section>
+
       <StatGrid cols={3} className="prof-stats">
         <Stat icon={<Footprints size={16} />} value={String(journeys.length)} label={plWyprawy(journeys.length)} />
         <Stat
@@ -75,66 +95,80 @@ export function ProfileScreen({
         <Stat icon={<Award size={16} />} value={String(golden)} label="złotych" />
       </StatGrid>
 
-      <ListHead>Ty</ListHead>
-      <List inset={false} className="prof-cells">
+      <ListHead>Twoja historia</ListHead>
+      <List divided={false} className="prof-cells">
         <ListItem
-          icon={<Route />}
+          className="prof-cell -featured"
+          icon={<BookOpen />}
           leadTone="accent"
-          title="Moje liczby"
-          meta="Postępy, rekordy i miejsca na mapie"
-          trailing={<ChevronRight size={18} />}
-          onClick={onStats}
-        />
-        <ListItem
-          icon={<Award />}
-          leadTone="gold"
-          title="Osiągnięcia"
-          meta={`${golden} ${golden === 1 ? 'pieczątka' : golden < 5 ? 'pieczątki' : 'pieczątek'}, ${challengeDone} z ${CHALLENGES.length} wyzwań`}
-          trailing={<ChevronRight size={18} />}
-          onClick={onAchievements}
-        />
-        <ListItem
-          icon={<Footprints />}
-          leadTone="sky"
-          title="Wyprawy i odkrycia"
+          leadShape="squircle"
+          title="Pamiętnik"
           meta={
             journeys.length
-              ? `${journeys.length} ${plWyprawy(journeys.length)} i mapa chmur`
-              : 'Ślady wypraw i mapa chmur nad Krakowem'
+              ? `${journeys.length} ${plWyprawy(journeys.length)} · wspomnienia i mapa odkryć`
+              : 'Wyprawy, zdjęcia, notatki i mapa odkryć w jednej historii'
           }
           trailing={<ChevronRight size={18} />}
           onClick={onJournal}
         />
       </List>
 
-      <div className="prof-sep" aria-hidden="true" />
-      <ListHead>Miejsca</ListHead>
-      <List inset={false} className="prof-cells">
+      <ListHead>Odkrywaj</ListHead>
+      <List divided={false} className="prof-cells">
         <ListItem
+          className="prof-cell"
           icon={<ListIcon />}
           leadTone="clay"
+          leadShape="squircle"
           title="Wszystkie parki"
-          meta={`${FEATURE_COUNT} miejsc, ${golden} zdobytych`}
+          meta={`${FEATURE_COUNT} miejsc · ${visited} odwiedzonych`}
           trailing={<ChevronRight size={18} />}
           onClick={onAllParks}
         />
+        <ListItem
+          className="prof-cell"
+          icon={<Award />}
+          leadTone="gold"
+          leadShape="squircle"
+          title="Osiągnięcia"
+          meta={`${golden} ${plNaklejki(golden)} · ${challengeDone} z ${CHALLENGES.length} wyzwań`}
+          trailing={<ChevronRight size={18} />}
+          onClick={onAchievements}
+        />
       </List>
 
-      <div className="prof-sep" aria-hidden="true" />
-      <ListHead>Ustawienia</ListHead>
-      <List inset={false} className="prof-cells">
+      <ListHead>Twoje dane</ListHead>
+      <List divided={false} className="prof-cells">
         <ListItem
+          className="prof-cell"
+          icon={<Route />}
+          leadTone="sky"
+          leadShape="squircle"
+          title="Moje liczby"
+          meta={`${points} odkrytych punktów · postępy i rekordy`}
+          trailing={<ChevronRight size={18} />}
+          onClick={onStats}
+        />
+      </List>
+
+      <ListHead>Aplikacja</ListHead>
+      <List divided={false} className="prof-cells -last">
+        <ListItem
+          className="prof-cell"
           icon={<Palette />}
           leadTone="plum"
+          leadShape="squircle"
           title="Wygląd"
           meta="Motyw i styl mapy"
           trailing={<ChevronRight size={18} />}
           onClick={onLooks}
         />
         <ListItem
+          className="prof-cell"
           icon={<Info />}
+          leadShape="squircle"
           title="O aplikacji"
-          meta={`Wersja ${VERSION}, odświeżanie, katalog`}
+          meta={`Wersja ${VERSION} · aktualizacje i katalog DS`}
           trailing={<ChevronRight size={18} />}
           onClick={onAbout}
         />

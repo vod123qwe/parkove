@@ -502,6 +502,33 @@
   width: 300px;
 }
 
+.cat-storydemo { max-width: 520px; }
+
+.cat-storydemo__route {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 104px;
+  background: var(--bg-mint);
+  color: var(--content-accent);
+}
+
+.cat-storydemo__quote {
+  margin-top: var(--sp-2);
+  color: var(--content-secondary);
+  font-family: var(--font-hand);
+  font-size: 16px;
+  line-height: 20px;
+}
+
+.cat-storydemo__meta {
+  margin-top: var(--sp-2);
+  color: var(--content-secondary);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 650;
+}
+
 /* list items */
 .cat-list {
   flex-direction: column;

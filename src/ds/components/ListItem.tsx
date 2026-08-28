@@ -12,6 +12,8 @@ export type ListItemProps = {
    * lista (np. profil) nie wymaga żadnych nowych tokenów.
    */
   leadTone?: 'neutral' | 'accent' | 'gold' | 'sky' | 'clay' | 'plum'
+  /** icon container geometry; squircle is for roomy navigation menus */
+  leadShape?: 'round' | 'squircle'
   /** square photo slot instead of the icon disc */
   photo?: { src: string; alt?: string }
   title: string
@@ -27,6 +29,7 @@ export function ListItem({
   icon,
   photo,
   leadTone = 'neutral',
+  leadShape = 'round',
   title,
   meta,
   metaExtra,
@@ -42,7 +45,11 @@ export function ListItem({
           <img src={photo.src} alt={photo.alt ?? ''} loading="lazy" />
         </span>
       ) : (
-        icon != null && <span className={cx('pk-listitem__lead', `-${leadTone}`)}>{icon}</span>
+        icon != null && (
+          <span className={cx('pk-listitem__lead', `-${leadTone}`, leadShape === 'squircle' && '-squircle')}>
+            {icon}
+          </span>
+        )
       )}
       <span className="pk-listitem__text">
         <span className="pk-listitem__title">{title}</span>

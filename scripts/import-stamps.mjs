@@ -6,19 +6,17 @@
 // Each file is trimmed, its background made transparent (flood fill from the
 // edge, so the sticker's cream outline survives) and written square at 768 px.
 //
-// Output is a palette PNG (PNG8, 128 colours). These stickers are flat
-// illustrations, so quantising costs nothing visible at 76 to 260 px on screen
-// and turns 1.3 MB into 90 kB. Nineteen stamps ship as 1.7 MB instead of 20 MB,
-// which on a phone over mobile data is the whole difference.
+// Output stays true-colour RGBA. Palette quantisation can turn fully transparent
+// pixels into alpha 1-2, which leaves an invisible but technically rectangular
+// bitmap. Exact alpha is more important here than the small extra file saving.
 
 import sharp from 'sharp'
-import { readdirSync, mkdirSync, existsSync, statSync } from 'node:fs'
+import { readdirSync, mkdirSync, existsSync, statSync, copyFileSync, unlinkSync } from 'node:fs'
 import { resolve, dirname, basename, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const OUT_SIZE = 768 // 2x what the largest on-map pin needs
 const BG_TOLERANCE = 20
-const PALETTE_COLORS = 128
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const inDir = resolve(root, 'assets-in/stamps')
@@ -73,12 +71,36 @@ function cutout(buf, w, h) {
   return buf
 }
 
+/** refuse a stamp that would ship with a rectangular background */
+async function verifyTransparency(file) {
+  const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+  const alphaAt = (x, y) => data[(y * info.width + x) * 4 + 3]
+  const corners = [
+    alphaAt(0, 0),
+    alphaAt(info.width - 1, 0),
+    alphaAt(0, info.height - 1),
+    alphaAt(info.width - 1, info.height - 1),
+  ]
+  let transparent = 0
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] === 0) transparent++
+  }
+  const ratio = transparent / (info.width * info.height)
+  if (corners.some((alpha) => alpha !== 0) || ratio < 0.05) {
+    throw new Error(
+      `stamp has no clean transparent surround (corners: ${corners.join(', ')}, transparent: ${(ratio * 100).toFixed(1)}%)`,
+    )
+  }
+  return ratio
+}
+
 for (const file of files) {
   const id = basename(file, extname(file))
   const src = resolve(inDir, file)
   const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
   const cut = cutout(Buffer.from(data), info.width, info.height)
   const out = resolve(outDir, `${id}.png`)
+  const candidate = resolve(outDir, `.${id}.candidate.png`)
   const existed = existsSync(out)
   await sharp(cut, { raw: { width: info.width, height: info.height, channels: 4 } })
     .png()
@@ -87,10 +109,20 @@ for (const file of files) {
       sharp(png)
         .trim({ threshold: 1 }) // drop the now-transparent margin
         .resize(OUT_SIZE, OUT_SIZE, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-        .png({ palette: true, colors: PALETTE_COLORS, compressionLevel: 9, effort: 10 })
-        .toFile(out),
+        .png({ compressionLevel: 9, effort: 10 })
+        .toFile(candidate),
     )
+  let alphaRatio
+  try {
+    alphaRatio = await verifyTransparency(candidate)
+    copyFileSync(candidate, out)
+  } finally {
+    if (existsSync(candidate)) unlinkSync(candidate)
+  }
   const kb = Math.round(statSync(out).size / 1024)
-  console.log(`  ${existed ? 'updated' : 'added  '} ${id}.png  ${String(kb).padStart(4)} kB  (source ${info.width}x${info.height})`)
+  console.log(
+    `  ${existed ? 'updated' : 'added  '} ${id}.png  ${String(kb).padStart(4)} kB  ` +
+      `(source ${info.width}x${info.height}, transparent ${(alphaRatio * 100).toFixed(1)}%)`,
+  )
 }
 console.log(`done: ${files.length} stamps in public/stamps/`)

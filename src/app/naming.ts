@@ -36,6 +36,7 @@ export const plMiejsca = (n: number) => plural(n, 'miejsce', 'miejsca', 'miejsc'
 export const plPunkty = (n: number) => plural(n, 'punkt', 'punkty', 'punktów')
 export const plRazy = (n: number) => plural(n, 'raz', 'razy', 'razy')
 export const plZdjecia = (n: number) => plural(n, 'zdjęcie', 'zdjęcia', 'zdjęć')
+export const plWspomnienia = (n: number) => plural(n, 'wspomnienie', 'wspomnienia', 'wspomnień')
 export const plNotatki = (n: number) => plural(n, 'notatka', 'notatki', 'notatek')
 export const plNagrania = (n: number) => plural(n, 'nagranie', 'nagrania', 'nagrań')
 export const plOdpowiedzi = (n: number) => plural(n, 'odpowiedź', 'odpowiedzi', 'odpowiedzi')

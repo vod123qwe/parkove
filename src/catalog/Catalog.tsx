@@ -46,6 +46,7 @@ import {
   Switch,
   Stat,
   StatGrid,
+  StoryCard,
   Toast,
 } from '../ds'
 import { CHANGELOG, VERSION } from '../changelog'
@@ -104,6 +105,7 @@ const GROUPS: Array<{ group: string; items: Array<readonly [string, string]> }> 
     group: 'Treść',
     items: [
       ['cards', 'Karty'],
+      ['storycard', 'Karta historii'],
       ['lists', 'Wiersze listy'],
       ['placerow', 'Wiersz miejsca'],
       ['hero', 'Nagłówek ze zdjęciem'],
@@ -779,9 +781,29 @@ export function Catalog() {
         </Section>
 
         <Section
+          id="storycard"
+          title="Story card"
+          lead="One chronological chapter with a route, photograph or illustration in the same visual slot. Use it in memory feeds, not as a generic navigation row."
+        >
+          <div className="cat-spec cat-storydemo">
+            <StoryCard
+              eyebrow="18 sierpnia 2026"
+              title="Wieczór na Skałkach"
+              meta="Skałki Twardowskiego · 2,8 km · 48 min"
+              visual={<div className="cat-storydemo__route"><Route size={34} /></div>}
+              onClick={() => {}}
+              action={<Button variant="tonal">Przeglądaj 4 wspomnienia</Button>}
+            >
+              <span className="cat-storydemo__quote">„Zostaliśmy chwilę dłużej przy punkcie widokowym.”</span>
+              <span className="cat-storydemo__meta">3 zdjęcia · 1 notatka</span>
+            </StoryCard>
+          </div>
+        </Section>
+
+        <Section
           id="lists"
           title="List items"
-          lead="Rows for the parks list. The leading disc tone tells the state: neutral, visited (accent), completed (gold). Wrap them in List for hairline dividers: inset past the icon by default, full-bleed with inset={false}. ListHead labels a group of rows, like the profile sections."
+          lead="Rows for lists and navigation. The leading tone carries meaning, while leadShape switches between the default disc and a soft square for roomy menus. Wrap rows in List for consistent spacing and optional dividers."
         >
           <div className="cat-spec cat-list">
             <ListHead>Sekcja z nagłówkiem</ListHead>
@@ -812,8 +834,9 @@ export function Catalog() {
               <ListItem
                 icon={<Footprints />}
                 leadTone="sky"
+                leadShape="squircle"
                 title="Ton sky"
-                meta="Informacyjny niebieski, np. wyprawy"
+                meta="Miękki kwadrat do głównej nawigacji"
                 onClick={() => {}}
               />
               <ListItem

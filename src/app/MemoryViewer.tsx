@@ -26,6 +26,7 @@ export function MemoryViewer({
   startId,
   onClose,
   onMove,
+  layer = 'default',
 }: {
   marks: Array<WalkMark & { url?: string }>
   startId: string
@@ -33,6 +34,8 @@ export function MemoryViewer({
   /** hands the map over so the pin can be dropped somewhere else; without it
    * the viewer is read only, which is what a replay wants */
   onMove?: (markId: string) => void
+  /** journal is itself a portal above profile, so its viewer needs the next rung */
+  layer?: 'default' | 'journal'
 }) {
   useDarkChrome()
   const rail = useRef<HTMLDivElement>(null)
@@ -114,7 +117,7 @@ export function MemoryViewer({
   }
 
   return createPortal(
-    <div className="memview">
+    <div className={`memview${layer === 'journal' ? ' -journal' : ''}`}>
       <div className="memview__top">
         <button className="memview__close" aria-label="Zamknij" onClick={onClose}>
           <X size={20} />

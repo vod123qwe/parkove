@@ -32,6 +32,11 @@ button.pk-listitem:hover {
   justify-content: center;
 }
 
+.pk-listitem__lead.-squircle {
+  border-radius: 13px;
+  corner-shape: var(--corner-smooth);
+}
+
 .pk-listitem__lead svg {
   width: 20px;
   height: 20px;

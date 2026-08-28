@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.110.7'
+export const VERSION = '0.111.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,27 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.111.0',
+    date: '2026-08-28',
+    title: 'Pamiętnik replaces Wyprawy and the main menu gains a clearer hierarchy',
+    tldr:
+      'Pamiętnik zastąpił listę Wypraw, menu ma nowy postęp i większy rytm, a siedem parków dostało własne transparentne pieczątki.',
+    changes: [
+      ['added', 'Pamiętnik now groups each finished walk with its route, photographs, notes, recordings and discovered points in a chronological chapter feed'],
+      ['added', 'An explicitly labelled Skałki Twardowskiego preview supplies three photos, a note and a recording when the real journal is empty, without writing demonstration data to storage'],
+      ['added', 'StoryCard joins the design system and its catalogue as the reusable editorial chapter card for chronological feeds'],
+      ['added', 'ListItem gains a documented squircle leading-icon variant for roomy navigation menus while preserving the round default everywhere else'],
+      ['added', 'Transparent place-specific stamps are connected to Zalew Bagry, Dolina Bolechowicka, Park Jordana, Planty, Skałki Twardowskiego, Park Zakrzówek and Park Krakowski'],
+      ['changed', 'The old Wyprawy tab is removed. Pamiętnik keeps its name and sits beside Odkrycia as the default view'],
+      ['changed', 'The main menu replaces the progress ring with an editorial city score, progress rail and next milestone, then groups actions into Historia, Odkrywaj, Twoje dane and Aplikacja'],
+      ['changed', 'Menu rows use larger vertical spacing, card-like grouping and soft square icon containers instead of round discs and heavy section bands'],
+      ['fixed', 'Stamp imports now validate exact zero-alpha corners and reject a bad candidate before it can replace a working transparent asset'],
+      ['fixed', 'Sample journal photos and the recording asked for the site root, which breaks on GitHub Pages where the app lives in a subfolder. They now resolve through the asset helper'],
+      ['fixed', 'The journal empty state measured its padding from a spacing token that does not exist, which silently voided the whole declaration. It now uses a real token from the scale'],
+      ['fixed', 'Journal statistics and chapter summaries now take Polish plural forms from the shared naming helpers, so 2 wyprawy and 5 zdjec no longer read as 2 wypraw and 5 zdjecia'],
+    ],
+  },
   {
     version: '0.110.7',
     date: '2026-08-25',
