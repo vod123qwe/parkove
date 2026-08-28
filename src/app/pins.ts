@@ -11,7 +11,7 @@ import type { PoiCategory } from './data/quests'
  * na zewnatrz razem z helperem, ktory sklada z niej gotowy SVG.
  */
 export const ICONS: Record<
-  PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note' | 'car' | 'park' | 'forest' | 'mound' | 'valley' | 'garden',
+  PoiCategory | 'parking' | 'stamp' | 'food' | 'playground' | 'audio' | 'note' | 'car' | 'park' | 'forest' | 'mound' | 'valley' | 'garden' | 'village',
   string[]
 > = {
   // eye
@@ -52,6 +52,8 @@ export const ICONS: Record<
   mound: ['m8 3 4 8 5-5 5 15H2L8 3z'],
   // litera V rysowana jak ikona: dolina
   valley: ['m5 5 7 14L19 5'],
+  // house: wies, jedyny rodzaj miejsca, ktory jest zamieszkany
+  village: ['M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8', 'M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
   // flower: ogrod
   garden: ['M12 7.5a4.5 4.5 0 1 1 4.5 4.5M12 7.5A4.5 4.5 0 1 0 7.5 12M12 7.5V9', 'M16.5 12a4.5 4.5 0 1 1-4.5 4.5M16.5 12H15', 'M12 16.5a4.5 4.5 0 1 1-4.5-4.5M12 16.5V15', 'M7.5 12H9', 'M9 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0'],
   // award, generic
@@ -257,6 +259,7 @@ const PARK_KIND_ICON: Record<string, keyof typeof ICONS> = {
   water: 'water',
   garden: 'garden',
   nature: 'nature',
+  village: 'village',
 }
 
 const PARK_W = 96

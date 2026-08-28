@@ -10,6 +10,7 @@
  * other side whichever option you pick, so nobody "wins" the question.
  */
 import { DOLINKI_QUESTS } from './quests-dolinki'
+import { ODECEIXE_QUESTS } from './quests-odeceixe'
 
 export type PoiDilemma = {
   question: string
@@ -3088,7 +3089,7 @@ const KRAKOW_QUESTS: Quest[] = [
 ]
 
 /** miasto plus wypady za miasto, w jednej liście, bo mechanika jest ta sama */
-export const QUESTS: Quest[] = [...KRAKOW_QUESTS, ...DOLINKI_QUESTS]
+export const QUESTS: Quest[] = [...KRAKOW_QUESTS, ...DOLINKI_QUESTS, ...ODECEIXE_QUESTS]
 
 
 export const questForPark = (parkId: string) => QUESTS.find((q) => q.parkId === parkId)

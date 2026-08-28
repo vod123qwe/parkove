@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.114.0'
+export const VERSION = '0.115.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,22 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.115.0',
+    date: '2026-08-28',
+    title: 'A trip to Portugal, for testing far from Krakow',
+    tldr:
+      'Odeceixe na Costa Vicentina wchodzi jako wyprawa tymczasowa: siedem punktow, dwa szlaki i jedna opowiesc o morzu, ktore odeszlo. Nie rusza procentu Krakowa, ale trasy i pieczatki dziala normalnie.',
+    changes: [
+      ['added', 'Odeceixe and the mouth of the Seixe join the app as a temporary trip, with seven points telling one story: why the walk from the village to the beach takes four kilometres'],
+      ['added', 'Two suggested trails shaped by the story rather than by the shortest line. One walks the valley down to the ocean, the other crosses the bridge to a five thousand year old shell midden and comes back'],
+      ['added', 'Six photographs from Wikimedia Commons, each credited, plus a place kind for villages so the card no longer calls a village a park'],
+      ['added', 'A link with trip=costa-vicentina opens the map in Portugal and remembers it, so a tester far from Krakow does not have to search for the place'],
+      ['changed', 'A temporary trip never counts towards the Krakow collection: the city percentage, the discovery board and the profile targets ignore it, while check in, points, the recorded walk and the stamp work exactly as everywhere else'],
+      ['fixed', 'The trail generator read a hard coded list of two quest files, so a third one simply did not exist for it: trails were silently not calculated while the run reported success'],
+      ['fixed', 'Trails can now be ordered by hand and are recalculated by the router on every run, which is the only way to build a route that leads from one place to another rather than around a single one'],
+    ],
+  },
   {
     version: '0.114.0',
     date: '2026-08-28',

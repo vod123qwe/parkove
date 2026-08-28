@@ -3,6 +3,10 @@ import { App } from './App'
 import { ErrorBoundary } from './ErrorBoundary'
 import { initTheme } from './theme'
 import { trackScreenHeight } from './screen'
+import { readTripFromUrl } from './data/trip'
+
+/* link z wyprawa ustawia dom mapy, zanim cokolwiek sie wyrenderuje */
+readTripFromUrl()
 
 initTheme()
 trackScreenHeight()

@@ -14,11 +14,17 @@ import { isParkComplete } from './progress'
 import parksData from './data/parks.json'
 import { CHALLENGES } from './data/challenges'
 import { VERSION } from '../changelog'
+import { countsForKrakow } from './data/trip'
 import { plMiejsca, plNaklejki, plWyprawy } from './naming'
 
-const FEATURE_COUNT =
-  (parksData as { features: Array<{ id: string }> }).features.filter((feature) => feature.id !== 'test-piltza')
-    .length
+/* liczniki miasta pomijaja wyprawy tymczasowe: procent ma mowic o Krakowie */
+const KRAKOW_IDS = new Set(
+  (parksData as { features: Array<{ id: string; properties?: { trip?: string } }> }).features
+    .filter(countsForKrakow)
+    .map((feature) => feature.id),
+)
+
+const FEATURE_COUNT = KRAKOW_IDS.size
 
 const TARGETS = [1, 3, 5, 10, 15, 20, 30, 40, FEATURE_COUNT]
 
@@ -44,10 +50,8 @@ export function ProfileScreen({
   onAbout: () => void
 }) {
   const { parks, journeys } = useGameState()
-  const visited = Object.keys(parks).filter((id) => id !== 'test-piltza').length
-  const golden = Object.keys(parks).filter(
-    (id) => id !== 'test-piltza' && isParkComplete(id, parks),
-  ).length
+  const visited = Object.keys(parks).filter((id) => KRAKOW_IDS.has(id)).length
+  const golden = Object.keys(parks).filter((id) => KRAKOW_IDS.has(id) && isParkComplete(id, parks)).length
   const totalKm = journeys.reduce((sum, journey) => sum + journey.distanceM, 0) / 1000
   const points = Object.values(parks).reduce((sum, park) => sum + park.points.length, 0)
   const percent = Math.min(100, Math.round((visited / FEATURE_COUNT) * 100))

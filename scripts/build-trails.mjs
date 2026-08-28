@@ -37,7 +37,7 @@
 //
 // Wynik: src/app/data/trails.ts
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -106,7 +106,15 @@ const parksData = JSON.parse(readFileSync(resolve(root, 'src/app/data/parks.json
 /** punkty wyprawy: id, nazwa i współrzędne. Uwaga: część plików ma "..." */
 function readQuests() {
   const out = {}
-  for (const file of ['src/app/data/quests.ts', 'src/app/data/quests-dolinki.ts']) {
+  /*
+   * Wszystkie pliki questow, nie recznie wypisane dwa. Lista byla
+   * zahardkodowana i trzeci plik (wyprawa Odeceixe) po prostu nie istnial
+   * dla generatora: trasy sie nie liczyly, a skrypt konczyl sie sukcesem.
+   */
+  const files = readdirSync(resolve(root, 'src/app/data'))
+    .filter((f) => /^quests.*\.ts$/.test(f))
+    .map((f) => `src/app/data/${f}`)
+  for (const file of files) {
     let park = null
     for (const line of readFileSync(resolve(root, file), 'utf8').split('\n')) {
       const p = line.match(/^\s+parkId: ['"]([a-z0-9-]+)['"]/)
@@ -641,6 +649,58 @@ async function markedTrails(parkId) {
  */
 const MIN_M = 400
 
+/*
+ * TRASY ZAMOWIONE: policzone routerem przez podane wspolrzedne, W TEJ
+ * KOLEJNOSCI (usluga route, nie trip, wiec nikt nam punktow nie przestawi).
+ *
+ * Po co: generator uklada trasy WEWNATRZ jednego miejsca, a czasem sens ma
+ * droga MIEDZY miejscami. Przy wyprawie Odeceixe cala opowiesc to marsz
+ * z wioski do oceanu, czyli z jednego miejsca do drugiego: bez tego trasa
+ * po prostu nie moglaby powstac. Trzymamy je tutaj, a nie dopisujemy do
+ * trails.ts po fakcie, zeby przezyly kazda regeneracje.
+ */
+const ORDERED = {
+  'odeceixe-vila': [
+    {
+      id: 'do-morza',
+      name: 'Do morza doliną',
+      /*
+       * Kolejnosc to kolejnosc OPOWIESCI, nie geograficzny skrot (mysl Jarka:
+       * planujac szlak wiesz, co i gdzie mozesz dopowiedziec). Most daje nazwe
+       * wsi i granice, kosciol i mlyn pokazuja zycie z ziemi, miradouro
+       * odslania zamulona dolina, plaza jest puenta. Idzie sie jedna linia
+       * w dol doliny, bez zawracania: okolo 5 km.
+       */
+      via: [
+        [-8.76549, 37.43445], // most graniczny
+        [-8.77097, 37.43237], // kosciol
+        [-8.7718, 37.43118], // mlyn
+        [-8.79831, 37.44079], // miradouro da maravilha
+        [-8.79785, 37.44214], // plaza w ujsciu
+      ],
+    },
+    {
+      id: 'za-rzeke',
+      /* prefiks „Spacer" to konwencja UI (TrailModal.shape): tak oznaczamy
+         trasy tam i z powrotem, zeby opis mowil prawde o zawracaniu */
+      name: 'Spacer za rzekę, do muszlowiska',
+      /*
+       * Muszlowisko lezy na DRUGIM brzegu Seixe, czyli juz w Alentejo, a most
+       * EN 120 jest jedyna przeprawa. Zmierzone routerem: mlyn -> muszlowisko
+       * to 3,1 km pieszo przy 1,0 km w linii prostej, i dokladnie tyle, ile
+       * wynosi suma mlyn -> most -> muszlowisko. Dlatego prehistoria dostaje
+       * WLASNA trase tam i z powrotem, zamiast psuc marsz do oceanu objazdem.
+       */
+      via: [
+        [-8.76549, 37.43445], // most graniczny: start i meta
+        [-8.78054, 37.43692], // muszlowisko, juz w Alentejo
+        [-8.76549, 37.43445], // powrot ta sama droga
+      ],
+    },
+  ],
+}
+
+
 const quests = readQuests()
 const argv = process.argv.slice(2)
 const pruneOnly = argv.includes('--prune')
@@ -1012,6 +1072,26 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
     // console.log, nie warn: wrapper czyta STDOUT i po warn uznawal bieg za udany
     console.log(`${parkId.padEnd(24)} router nie odpowiada, zostawiam stary wpis`)
     continue
+  }
+
+  /* trasy zamowione: liczymy je po wszystkim, zeby staly na poczatku listy */
+  for (const spec of ORDERED[parkId] ?? []) {
+    const r = await osrm('route', spec.via)
+    if (!r) {
+      console.log(`${parkId.padEnd(24)} zamowiona "${spec.id}": router nie odpowiada`)
+      const kept = (result[parkId] ?? []).find((t) => t.id === spec.id)
+      if (kept) trails.unshift(kept)
+      continue
+    }
+    trails.unshift({
+      id: spec.id,
+      name: spec.name,
+      kind: 'points',
+      m: Math.round(r.trip.distance),
+      min: Math.max(1, Math.round(r.trip.duration / 60)),
+      line: thin(r.trip.geometry.coordinates),
+    })
+    console.log(`  zamowiona ${spec.id}: ${(r.trip.distance / 1000).toFixed(1)} km`)
   }
 
   if (trails.length) result[parkId] = trails

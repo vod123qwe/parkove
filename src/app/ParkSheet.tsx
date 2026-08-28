@@ -51,6 +51,10 @@ export type ParkFeature = {
     center: [number, number]
     /** which collection a place belongs to; missing means a Kraków park */
     group?: 'dolinki'
+    /** wyprawa tymczasowa (np. wyjazd): miejsce spoza kolekcji miasta */
+    trip?: string
+    /** poligon testowy, nigdy nie liczony do kolekcji */
+    test?: boolean
   }
   geometry: ParkGeometry
 }

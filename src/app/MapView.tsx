@@ -10,6 +10,7 @@ import type { ParkPinState } from './pins'
 import { asset } from './assets'
 import type { ResolvedStyle } from './data/mapstyles'
 
+import { TRIP_CENTER, isTripHome } from './data/trip'
 const KRAKOW: [number, number] = [19.9445, 50.0555]
 
 export type MapFocus = {
@@ -407,8 +408,9 @@ export function MapView({
     const map = new MapGL({
       container: containerRef.current,
       style: initialStyle.current.spec,
-      center: KRAKOW,
-      zoom: 11.4,
+      /* wyprawa tymczasowa: tester dostaje link i mapa otwiera sie u niego */
+      center: isTripHome() ? TRIP_CENTER : KRAKOW,
+      zoom: isTripHome() ? 13.2 : 11.4,
       attributionControl: { compact: true },
     })
     mapRef.current = map

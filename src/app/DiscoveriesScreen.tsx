@@ -26,10 +26,10 @@ import { isParkComplete } from './progress'
 import { useGameState } from './state'
 import { asset } from './assets'
 import type { ParkFeature } from './ParkSheet'
+import { countsForKrakow } from './data/trip'
 
-const FEATURES = (parksData as unknown as { features: ParkFeature[] }).features.filter(
-  (f) => f.id !== 'test-piltza',
-)
+/* plansza odkryc jest o Krakowie, wiec wyprawy tymczasowe jej nie dotycza */
+const FEATURES = (parksData as unknown as { features: ParkFeature[] }).features.filter(countsForKrakow)
 
 const SEEN_KEY = 'pk-disc-seen'
 const readSeen = (): string[] => {

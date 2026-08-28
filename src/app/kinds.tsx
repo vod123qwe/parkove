@@ -1,4 +1,4 @@
-import { Flower2, Leaf, Mountain, MountainSnow, Sprout, TreePine, Trees, Waves } from 'lucide-react'
+import { Flower2, Home, Leaf, Mountain, MountainSnow, Sprout, TreePine, Trees, Waves } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 export const KIND_META: Record<string, { label: string; icon: ReactNode }> = {
@@ -10,4 +10,5 @@ export const KIND_META: Record<string, { label: string; icon: ReactNode }> = {
   water: { label: 'Woda', icon: <Waves /> },
   garden: { label: 'Ogród', icon: <Sprout /> },
   valley: { label: 'Dolina', icon: <MountainSnow /> },
+  village: { label: 'Wieś', icon: <Home /> },
 }

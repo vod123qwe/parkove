@@ -18,6 +18,40 @@ export type ParkInfo = {
 }
 
 export const PARK_INFO: Record<string, ParkInfo> = {
+  /* Wyprawa tymczasowa: Costa Vicentina. Usuwana razem z miejscami przez
+     scripts/trip-odeceixe.mjs --remove */
+  'odeceixe-vila': {
+    photos: [
+      { src: '/photos/odeceixe-vila-b.jpg', credit: 'Fot. Vítor Oliveira · CC BY-SA 2.0 · Wikimedia Commons' },
+      { src: '/photos/odeceixe-vila-a.jpg', credit: 'Fot. Lacobrigo · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/odeceixe-moinho-b.jpg', credit: 'Fot. Geerd-Olaf Freyer · CC BY-SA 2.0 · Wikimedia Commons' },
+      { src: '/photos/odeceixe-igreja.jpg', credit: 'Fot. RHaworth · CC BY-SA 3.0 · Wikimedia Commons' },
+    ],
+    description: [
+      'Odeceixe to niecały tysiąc mieszkańców na zboczu nad rzeką Seixe, w Parku Przyrody Południowo-Zachodniego Alentejo i Costa Vicentina. Rzeka pod wsią wyznacza granicę Algarve i Alentejo, więc jest to pierwsza algarvijska wieś, jaką spotyka ktoś idący wybrzeżem z północy.',
+      'Chodzi się tu wąskimi uliczkami w górę, do białego młyna wiatrowego z 1898 roku, i w dół, do doliny. Przez wieś przechodzi Rota Vicentina, a lokalny szlak Odeceixe-ao-Rio prowadzi doliną prosto do oceanu, cztery kilometry stąd.',
+      'Ta droga na plażę jest właściwym powodem, dla którego warto tu przyjść pieszo. Idąc do wody, powtarzasz spacer, który krajobraz kiedyś komuś wydłużył: na drugim brzegu rzeki leży muszlowisko sprzed pięciu tysięcy lat, a w nim zapis tego, jak ujście odsuwało się od ludzi.',
+    ],
+    amenities: {
+      food: { has: true, note: 'Kilka restauracji i kawiarni w centrum wsi, kuchnia prosta i rybna.' },
+      verified: false,
+    },
+  },
+  'odeceixe-foz': {
+    photos: [
+      { src: '/photos/odeceixe-praia-a.jpg', credit: 'Fot. Vítor Oliveira · CC BY-SA 2.0 · Wikimedia Commons' },
+      { src: '/photos/odeceixe-praia-b.jpg', credit: 'Fot. Beeston · CC BY 3.0 · Wikimedia Commons' },
+    ],
+    description: [
+      'Ujście Ribeira de Seixe: plaża zamknięta z obu stron wysokimi klifami, z rzeką po jednej stronie i oceanem po drugiej. Rzeka rozlewa się płytko i spokojnie, ocean daje falę, po którą przyjeżdżają surferzy.',
+      'Nad zejściem na plażę stoi Miradouro da Maravilha, punkt widokowy na całe ujście. To stąd najlepiej widać szeroką, płaską dolinę, którą rzeka wypełniła osadami przez tysiące lat.',
+      'Tuż za skalnym cyplem na południe leży Praia das Adegas, jedna z niewielu oficjalnie wyznaczonych plaż naturystycznych w Portugalii. Warto o tym wiedzieć, idąc brzegiem z dziećmi.',
+    ],
+    amenities: {
+      food: { has: true, note: 'Sezonowe bary przy zejściu na plażę, poza sezonem bywa zamknięte.' },
+      verified: false,
+    },
+  },
   'zalew-nowohucki': {
     photos: [
       { src: '/photos/park-zalew-nowohucki-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },
