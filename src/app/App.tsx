@@ -30,6 +30,7 @@ import { ParkPeekContent, ParkingPeekContent, PoiPeekContent } from './PeekConte
 import { AchievementsModal } from './AchievementsModal'
 import { StampCelebration } from './StampCelebration'
 import { ExpeditionController } from './ExpeditionController'
+import { FarAwaySheet } from './FarAwaySheet'
 import { ExpeditionBar } from './ExpeditionBar'
 import { MarkSheet } from './MarkSheet'
 import { updateMark, useMarks, addMark } from './photos'
@@ -164,6 +165,12 @@ export function App() {
   const [photoAdded, setPhotoAdded] = useState<string | null>(null)
   /** confirmation before a walk becomes a journal entry */
   const [endingWalk, setEndingWalk] = useState(false)
+  /*
+   * Apka sama zauwazyla, ze wracasz: {ile metrow od miejsca, ile punktow sladu
+   * powstalo, zanim wyszedles}. Ta druga liczba obcina droge powrotna przy
+   * zapisie, zeby jazda autem nie dopisala sie do spaceru.
+   */
+  const [farAway, setFarAway] = useState<{ distance: number; keep: number } | null>(null)
   /** the walk that just ended, waiting to show its summary */
   const [summaryId, setSummaryId] = useState<string | null>(null)
   /** last known position outside a walk: decides whether the start CTA shows */
@@ -643,6 +650,28 @@ export function App() {
     [expedition?.parkId],
   )
 
+  /**
+   * Oddaliles sie od miejsca i nie wracasz. Pytamy arkuszem, a gdy telefon
+   * jest w kieszeni, takze powiadomieniem: inaczej pytanie czekaloby do
+   * momentu, w ktorym trasa ma juz w sobie pol miasta.
+   */
+  const onFarAway = useCallback((distance: number, keep: number) => {
+    setFarAway({ distance, keep })
+    navigator.vibrate?.([60, 80, 60])
+    if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+      void navigator.serviceWorker?.ready
+        .then((reg) =>
+          reg.showNotification('Kończymy wyprawę?', {
+            body: 'Jesteś już daleko od miejsca. Otwórz apkę i potwierdź, żeby droga powrotna nie trafiła do trasy.',
+            icon: `${import.meta.env.BASE_URL}icon-192.png`,
+            tag: 'walk-far-away',
+            requireInteraction: true,
+          }),
+        )
+        .catch(() => {})
+    }
+  }, [])
+
   // pin tap: swap the peek page while browsing, open the full card otherwise
   const onSelectPoi = useCallback(
     (poiId: string) => {
@@ -922,7 +951,7 @@ export function App() {
           setMovingPhotoId(null)
         }}
       />
-      <ExpeditionController onNear={onNear} onArrive={onArrive} />
+      <ExpeditionController onNear={onNear} onArrive={onArrive} onFarAway={onFarAway} />
 
       {/* nothing on the left when not walking: a percentage of a city is a
           number, not a reason to go outside. Something may earn this corner
@@ -1391,6 +1420,23 @@ export function App() {
               setMenuOpen(true)
               setJournalOpen(true)
             }
+          }}
+        />
+      )}
+
+      {farAway && expeditionPark && !endingWalk && (
+        <FarAwaySheet
+          parkName={expeditionPark.properties.name}
+          distance={farAway.distance}
+          onKeepWalking={() => setFarAway(null)}
+          onFinish={() => {
+            const finished = expedition?.id ?? null
+            /* keep === 0 znaczy, ze nie zdazylismy zapamietac, gdzie byles na
+               miejscu: wtedy NIE tniemy, bo pusty slad jest gorszy niz dlugi */
+            stopExpedition(farAway.keep > 0 ? { keepTrackPoints: farAway.keep } : undefined)
+            setFarAway(null)
+            setFollowMe(true)
+            setSummaryId(finished)
           }}
         />
       )}

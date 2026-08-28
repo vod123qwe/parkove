@@ -4,6 +4,9 @@ import { distanceM } from './geo'
 import type { Pt } from './geo'
 import { questForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
+import { distanceToParkM } from './geo'
+import parksData from './data/parks.json'
+import type { ParkFeature } from './ParkSheet'
 
 /**
  * Headless expedition engine: while an expedition is active it keeps the
@@ -21,12 +24,33 @@ const ARRIVE_MAX_M = 35
 /** on foot this is already a run: a faster jump is the GPS lying, not a step */
 const MAX_WALK_SPEED = 6
 
+/*
+ * Kiedy uznajemy, ze spacer sie skonczyl, tylko nikt tego nie klilknal.
+ *
+ * Zyczenie Jarka: po wyjsciu z parku okolo kilometra apka ma zapytac, czy to
+ * juz koniec, zeby droga powrotna (zwykle autem) nie dopisala sie do trasy.
+ *
+ * Dwa zabezpieczenia, zeby nie pytac bez powodu: dystans liczymy do GRANICY
+ * miejsca, nie do srodka, a pytanie pada dopiero, gdy oddalenie utrzymuje sie
+ * przez chwile. Pojedynczy skok GPS o kilometr zdarza sie miedzy blokami.
+ */
+const AWAY_M = 1000
+const AWAY_HOLD_MS = 45000
+/** dopoki jestes tak blisko granicy, slad liczy sie jako czesc spaceru */
+const STILL_THERE_M = 150
+
 export function ExpeditionController({
   onNear,
   onArrive,
+  onFarAway,
 }: {
   onNear: (poi: QuestPoi, distance: number) => void
   onArrive: (poi: QuestPoi) => void
+  /**
+   * Oddaliles sie od miejsca i nie wracasz. `keepTrackPoints` mowi, ile
+   * punktow sladu powstalo, zanim wyszedles: tyle warto zapisac.
+   */
+  onFarAway?: (distance: number, keepTrackPoints: number) => void
 }) {
   const { expedition, parks } = useGameState()
   const parkId = expedition?.parkId ?? null
@@ -34,8 +58,17 @@ export function ExpeditionController({
   collectedRef.current = new Set(parkId ? (parks[parkId]?.points ?? []) : [])
   // one heads-up per point per walk, otherwise it fires on every GPS tick
   const warnedRef = useRef<Set<string>>(new Set())
-  const cbRef = useRef({ onNear, onArrive })
-  cbRef.current = { onNear, onArrive }
+  /* aktualny slad: handler GPS zyje w efekcie [parkId], wiec musi czytac
+     przez ref, inaczej domknie stan z pierwszego renderu */
+  const expRef = useRef(expedition)
+  expRef.current = expedition
+  const cbRef = useRef({ onNear, onArrive, onFarAway })
+  cbRef.current = { onNear, onArrive, onFarAway }
+  /* ile punktow sladu bylo, gdy ostatnio byles przy miejscu */
+  const hereAtRef = useRef(0)
+  /* od kiedy trwa oddalenie; null = jestes w poblizu */
+  const awaySinceRef = useRef<number | null>(null)
+  const askedRef = useRef(false)
 
   // a phone in a street of blocks reports positions that hop a few metres
   // sideways while you walk straight; this keeps the drawn line calm
@@ -45,7 +78,13 @@ export function ExpeditionController({
     if (!parkId) return
     warnedRef.current = new Set()
     smoothRef.current = null
+    awaySinceRef.current = null
+    askedRef.current = false
+    hereAtRef.current = 0
     const quest = questForPark(parkId)
+    const feature = (parksData as unknown as { features: ParkFeature[] }).features.find(
+      (f) => f.id === parkId,
+    )
 
     let watchId: number | null = null
     if (navigator.geolocation) {
@@ -60,6 +99,49 @@ export function ExpeditionController({
               : null
 
           const now = Date.now()
+
+          /*
+           * Czy to juz droga powrotna? Liczymy to na SUROWEJ pozycji i przed
+           * filtrem predkosci. Filtr odrzuca skoki szybsze niz bieg, wiec
+           * odczyty z jadacego auta przepadaja i wlasnie ich tu potrzebujemy:
+           * pytanie ma paść, gdy ktos odjezdza, a nie dopiero gdy znow idzie.
+           */
+          /* podglad w DEV: w terenie nie da sie inaczej sprawdzic, czemu
+             pytanie nie padlo (window.__far) */
+          if (import.meta.env.DEV) {
+            ;(window as unknown as { __far?: unknown }).__far = {
+              feature: !!feature,
+              cb: !!cbRef.current.onFarAway,
+              asked: askedRef.current,
+              away: feature ? Math.round(distanceToParkM(raw, feature.geometry)) : null,
+              since: awaySinceRef.current,
+              held: awaySinceRef.current ? now - awaySinceRef.current : 0,
+              here: hereAtRef.current,
+            }
+          }
+          if (feature && cbRef.current.onFarAway && !askedRef.current) {
+            const away = distanceToParkM(raw, feature.geometry)
+            const track = expRef.current?.track.length ?? 0
+            if (away <= STILL_THERE_M) {
+              awaySinceRef.current = null
+              /*
+               * Slad rosnie w recordFix, ktore idzie NIZEJ, wiec tutaj widzimy
+               * stan sprzed biezacego punktu. Bierzemy maksimum, bo lepiej
+               * zapisac spacer o punkt za dlugi niz uciac go za wczesnie.
+               */
+              hereAtRef.current = Math.max(hereAtRef.current, track)
+            } else if (away >= AWAY_M) {
+              if (awaySinceRef.current == null) awaySinceRef.current = now
+              else if (now - awaySinceRef.current >= AWAY_HOLD_MS) {
+                askedRef.current = true
+                cbRef.current.onFarAway(Math.round(away), hereAtRef.current)
+              }
+            } else {
+              /* miedzy 150 m a kilometrem: ani nie na miejscu, ani nie daleko */
+              awaySinceRef.current = null
+            }
+          }
+
           const prev = smoothRef.current
           let pt = raw
           if (prev) {
@@ -77,6 +159,7 @@ export function ExpeditionController({
           smoothRef.current = { pt, at: now }
 
           recordFix({ coords: pt, accuracy, course })
+
           if (!quest) return
 
           const reach = Math.min(Math.max(ARRIVE_M, accuracy), ARRIVE_MAX_M)

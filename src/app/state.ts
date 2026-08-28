@@ -226,11 +226,27 @@ export function startExpedition(parkId: string, name: string) {
   )
 }
 
-export function stopExpedition() {
+/**
+ * Konczy wyprawe i zapisuje ja w dzienniku.
+ *
+ * `keepTrackPoints` obcina slad do podanej liczby punktow. Sluzy do jednego:
+ * kiedy apka sama zauwazy, ze oddalasz sie od parku, i potwierdzisz, ze to
+ * juz koniec, droga powrotna (czesto autem) NIE ma trafic do dziennika jako
+ * czesc spaceru. Kontroler pamieta, ile punktow slad mial, gdy byles jeszcze
+ * na miejscu, i to jest ta liczba. Dystans liczymy wtedy od nowa, bo licznik
+ * biegl dalej razem z jazda.
+ */
+export function stopExpedition(opts?: { keepTrackPoints?: number }) {
   const exp = state.expedition
   if (!exp) return
+  const cut = opts?.keepTrackPoints
+  const track = cut != null && cut >= 0 && cut < exp.track.length ? exp.track.slice(0, cut) : exp.track
+  const distance =
+    track === exp.track
+      ? exp.distanceM
+      : track.reduce((sum, pt, i) => (i ? sum + distanceM(track[i - 1], pt) : 0), 0)
   // a walk earns a journal entry when it produced anything: movement or points
-  const worthKeeping = exp.track.length > 4 || exp.collected.length > 0
+  const worthKeeping = track.length > 4 || exp.collected.length > 0
   const journeys = worthKeeping
     ? [
         ...state.journeys,
@@ -240,8 +256,8 @@ export function stopExpedition() {
           name: exp.name,
           startedAt: exp.startedAt,
           endedAt: Date.now(),
-          distanceM: Math.round(exp.distanceM),
-          track: simplifyTrack(exp.track),
+          distanceM: Math.round(distance),
+          track: simplifyTrack(track),
           points: exp.collected,
           times: exp.times,
         },

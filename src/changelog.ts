@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.116.1'
+export const VERSION = '0.117.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.117.0',
+    date: '2026-08-28',
+    title: 'The app asks whether the walk is over',
+    tldr:
+      'Gdy oddalisz sie od miejsca o kilometr i nie wracasz, apka pyta arkuszem i powiadomieniem, czy to juz koniec. Po potwierdzeniu zapisuje spacer BEZ drogi powrotnej, wiec jazda autem nie dopisuje sie do trasy.',
+    changes: [
+      ['added', 'Walking away from a place by a kilometre without coming back now raises a question: is the walk over. It arrives as a sheet, and as a notification when the phone is in a pocket'],
+      ['added', 'Answering yes saves the walk as it was on site. The engine remembers how much of the track existed while you were still there, so the drive home is cut off instead of being recorded as part of the walk'],
+      ['fixed', 'The check runs on the raw position and before the speed filter. That filter drops anything faster than running, so readings from a moving car were being discarded and the question could never have fired while driving away'],
+    ],
+  },
   {
     version: '0.116.1',
     date: '2026-08-28',

@@ -6651,3 +6651,22 @@
   min-height: 0;
   z-index: auto;
 }
+
+/* pytanie „chyba juz wrociles": arkusz z dwiema drogami wyjscia */
+.faraway {
+  padding: 0 var(--sp-6) var(--sp-4);
+}
+
+.faraway__lead { color: var(--content-primary); }
+
+.faraway__note {
+  margin-top: var(--sp-3);
+  color: var(--content-tertiary);
+}
+
+.faraway__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}

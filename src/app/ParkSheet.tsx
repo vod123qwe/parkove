@@ -481,7 +481,8 @@ export function ParkSheet({
       {/* jedna decyzja, przyklejona do dołu: reszta karty przewija się pod nią */}
       <ActionBar>
         {onExpeditionHere ? (
-          <Button full size="lg" icon={<Square size={18} />} onClick={stopExpedition}>
+          <Button full size="lg" icon={<Square size={18} />} /* jawna strzalka: inaczej React podal by event jako opcje zakonczenia */
+              onClick={() => stopExpedition()}>
             Zakończ wyprawę
           </Button>
         ) : (
