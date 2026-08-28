@@ -96,6 +96,14 @@ button.pk-listitem:hover {
   color: var(--content-play);
 }
 
+/*
+ * paper: biała podkładka, kolor tonu zostaje w ikonie. Po regułach tonów,
+ * żeby nadpisywać samo tło i nie ruszać koloru glifu.
+ */
+.pk-listitem__lead.-paper {
+  background: var(--bg-surface);
+}
+
 .pk-listitem__text {
   display: flex;
   flex-direction: column;

@@ -84,6 +84,3 @@
   transition: transform var(--motion-fast) var(--ease-out);
 }
 
-.pk-stamp.-tappable:active {
-  transform: scale(0.97);
-}

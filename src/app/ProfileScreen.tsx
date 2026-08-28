@@ -120,6 +120,7 @@ export function ProfileScreen({
           icon={<ListIcon />}
           leadTone="clay"
           leadShape="squircle"
+          leadSurface="paper"
           title="Wszystkie parki"
           meta={`${FEATURE_COUNT} miejsc · ${visited} odwiedzonych`}
           trailing={<ChevronRight size={18} />}
@@ -130,6 +131,7 @@ export function ProfileScreen({
           icon={<Award />}
           leadTone="gold"
           leadShape="squircle"
+          leadSurface="paper"
           title="Osiągnięcia"
           meta={`${golden} ${plNaklejki(golden)} · ${challengeDone} z ${CHALLENGES.length} wyzwań`}
           trailing={<ChevronRight size={18} />}
@@ -144,6 +146,7 @@ export function ProfileScreen({
           icon={<Route />}
           leadTone="sky"
           leadShape="squircle"
+          leadSurface="paper"
           title="Moje liczby"
           meta={`${points} odkrytych punktów · postępy i rekordy`}
           trailing={<ChevronRight size={18} />}
@@ -158,6 +161,7 @@ export function ProfileScreen({
           icon={<Palette />}
           leadTone="plum"
           leadShape="squircle"
+          leadSurface="paper"
           title="Wygląd"
           meta="Motyw i styl mapy"
           trailing={<ChevronRight size={18} />}
@@ -167,6 +171,7 @@ export function ProfileScreen({
           className="prof-cell"
           icon={<Info />}
           leadShape="squircle"
+          leadSurface="paper"
           title="O aplikacji"
           meta={`Wersja ${VERSION} · aktualizacje i katalog DS`}
           trailing={<ChevronRight size={18} />}

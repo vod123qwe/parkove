@@ -26,11 +26,13 @@
 button.pk-storycard__tap {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background var(--motion-fast) var(--ease-out);
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    transform var(--press-release),
+    opacity var(--press-release);
 }
 
 button.pk-storycard__tap:hover { background: var(--bg-surface-sunken); }
-button.pk-storycard__tap:active { background: var(--bg-mint); }
 
 button.pk-storycard__tap:focus-visible {
   outline: 3px solid var(--border-focus);

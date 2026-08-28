@@ -803,7 +803,7 @@ export function Catalog() {
         <Section
           id="lists"
           title="List items"
-          lead="Rows for lists and navigation. The leading tone carries meaning, while leadShape switches between the default disc and a soft square for roomy menus. Wrap rows in List for consistent spacing and optional dividers."
+          lead="Rows for lists and navigation. The leading tone carries meaning, leadShape switches between the default disc and a soft square, and leadSurface can swap the tinted plate for a paper one that keeps the tone in the icon only. Wrap rows in List for consistent spacing and optional dividers."
         >
           <div className="cat-spec cat-list">
             <ListHead>Sekcja z nagłówkiem</ListHead>
@@ -851,6 +851,15 @@ export function Catalog() {
                 leadTone="plum"
                 title="Ton plum"
                 meta="Fiolet zabawy, np. wygląd"
+                onClick={() => {}}
+              />
+              <ListItem
+                icon={<Landmark />}
+                leadTone="clay"
+                leadShape="squircle"
+                leadSurface="paper"
+                title="Podkładka paper"
+                meta="Białe tło, ton zostaje w ikonie"
                 onClick={() => {}}
               />
             </List>

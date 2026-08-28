@@ -77,7 +77,7 @@ const roles = {
   'border-info': [t('B', 55), t('B', 65)],
   // pin parkingu w nowym języku mapy: ciemny krążek, jasny znak w środku
   'map-parking-fill': [t('B', 28), t('B', 24)],
-  'map-parking-icon': [t('B', 84), t('B', 80)],
+
 
   // food and drink
   'bg-food-subtle': [t('F', 95), t('F', 22)],
@@ -90,19 +90,26 @@ const roles = {
    * odcieniu: ciepły amber i magenta zamiast błękitu.
    */
   'map-food-fill': [t('F', 30), t('F', 26)],
-  'map-food-icon': [t('F', 88), t('F', 84)],
+
 
   // playgrounds
   'bg-play-subtle': [t('Y', 95), t('Y', 22)],
   'content-play': [t('Y', 42), t('Y', 84)],
   'border-play': [t('Y', 55), t('Y', 68)],
   'map-play-fill': [t('Y', 32), t('Y', 26)],
-  'map-play-icon': [t('Y', 88), t('Y', 84)],
+
 }
 
 // Not tonal: overlays.
 const statics = {
   'bg-scrim': ['rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.55)'],
+  // Ikony pinow mapy: strojone recznie POZA paleta (wiecej chromy, zeby
+  // odcien bylo widac na 20 px na kaflu satelity). Kiedys wpisane wprost w
+  // wygenerowany colors.css i stracone przy pierwszej regeneracji - dlatego
+  // zyja tutaj, w zrodle prawdy, jako doslowne hexy.
+  'map-parking-icon': ['#93c7ff /* ~B78, jasniej niz B84 */', '#93c7ff /* ~B78 */'],
+  'map-food-icon': ['#ffb27a /* ~F75, cieplej niz F88 */', '#ffb27a /* ~F75 */'],
+  'map-play-icon': ['#eab3ff /* ~Y78, wyrazniej niz Y88 */', '#eab3ff /* ~Y78 */'],
 }
 
 const line = (name, spec) =>

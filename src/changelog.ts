@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.111.0'
+export const VERSION = '0.112.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.112.0',
+    date: '2026-08-28',
+    title: 'One press rule and a menu that points at the journal',
+    tldr:
+      'Wcisniecie w calej apce to teraz jedna delikatna zasada, ikonki menu stoja na bialych podkladkach, a Pamietnik dostal ciemnozielona karte z limonkowym tytulem.',
+    changes: [
+      ['changed', 'Pressing anything follows one system rule now: the element shrinks by five percent and loses ten percent of its opacity, with tokens for both values. The old squash morph stretched letters on text rows and is gone'],
+      ['changed', 'Menu link icons stand on white plates so the tone lives in the icon alone. ListItem gains a documented paper lead surface for this'],
+      ['added', 'The journal cell is the single loud card in the menu: deep forest green with a lime headline, a lime icon badge and a soft glow. In the dark theme the pair flips and stays readable'],
+      ['added', 'A content-on-lime pairing guarantees dark ink on lime badges in both themes'],
+      ['fixed', 'Hand tuned map pin icon colours lived only in the generated tokens file, so the first regeneration wiped them. They moved into the generator itself as the source of truth'],
+    ],
+  },
   {
     version: '0.111.0',
     date: '2026-08-28',

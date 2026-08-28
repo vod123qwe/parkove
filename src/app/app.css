@@ -1632,7 +1632,8 @@
 }
 
 .plantcam__shutter:active {
-  transform: scale(0.94);
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
 }
 
 .plantcam__shutter.-ok {
@@ -1848,7 +1849,8 @@
 }
 
 .app-nextstop:active:not(:disabled) {
-  transform: scale(0.985);
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
   background: var(--bg-surface-sunken);
 }
 
@@ -2019,13 +2021,14 @@
 
 /* dotknięcie: przycisk się ugina i szkło na moment jaśnieje */
 .app-expaction__btn:active:not(:disabled) {
-  transform: scale(0.9);
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
   background: rgb(16 22 16 / 0.68);
   border-color: rgb(255 255 255 / 0.34);
 }
 
 .app-expaction__btn.-primary:active {
-  transform: scale(0.92);
+  transform: scale(var(--press-scale));
   background: var(--bg-lime);
   box-shadow: 0 0 0 10px rgb(201 242 77 / 0.22);
 }
@@ -2566,7 +2569,6 @@
 }
 
 .app-locate:active {
-  transform: scale(0.9);
   background: rgb(16 22 16 / 0.6);
 }
 
@@ -2672,7 +2674,6 @@
 }
 
 .app-look:active {
-  transform: scale(0.9);
   background: rgb(16 22 16 / 0.6);
 }
 
@@ -3114,7 +3115,6 @@
 }
 
 .app-addmenu .app-addmenu__item.pk-btn:active {
-  transform: scale(0.975);
   background: rgb(16 22 16 / 0.44);
   border-color: rgb(255 255 255 / 0.36);
 }
@@ -3175,7 +3175,8 @@
 }
 
 .app-addmenu__x:active {
-  transform: scale(0.92);
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
 }
 
 .app-addmenu__catch {
@@ -4250,7 +4251,8 @@
 }
 
 .memplay__memory:active {
-  transform: scale(0.99);
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
 }
 
 /* notatka i nagranie nie prowadza nigdzie, wiec nie zachowuja sie jak przycisk */
@@ -4884,7 +4886,8 @@
 }
 
 .app-chip.-link:active {
-  transform: scale(0.96);
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
   background: var(--bg-surface-sunken);
 }
 
@@ -6282,28 +6285,53 @@
   border-radius: 20px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface-sunken);
-  transition: background var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    transform var(--press-release),
+    opacity var(--press-release);
 }
 
-.prof-cells .pk-listitem:hover { background: var(--bg-mint); }
-.prof-cells .pk-listitem:active { transform: scale(0.985); }
+.prof-cells .pk-listitem:not(.-featured):hover { background: var(--bg-mint); }
 
 .prof-cells .pk-listitem__lead {
   width: 44px;
   height: 44px;
 }
 
+/*
+ * Pamietnik dostaje cala karte w ciemnej zieleni z limonkowym naglowkiem
+ * (Jarek 2026-08-28) - jedyna kolorowa plama w menu, wiec prowadzi wzrok.
+ * Delikatna limonkowa poswiata od gornego rogu podbija ja bez gradientowego
+ * kiczu. Tokeny, nie hexy: w ciemnym motywie para sie odwraca i dalej gra.
+ */
 .prof-cells .prof-cell.-featured {
   min-height: 92px;
-  background: var(--bg-mint);
-  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  background:
+    radial-gradient(130% 150% at 100% 0%, color-mix(in srgb, var(--bg-lime) 20%, transparent), transparent 58%),
+    var(--bg-primary);
+  box-shadow: var(--elevation-1);
 }
 
+.prof-cells .prof-cell.-featured .pk-listitem__title {
+  color: var(--content-on-primary);
+}
+
+.prof-cells .prof-cell.-featured .pk-listitem__meta {
+  /* wtorny tekst = tusz on-primary sciagniety w strone tla karty; w ciemnym
+     motywie para sie odwraca i mieszanka dalej trzyma kontrast */
+  color: color-mix(in srgb, var(--content-on-primary) 72%, var(--bg-primary));
+}
+
+.prof-cells .prof-cell.-featured .pk-listitem__trailing {
+  color: color-mix(in srgb, var(--content-on-primary) 82%, var(--bg-primary));
+}
+
+/* limonkowa plakietka z ciemnym glifem: jedyny mocny akcent na karcie */
 .prof-cells .prof-cell.-featured .pk-listitem__lead {
   width: 48px;
   height: 48px;
-  background: var(--bg-primary);
-  color: var(--content-on-primary);
+  background: var(--bg-lime);
+  color: var(--content-on-lime);
 }
 
 /*

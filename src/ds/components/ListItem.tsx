@@ -14,6 +14,12 @@ export type ListItemProps = {
   leadTone?: 'neutral' | 'accent' | 'gold' | 'sky' | 'clay' | 'plum'
   /** icon container geometry; squircle is for roomy navigation menus */
   leadShape?: 'round' | 'squircle'
+  /**
+   * tint (domyślnie) = kolorowa podkładka z pary tonu; paper = biała podkładka,
+   * ton zostaje w samej ikonie. Do rzędów na przygaszonych kartach, gdzie
+   * kolorowe plamy robiły się zbyt głośne.
+   */
+  leadSurface?: 'tint' | 'paper'
   /** square photo slot instead of the icon disc */
   photo?: { src: string; alt?: string }
   title: string
@@ -30,6 +36,7 @@ export function ListItem({
   photo,
   leadTone = 'neutral',
   leadShape = 'round',
+  leadSurface = 'tint',
   title,
   meta,
   metaExtra,
@@ -46,7 +53,14 @@ export function ListItem({
         </span>
       ) : (
         icon != null && (
-          <span className={cx('pk-listitem__lead', `-${leadTone}`, leadShape === 'squircle' && '-squircle')}>
+          <span
+            className={cx(
+              'pk-listitem__lead',
+              `-${leadTone}`,
+              leadShape === 'squircle' && '-squircle',
+              leadSurface === 'paper' && '-paper',
+            )}
+          >
             {icon}
           </span>
         )

@@ -1,42 +1,64 @@
 /*
- * Morph pod palcem, do użycia na dowolnym elemencie dotykalnym.
+ * Wciśnięcie: JEDNA zasada dla całego systemu (decyzja Jarka 2026-08-28):
+ * element pod palcem robi się o 5% mniejszy i traci 10% krycia. Nic więcej.
  *
- * Wzięte z rączki przepustnicy w odtwarzaniu wspomnienia, gdzie się sprawdziło
- * (Jarek: „podoba mi się ta forma morpha, może powinna być zastosowana też na
- * innych elementach"). Fizyka jest ta sama, co przy dotknięciu szkła: rzecz
- * przyciśnięta rozlewa się na boki i spłaszcza. Nie rusza się z miejsca, bo
- * początek układu jest w jej środku, więc nic nie skacze pod palcem.
+ * Nagrobek morpha scale(1.07, 0.9): squash wzięty z rączki przepustnicy
+ * rozjeżdżał litery na wierszach z tekstem (Wygląd) i był po prostu za mocny.
+ * Rączka i tak już go nie używała, więc wariant -pull też wyleciał.
  *
- * WAŻNE, gdzie tego NIE używać: na przyciskach z tekstem. Rozciągnięty tekst
- * czyta się jak błąd, nie jak reakcja. To jest do przycisków ikonowych,
- * pastylek i chwytów, czyli tam, gdzie nie ma liter do zdeformowania.
- *
- * Krzywa ma lekki wyskok, więc puszczenie jest odbiciem, a nie samym powrotem.
- * Powrót jest wyraźnie dłuższy od naciśnięcia: dociśnięcie ma być natychmiast,
- * a rozprężenie ma być widać.
+ * Dociśnięcie jest natychmiastowe (90 ms), powrót wyraźnie dłuższy i z lekkim
+ * odbiciem, żeby puszczenie było widać. Wartości siedzą w tokenach, więc
+ * app.css nigdzie nie wpisuje własnych liczb.
  */
-.pk-press {
-  transform-origin: center;
-  transition: transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.pk-press:active {
-  transform: scale(1.07, 0.9);
-  transition-duration: 90ms;
+:root {
+  --press-scale: 0.95;
+  --press-opacity: 0.9;
+  --press-release: 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /*
- * Wariant dla chwytów, które ciągnie się wzdłuż osi: wyciąga się w kierunku
- * jazdy, zamiast rozlewać na boki.
+ * .pk-press = opt-in dla elementów spoza tej listy (ikonowe przyciski mapy,
+ * wiersze Wyglądu, kafle edytora). Reszta selektorów to dotykalne elementy DS,
+ * które dostają zasadę bez zmian w markupie. Segmented i uchwyty przeciągania
+ * zostają poza listą: tam skala kłóciłaby się z suwakiem albo gestem.
  */
-.pk-press.-pull:active {
-  transform: scale(0.9, 1.16);
+.pk-press,
+.pk-btn,
+.pk-chip,
+button.pk-listitem,
+button.pk-storycard__tap,
+.pk-stamp.-tappable {
+  transform-origin: center;
 }
 
-/* nikt nie chce, żeby mu się interfejs ruszał, jeśli o to prosił */
+.pk-press,
+.pk-btn,
+button.pk-listitem,
+button.pk-storycard__tap {
+  transition:
+    transform var(--press-release),
+    opacity var(--press-release);
+}
+
+.pk-press:active,
+.pk-btn:active:not(:disabled),
+.pk-chip:active,
+button.pk-listitem:active,
+button.pk-storycard__tap:active,
+.pk-stamp.-tappable:active {
+  transform: scale(var(--press-scale));
+  opacity: var(--press-opacity);
+  transition-duration: 90ms;
+}
+
+/* mniej ruchu na życzenie systemu: zostaje samo przygaszenie, bez skali */
 @media (prefers-reduced-motion: reduce) {
-  .pk-press,
-  .pk-press:active {
+  .pk-press:active,
+  .pk-btn:active:not(:disabled),
+  .pk-chip:active,
+  button.pk-listitem:active,
+  button.pk-storycard__tap:active,
+  .pk-stamp.-tappable:active {
     transform: none;
     transition: none;
   }

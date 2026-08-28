@@ -243,3 +243,25 @@ trasy). Zmierzone elementFromPoint przed i po.
 Druga wpadka dnia: sprzatanie CSS w 0.106 przypadkiem wycielo style
 .app-searchrow i .app-fbtn (okragly przycisk filtrow przy wyszukiwarce);
 przywrocone tutaj.
+
+## Hierarchia wizualna menu (0.112.0, decyzje Jarka)
+
+- **Jedna kolorowa karta**: Pamietnik. Ciemna zielen (`--bg-primary`) z
+  limonkowym tytulem (`--content-on-primary`), limonkowa plakietka ikony
+  (`--bg-lime` + `--content-on-lime`) i delikatna poswiata radialna od
+  gornego rogu. W ciemnym motywie para sie odwraca (jasna karta, ciemny
+  tekst) i dalej gra, bo wszystko stoi na tokenach, nie na hexach.
+- **Reszta cellek**: biale podkladki pod ikonami (`leadSurface="paper"` w
+  ListItem, wariant udokumentowany w katalogu). Ton zostaje w samej ikonie,
+  wiec menu przestalo byc rzedem kolorowych plam.
+- **Wcisniecie**: JEDNA globalna zasada w `ds/components/press.css`:
+  scale 0.95 + opacity 0.9 (tokeny `--press-scale`, `--press-opacity`).
+  Squash morph scale(1.07, 0.9) skasowany, bo rozjezdzal litery na
+  wierszach Wygladu. app.css nigdzie nie wpisuje wlasnych liczb docisku,
+  tylko te tokeny.
+
+GOTCHA (tokeny): `src/ds/tokens/colors.css` jest GENEROWANY. Reczne
+strojenie ikon pinow mapy bylo kiedys wpisane wprost w ten plik i pierwsza
+regeneracja (`npm run tokens`) je zgubila. Strojone hexy zyja teraz w
+`scripts/generate-colors.mjs` w bloku `statics`. Nie edytowac colors.css
+recznie, nigdy.
