@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.118.0'
+export const VERSION = '0.119.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.119.0',
+    date: '2026-08-28',
+    title: 'Miechow: a park standing on a burnt manor, above medieval tunnels',
+    tldr:
+      'Park Miejski w Miechowie wchodzi do kolekcji z czterema punktami: wyjscia z podziemi bozogrobcow, dwor spalony w 1863, Ogrod Zen i rewitalizacja za dwadziescia milionow.',
+    changes: [
+      ['added', 'Park Miejski in Miechow, thirty kilometres north of Krakow, joins the collection with twelve hectares and four points'],
+      ['added', 'The story under the lawn: the park sits on the old Wielko-Zagorze estate and is where the medieval tunnels of the Holy Sepulchre canons came out. Researchers put them at up to a kilometre and a half; the entrances were bricked up in 1981 and part of the corridors became heating chambers'],
+      ['added', 'Why the park exists at all: the manor that stood here burned after the January Uprising of 1863 and was never rebuilt, so the garden stayed public'],
+      ['added', 'Two more points from the park itself, a Japanese garden at its eastern edge and the twenty million zloty rebuild that gave it fountains, loungers and an outdoor bookcase'],
+    ],
+  },
   {
     version: '0.118.0',
     date: '2026-08-28',
