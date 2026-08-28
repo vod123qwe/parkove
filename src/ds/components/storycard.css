@@ -25,13 +25,15 @@
   font: inherit;
 }
 
+/*
+ * Bez reakcji tłem (Jarek 2026-08-28: „tło lekko podświetla się na szaro,
+ * usuń to"). Na dotyku iOS zostawia :hover po tapnięciu, więc szary błysk
+ * zostawał na karcie. Sygnałem dotykalności jest sama kompozycja i akcja.
+ */
 button.pk-storycard__tap {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background var(--motion-fast) var(--ease-out);
 }
-
-button.pk-storycard__tap:hover { background: var(--bg-surface-sunken); }
 
 button.pk-storycard__tap:focus-visible {
   outline: 3px solid var(--border-focus);
@@ -68,13 +70,30 @@ button.pk-storycard__tap:focus-visible {
   line-height: 19px;
 }
 
-/* pas polaroidów: DS Polaroid zmniejszony do miniaturki, przechył zostaje */
+/* kadr mapy: pełna szerokość WEWNĄTRZ paddingu karty, nie od krawędzi */
+.pk-storycard__media {
+  display: block;
+  width: 100%;
+}
+
+.pk-storycard__media > * { margin: 0; }
+
+/*
+ * Pas polaroidów: DS Polaroid zmniejszony do miniaturki, przechył zostaje,
+ * a zdjęcia lekko na siebie nachodzą jak odłożone na stole. Pierwsze leży
+ * na wierzchu, następne wsuwają się pod nie.
+ */
 .pk-storycard__gallery {
   display: flex;
   align-items: flex-start;
-  gap: var(--sp-4);
-  padding: var(--sp-2) var(--sp-1) var(--sp-2);
+  padding: var(--sp-1) var(--sp-1) var(--sp-2);
 }
+
+.pk-storycard__gallery > * + * { margin-left: -14px; }
+
+.pk-storycard__gallery > :nth-child(1) { z-index: 3; }
+.pk-storycard__gallery > :nth-child(2) { z-index: 2; }
+.pk-storycard__gallery > :nth-child(3) { z-index: 1; }
 
 /* elastycznie: trzy sztuki dzielą rząd po równo i mieszczą się w każdej
    szerokości karty; limit trzyma je w skali miniaturki */
@@ -93,30 +112,6 @@ button.pk-storycard__tap:focus-visible {
 .pk-storycard__gallery .pk-polaroid__text {
   min-height: 10px;
   padding-top: var(--sp-1);
-}
-
-/* kafel bez zdjęcia (np. sam ślad trasy) w tej samej papierowej ramce */
-.pk-storycard__tile {
-  display: block;
-  width: auto;
-  min-width: 0;
-  flex: 1 1 0;
-  max-width: 112px;
-  padding: var(--sp-2) var(--sp-2) calc(var(--sp-2) + 10px);
-  background: #fdfdf8;
-  border-radius: 14px;
-  corner-shape: var(--corner-smooth);
-  box-shadow: var(--elevation-2);
-  transform: rotate(var(--pk-tilt, 0deg));
-}
-
-.pk-storycard__tile > * {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 10px;
-  corner-shape: var(--corner-smooth);
-  background: var(--bg-mint);
 }
 
 .pk-storycard__action {

@@ -105,6 +105,7 @@ export function JourneyScreen({
     <div className="jscreen">
       <JourneyMap
         track={journey.track}
+        parkId={journey.parkId}
         points={points}
         collected={walked}
         marks={marks}

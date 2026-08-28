@@ -74,8 +74,9 @@ export function TileMap({
    * Ma początek i koniec zamiast jednego celu, więc dostaje dwie kropki.
    */
   line?: Pt[]
-  /** podpis kadru, gdy domyślny („ile do wejścia na szlak") nie ma sensu */
-  caption?: string
+  /** podpis kadru, gdy domyślny („ile do wejścia na szlak") nie ma sensu;
+   *  null = bez podpisu, gdy kontekst niesie już sąsiedni tekst */
+  caption?: string | null
   /** kolor linii: szlak znakowany rysujemy jego kolorem z terenu */
   ink?: string
   height?: number
@@ -110,11 +111,17 @@ export function TileMap({
         .sort((a, b) => a.d - b.d)[0]
 
   const drawn: Pt[] | null = line?.length ? line : route?.line?.length ? (route.line as Pt[]) : null
-  if (!w || (!near && !drawn)) return <div className="app-tilemap" ref={ref} style={{ height }} />
+  /*
+   * Nie ma ani celu, ani linii (np. wyprawa bez zapisanego śladu): kadrujemy
+   * sam obrys miejsca. Pusty prostokąt nie mówi nic, widok parku z góry już tak.
+   */
+  const ringPath: Pt[] = rings.flat().map((c) => [c[0], c[1]] as Pt)
+  if (!w || (!near && !drawn && !ringPath.length))
+    return <div className="app-tilemap" ref={ref} style={{ height }} />
 
   /* dobierz przybliżenie tak, żeby oba końce linii zmieściły się w kadrze */
   const pad = 26
-  const path: Pt[] = drawn ?? [point as Pt, (near as { c: Pt }).c]
+  const path: Pt[] = drawn ?? (point && near ? [point, near.c] : ringPath)
   const lons = path.map((c) => c[0])
   const lats = path.map((c) => c[1])
   let z = 17
@@ -172,9 +179,11 @@ export function TileMap({
         ))}
         {a && <circle className="app-tilemap__spot" cx={a[0]} cy={a[1]} r={7} />}
       </svg>
-      <span className="app-tilemap__label">
-        {caption ?? label(route, near?.d ?? 0, showStraight)}
-      </span>
+      {caption !== null && (
+        <span className="app-tilemap__label">
+          {caption ?? label(route, near?.d ?? 0, showStraight)}
+        </span>
+      )}
     </div>
   )
 }

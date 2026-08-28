@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.113.0'
+export const VERSION = '0.114.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.114.0',
+    date: '2026-08-28',
+    title: 'Every walk in the journal opens with its own map',
+    tldr:
+      'Karta wyprawy zaczyna sie teraz mapa przebytej trasy, zdjecia lekko na siebie nachodza, karta nie szarzeje pod palcem, a ekran wyprawy kadruje sie na miejscu spaceru takze wtedy, gdy nie ma sladu GPS.',
+    changes: [
+      ['added', 'Each chapter in the journal opens with a satellite frame of the walk, drawn full width inside the card padding. It reuses the tile frame from the place cards, so no second map engine runs and the tiles are already cached'],
+      ['changed', 'Photographs in a chapter overlap slightly, the way prints lie on a table, instead of standing in a neat row'],
+      ['changed', 'A chapter card no longer turns grey under a finger. On iOS that hover tint stayed behind after every tap'],
+      ['fixed', 'Opening a walk framed the camera on its recorded track, so walks without one stayed on the default view of Kraków. They frame the place itself now'],
+      ['fixed', 'The route no longer slips under the walk card: the frame reserves exactly the height the card covers, and it is restored after the screen finishes sliding in'],
+    ],
+  },
   {
     version: '0.113.0',
     date: '2026-08-28',

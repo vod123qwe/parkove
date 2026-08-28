@@ -7,6 +7,21 @@ import { buildPhotoImage, buildPinImages, pinColors, pinImageId } from './pins'
 import { resolveMapStyle, getMapStyle } from './data/mapstyles'
 import type { WalkMark } from './photos'
 import type { QuestPoi } from './data/quests'
+import parksData from './data/parks.json'
+
+/** obrys miejsca: kadr zapasowy, gdy wyprawa nie ma zapisanego śladu */
+function parkRing(parkId?: string): Pt[] {
+  if (!parkId) return []
+  const feature = (
+    parksData as { features: Array<{ id: string; geometry: { type: string; coordinates: unknown } }> }
+  ).features.find((f) => f.id === parkId)
+  if (!feature) return []
+  const rings: number[][][] =
+    feature.geometry.type === 'Polygon'
+      ? (feature.geometry.coordinates as number[][][])
+      : (feature.geometry.coordinates as number[][][][]).flat()
+  return rings.flat().map((c) => [c[0], c[1]] as Pt)
+}
 
 /**
  * The map of a walk that already happened: the path, the points it collected
@@ -15,6 +30,7 @@ import type { QuestPoi } from './data/quests'
  */
 export function JourneyMap({
   track,
+  parkId,
   points,
   collected,
   marks,
@@ -24,6 +40,8 @@ export function JourneyMap({
   bottomPadding = 48,
 }: {
   track: Pt[]
+  /** miejsce wyprawy: kadr zapasowy, gdy nie ma śladu do pokazania */
+  parkId?: string
   points: QuestPoi[]
   collected: Set<string>
   marks: Array<WalkMark & { url?: string }>
@@ -42,6 +60,14 @@ export function JourneyMap({
   data.current = { track, points, collected, marks }
   const padRef = useRef(bottomPadding)
   padRef.current = bottomPadding
+  const parkRef = useRef(parkId)
+  parkRef.current = parkId
+  /* ramka wyprawy liczona raz; trzymamy ją, żeby dało się wrócić do kadru
+     po zmianie rozmiaru (ekran wjeżdża animacją, więc pierwszy pomiar
+     kontenera potrafi być inny niż docelowy) */
+  const frameRef = useRef<[[number, number], [number, number]] | null>(null)
+  /* ruch ręką oddaje sterowanie: od tego momentu nie poprawiamy kadru */
+  const touched = useRef(false)
 
   useEffect(() => {
     if (!holder.current) return
@@ -54,7 +80,7 @@ export function JourneyMap({
        * Esri: to ma być to samo zdjęcie, tylko położone.
        */
       style: resolveMapStyle(getMapStyle() === 'satellite-3d' ? 'satellite' : getMapStyle()).spec,
-      center: track[0] ?? [19.9445, 50.0555],
+      center: track[0] ?? parkRing(parkId)[0] ?? [19.9445, 50.0555],
       zoom: 14,
       attributionControl: { compact: true },
       // a small map inside a screen: panning yes, twisting no
@@ -200,32 +226,77 @@ export function JourneyMap({
         },
       })
 
-      // frame the whole walk, with room for the pins at its edges
-      if (line.length > 1) {
-        let west = line[0][0]
+      /*
+       * Kadr na tym, gdzie się szło. Ślad, a gdy go nie ma (wyprawa bez
+       * zapisu GPS), obrys samego miejsca: inaczej mapa zostawała na
+       * domyślnym środku Krakowa i ekran wyprawy pokazywał nie to miasto,
+       * co trzeba.
+       */
+      const shape: Pt[] = line.length > 1 ? line : parkRing(parkRef.current)
+      if (shape.length > 1) {
+        let west = shape[0][0]
         let east = west
-        let south = line[0][1]
+        let south = shape[0][1]
         let north = south
-        for (const [lng, lat] of line) {
+        for (const [lng, lat] of shape) {
           west = Math.min(west, lng)
           east = Math.max(east, lng)
           south = Math.min(south, lat)
           north = Math.max(north, lat)
         }
-        map.fitBounds(
-          [
-            [west, south],
-            [east, north],
-          ],
-          {
-            padding: { top: 96, left: 40, right: 40, bottom: padRef.current + 24 },
-            maxZoom: 17,
-            duration: 0,
-          },
-        )
+        frameRef.current = [
+          [west, south],
+          [east, north],
+        ]
+        frame()
       } else if (line.length === 1) {
         map.jumpTo({ center: line[0], zoom: 16.5 })
       }
+    }
+
+    /*
+     * Wysokość pola, w którym ma się zmieścić trasa.
+     *
+     * Dół to dokładnie tyle, ile zasłania karta wyprawy (62% ekranu) plus
+     * oddech. Zmierzone: karta zaczyna się na 309 px z 812, a przycięcie
+     * pola do 58% wsuwało dolny koniec trasy pod nią. Limit 72% jest tylko
+     * bezpiecznikiem na wypadek karty rozwiniętej na pełny ekran.
+     *
+     * Góra to sam pasek nawigacji (72 zamiast 96), żeby trasa mogła być
+     * większa i siedziała bliżej środka widocznego pasa.
+     */
+    const frame = () => {
+      const box = frameRef.current
+      if (!box || touched.current) return
+      const height = map.getContainer().clientHeight
+      if (height < 120) return
+      map.fitBounds(box, {
+        padding: {
+          top: 72,
+          left: 40,
+          right: 40,
+          bottom: Math.min(padRef.current + 24, Math.round(height * 0.72)),
+        },
+        maxZoom: 17,
+        duration: 0,
+      })
+    }
+
+    if (import.meta.env.DEV) {
+      ;(window as unknown as { __pkJourneyMap?: MapGL }).__pkJourneyMap = map
+    }
+
+    /* ekran wjeżdża animacją: po ustabilizowaniu rozmiaru wracamy do kadru */
+    const ro = new ResizeObserver(() => {
+      map.resize()
+      frame()
+    })
+    if (holder.current) ro.observe(holder.current)
+
+    for (const gesture of ['dragstart', 'zoomstart', 'rotatestart'] as const) {
+      map.on(gesture, (e: { originalEvent?: unknown }) => {
+        if (e.originalEvent) touched.current = true
+      })
     }
 
     map.on('load', () => void draw())
@@ -260,6 +331,7 @@ export function JourneyMap({
     const t = window.setTimeout(() => map.resize(), 260)
 
     return () => {
+      ro.disconnect()
       window.clearTimeout(t)
       map.remove()
       mapRef.current = null

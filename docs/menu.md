@@ -281,3 +281,32 @@ recznie, nigdy.
   portalowany do body zawsze go przykrywal - klik w wyprawe "wracal do
   menu". Fix w App.tsx: otwarcie wyprawy z Pamietnika chowa menu i
   pamietnik (flaga journalReturn), zamkniecie przywraca oba.
+
+## Karta wyprawy, wersja z mapa (0.114.0, decyzje Jarka)
+
+- **Kadr mapy na gorze karty**, pelna szerokoscia WEWNATRZ paddingu (slot
+  `media` w StoryCard). Uzywamy istniejacego `TileMap`: kafle satelity
+  liczone recznie rzutem Mercatora, bez drugiej instancji MapLibre, wiec
+  kilka kart naraz nie kosztuje kontekstow graficznych. Kafle te same, co
+  na duzej mapie, wiec service worker ma je juz w pamieci.
+- **TileMap** dostal dwie rzeczy: kadr samego obrysu miejsca, gdy nie ma
+  ani celu, ani linii (wyprawa bez sladu), oraz `caption={null}` na kadr
+  bez podpisu.
+- **Polaroidy lekko na siebie nachodza** (margin-left -14 px, pierwszy na
+  wierzchu), jak zdjecia odlozone na stole.
+- **Karta nie reaguje tlem** na dotyk: iOS zostawial szary :hover po tapie.
+
+GOTCHA (kadrowanie ekranu wyprawy, zmierzone): mapa `JourneyMap` kadrowala
+sie na `track`, a wyprawy bez zapisu GPS zostawaly na domyslnym srodku
+Krakowa. Teraz kadr zapasowy to obrys parku (`parkId` przekazywany z
+JourneyScreen). Padding dolny musi odpowiadac temu, ile realnie zaslania
+karta wyprawy: 62% ekranu (309 px z 812). Przyciecie do 58% wsuwalo dolny
+koniec trasy pod karte; limit 72% zostal jako bezpiecznik. Kadr jest
+odtwarzany po zmianie rozmiaru (ResizeObserver), dopoki uzytkownik nie
+ruszy mapa reka. W DEV instancja siedzi w `window.__pkJourneyMap`.
+
+GOTCHA (testy w panelu): ukryty panel podgladu potrafi nie renderowac
+klatek, wiec MapLibre nie dochodzi do `load` i pomiar kamery klamie
+(zoom zostaje na wartosci z konstruktora). Ratunek: swieza karta
+(`tabs_close` + `preview_start`) i odczyt center/zoom/projekcji w JEDNYM
+wywolaniu, bo `__pkJourneyMap` wskazuje ostatnio zamontowana mape.

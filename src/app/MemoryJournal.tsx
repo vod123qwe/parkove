@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import type { CSSProperties } from 'react'
 import { Camera, Footprints, Mic, Route, Sparkles, StickyNote } from 'lucide-react'
 import { Button, Chip, Polaroid, Stat, StatGrid, StoryCard } from '../ds'
 import type { Journey } from './state'
@@ -7,6 +6,7 @@ import { useMarks } from './photos'
 import type { WalkMark } from './photos'
 import parksData from './data/parks.json'
 import { MemoryViewer } from './MemoryViewer'
+import { TileMap } from './TileMap'
 import { asset } from './assets'
 import {
   plMiejsca,
@@ -62,25 +62,6 @@ const month = (ms: number) =>
 const duration = (ms: number) => {
   const mins = Math.max(1, Math.round(ms / 60000))
   return mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, '0')}`
-}
-
-function MiniRoute({ track }: { track: Array<[number, number]> }) {
-  if (track.length < 2) return <Route size={26} />
-  const xs = track.map((point) => point[0])
-  const ys = track.map((point) => point[1])
-  const minX = Math.min(...xs)
-  const minY = Math.min(...ys)
-  const span = Math.max(Math.max(...xs) - minX, Math.max(...ys) - minY) || 1e-5
-  const points = track
-    .map(([x, y]) => `${(10 + ((x - minX) / span) * 68).toFixed(1)},${(94 - ((y - minY) / span) * 68).toFixed(1)}`)
-    .join(' ')
-  const [startX, startY] = points.split(' ')[0].split(',')
-  return (
-    <svg viewBox="0 0 88 104" aria-hidden="true">
-      <polyline points={points} className="memjrnl__route-line" />
-      <circle cx={startX} cy={startY} r="4" className="memjrnl__route-start" />
-    </svg>
-  )
 }
 
 export function MemoryJournal({ journeys, onOpenJourney }: { journeys: Journey[]; onOpenJourney: (id: string) => void }) {
@@ -165,16 +146,20 @@ export function MemoryJournal({ journeys, onOpenJourney }: { journeys: Journey[]
                   eyebrow={date(journey.startedAt)}
                   title={journey.name ?? park(journey.parkId)}
                   meta={`${park(journey.parkId)} · ${(journey.distanceM / 1000).toFixed(1).replace('.', ',')} km · ${duration(journey.endedAt - journey.startedAt)}`}
+                  media={
+                    <TileMap
+                      parkId={journey.parkId}
+                      line={journey.track.length > 1 ? journey.track : undefined}
+                      caption={null}
+                      height={146}
+                    />
+                  }
                   gallery={
-                    photos.length ? (
-                      photos.slice(0, 3).map((photo, at) => (
-                        <Polaroid key={photo.id} src={photo.url ?? ''} tilt={TILTS[at % TILTS.length]} />
-                      ))
-                    ) : (
-                      <span className="pk-storycard__tile" style={{ '--pk-tilt': '-1.6deg' } as CSSProperties}>
-                        <MiniRoute track={journey.track} />
-                      </span>
-                    )
+                    photos.length
+                      ? photos.slice(0, 3).map((photo, at) => (
+                          <Polaroid key={photo.id} src={photo.url ?? ''} tilt={TILTS[at % TILTS.length]} />
+                        ))
+                      : undefined
                   }
                   onClick={() => demo ? setMemoryId(mine[0]?.id ?? null) : onOpenJourney(journey.id)}
                   action={mine.length ? (

@@ -784,13 +784,20 @@ export function Catalog() {
         <Section
           id="storycard"
           title="Story card"
-          lead="One chronological chapter in a memory feed. Text runs the full width, photographs sit under it as small polaroids in the gallery slot, and the single action stretches across the card. No chevron: the whole card is the tap target."
+          lead="One chronological chapter in a memory feed. The media slot at the top carries a full width frame, usually the map of the route walked. Text runs the full width below it, photographs sit under the story as slightly overlapping polaroids, and the single action stretches across the card. No chevron and no background change on press: the whole card is the tap target."
         >
           <div className="cat-spec cat-storydemo">
             <StoryCard
               eyebrow="18 sierpnia 2026"
               title="Wieczór na Skałkach"
               meta="Skałki Twardowskiego · 2,8 km · 48 min"
+              media={
+                <span className="cat-storydemo__route">
+                  <svg viewBox="0 0 300 146" aria-hidden="true">
+                    <polyline points="34,116 78,74 130,92 186,44 244,66 268,30" />
+                  </svg>
+                </span>
+              }
               gallery={
                 <>
                   <Polaroid src={`${import.meta.env.BASE_URL}demo/skalki-sunset.jpg`} tilt={-2.4} />
