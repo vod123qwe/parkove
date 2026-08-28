@@ -17,20 +17,26 @@ import { formatDistance } from './geo'
 export function FarAwaySheet({
   parkName,
   distance,
+  reason,
   onKeepWalking,
   onFinish,
 }: {
   parkName: string
   distance: number
+  /** co nas do tego pytania doprowadzilo: odejscie czy powrot pod auto */
+  reason: 'away' | 'car'
   onKeepWalking: () => void
   onFinish: () => void
 }) {
   return (
-    <BottomSheet open modal onClose={onKeepWalking} title="Kończymy wyprawę?">
+    <BottomSheet open modal onClose={onKeepWalking} title={reason === 'car' ? 'Wróciłeś pod auto' : 'Kończymy wyprawę?'}>
       <div className="faraway">
         <p className="t-body faraway__lead">
-          Jesteś już {formatDistance(distance)} od miejsca „{parkName}" i nie wracasz. Jeśli spacer
-          się skończył, zapiszemy go bez drogi powrotnej.
+          {reason === 'car'
+            ? `Wróciłeś tam, gdzie zostawiłeś auto, a spacer po miejscu „${parkName}" trwa już ponad
+               dwadzieścia minut. Jeśli to koniec, zapiszemy go bez drogi powrotnej.`
+            : `Jesteś już ${formatDistance(distance)} od miejsca „${parkName}" i nie wracasz. Jeśli
+               spacer się skończył, zapiszemy go bez drogi powrotnej.`}
         </p>
         <p className="t-caption faraway__note">
           Nagrywanie leci dalej, dopóki nie odpowiesz, więc jazda autem dopisałaby się do trasy.

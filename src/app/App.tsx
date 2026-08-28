@@ -170,7 +170,11 @@ export function App() {
    * powstalo, zanim wyszedles}. Ta druga liczba obcina droge powrotna przy
    * zapisie, zeby jazda autem nie dopisala sie do spaceru.
    */
-  const [farAway, setFarAway] = useState<{ distance: number; keep: number } | null>(null)
+  const [farAway, setFarAway] = useState<{
+    distance: number
+    keep: number
+    reason: 'away' | 'car'
+  } | null>(null)
   /** the walk that just ended, waiting to show its summary */
   const [summaryId, setSummaryId] = useState<string | null>(null)
   /** last known position outside a walk: decides whether the start CTA shows */
@@ -655,14 +659,17 @@ export function App() {
    * jest w kieszeni, takze powiadomieniem: inaczej pytanie czekaloby do
    * momentu, w ktorym trasa ma juz w sobie pol miasta.
    */
-  const onFarAway = useCallback((distance: number, keep: number) => {
-    setFarAway({ distance, keep })
+  const onFarAway = useCallback((distance: number, keep: number, reason: 'away' | 'car') => {
+    setFarAway({ distance, keep, reason })
     navigator.vibrate?.([60, 80, 60])
     if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
       void navigator.serviceWorker?.ready
         .then((reg) =>
-          reg.showNotification('Kończymy wyprawę?', {
-            body: 'Jesteś już daleko od miejsca. Otwórz apkę i potwierdź, żeby droga powrotna nie trafiła do trasy.',
+          reg.showNotification(reason === 'car' ? 'Wróciłeś pod auto' : 'Kończymy wyprawę?', {
+            body:
+              reason === 'car'
+                ? 'Spacer trwa ponad dwadzieścia minut, a Ty jesteś przy aucie. Otwórz apkę i potwierdź, czy to koniec.'
+                : 'Oddalasz się od miejsca. Otwórz apkę i potwierdź, żeby droga powrotna nie trafiła do trasy.',
             icon: `${import.meta.env.BASE_URL}icon-192.png`,
             tag: 'walk-far-away',
             requireInteraction: true,
@@ -1428,6 +1435,7 @@ export function App() {
         <FarAwaySheet
           parkName={expeditionPark.properties.name}
           distance={farAway.distance}
+          reason={farAway.reason}
           onKeepWalking={() => setFarAway(null)}
           onFinish={() => {
             const finished = expedition?.id ?? null

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.117.0'
+export const VERSION = '0.118.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.118.0',
+    date: '2026-08-28',
+    title: 'Coming back to the car also ends the walk',
+    tldr:
+      'Pytanie o koniec wyprawy pada teraz juz po trzystu metrach, a takze wtedy, gdy po dwudziestu minutach chodzenia wrocisz tam, gdzie oznaczyles zaparkowane auto.',
+    changes: [
+      ['changed', 'The question about ending a walk now comes after three hundred metres instead of a kilometre, so the drive home is cut off much earlier'],
+      ['added', 'A second way to the same question: returning to the spot where you marked the parked car. It only counts after twenty minutes of walking, because the pin is dropped at the start and you circle it for the first few minutes anyway'],
+      ['changed', 'The sheet and the notification now say which of the two happened, so being back at the car does not read as being far away'],
+    ],
+  },
   {
     version: '0.117.0',
     date: '2026-08-28',

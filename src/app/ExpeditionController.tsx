@@ -5,6 +5,7 @@ import type { Pt } from './geo'
 import { questForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 import { distanceToParkM } from './geo'
+import { listMarks } from './photos'
 import parksData from './data/parks.json'
 import type { ParkFeature } from './ParkSheet'
 
@@ -34,10 +35,21 @@ const MAX_WALK_SPEED = 6
  * miejsca, nie do srodka, a pytanie pada dopiero, gdy oddalenie utrzymuje sie
  * przez chwile. Pojedynczy skok GPS o kilometr zdarza sie miedzy blokami.
  */
-const AWAY_M = 1000
+const AWAY_M = 300
 const AWAY_HOLD_MS = 45000
 /** dopoki jestes tak blisko granicy, slad liczy sie jako czesc spaceru */
-const STILL_THERE_M = 150
+const STILL_THERE_M = 100
+
+/*
+ * Druga droga do tego samego pytania: wrociles do auta.
+ *
+ * Pin „tu stoi auto" stawia sie na poczatku spaceru, wiec sam powrot w to
+ * miejsce nie wystarczy: przez pierwsze minuty ciagle sie przy nim krecisz.
+ * Dlatego liczy sie dopiero po dwudziestu minutach chodzenia. Wtedy powrot
+ * pod auto znaczy dokladnie jedno i nie trzeba czekac, az odjedziesz.
+ */
+const CAR_MIN_WALK_MS = 20 * 60 * 1000
+const CAR_BACK_M = 60
 
 export function ExpeditionController({
   onNear,
@@ -50,7 +62,7 @@ export function ExpeditionController({
    * Oddaliles sie od miejsca i nie wracasz. `keepTrackPoints` mowi, ile
    * punktow sladu powstalo, zanim wyszedles: tyle warto zapisac.
    */
-  onFarAway?: (distance: number, keepTrackPoints: number) => void
+  onFarAway?: (distance: number, keepTrackPoints: number, reason: 'away' | 'car') => void
 }) {
   const { expedition, parks } = useGameState()
   const parkId = expedition?.parkId ?? null
@@ -69,6 +81,7 @@ export function ExpeditionController({
   /* od kiedy trwa oddalenie; null = jestes w poblizu */
   const awaySinceRef = useRef<number | null>(null)
   const askedRef = useRef(false)
+  const carRef = useRef<Pt | null>(null)
 
   // a phone in a street of blocks reports positions that hop a few metres
   // sideways while you walk straight; this keeps the drawn line calm
@@ -81,6 +94,16 @@ export function ExpeditionController({
     awaySinceRef.current = null
     askedRef.current = false
     hereAtRef.current = 0
+    /* gdzie stoi auto tej wyprawy; dociagane w tle, bo siedzi w IndexedDB */
+    carRef.current = null
+    void listMarks()
+      .then((list) => {
+        const car = list.find(
+          (m) => m.kind === 'car' && m.journeyId === expRef.current?.id && m.coords,
+        )
+        carRef.current = car?.coords ?? null
+      })
+      .catch(() => {})
     const quest = questForPark(parkId)
     const feature = (parksData as unknown as { features: ParkFeature[] }).features.find(
       (f) => f.id === parkId,
@@ -134,11 +157,23 @@ export function ExpeditionController({
               if (awaySinceRef.current == null) awaySinceRef.current = now
               else if (now - awaySinceRef.current >= AWAY_HOLD_MS) {
                 askedRef.current = true
-                cbRef.current.onFarAway(Math.round(away), hereAtRef.current)
+                cbRef.current.onFarAway(Math.round(away), hereAtRef.current, 'away')
               }
             } else {
-              /* miedzy 150 m a kilometrem: ani nie na miejscu, ani nie daleko */
+              /* miedzy progami: ani nie na miejscu, ani nie na tyle daleko */
               awaySinceRef.current = null
+            }
+
+            /* albo po prostu wrociles pod auto, po dobrym spacerze */
+            const startedAt = expRef.current?.startedAt ?? now
+            if (
+              !askedRef.current &&
+              carRef.current &&
+              now - startedAt >= CAR_MIN_WALK_MS &&
+              distanceM(raw, carRef.current) <= CAR_BACK_M
+            ) {
+              askedRef.current = true
+              cbRef.current.onFarAway(Math.round(away), hereAtRef.current, 'car')
             }
           }
 
