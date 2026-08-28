@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.116.0'
+export const VERSION = '0.116.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,16 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.116.1',
+    date: '2026-08-28',
+    title: 'The discoveries map starts under a light bar',
+    tldr:
+      'Zakladka Odkrycia przelaczala na ciemno caly ekran razem z paskiem i tabami. Teraz gora zostaje jasna, a chmury zaczynaja sie dokladnie pod przelacznikiem.',
+    changes: [
+      ['changed', 'Opening Odkrycia no longer repaints the bar and the tabs dark. The top of the screen stays light in both tabs and only the cloud map below is dark, so the switch keeps one colour whichever side you are on'],
+    ],
+  },
   {
     version: '0.116.0',
     date: '2026-08-28',

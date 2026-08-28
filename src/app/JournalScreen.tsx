@@ -24,12 +24,13 @@ export function JournalScreen({
 }) {
   const [tab, setTab] = useState<JournalTab>(initialTab)
   const { journeys } = useGameState()
-  useLightChrome(tab === 'pamietnik')
+  /* gora ekranu jest jasna w obu zakladkach, wiec i pasek systemowy */
+  useLightChrome(true)
 
   const rows = useMemo(() => [...journeys].sort((a, b) => b.startedAt - a.startedAt), [journeys])
 
   return createPortal(
-    <div className={`jrnl${tab === 'odkrycia' ? ' -dark' : ''}`}>
+    <div className="jrnl">
       <NavBar
         className="jrnl__nav"
         title="Pamiętnik"

@@ -6414,9 +6414,12 @@
   background: var(--bg-page);
 }
 
-.jrnl.-dark {
-  background: #0f1a0d;
-}
+/*
+ * Ciemne jest TYLKO pole mapy, nie caly ekran (Jarek 2026-08-28). Wczesniej
+ * zakladka Odkrycia przelaczala na ciemno wszystko razem z paskiem i tabami,
+ * przez co przelacznik zmienial kolor przy kazdym tapnieciu. Teraz gora
+ * zostaje bialym paskiem, a chmury zaczynaja sie pod nia.
+ */
 
 .jrnl__nav {
   flex: none;
@@ -6427,10 +6430,6 @@
   padding: var(--sp-2) var(--sp-6) var(--sp-3);
 }
 
-.jrnl.-dark .jrnl__seg {
-  /* przelacznik na ciemnym: wlasna wyspa, zeby nie znikl na mapie chmur */
-  background: rgb(15 26 13 / 0.88);
-}
 
 .jrnl__body {
   flex: 1;
@@ -6641,6 +6640,9 @@
 .jrnl__disc {
   position: relative;
   flex: 1;
+  /* mapa chmur wchodzi pod jasna gore wlasnym, ciemnym tlem */
+  background: #0f1a0d;
+  overflow: hidden;
 }
 
 .discscreen.-embedded {
