@@ -25,11 +25,16 @@ type ParkLike = { id: string; properties?: { trip?: string; test?: boolean } }
 /** czy to miejsce z wyprawy (a nie z kolekcji krakowskiej) */
 export const isTripPark = (f: ParkLike) => f.properties?.trip != null
 
+/** poligon testowy: rozpoznajemy po prefiksie, bo nazwa zmienia się co test */
+export const isTestPark = (f: ParkLike) => f.id.startsWith('test-') || f.properties?.test === true
+
 /**
- * Czy miejsce liczy się do kolekcji Krakowa. Poligon testowy przy Piltza
- * odpada z tego samego powodu co wyprawa: jest w pliku, ale nie jest miastem.
+ * Czy miejsce liczy się do kolekcji Krakowa. Poligon testowy odpada z tego
+ * samego powodu co wyprawa: jest w pliku, ale nie jest miastem. Sprawdzamy
+ * prefiks, a nie konkretne id, bo poprzednie („test-piltza") zdążyło już
+ * zniknąć, a filtr z jego nazwą został i nic nie robił.
  */
-export const countsForKrakow = (f: ParkLike) => f.id !== 'test-piltza' && f.properties?.trip == null
+export const countsForKrakow = (f: ParkLike) => !isTestPark(f) && f.properties?.trip == null
 
 const HOME_KEY = 'pk-trip-home'
 

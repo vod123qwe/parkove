@@ -36,7 +36,52 @@ if (!files.length) {
 }
 
 /** make edge-connected light pixels transparent */
+/**
+ * Wycina tlo flood fillem od krawedzi.
+ *
+ * Kolor tla BIERZEMY Z NAROZNIKOW, zamiast zakladac biel. Poprzednia wersja
+ * usuwala tylko piksele prawie biale, wiec naklejka przyslana na CZARNYM tle
+ * (park-jordana) wychodzila z czarnym prostokatem dookola: fill nie mial sie
+ * po czym rozlac, a walidator przepuszczal ja, bo przezroczystych pikseli i
+ * tak bylo ponad 5% (same rogi po dopasowaniu do kwadratu).
+ *
+ * Gdy naczoniki nie zgadzaja sie ze soba, znaczy ze w rogu siedzi grafika:
+ * wracamy wtedy do bieli, czyli do starego zachowania.
+ */
 function cutout(buf, w, h) {
+  const at = (x, y) => {
+    const d = (y * w + x) * 4
+    return [buf[d], buf[d + 1], buf[d + 2]]
+  }
+  /*
+   * Kolor tla = najczestszy kolor WSROD NIEPRZEZROCZYSTYCH pikseli krawedzi.
+   *
+   * Braly go kiedys same narozniki i to sie sypalo dwa razy: przy naklejce na
+   * czarnym tle (park-jordana) oraz przy takiej, ktora miala juz wyciete rogi,
+   * a wzdluz krawedzi dalej biegla jasnoszara ramka (krowoderski) - naroznik
+   * zwracal wtedy smieciowy kolor spod alfy 0. Moda z krawedzi radzi sobie
+   * z obydwoma, a dla zwyklej bieli daje ten sam wynik co wczesniej.
+   */
+  const votes = new Map()
+  const vote = (x, y) => {
+    const d = (y * w + x) * 4
+    if (buf[d + 3] <= 12) return
+    const key = `${buf[d] >> 3},${buf[d + 1] >> 3},${buf[d + 2] >> 3}`
+    votes.set(key, (votes.get(key) ?? 0) + 1)
+  }
+  for (let x = 0; x < w; x += 2) {
+    vote(x, 0)
+    vote(x, h - 1)
+  }
+  for (let y = 0; y < h; y += 2) {
+    vote(0, y)
+    vote(w - 1, y)
+  }
+  const top = [...votes.entries()].sort((a, b) => b[1] - a[1])[0]
+  const bg = top
+    ? top[0].split(',').map((n) => (Number(n) << 3) + 4)
+    : [255, 255, 255]
+
   const seen = new Uint8Array(w * h)
   const stack = []
   const push = (x, y) => {
@@ -44,9 +89,11 @@ function cutout(buf, w, h) {
     const k = y * w + x
     if (seen[k]) return
     const d = k * 4
-    const light =
-      buf[d] > 255 - BG_TOLERANCE && buf[d + 1] > 255 - BG_TOLERANCE && buf[d + 2] > 255 - BG_TOLERANCE
-    if (!light && buf[d + 3] > 12) return
+    const isBg =
+      Math.abs(buf[d] - bg[0]) <= BG_TOLERANCE &&
+      Math.abs(buf[d + 1] - bg[1]) <= BG_TOLERANCE &&
+      Math.abs(buf[d + 2] - bg[2]) <= BG_TOLERANCE
+    if (!isBg && buf[d + 3] > 12) return
     seen[k] = 1
     buf[d + 3] = 0
     stack.push(k)
@@ -86,9 +133,9 @@ async function verifyTransparency(file) {
     if (data[i] === 0) transparent++
   }
   const ratio = transparent / (info.width * info.height)
-  if (corners.some((alpha) => alpha !== 0) || ratio < 0.05) {
+  if (corners.some((alpha) => alpha !== 0) || ratio < 0.12) {
     throw new Error(
-      `stamp has no clean transparent surround (corners: ${corners.join(', ')}, transparent: ${(ratio * 100).toFixed(1)}%)`,
+      `stamp has no clean transparent surround (corners: ${corners.join(', ')}, transparent: ${(ratio * 100).toFixed(1)}%, prog 12%)`,
     )
   }
   return ratio
@@ -116,6 +163,11 @@ for (const file of files) {
   try {
     alphaRatio = await verifyTransparency(candidate)
     copyFileSync(candidate, out)
+  } catch (e) {
+    /* jedna wadliwa naklejka nie moze zatrzymac calej paczki: mowimy, ktora
+       i idziemy dalej, a dzialajacy plik zostaje nietkniety */
+    console.log(`  ODRZUCONA ${id}.png  ${e.message}`)
+    continue
   } finally {
     if (existsSync(candidate)) unlinkSync(candidate)
   }

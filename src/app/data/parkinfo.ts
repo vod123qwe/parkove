@@ -69,14 +69,7 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       verified: false,
     },
   },
-  'test-piltza': {
-    description: [
-      'Trasa testowa wzdłuż ulicy Piltza, od numeru 43 do 34: pół kilometra w jedną stronę i sześć punktów, na których sprawdzasz, czy aplikacja robi to, co ma robić w terenie.',
-      'Nie jest to park, ale trasa ma własną opowieść. Zaczyna się przy bloku o nazwie Bruksela, prowadzi obok przedszkoli i żłobków najmłodszej dzielnicy Krakowa, skręca do pomnika pacjentów szpitala w Kobierzynie zamordowanych w 1942 roku i kończy przy numerze 34, pod nazwiskiem lekarza, który ten szpital wywalczył.',
-      'Po testach usuniesz ją jedną komendą: npm run test-park:remove.',
-    ],
-    amenities: { playground: { has: true, note: 'Kilka placów zabaw między blokami, największy przy numerze 34.' }, food: { has: true, note: 'Kwiaty i Kawa oraz Dary Posejdona po drodze, Żabka i Groszek przy starcie.' }, verified: false },
-  },
+
   blonia: {
     photos: [
       { src: '/photos/park-blonia-zzm-1.jpg', credit: 'Fot. ZZM Kraków · zzm.krakow.pl' },

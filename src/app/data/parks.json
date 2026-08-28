@@ -7112,48 +7112,6 @@
     },
     {
       "type": "Feature",
-      "id": "test-piltza",
-      "properties": {
-        "name": "Trasa testowa Piltza",
-        "kind": "park",
-        "areaHa": 10.6,
-        "center": [
-          19.8896,
-          50.01305
-        ],
-        "test": true,
-        "id": "test-piltza"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              19.8878,
-              50.0112
-            ],
-            [
-              19.8914,
-              50.0112
-            ],
-            [
-              19.8914,
-              50.0149
-            ],
-            [
-              19.8878,
-              50.0149
-            ],
-            [
-              19.8878,
-              50.0112
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "type": "Feature",
       "id": "dolina-bolechowicka",
       "properties": {
         "id": "dolina-bolechowicka",

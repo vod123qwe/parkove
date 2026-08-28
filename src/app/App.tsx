@@ -63,6 +63,7 @@ import type { QuestPoi } from './data/quests'
 import parksData from './data/parks.json'
 import { plPunkty } from './naming'
 import './app.css'
+import { isTestPark } from './data/trip'
 
 const FEATURES = parksData.features as unknown as ParkFeature[]
 
@@ -247,7 +248,7 @@ export function App() {
   /* piny miejsc na mapie: ikona rodzaju, kolor stanu (grill 2026-08-24) */
   const parkPins = useMemo(
     () =>
-      FEATURES.filter((f) => f.id !== 'test-piltza').map((f) => ({
+      FEATURES.filter((f) => !isTestPark(f)).map((f) => ({
         id: f.id,
         kind: f.properties.kind,
         coords: f.properties.center as [number, number],
