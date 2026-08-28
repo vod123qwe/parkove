@@ -772,7 +772,9 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       "Zespół stawów na wschodnim skraju Krakowa, powstałych po wybieraniu żwiru. Woda, plaża, wędkarze i cisza, jakiej nie znajdziesz w żadnym parku w centrum.",
       "Latem jeden ze stawów działa jako kąpielisko z ratownikami, pozostałe zostają dla wędkarzy i ptaków. Wokół rosną łąki i zarośla, w których gniazduje sporo gatunków.",
       "To najdalszy punkt kolekcji i najbardziej wakacyjny: pół godziny jazdy z centrum, a klimat jak nad jeziorem w Polsce środkowej.",
-    ],
+          "Warto wiedzieć dwie rzeczy przed wyjazdem. Kąpielisko jest strzeżone i czynne od dziesiątej do osiemnastej, a w sezonie dojeżdża tu specjalna linia autobusowa spod dworca w Czyżynach, więc nie trzeba mieć auta. Przy plaży stoją sezonowe budki z jedzeniem i lodami, a obok jest plac zabaw.",
+      "Sam zespół liczy czternaście zbiorników i to jest właściwy powód, żeby zostać dłużej niż na plażowanie. Ścieżki między nimi dają godzinną pętlę, na której mija się i zagospodarowany brzeg, i ciche lustra wody w trzcinach.",
+],
     amenities: {
       playground: { has: true, note: "Plac zabaw przy kąpielisku, po stronie plaży." },
       food: { has: true, note: "Sezonowe bary i lodziarnia przy kąpielisku." },

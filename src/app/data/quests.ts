@@ -2731,6 +2731,48 @@ const KRAKOW_QUESTS: Quest[] = [
         coords: [20.15764, 50.05028],
         radius: 70,
       },
+      {
+        id: 'pomosty',
+        category: 'water',
+        name: 'Pływające pomosty',
+        teaser: 'Osiemnaście pomostów, które podnoszą się razem z wodą.',
+        description: [
+          'Wzdłuż brzegu zbiornika numer 1 leży kilkanaście pomostów. W OpenStreetMap są opisane jako pływające i to nie jest szczegół techniczny, tylko odpowiedź na pytanie, dlaczego akurat takie.',
+          'Zwykły pomost stoi na palach wbitych w dno i zakłada, że poziom wody jest mniej więcej stały. Tutaj woda pochodzi z wód gruntowych, więc lustro potrafi się przesunąć o kilkadziesiąt centymetrów między mokrym a suchym latem. Pomost na palach byłby raz za wysoko, raz pod wodą.',
+          'Latem służą do wchodzenia do wody i do leżenia, poza sezonem głównie wędkarzom. Z któregoś z nich widać większość zbiornika, więc to także najprostszy punkt widokowy w okolicy.',
+        ],
+        findHint:
+          'Wschodni i południowy brzeg zbiornika numer 1, blisko plaży. Idąc brzegiem miniesz kilka w ciągu paru minut.',
+        reveal:
+          'Te pomosty nie stoją na dnie, tylko unoszą się na wodzie i są przycumowane do brzegu. Dzięki temu zawsze są tuż nad lustrem, niezależnie od tego, jak wysoko stoi woda w danym roku. W zbiorniku zasilanym wodami gruntowymi to jedyne rozwiązanie, które nie wymaga przebudowy co kilka lat.',
+        sources: ['https://www.openstreetmap.org/'],
+        coords: [20.16032, 50.04862],
+        radius: 60,
+      },
+      {
+        id: 'jeziorka',
+        category: 'nature',
+        name: 'Czternaście jeziorek',
+        teaser: 'Nie mają nazw, tylko numery od jednego do czternastu.',
+        description: [
+          'Kąpielisko to jeden akwen z czternastu. Cały zespół ciągnie się na zachód i północ od plaży, a każdy zbiornik ma w rejestrach po prostu numer: od pierwszego do czternastego.',
+          'Idąc ścieżkami między nimi, mija się bardzo różne miejsca. Numer 1 jest zagospodarowany, z plażą i budkami. Kilka kolejnych to ciche lustra wody w trzcinach, gdzie latem nie ma nikogo poza wędkarzami. Najdalsze zarastają i powoli zmieniają się w mokradła.',
+          'To dobry powód, żeby przyjść tu na spacer, a nie tylko na plażowanie. Pętla wokół kilku zbiorników zajmuje godzinę i za każdym zakrętem wygląda inaczej.',
+        ],
+        findHint:
+          'Ścieżki na zachód i północ od kąpieliska. Najłatwiej trzymać się brzegu i skręcać tam, gdzie widać kolejną wodę.',
+        reveal:
+          'Numery zamiast nazw są śladem po tym, czym te zbiorniki były na papierze: kolejnymi wyrobiskami żwiru, a nie jeziorami. Nazwy dostaje się za historię, a te akweny są młodsze niż bloki Nowej Huty, na które poszedł wybrany stąd materiał.',
+        dilemma: {
+          question:
+            'Jedne zbiorniki zagospodarowano, inne zostawiono samym sobie i powoli zarastają. Co jest lepsze dla takiego miejsca?',
+          options: ['Zagospodarować więcej', 'Zostawić naturze', 'Tak jak teraz, po połowie'],
+          counterpoint:
+            'Zarastanie nie jest zaniedbaniem, tylko normalną koleją rzeczy: płytki zbiornik z czasem staje się mokradłem, a mokradła są rzadsze i cenniejsze przyrodniczo niż otwarta woda. Z drugiej strony miejsce, do którego nikt nie ma powodu przyjść, nie ma też nikogo, kto stanąłby w jego obronie, gdy przyjdzie plan zabudowy.',
+        },
+        coords: [20.15593, 50.05158],
+        radius: 90,
+      },
     ],
   },
   {

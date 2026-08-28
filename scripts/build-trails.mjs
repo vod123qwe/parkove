@@ -660,6 +660,25 @@ const MIN_M = 400
  * trails.ts po fakcie, zeby przezyly kazda regeneracje.
  */
 const ORDERED = {
+  'przylasek-rusiecki': [
+    {
+      id: 'wokol-jeziorek',
+      name: 'Pętla wokół jeziorek',
+      /*
+       * Opis miejsca obiecuje godzinna petle miedzy zbiornikami, wiec taka
+       * trasa musi istniec. Generator jej nie zlozyl: obwod calego obrysu to
+       * po nowym rysunku ponad 30 km, a trasa po samych punktach wyprawy
+       * omija zachodnia grupe akwenow.
+       */
+      via: [
+        [20.15962, 50.04833], // kapielisko i plaza
+        [20.15593, 50.05158], // zbiornik nr 2
+        [20.1505, 50.05112], // zbiornik nr 3
+        [20.15086, 50.04825], // zbiornik nr 4
+        [20.15962, 50.04833], // powrot na plaze
+      ],
+    },
+  ],
   'odeceixe-vila': [
     {
       id: 'do-morza',

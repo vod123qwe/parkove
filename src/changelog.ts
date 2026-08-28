@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.115.0'
+export const VERSION = '0.116.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.116.0',
+    date: '2026-08-28',
+    title: 'Przylasek Rusiecki is a whole set of lakes again',
+    tldr:
+      'Przylasek obejmowal tylko jeden zbiornik, a to zespol czternastu jeziorek. Obrys urosl z osiemnastu do stu dziewiecdziesieciu szesciu hektarow, doszly pomosty, jeziorka, budki, lody, place zabaw i petla na godzine.',
+    changes: [
+      ['fixed', 'The outline covered a single reservoir, which left the beaches, the food stalls, the playground and thirteen further lakes outside the place. It is redrawn from the water, beaches, piers and car parks that actually sit there'],
+      ['added', 'Two points: the floating piers, which rise and fall with groundwater instead of standing on posts, and the set of fourteen lakes that carry numbers rather than names'],
+      ['added', 'The seasonal food stalls, the ice cream stand by the beach and both playgrounds now show on the map, and the description says when the guarded swimming area is open and that a summer bus runs there'],
+      ['added', 'An hour long loop past four of the lakes, because the description promised one and the generator could not build it: the new outline is thirty kilometres around'],
+    ],
+  },
   {
     version: '0.115.0',
     date: '2026-08-28',

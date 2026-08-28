@@ -22,6 +22,15 @@ export const KIND_LABEL: Record<AmenityKind, string> = {
 }
 
 export const AMENITIES: Record<string, AmenitySpot[]> = {
+  /* Przylasek: budki bez nazw w OSM, czyli sezonowe. Nazwy opisowe, bo
+     „(bez nazwy)" na liscie nie pomaga nikomu, a te punkty realnie stoja. */
+  'przylasek-rusiecki': [
+    { id: 'przylasek-buda-1', name: 'Budka przy plaży', kind: 'fast_food', coords: [20.16065, 50.04846] },
+    { id: 'przylasek-buda-2', name: 'Druga budka przy zejściu', kind: 'fast_food', coords: [20.1606, 50.04825] },
+    { id: 'przylasek-lody', name: 'Lody przy kąpielisku', kind: 'ice_cream', coords: [20.16067, 50.04852] },
+    { id: 'przylasek-plac', name: 'Plac zabaw przy plaży', kind: 'playground', coords: [20.15828, 50.04744] },
+    { id: 'przylasek-plac-2', name: 'Plac zabaw od zachodu', kind: 'playground', coords: [20.15328, 50.04736] },
+  ],
   'zalew-nowohucki': [
     { id: 'zalew-huta-wita', name: 'Huta Wita Food Truck Park', kind: 'fast_food', coords: [20.04991, 50.08079] },
     { id: 'zalew-papa-gelato', name: 'Papa Gelato', kind: 'ice_cream', coords: [20.05104, 50.08127] },
