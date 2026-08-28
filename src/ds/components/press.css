@@ -1,65 +1,12 @@
 /*
- * Wciśnięcie: JEDNA zasada dla całego systemu (decyzja Jarka 2026-08-28):
- * element pod palcem robi się o 5% mniejszy i traci 10% krycia. Nic więcej.
+ * Nagrobek zasady wciśnięcia (2026-08-28, dwa akty w jeden dzień):
  *
- * Nagrobek morpha scale(1.07, 0.9): squash wzięty z rączki przepustnicy
- * rozjeżdżał litery na wierszach z tekstem (Wygląd) i był po prostu za mocny.
- * Rączka i tak już go nie używała, więc wariant -pull też wyleciał.
+ * 1. Squash morph scale(1.07, 0.9) z rączki przepustnicy rozjeżdżał litery
+ *    na wierszach z tekstem (Wygląd) i był za mocny.
+ * 2. Zastąpiła go globalna reguła scale 0.95 + opacity 0.9 (0.112.0),
+ *    ale Jarek po teście na telefonie kazał ją usunąć w całości.
  *
- * Dociśnięcie jest natychmiastowe (90 ms), powrót wyraźnie dłuższy i z lekkim
- * odbiciem, żeby puszczenie było widać. Wartości siedzą w tokenach, więc
- * app.css nigdzie nie wpisuje własnych liczb.
+ * Stan docelowy: ŻADNEJ animacji wciśnięcia. Dotykalne elementy odpowiadają
+ * kolorem (tło/overlay w swoich własnych stylach), nie ruchem. Klasa
+ * .pk-press została w markupie jako pusty haczyk na wypadek zmiany zdania.
  */
-:root {
-  --press-scale: 0.95;
-  --press-opacity: 0.9;
-  --press-release: 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/*
- * .pk-press = opt-in dla elementów spoza tej listy (ikonowe przyciski mapy,
- * wiersze Wyglądu, kafle edytora). Reszta selektorów to dotykalne elementy DS,
- * które dostają zasadę bez zmian w markupie. Segmented i uchwyty przeciągania
- * zostają poza listą: tam skala kłóciłaby się z suwakiem albo gestem.
- */
-.pk-press,
-.pk-btn,
-.pk-chip,
-button.pk-listitem,
-button.pk-storycard__tap,
-.pk-stamp.-tappable {
-  transform-origin: center;
-}
-
-.pk-press,
-.pk-btn,
-button.pk-listitem,
-button.pk-storycard__tap {
-  transition:
-    transform var(--press-release),
-    opacity var(--press-release);
-}
-
-.pk-press:active,
-.pk-btn:active:not(:disabled),
-.pk-chip:active,
-button.pk-listitem:active,
-button.pk-storycard__tap:active,
-.pk-stamp.-tappable:active {
-  transform: scale(var(--press-scale));
-  opacity: var(--press-opacity);
-  transition-duration: 90ms;
-}
-
-/* mniej ruchu na życzenie systemu: zostaje samo przygaszenie, bez skali */
-@media (prefers-reduced-motion: reduce) {
-  .pk-press:active,
-  .pk-btn:active:not(:disabled),
-  .pk-chip:active,
-  button.pk-listitem:active,
-  button.pk-storycard__tap:active,
-  .pk-stamp.-tappable:active {
-    transform: none;
-    transition: none;
-  }
-}

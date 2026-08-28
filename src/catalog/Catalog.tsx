@@ -46,6 +46,7 @@ import {
   Switch,
   Stat,
   StatGrid,
+  Polaroid,
   StoryCard,
   Toast,
 } from '../ds'
@@ -783,14 +784,20 @@ export function Catalog() {
         <Section
           id="storycard"
           title="Story card"
-          lead="One chronological chapter with a route, photograph or illustration in the same visual slot. Use it in memory feeds, not as a generic navigation row."
+          lead="One chronological chapter in a memory feed. Text runs the full width, photographs sit under it as small polaroids in the gallery slot, and the single action stretches across the card. No chevron: the whole card is the tap target."
         >
           <div className="cat-spec cat-storydemo">
             <StoryCard
               eyebrow="18 sierpnia 2026"
               title="Wieczór na Skałkach"
               meta="Skałki Twardowskiego · 2,8 km · 48 min"
-              visual={<div className="cat-storydemo__route"><Route size={34} /></div>}
+              gallery={
+                <>
+                  <Polaroid src={`${import.meta.env.BASE_URL}demo/skalki-sunset.jpg`} tilt={-2.4} />
+                  <Polaroid src={`${import.meta.env.BASE_URL}demo/skalki-rocks.jpg`} tilt={1.8} />
+                  <Polaroid src={`${import.meta.env.BASE_URL}demo/skalki-path.jpg`} tilt={-1.1} />
+                </>
+              }
               onClick={() => {}}
               action={<Button variant="tonal">Przeglądaj 4 wspomnienia</Button>}
             >

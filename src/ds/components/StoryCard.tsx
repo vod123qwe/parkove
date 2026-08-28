@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { ChevronRight } from 'lucide-react'
 import { cx } from '../cx'
 import './storycard.css'
 
@@ -7,29 +6,32 @@ export type StoryCardProps = {
   eyebrow?: string
   title: string
   meta?: string
-  visual?: ReactNode
+  /** polaroidy albo kafle trasy, pełną szerokością pod treścią */
+  gallery?: ReactNode
   children?: ReactNode
+  /** jedna akcja na całą szerokość karty */
   action?: ReactNode
   onClick?: () => void
   className?: string
 }
 
-/**
- * A roomy, editorial card for one chapter in a chronological feed.
- * Its visual is a slot, so a route, photograph or illustration still uses
- * the same card and the same interaction pattern.
+/*
+ * Karta jednego rozdziału w chronologicznym feedzie. Przebudowa 2026-08-28
+ * (Jarek): bez chevrona i bez zdjęcia z lewej. Treść idzie pełną szerokością
+ * z większymi odstępami, zdjęcia leżą pod nią jako polaroidy (DS Polaroid),
+ * a akcja rozciąga się na całą kartę. Galeria siedzi wewnątrz przycisku
+ * karty, więc jej elementy NIE mogą być klikalne (Polaroid bez onClick).
  */
-export function StoryCard({ eyebrow, title, meta, visual, children, action, onClick, className }: StoryCardProps) {
+export function StoryCard({ eyebrow, title, meta, gallery, children, action, onClick, className }: StoryCardProps) {
   const content = (
     <>
-      {visual != null && <span className="pk-storycard__visual">{visual}</span>}
       <span className="pk-storycard__body">
         {eyebrow != null && <span className="pk-storycard__eyebrow">{eyebrow}</span>}
         <span className="pk-storycard__title">{title}</span>
         {meta != null && <span className="pk-storycard__meta">{meta}</span>}
         {children}
       </span>
-      {onClick != null && <ChevronRight className="pk-storycard__chevron" aria-hidden="true" />}
+      {gallery != null && <span className="pk-storycard__gallery">{gallery}</span>}
     </>
   )
 

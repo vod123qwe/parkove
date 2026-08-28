@@ -16,9 +16,7 @@
   transition:
     background var(--motion-fast) var(--ease-out),
     border-color var(--motion-fast) var(--ease-out),
-    color var(--motion-fast) var(--ease-out),
-    transform var(--press-release),
-    opacity var(--press-release);
+    color var(--motion-fast) var(--ease-out);
 }
 
 .pk-chip:hover {

@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.112.0'
+export const VERSION = '0.113.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.113.0',
+    date: '2026-08-28',
+    title: 'The journal reads like a journal',
+    tldr:
+      'Karty wypraw w Pamietniku maja wiecej powietrza i polaroidowe miniaturki, przycisk idzie na cala szerokosc, klik w wyprawe naprawde ja otwiera, a animacja wciskania znikla.',
+    changes: [
+      ['fixed', 'Tapping a walk in Pamietnik opens it now. The journey screen lives inside the app shell, so the profile modal always covered it and a tap seemed to bounce back to the menu. Opening a walk now puts the menu away and closing it brings Pamietnik right back'],
+      ['changed', 'Chapter cards breathe: text runs the full width with larger padding, photographs sit under the story as small tilted polaroids instead of one square on the left, and the browse action stretches across the whole card. The chevron is gone, the whole card is the tap target'],
+      ['changed', 'Sections of the journal page sit much further apart, so the header, the numbers, the filters and the timeline each get their own room'],
+      ['changed', 'The press animation rule from the previous release is removed on request. Touchable things answer with colour, not with movement'],
+    ],
+  },
   {
     version: '0.112.0',
     date: '2026-08-28',

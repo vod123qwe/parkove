@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
 import { Camera, Footprints, Mic, Route, Sparkles, StickyNote } from 'lucide-react'
-import { Button, Chip, Stat, StatGrid, StoryCard } from '../ds'
+import { Button, Chip, Polaroid, Stat, StatGrid, StoryCard } from '../ds'
 import type { Journey } from './state'
 import { useMarks } from './photos'
 import type { WalkMark } from './photos'
@@ -44,6 +45,9 @@ const DEMO_MARKS: Array<WalkMark & { url?: string }> = [
   { id: 'demo-photo-path', kind: 'photo', parkId: 'skalki-twardowskiego', journeyId: 'demo-skalki', caption: 'Ścieżka była węższa, niż pamiętałem.', at: new Date(2026, 7, 18, 18, 18).getTime(), coords: [19.9060, 50.0428], url: asset('demo/skalki-path.jpg') },
   { id: 'demo-note-zakrzowek', kind: 'note', parkId: 'zakrzowek', journeyId: 'demo-zakrzowek', caption: 'Wrócić tu jesienią, o tej samej porze.', at: new Date(2026, 6, 27, 8, 4).getTime() },
 ]
+
+/* przechyly miniaturek: deterministyczne, zeby rzad wygladal na odlozony reka */
+const TILTS = [-2.4, 1.8, -1.1]
 
 const park = (id: string) =>
   (parksData as { features: Array<{ id: string; properties: { name: string } }> })
@@ -146,7 +150,6 @@ export function MemoryJournal({ journeys, onOpenJourney }: { journeys: Journey[]
             const photos = mine.filter((mark) => mark.kind === 'photo' && mark.url)
             const notes = mine.filter((mark) => mark.kind === 'note')
             const audio = mine.filter((mark) => mark.kind === 'audio')
-            const firstPhoto = photos[0]
             const previous = shown[index - 1]
             const startsMonth = !previous || month(previous.startedAt) !== month(journey.startedAt)
             const memories = [
@@ -162,7 +165,17 @@ export function MemoryJournal({ journeys, onOpenJourney }: { journeys: Journey[]
                   eyebrow={date(journey.startedAt)}
                   title={journey.name ?? park(journey.parkId)}
                   meta={`${park(journey.parkId)} · ${(journey.distanceM / 1000).toFixed(1).replace('.', ',')} km · ${duration(journey.endedAt - journey.startedAt)}`}
-                  visual={firstPhoto?.url ? <img src={firstPhoto.url} alt="" /> : <MiniRoute track={journey.track} />}
+                  gallery={
+                    photos.length ? (
+                      photos.slice(0, 3).map((photo, at) => (
+                        <Polaroid key={photo.id} src={photo.url ?? ''} tilt={TILTS[at % TILTS.length]} />
+                      ))
+                    ) : (
+                      <span className="pk-storycard__tile" style={{ '--pk-tilt': '-1.6deg' } as CSSProperties}>
+                        <MiniRoute track={journey.track} />
+                      </span>
+                    )
+                  }
                   onClick={() => demo ? setMemoryId(mine[0]?.id ?? null) : onOpenJourney(journey.id)}
                   action={mine.length ? (
                     <Button variant="tonal" onClick={() => setMemoryId(mine[0].id)}>
@@ -180,11 +193,6 @@ export function MemoryJournal({ journeys, onOpenJourney }: { journeys: Journey[]
                         ? `${journey.points.length} ${plural(journey.points.length, 'odkryty punkt', 'odkryte punkty', 'odkrytych punktów')}`
                         : 'Został ślad tej drogi'}
                   </span>
-                  {photos.length > 1 && (
-                    <span className="memjrnl__thumbs" aria-hidden="true">
-                      {photos.slice(1, 4).map((photo) => <img key={photo.id} src={photo.url} alt="" />)}
-                    </span>
-                  )}
                 </StoryCard>
               </section>
             )

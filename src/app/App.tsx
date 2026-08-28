@@ -177,6 +177,14 @@ export function App() {
   /* jeden ekran wypraw i odkryc (Jarek: polaczyc); null = zamkniety */
   const [journalOpen, setJournalOpen] = useState(false)
   /*
+   * Wyprawa otwarta Z PAMIETNIKA musi na czas ogladania schowac profil i
+   * pamietnik: ekran wyprawy (.jscreen) zyje wewnatrz .app-shell (fixed =
+   * wlasny kontekst stosu), wiec modal profilu portalowany do body ZAWSZE
+   * go przykryje, niezaleznie od z-indexow w srodku. Objaw: klik w wyprawe
+   * "wracal do menu". Po zamknieciu wyprawy wracamy tu, skad przyszlismy.
+   */
+  const [journalReturn, setJournalReturn] = useState(false)
+  /*
    * Jeden ekran wygladu (motyw + mapa) i jeden o aplikacji, zamiast czterech
    * wejsc rozsypanych po menu i profilu. Uwaga na nazwe: looksOpen nizej to
    * szybki przelacznik stylu NA mapie, co innego niz ten ekran.
@@ -1362,7 +1370,9 @@ export function App() {
         <JournalScreen
           onClose={() => setJournalOpen(false)}
           onOpenJourney={(id) => {
+            setMenuOpen(false)
             setJournalOpen(false)
+            setJournalReturn(true)
             clearSelection()
             setJourneyId(id)
           }}
@@ -1373,7 +1383,14 @@ export function App() {
         <JourneyScreen
           journey={journey}
           parkName={journeyPark.properties.name}
-          onClose={() => setJourneyId(null)}
+          onClose={() => {
+            setJourneyId(null)
+            if (journalReturn) {
+              setJournalReturn(false)
+              setMenuOpen(true)
+              setJournalOpen(true)
+            }
+          }}
         />
       )}
 

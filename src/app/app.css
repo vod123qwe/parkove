@@ -1631,11 +1631,6 @@
     transform 120ms ease;
 }
 
-.plantcam__shutter:active {
-  transform: scale(var(--press-scale));
-  opacity: var(--press-opacity);
-}
-
 .plantcam__shutter.-ok {
   background: var(--bg-lime);
   border-color: rgb(255 255 255 / 0.75);
@@ -1849,8 +1844,6 @@
 }
 
 .app-nextstop:active:not(:disabled) {
-  transform: scale(var(--press-scale));
-  opacity: var(--press-opacity);
   background: var(--bg-surface-sunken);
 }
 
@@ -2021,14 +2014,11 @@
 
 /* dotknięcie: przycisk się ugina i szkło na moment jaśnieje */
 .app-expaction__btn:active:not(:disabled) {
-  transform: scale(var(--press-scale));
-  opacity: var(--press-opacity);
   background: rgb(16 22 16 / 0.68);
   border-color: rgb(255 255 255 / 0.34);
 }
 
 .app-expaction__btn.-primary:active {
-  transform: scale(var(--press-scale));
   background: var(--bg-lime);
   box-shadow: 0 0 0 10px rgb(201 242 77 / 0.22);
 }
@@ -3174,11 +3164,6 @@
   transition: transform var(--motion-fast) var(--ease-out);
 }
 
-.app-addmenu__x:active {
-  transform: scale(var(--press-scale));
-  opacity: var(--press-opacity);
-}
-
 .app-addmenu__catch {
   position: fixed;
   inset: 0;
@@ -4250,19 +4235,11 @@
   animation: memory-rise 380ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.memplay__memory:active {
-  transform: scale(var(--press-scale));
-  opacity: var(--press-opacity);
-}
-
 /* notatka i nagranie nie prowadza nigdzie, wiec nie zachowuja sie jak przycisk */
 .memplay__memory.-flat {
   cursor: default;
 }
 
-.memplay__memory.-flat:active {
-  transform: none;
-}
 
 /* a quiet hint that there is more behind a point */
 .memplay__more {
@@ -4886,8 +4863,6 @@
 }
 
 .app-chip.-link:active {
-  transform: scale(var(--press-scale));
-  opacity: var(--press-opacity);
   background: var(--bg-surface-sunken);
 }
 
@@ -6285,10 +6260,7 @@
   border-radius: 20px;
   corner-shape: var(--corner-smooth);
   background: var(--bg-surface-sunken);
-  transition:
-    background var(--motion-fast) var(--ease-out),
-    transform var(--press-release),
-    opacity var(--press-release);
+  transition: background var(--motion-fast) var(--ease-out);
 }
 
 .prof-cells .pk-listitem:not(.-featured):hover { background: var(--bg-mint); }
@@ -6475,7 +6447,7 @@
   padding-bottom: var(--sp-8);
 }
 
-.memjrnl__intro { padding: var(--sp-3) 0 var(--sp-5); }
+.memjrnl__intro { padding: var(--sp-4) 0 var(--sp-8); }
 
 .memjrnl__kicker {
   display: inline-flex;
@@ -6504,15 +6476,15 @@
   color: var(--content-secondary);
 }
 
-.memjrnl__stats { margin-bottom: var(--sp-5); }
+.memjrnl__stats { margin-bottom: var(--sp-8); }
 
 .memjrnl__demo {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
-  margin: calc(var(--sp-2) * -1) 0 var(--sp-4);
-  padding: var(--sp-3);
+  margin: 0 0 var(--sp-6);
+  padding: var(--sp-3) var(--sp-4);
   border-radius: var(--radius-md);
   background: var(--bg-mint);
   color: var(--content-accent);
@@ -6534,7 +6506,7 @@
 .memjrnl__filters {
   display: flex;
   gap: var(--sp-2);
-  margin: 0 calc(var(--sp-6) * -1) var(--sp-7);
+  margin: 0 calc(var(--sp-6) * -1) var(--sp-10);
   padding: 0 var(--sp-6) var(--sp-1);
   overflow-x: auto;
   scrollbar-width: none;
@@ -6548,7 +6520,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-6);
+  gap: var(--sp-8);
   padding-left: var(--sp-5);
 }
 
@@ -6566,7 +6538,7 @@
 
 .memjrnl__dot {
   position: absolute;
-  top: 33px;
+  top: 37px;
   left: calc(var(--sp-5) * -1 - 2px);
   width: 9px;
   height: 9px;
@@ -6577,7 +6549,7 @@
 }
 
 .memjrnl__month {
-  margin: 0 0 var(--sp-3);
+  margin: var(--sp-2) 0 var(--sp-4);
   color: var(--content-tertiary);
   font-size: 12px;
   line-height: 18px;
@@ -6601,7 +6573,7 @@
 
 .memjrnl__quote {
   display: -webkit-box;
-  margin-top: var(--sp-2);
+  margin-top: var(--sp-3);
   overflow: hidden;
   color: var(--content-secondary);
   font-family: var(--font-hand);
@@ -6612,15 +6584,12 @@
 }
 
 .memjrnl__remains {
-  margin-top: var(--sp-2);
+  margin-top: var(--sp-3);
   color: var(--content-secondary);
   font-size: 11px;
   line-height: 16px;
   font-weight: 650;
 }
-
-.memjrnl__thumbs { display: flex; gap: 4px; margin-top: var(--sp-2); }
-.memjrnl__thumbs img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
 
 .memjrnl__empty {
   display: flex;

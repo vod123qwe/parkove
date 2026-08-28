@@ -32,6 +32,10 @@
   opacity: 0.08;
 }
 
+.pk-btn:active::after {
+  opacity: 0.14;
+}
+
 
 .pk-btn.-md {
   height: var(--control-md);

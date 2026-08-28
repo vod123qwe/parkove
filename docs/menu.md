@@ -254,14 +254,30 @@ przywrocone tutaj.
 - **Reszta cellek**: biale podkladki pod ikonami (`leadSurface="paper"` w
   ListItem, wariant udokumentowany w katalogu). Ton zostaje w samej ikonie,
   wiec menu przestalo byc rzedem kolorowych plam.
-- **Wcisniecie**: JEDNA globalna zasada w `ds/components/press.css`:
-  scale 0.95 + opacity 0.9 (tokeny `--press-scale`, `--press-opacity`).
-  Squash morph scale(1.07, 0.9) skasowany, bo rozjezdzal litery na
-  wierszach Wygladu. app.css nigdzie nie wpisuje wlasnych liczb docisku,
-  tylko te tokeny.
+- **Wcisniecie**: BRAK animacji (0.113.0). Globalna zasada scale 0.95 +
+  opacity 0.9 z 0.112.0 przezyla jeden dzien: Jarek po tescie kazal ja
+  usunac w calosci. Dotykalne elementy odpowiadaja kolorem (tlo/overlay),
+  nie ruchem. Nagrobek w `ds/components/press.css`; klasa .pk-press
+  zostala w markupie jako pusty haczyk.
 
 GOTCHA (tokeny): `src/ds/tokens/colors.css` jest GENEROWANY. Reczne
 strojenie ikon pinow mapy bylo kiedys wpisane wprost w ten plik i pierwsza
 regeneracja (`npm run tokens`) je zgubila. Strojone hexy zyja teraz w
 `scripts/generate-colors.mjs` w bloku `statics`. Nie edytowac colors.css
 recznie, nigdy.
+
+## Karty wypraw w Pamietniku (0.113.0, decyzje Jarka)
+
+- StoryCard bez chevrona i bez zdjecia z lewej: tekst pelna szerokoscia
+  z wiekszymi paddingami (sp-6), zdjecia jako male przechylone polaroidy
+  (DS Polaroid, flex 1 z limitem 112 px, deterministyczne tilty) w slocie
+  `gallery`, akcja "Przegladaj wspomnienia" na cala szerokosc karty.
+  Wyprawa bez zdjec dostaje kafel sladu trasy w tej samej papierowej ramce
+  (`.pk-storycard__tile`).
+- Sekcje strony Pamietnika rozsuniete: intro sp-8, statystyki sp-8,
+  filtry sp-10, os czasu gap sp-8.
+- GOTCHA (naprawiony bug): ekran wyprawy `.jscreen` zyje WEWNATRZ
+  .app-shell (fixed = wlasny kontekst stosu), wiec modal profilu
+  portalowany do body zawsze go przykrywal - klik w wyprawe "wracal do
+  menu". Fix w App.tsx: otwarcie wyprawy z Pamietnika chowa menu i
+  pamietnik (flaga journalReturn), zamkniecie przywraca oba.
