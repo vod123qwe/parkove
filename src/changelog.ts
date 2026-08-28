@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.119.0'
+export const VERSION = '0.119.1'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.119.1',
+    date: '2026-08-29',
+    title: 'Miechow gets its outline, its photographs and its stamp',
+    tldr:
+      'Park w Miechowie nie mial obramowania na mapie, bo plik z granicami byl liczony przed jego dodaniem. Doszly tez zdjecia, pieczatka i piaty punkt: modrzewiowy Dworek Zacisze z 1784 roku.',
+    changes: [
+      ['fixed', 'Place outlines come from a separate generated file, last built before Miechow, Odeceixe and the redrawn Przylasek existed, so those four had no border on the map. Rebuilt: all fifty nine places have one again'],
+      ['added', 'Photographs of the park side of Miechow, found by searching Commons around the coordinates rather than by name, plus the park stamp'],
+      ['added', 'A fifth point: Dworek Zacisze, a larch manor from 1784 standing at the southern edge of the park, with the date cut into a ceiling beam. It is older than the United States and stood here while the manor inside the park burned'],
+    ],
+  },
   {
     version: '0.119.0',
     date: '2026-08-28',

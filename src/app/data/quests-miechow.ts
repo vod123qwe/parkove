@@ -71,8 +71,33 @@ export const MIECHOW_QUESTS: Quest[] = [
           'http://miechow.info/zabytki-miechowskie/',
           'https://pl.wikipedia.org/wiki/Bitwa_pod_Miechowem_(1863)',
         ],
+        photo: '/photos/miechow-dworek-c.jpg',
+        photoCredit: 'Fot. Januszk57 · CC BY-SA 4.0 · Wikimedia Commons',
         coords: [20.03674, 50.35765],
         radius: 60,
+      },
+      {
+        id: 'dworek',
+        category: 'monument',
+        name: 'Dworek Zacisze',
+        teaser: 'Modrzewiowy dwór z 1784 roku, z datą wyciętą na belce stropowej.',
+        description: [
+          'Przy Racławickiej, po południowej stronie parku, stoi parterowy dwór z modrzewia, w konstrukcji zrębowej, kryty łamanym dachem polskim. Uchodzi za jeden z najcenniejszych zabytków architektury staropolskiej w Małopolsce i należy do Szlaku Architektury Drewnianej.',
+          'Wiek budynku nie jest domysłem konserwatora. W izbie frontowej zachowała się belka stropowa z wyciętą datą: szesnasty sierpnia 1784 roku.',
+          'W latach 1981 do 1994 mieściło się tu Muzeum Kościuszkowskie, oddział muzeum regionalnego PTTK, ze zbiorami o Kościuszce i bitwie pod Racławicami z 1794 roku. Od 2011 roku budynkiem opiekuje się Biuro Wystaw Artystycznych „U Jaksy".',
+        ],
+        findHint:
+          'Ulica Racławicka 26, przy południowej granicy parku. Drewniany dom za białym płotem, trudno pomylić.',
+        reveal:
+          'Ten dom jest starszy od Stanów Zjednoczonych i stał tu już, gdy sto lat później palił się dwór w Wielkozagórzu, na terenie dzisiejszego parku. Tamten zniknął bez śladu, ten stoi dalej z datą na belce. Nazwa galerii, która dziś w nim mieszka, wraca zresztą do samego początku miasta: „U Jaksy", od rycerza, który w 1163 roku sprowadził tu bożogrobców.',
+        sources: [
+          'https://zabytek.pl/en/obiekty/miechow-dworek-zacisze-2',
+          'https://www.miechow.eu/kultura-rozrywka/biuro-wystaw-artystycznych-u-jaksy/dworek-zacisze/',
+        ],
+        photo: '/photos/miechow-dworek-a.jpg',
+        photoCredit: 'Fot. Januszk57 · CC BY-SA 4.0 · Wikimedia Commons',
+        coords: [20.0376, 50.35515],
+        radius: 45,
       },
       {
         id: 'ogrod-zen',

@@ -19,10 +19,16 @@ export type ParkInfo = {
 
 export const PARK_INFO: Record<string, ParkInfo> = {
   miechow: {
+    photos: [
+      { src: '/photos/miechow-dworek-a.jpg', credit: 'Fot. Januszk57 · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/miechow-dworek-c.jpg', credit: 'Fot. Januszk57 · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/miechow-dworek-b.jpg', credit: 'Fot. Januszk57 · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/miechow-miasto.jpg', credit: 'Fot. Adam Maś · CC BY-SA 3.0 · Wikimedia Commons' },
+    ],
     description: [
       'Park Miejski w Miechowie, trzydzieści kilometrów na północ od Krakowa, czyli wypad na pół dnia. Dwanaście hektarów po rewitalizacji za dwadzieścia milionów: fontanny, alejki, leżaki, stoły piknikowe, plenerowa biblioteczka i osobno ogrodzony Ogród Zen.',
       'Ciekawsze jest to, czego nie widać. Park leży na terenie dawnego majątku Wielko-Zagórze i to właśnie tutaj kończyły się wyjścia ze średniowiecznych podziemi, które zakonnicy sprowadzeni z Jerozolimy poprowadzili spod klasztoru na skarpie. Badacze szacują ich długość nawet na półtora kilometra.',
-      'Sam park istnieje dlatego, że stojącego tu dworu nigdy nie odbudowano po tym, jak spłonął w 1863 roku. Bazylika z kopią Grobu Bożego, przez którą Miechów nazywano Polską Jerozolimą, stoi niecały kilometr stąd i jest naturalnym przedłużeniem spaceru.',
+      'Sam park istnieje dlatego, że stojącego tu dworu nigdy nie odbudowano po tym, jak spłonął w 1863 roku. Przy jego południowej granicy stoi za to modrzewiowy Dworek Zacisze z 1784 roku, jeden z najcenniejszych drewnianych zabytków w Małopolsce. Bazylika z kopią Grobu Bożego, przez którą Miechów nazywano Polską Jerozolimą, stoi niecały kilometr stąd i jest naturalnym przedłużeniem spaceru.',
     ],
     amenities: {
       food: { has: true, note: 'Kawiarnie i restauracje przy rynku, kilkanaście minut spacerem.' },
