@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.119.1'
+export const VERSION = '0.120.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.120.0',
+    date: '2026-08-29',
+    title: 'Odeceixe gains a twelfth century tower and a reason for a beach name',
+    tldr:
+      'Wyprawa dostala piaty punkt: sredniowieczna wieze nad rzeka, ktora pilnowala tej samej granicy co dzisiejszy most, a potem pobierala myto. Nazwa Praia das Adegas przestala byc przypadkiem.',
+    changes: [
+      ['added', 'A fifth point on the walk: the remains of a medieval tower above the Seixe valley, found during a survey in 1988 and dug from 2007. Circular plan, a walled enclosure with small rooms, finds from the twelfth and thirteenth centuries, and researchers asking whether it is a previously undescribed type of defensive building'],
+      ['changed', 'The border story is no longer only about provinces on a modern map. After the Christian conquest the tower probably collected tolls, so this river crossing has been watched and paid for since the twelfth century'],
+      ['changed', 'Praia das Adegas explains its own name: adega is a wine cellar, seventeen of them once worked in the village at the same time, and one has been a museum since 1992 with an interior recreated from the nineteen twenties and forties'],
+      ['changed', 'The walk area now reaches the tower, so the place covers the valley rather than just the village'],
+    ],
+  },
   {
     version: '0.119.1',
     date: '2026-08-29',

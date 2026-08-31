@@ -37,7 +37,7 @@ export const ODECEIXE_QUESTS: Quest[] = [
         findHint:
           'Most drogi krajowej EN 120, kilkaset metrów na północ od centrum wsi. Stań przy barierce i spójrz w dół rzeki, w stronę oceanu.',
         reveal:
-          'Przechodząc tym mostem zmieniasz prowincję: północny brzeg to już Alentejo, południowy to Algarve. Granica biegnie środkiem wody, którą widzisz pod sobą. A nazwa wsi jest zapisem po dwóch cywilizacjach naraz: arabskie wād, czyli rzeka, plus portugalskie Seixe. Ten most jest też jedyną drogą do najstarszego śladu ludzi w tej dolinie: muszlowisko leży na tamtym brzegu.',
+          'Przechodząc tym mostem zmieniasz prowincję: północny brzeg to już Alentejo, południowy to Algarve. Granica biegnie środkiem wody, którą widzisz pod sobą. A nazwa wsi jest zapisem po dwóch cywilizacjach naraz: arabskie wād, czyli rzeka, plus portugalskie Seixe. Ta granica nie jest zresztą pomysłem nowoczesnej administracji: kilometr w górę doliny stoją resztki wieży z dwunastego wieku, która pilnowała tego przejścia, a potem pobierała tu myto.',
         dilemma: {
           question:
             'Granicę poprowadzono rzeką. Rzeka jest jednak tym, co obie strony łączy: ta sama woda, te same ryby, ten sam most, po którym się chodzi do sąsiada. Co właściwie robi rzeka na mapie?',
@@ -48,6 +48,34 @@ export const ODECEIXE_QUESTS: Quest[] = [
         sources: ['https://en.wikipedia.org/wiki/Odeceixe'],
         coords: [-8.76549, 37.43445],
         radius: 45,
+      },
+      {
+        id: 'torre',
+        category: 'history',
+        name: 'Wieża nad rzeką',
+        teaser: 'Granica na tej rzece jest pilnowana od ośmiuset lat.',
+        description: [
+          'Nad doliną Seixe, kilometr od mostu, leżą resztki średniowiecznej wieży. Znaleziono ją dopiero w 1988 roku podczas prospekcji terenowej, a wykopaliska ruszyły w 2007.',
+          'Główna budowla miała plan kolisty i wchodziła w skład obwodu murowanego z małymi pomieszczeniami, prawdopodobnie dla załogi. Znalezione przedmioty datują się na dwunasty i trzynasty wiek. Obok są jeszcze ślady drugiej wieży.',
+          'Wieża należała do sieci fortyfikacji, która pilnowała tego skrawka wybrzeża przed nadchodzącymi wojskami. Archeolodzy zastanawiają się nawet, czy nie jest to nowy, nieopisany dotąd typ budowli obronnej.',
+        ],
+        findHint:
+          'Zbocze nad rzeką po wschodniej stronie doliny, około kilometra w górę od mostu. To stanowisko archeologiczne, nie ruina do wejścia: szukaj resztek murów w trawie.',
+        reveal:
+          'Po chrześcijańskim podboju wieża dostała nowe zadanie: prawdopodobnie pobierano tu myto, zanim ją porzucono na dobre. To znaczy, że granica, którą dziś wyznacza rzeka pod mostem, była tu pilnowana i opłacana już osiemset lat temu, tylko wtedy nie dzieliła prowincji, a dwa różne światy.',
+        dilemma: {
+          question:
+            'Wieża pilnowała granicy, potem brała myto, w końcu została porzucona. Dziś granica jest tylko linią na mapie, po której nikt nie pobiera opłat. Co się właściwie zmieniło?',
+          options: ['Granice zmiękły', 'Zmienił się tylko sposób poboru', 'Granica przeniosła się dalej'],
+          counterpoint:
+            'Można powiedzieć, że nic: myto wciąż istnieje, tylko pobiera się je na autostradzie i w podatku, a nie przy brodzie. Ale różnica jest odczuwalna dla przechodnia: tę granicę przekracza się dziś na piechotę, nie zauważając, i to jest zmiana, o którą ludzie po obu stronach tej rzeki bili się przez kilka stuleci.',
+        },
+        sources: [
+          'https://atlas.cimal.pt/drupal/?q=pt-pt%2Fnode%2F248',
+          'https://www.academia.edu/1556971/Trabalhos_arqueol%C3%B3gicos_na_Torre_de_Odeceixe_Aljezur_Primeiros_resultados_2007_2009_',
+        ],
+        coords: [-8.75362, 37.42801],
+        radius: 70,
       },
       {
         id: 'concheiro',
@@ -180,6 +208,7 @@ export const ODECEIXE_QUESTS: Quest[] = [
         teaser: 'Sąsiednia plaża, oficjalnie naturystyczna. Warto wiedzieć przed wyjściem zza skały.',
         description: [
           'Tuż na południe od plaży w ujściu, za skalnym cyplem, leży Praia das Adegas. Jest to jedna z niewielu oficjalnie wyznaczonych plaż naturystycznych w Portugalii i tak też jest oznaczona w terenie oraz na mapach.',
+          'Nazwa nie ma z tym nic wspólnego i mówi o czymś zupełnie innym: „adega" to po portugalsku piwnica na wino. W Odeceixe działało ich kiedyś siedemnaście naraz, a od 1992 roku jedna z nich jest muzeum, w którym odtworzono wnętrze z lat dwudziestych i czterdziestych, razem z beczkami i narzędziami zebranymi ze starych domów w okolicy.',
           'Wyznaczanie takich plaż jest w Portugalii uregulowane, więc nie jest to zwyczaj, który się przyjął, tylko decyzja z tabliczką. Dzięki temu wiadomo, gdzie się kończy jedna konwencja, a zaczyna druga, i nikt nikogo nie zaskakuje.',
           'Dojście prowadzi ścieżką po klifie, z górnego parkingu, i jest bardziej strome niż zejście na plażę główną.',
         ],

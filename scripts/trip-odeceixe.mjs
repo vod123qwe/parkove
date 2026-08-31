@@ -37,6 +37,7 @@ const PLACES = [
       [-8.77097, 37.43237], // igreja matriz
       [-8.78054, 37.43692], // concheiro de montes de baixo
       [-8.76549, 37.43445], // most EN 120 nad Ribeira de Seixe
+      [-8.75362, 37.42801], // Torre de Odeceixe, sredniowieczna wieza nad rzeka
     ],
   },
   {
