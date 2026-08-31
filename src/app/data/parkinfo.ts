@@ -54,6 +54,17 @@ export const PARK_INFO: Record<string, ParkInfo> = {
       verified: false,
     },
   },
+  aljezur: {
+    description: [
+      'Siedemnaście kilometrów na południe od Odeceixe, czyli wyjazd na dzień z autem. Małe miasteczko nad rzeką, z ruinami zamku na łupkowym wzgórzu i starym miastem pod nim.',
+      'Zamek postawili Maurowie w dziesiątym wieku, a w 1249 roku został zdobyty jako ostatni maurski zamek w Algarve. Wewnątrz murów stoi sklepiona cysterna arabska, od której zależało, jak długo obrona wytrzyma.',
+      'Druga rzecz, z której miasteczko jest znane, to słodki ziemniak z europejskim znakiem IGP i festiwalem pod koniec listopada. Towarzyszy mu legenda, której nie da się uratować żadną interpretacją, i właśnie dlatego jest ciekawa.',
+    ],
+    amenities: {
+      food: { has: true, note: 'Kawiarnie i restauracje przy moście w centrum, kilka minut od zamku.' },
+      verified: false,
+    },
+  },
   'odeceixe-foz': {
     photos: [
       { src: '/photos/odeceixe-praia-a.jpg', credit: 'Fot. Vítor Oliveira · CC BY-SA 2.0 · Wikimedia Commons' },

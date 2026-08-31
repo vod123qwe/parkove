@@ -6,6 +6,7 @@ import { questForPark } from './data/quests'
 import type { QuestPoi } from './data/quests'
 import { useGameState } from './state'
 import { distanceM, formatDistance } from './geo'
+import { revealNow } from './reveal'
 
 export function RevealSheet({
   parkId,
@@ -38,7 +39,7 @@ export function RevealSheet({
       <p className="reveal-kicker t-caption">
         <Sparkles size={14} /> Odkryte: punkt {done} z {total}
       </p>
-      <p className="t-body reveal-story">{poi.reveal}</p>
+      <p className="t-body reveal-story">{revealNow(poi)}</p>
       {poi.dilemma && <Dilemma parkId={parkId} poiId={poi.id} dilemma={poi.dilemma} />}
       <div className="reveal-footer">
         <ProgressRing value={(done / total) * 100} label={`${done}/${total}`} />

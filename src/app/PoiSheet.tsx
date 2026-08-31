@@ -4,6 +4,7 @@ import { Modal, Segmented } from '../ds'
 import { Dilemma } from './Dilemma'
 import type { QuestPoi } from './data/quests'
 import { asset } from './assets'
+import { revealNow } from './reveal'
 
 const MODE_KEY = 'pk-story-mode'
 
@@ -107,7 +108,7 @@ export function PoiModal({
                 <p className="t-label poi-reveal__label">
                   <Sparkles size={14} /> Odkryte na miejscu
                 </p>
-                <p className="t-body-sm poi-reveal__text">{poi.reveal}</p>
+                <p className="t-body-sm poi-reveal__text">{revealNow(poi)}</p>
               </div>
               {poi.dilemma && parkId && (
                 <Dilemma parkId={parkId} poiId={poi.id} dilemma={poi.dilemma} />

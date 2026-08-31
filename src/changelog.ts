@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.120.0'
+export const VERSION = '0.121.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.121.0',
+    date: '2026-08-29',
+    title: 'Aljezur joins the trip, and some points now speak differently at sunset',
+    tldr:
+      'Wyprawa ma trzecie miejsce: Aljezur z ostatnim maurskim zamkiem Algarve, arabska cysterna i legenda o batacie spozniona o 250 lat. Plaza i punkt widokowy maja druga wersje puenty na zlota godzine i na noc.',
+    changes: [
+      ['added', 'Aljezur, seventeen kilometres south, with three points: the castle Moors built in the tenth century and the last one taken in the Algarve in 1249, the vaulted Arab cistern that decided how long a siege could last, and the sweet potato with a European mark whose legend cannot have happened'],
+      ['added', 'A point can now carry a second version of its punchline, chosen by the position of the sun where you are standing. The beach at the river mouth and the viewpoint above it read differently in the golden hour and at night, when the valley shows its old river bends and the coast turns out to be one of the darkest in Portugal'],
+      ['changed', 'Deliberately not modelled: tides. Approximating them without harmonic constants for this port would sometimes claim low water while you stand knee deep, so the app only says what it can compute'],
+    ],
+  },
   {
     version: '0.120.0',
     date: '2026-08-29',

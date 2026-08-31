@@ -67,6 +67,15 @@ export type QuestPoi = {
   findHint?: string
   /** hidden: the punchline, unlocked on site */
   reveal: string
+  /**
+   * Druga wersja puenty, wybierana po porze dnia W MIEJSCU, w którym stoisz
+   * (src/app/sun.ts). Dla punktów, które o zachodzie są czymś innym niż
+   * w południe: klif nad oceanem, punkt widokowy, plaża.
+   *
+   * Wypełniamy tylko tam, gdzie różnica jest realna. Brak wariantu znaczy
+   * „ta historia brzmi tak samo o każdej porze" i to jest normalny przypadek.
+   */
+  revealAt?: Partial<Record<'golden' | 'night', string>>
   /** hidden: the dilemma, shown under the reveal */
   dilemma?: PoiDilemma
   /** photo url (public/photos), added when assets are fetched */

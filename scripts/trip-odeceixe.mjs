@@ -41,6 +41,19 @@ const PLACES = [
     ],
   },
   {
+    /* Aljezur: 17 km na poludnie, wyjazd na dzien z autem. Zamek nie jest
+       w OSM tagowany jako castle, tylko jako ruiny z tabliczka „Cisterna",
+       wiec wspolrzedne bierzemy z tych obiektow. */
+    id: 'aljezur',
+    name: 'Aljezur',
+    kind: 'village',
+    points: [
+      [-8.8052, 37.31625], // ruiny zamku na lupkowym wzgorzu
+      [-8.80529, 37.31648], // cysterna arabska
+      [-8.8028, 37.31706], // rynek i mercado
+    ],
+  },
+  {
     id: 'odeceixe-foz',
     name: 'Ujście Seixe',
     kind: 'water',

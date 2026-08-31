@@ -152,6 +152,82 @@ export const ODECEIXE_QUESTS: Quest[] = [
     ],
   },
   {
+    parkId: 'aljezur',
+    pois: [
+      {
+        id: 'castelo',
+        category: 'history',
+        name: 'Ostatni zamek Maurów',
+        teaser: 'Zdobyty w 1249 roku, jako ostatni maurski zamek w Algarve.',
+        description: [
+          'Zamek postawili Maurowie w dziesiątym wieku, na wzgórzu z łupku nad rzeką. Samo wzgórze było jednak zamieszkane znacznie dłużej: wykopaliska pokazują ślady osadnictwa od epoki brązu, przez Luzytanów, Rzymian i Wizygotów, aż po przybycie Arabów.',
+          'W 1249 roku zdobyły go wojska pod dowództwem Paio Peresa Correi, mistrza Zakonu Santiago. Był to ostatni maurski zamek zdobyty w Algarve, czyli koniec pewnej epoki, dosłownie w tym miejscu.',
+          'Z murów zostało niewiele: długi odcinek z dwiema wieżami, a w środku resztki domów i koszar. Zamek pełnił funkcję obronną jeszcze w osiemnastym wieku.',
+        ],
+        findHint:
+          'Wzgórze nad starym miastem, dojście uliczkami o nazwach z „Castelo". Ruiny są otwarte i wchodzi się w nie bez biletu.',
+        reveal:
+          'Zdobycie tego zamku było ostatnim aktem chrześcijańskiej rekonkwisty w Algarve. Od dziesiątego wieku do 1249 roku, czyli przez ponad trzysta lat, wzgórze należało do świata, który dziś rozpoznajemy tu głównie po nazwach rzek: to samo arabskie wād, które dało nazwę Odeceixe, siedzi też w nazwie Aljezur.',
+        dilemma: {
+          question:
+            'Z zamku, który stał tu tysiąc lat, zostały dwa odcinki murów i cysterna. Utrzymanie ruiny kosztuje, a zwiedzających w małym miasteczku jest niewielu. Ile warto wydać na kamienie?',
+          options: ['Tyle, ile trzeba', 'Tylko na zabezpieczenie', 'Lepiej wydać na muzeum'],
+          counterpoint:
+            'Ruina bez opieki znika w ciągu dwóch pokoleń: mury rozbiera pogoda i ludzie, a to, co zostanie, przestaje być czytelne. Ale prawdą jest też, że dobrze zrobione muzeum obok opowie więcej niż same kamienie, a kamienie i tak są tylko fragmentem tego, co tu stało.',
+        },
+        sources: [
+          'https://pl.wikipedia.org/wiki/Castelo_de_Aljezur',
+          'https://en.wikipedia.org/wiki/Castle_of_Aljezur',
+        ],
+        coords: [-8.8052, 37.31625],
+        radius: 55,
+      },
+      {
+        id: 'cisterna',
+        category: 'water',
+        name: 'Cysterna arabska',
+        teaser: 'Sklepiony zbiornik, od którego zależało, jak długo zamek wytrzyma.',
+        description: [
+          'Wewnątrz murów stoi sklepiona cysterna pochodzenia arabskiego. Wygląda skromnie i łatwo ją przeoczyć, a była najważniejszym urządzeniem w całym zamku.',
+          'O losie oblężonej twierdzy nie decydowała grubość murów, tylko woda. Zamek na wzgórzu z łupku nie ma studni, do której da się dokopać, więc jedynym zapasem była woda deszczowa zebrana z dachów i placu, i przetrzymana w chłodzie pod sklepieniem.',
+        ],
+        findHint: 'Wewnątrz obwodu murów, przy tabliczce z napisem „Cisterna".',
+        reveal:
+          'Ta cysterna jest starsza od wszystkiego, co stoi wokół niej, i przeżyła zarówno tych, którzy ją zbudowali, jak i tych, którzy zamek zdobyli. Woda była tu ważniejsza od broni: obrona kończyła się nie wtedy, gdy padał mur, ale wtedy, gdy zbiornik był pusty.',
+        sources: ['https://en.wikipedia.org/wiki/Castle_of_Aljezur'],
+        coords: [-8.80529, 37.31648],
+        radius: 35,
+      },
+      {
+        id: 'batata',
+        category: 'monument',
+        name: 'Legenda spóźniona o 250 lat',
+        teaser: 'Słodki ziemniak z Aljezur ma unijny znak i legendę, która nie mogła się wydarzyć.',
+        description: [
+          'Batat z Aljezur, czyli słodki ziemniak, jest tutejszą specjalnością z prawdziwym statusem: od 2009 roku ma europejski znak IGP, przyznawany produktom z chronionego obszaru. Od 1998 roku pod koniec listopada odbywa się jego festiwal, jeden z największych jesiennych święt kulinarnych na południu Portugalii.',
+          'Do tego dochodzi legenda. Mówi ona, że rycerze Zakonu Santiago pili przed każdą ważną bitwą miksturę ze słodkich ziemniaków, a o zwycięstwie przesądziła feijoada z batata z Aljezur.',
+          'Kłopot polega na tym, że tej historii nie da się uratować żadną interpretacją.',
+        ],
+        findHint: 'Rynek i hala targowa w centrum, kilka minut od rzeki. Tam się go kupuje.',
+        reveal:
+          'Batat przypłynął do Europy dopiero po 1492 roku, razem z Kolumbem, a Hiszpanie zaczęli go uprawiać w połowie szesnastego wieku. Aljezur zdobyto w 1249. Legenda spóźnia się więc o jakieś dwieście pięćdziesiąt lat i rycerze Santiago nie mieli szans napić się tej mikstury. Batat jest tu naprawdę ważny, tylko o wiele młodszy, niż mówi opowieść.',
+        dilemma: {
+          question:
+            'Legenda jest chronologicznie niemożliwa, ale spaja lokalną tożsamość i sprzedaje festiwal. Powiedzieć wprost, że to bajka, czy pozwolić jej żyć?',
+          options: ['Mówić prawdę', 'Niech żyje legenda', 'Opowiadać obie naraz'],
+          counterpoint:
+            'Legendy nie są kłamstwem, tylko sposobem, w jaki miejsce mówi o sobie: ta łączy dumę z pola z dumą z historii i nikomu nie szkodzi. Ale jeśli nikt nigdy nie doda przypisu, po dwóch pokoleniach mieszkańcy będą pewni, że tak było, a to już jest różnica między opowieścią a pomyłką.',
+        },
+        sources: [
+          'https://tradicional.dgadr.gov.pt/en/categories/vegetables-and-cereals/638-batata-doce-de-aljezur-pgi',
+          'https://ediblesouthflorida.ediblecommunities.com/food-thought/sweet-potato-1492/',
+        ],
+        coords: [-8.8028, 37.31706],
+        radius: 60,
+      },
+    ],
+  },
+  {
     parkId: 'odeceixe-foz',
     pois: [
       {
@@ -168,6 +244,10 @@ export const ODECEIXE_QUESTS: Quest[] = [
           'Nad drogą schodzącą do plaży, po południowej stronie ujścia. Szukaj miejsca, z którego widać jednocześnie ocean i zakole rzeki.',
         reveal:
           'To jest widok, który tłumaczy całą wyprawę. Szeroka zielona dolina pod tobą jest wypełnioną zatoką. Ludzie z muszlowiska patrzyli na wodę tam, gdzie ty patrzysz na łąki, i dlatego nie musieli nigdzie chodzić po kolację.',
+        revealAt: {
+          golden:
+            'Stoisz tu w godzinie, która robi z tego widoku wykład. Gdy słońce jest nisko, każde zagłębienie w dolinie dostaje własny cień i płaskie dno przestaje być płaskie: widać dawne zakola rzeki, wygięte tam, gdzie kiedyś sięgała woda. W południe to jedna zielona plama, teraz to mapa zatoki, której już nie ma.',
+        },
         photo: '/photos/odeceixe-praia-b.jpg',
         photoCredit: 'Fot. Beeston · CC BY 3.0 · Wikimedia Commons',
         sources: ['https://en.wikipedia.org/wiki/Odeceixe'],
@@ -188,6 +268,12 @@ export const ODECEIXE_QUESTS: Quest[] = [
           'Koniec drogi z wioski wzdłuż rzeki. Pieszo doliną około czterech kilometrów, cały czas z wodą po lewej ręce.',
         reveal:
           'Stoisz na końcu tej samej trasy, którą pięć tysięcy lat temu ktoś pokonywał nie dla widoku, tylko dlatego, że tu przeniosły się małże. Dla nich to była praca i dwie i pół godziny drogi w obie strony. Dla ciebie to spacer z ręcznikiem.',
+        revealAt: {
+          golden:
+            'Trafiłeś tu w najlepszej godzinie. Słońce jest nisko nad oceanem, a plaża w ujściu leży dokładnie na zachód, więc światło idzie wzdłuż wody, nie z góry. To także moment, w którym najlepiej widać, jak rzeka wchodzi w morze: dwie fale, jedna z lądu i jedna z oceanu, spotykają się na piasku. Jeśli akurat trwa odpływ, obnażona ławica pokaże ci wprost to, o czym mówi muszlowisko: ujście przesuwa się dalej, tylko dziś dzieje się to w skali godzin, a nie tysiącleci.',
+          night:
+            'Po zmroku ta plaża robi się miejscem, po którym trudno chodzić i po którym warto stać. Klify zamykają zatokę, więc nie ma tu świateł z żadnej strony, a Costa Vicentina jest jednym z najciemniejszych odcinków wybrzeża Portugalii. Ludzie z muszlowiska widzieli dokładnie to samo niebo, tylko dla nich to nie było wrażenie, a jedyny zegar i kalendarz, jaki mieli.',
+        },
         dilemma: {
           question:
             'Ta sama droga: kiedyś konieczność, dziś przyjemność. Czy to znaczy, że mamy lepiej, czy tylko inaczej?',
