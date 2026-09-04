@@ -72,11 +72,83 @@ const IMAGERY_SHARP = { ...IMAGERY, tileSize: 128 }
 // glyphs so symbol layers (the parking P) render on imagery too
 const GLYPHS = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf'
 
+/** te same kafle wektorowe, z ktorych bierzemy budynki 3D */
+const OFM_VECTOR = {
+  type: 'vector' as const,
+  url: 'https://tiles.openfreemap.org/planet',
+  attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
+}
+
+/*
+ * SCIEZKI I NAZWY SKAL NA ZDJECIU (Jarek 2026-08-29: „czy nasza mapa bierze
+ * pod uwage wszystkie sciezki, jak np. ta mapa?").
+ *
+ * Nie braly. Satelita to samo zdjecie: sciezke widac tylko wtedy, gdy jest
+ * wydeptana na tyle, ze rzuca sie w oczy z powietrza, a nazwy skal nie
+ * istnialy w ogole. W dolinkach to jest roznica miedzy mapa a tapeta: Turnia
+ * Pilcha i Zabi Kon sa w OSM, tylko nikt ich nie rysowal.
+ *
+ * Zrodlo jest to samo, ktore juz wozimy dla budynkow 3D, wiec nie dochodzi
+ * zadna zaleznosc ani klucz. Sprawdzone na Jurze: w jednym kadrze 15 odcinkow
+ * sciezek i piec nazwanych skal.
+ *
+ * Styl: biala linia przerywana, jak na mapach turystycznych, bo na zdjeciu
+ * lasu kazdy ciemny kolor ginie. Nazwy skal maja obwodke, nie tlo, zeby nie
+ * zaslanialy terenu.
+ */
+const PATH_LAYERS = [
+  {
+    id: 'osm-track',
+    type: 'line' as const,
+    source: 'ofm',
+    'source-layer': 'transportation',
+    minzoom: 13,
+    filter: ['match', ['get', 'class'], ['track', 'service'], true, false],
+    paint: {
+      'line-color': 'rgba(255,255,255,0.62)',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 13, 0.8, 17, 2.4],
+    },
+  },
+  {
+    id: 'osm-path',
+    type: 'line' as const,
+    source: 'ofm',
+    'source-layer': 'transportation',
+    minzoom: 13,
+    filter: ['==', ['get', 'class'], 'path'],
+    paint: {
+      'line-color': 'rgba(255,255,255,0.78)',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 13, 0.9, 17, 2.2],
+      'line-dasharray': [2.4, 1.6],
+    },
+  },
+  {
+    id: 'osm-peak',
+    type: 'symbol' as const,
+    source: 'ofm',
+    'source-layer': 'mountain_peak',
+    minzoom: 13,
+    layout: {
+      'text-field': ['get', 'name'],
+      'text-font': ['Noto Sans Regular'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 13, 10, 17, 13],
+      'text-offset': [0, 0.7],
+      'text-anchor': 'top',
+      'text-max-width': 8,
+    },
+    paint: {
+      'text-color': '#f4f7ef',
+      'text-halo-color': 'rgba(12,20,12,0.85)',
+      'text-halo-width': 1.6,
+    },
+  },
+] as never[]
+
 const SATELLITE: StyleSpecification = {
   version: 8,
   glyphs: GLYPHS,
-  sources: { sat: IMAGERY },
-  layers: [{ id: 'sat', type: 'raster', source: 'sat' }],
+  sources: { sat: IMAGERY, ofm: OFM_VECTOR },
+  layers: [{ id: 'sat', type: 'raster', source: 'sat' }, ...PATH_LAYERS],
 }
 
 /**
@@ -92,17 +164,14 @@ const SATELLITE_3D: StyleSpecification = {
   sources: {
     sat: IMAGERY,
     dem: DEM,
-    ofm: {
-      type: 'vector',
-      url: 'https://tiles.openfreemap.org/planet',
-      attribution: 'OpenFreeMap, OpenMapTiles, OpenStreetMap',
-    },
+    ofm: OFM_VECTOR,
   },
   // no terrain here on purpose: declared in a style it comes out blank when the
   // style is swapped in with setStyle, and only works when the map is built
   // with it. The replay can do that, this map cannot, so it is set separately
   layers: [
     { id: 'sat', type: 'raster', source: 'sat' },
+    ...PATH_LAYERS,
     {
       id: 'buildings-3d',
       type: 'fill-extrusion',

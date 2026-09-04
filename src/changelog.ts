@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.121.0'
+export const VERSION = '0.122.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,18 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.122.0',
+    date: '2026-08-29',
+    title: 'Paths and rock names on the satellite photograph',
+    tldr:
+      'Satelita pokazywala sciezke tylko wtedy, gdy byla wydeptana na tyle, ze widac ja z powietrza, a nazw skal nie mialo skad wziac. Teraz sciezki, drogi lesne i nazwane skaly rysuja sie na zdjeciu i na rzezbie terenu.',
+    changes: [
+      ['added', 'Paths and forest tracks from OpenStreetMap now draw on the satellite view as white dashed lines, the way a walking map does it, because on a photograph of woodland any dark colour disappears'],
+      ['added', 'Named rocks and peaks get labels. In the Jura valleys that is the difference between a map and wallpaper: Labajowa Baszta, Kapucyn, Mniszek and the rest are in OpenStreetMap, nobody was drawing them'],
+      ['changed', 'Both come from the vector tiles the app already loads for the 3D buildings, so no new dependency and no key. They also show on the relief style, next to the buildings'],
+    ],
+  },
   {
     version: '0.121.0',
     date: '2026-08-29',
