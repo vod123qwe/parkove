@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.123.0'
+export const VERSION = '0.124.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,21 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.124.0',
+    date: '2026-09-05',
+    title: 'Three new places around Krakow',
+    tldr: 'Nowe miejsca: Kamieniolom Libana, rezerwat Bonarka i Dolina Mnikowska.',
+    changes: [
+      ['added', 'Kamieniolom Libana under Krakus Mound: 5 points about the 1872 lime works, the 1942 Baudienst penal camp, the Schindler List scenography whose fake matzevot are still mistaken for real graves, the quarry walls and the habitat that grew back on its own.'],
+      ['added', 'Bonarka geological reserve in Podgorze: 3 points about the Cretaceous sea floor, the fault steps and the cement quarry that exposed both.'],
+      ['added', 'Dolina Mnikowska, 17 km west of the market square: 5 points about the rock painting from 1863, the cave dug by Ossowski in 1881, the 80 metre gorge walls, the karst spring and the 17 protected plant species.'],
+      ['added', '13 photos from Wikimedia Commons with credits, including a shot of the film matzevot and one of the painted niche.'],
+      ['added', 'scripts/add-places.mjs fetches outlines for places outside the curated Krakow list, by OSM id or by name.'],
+      ['added', 'scripts/photos-nowe.mjs searches Commons by name and by coordinates, then downloads a hand picked set.'],
+      ['changed', 'Trails, borders and nearby data regenerated for the three new places.'],
+    ],
+  },
   {
     version: '0.123.0',
     date: '2026-08-29',

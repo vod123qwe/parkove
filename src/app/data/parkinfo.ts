@@ -18,6 +18,78 @@ export type ParkInfo = {
 }
 
 export const PARK_INFO: Record<string, ParkInfo> = {
+  liban: {
+    photos: [
+      { src: '/photos/liban-a.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons' },
+      {
+        src: '/photos/liban-b.jpg',
+        credit: 'Fot. Zygmunt Put Zetpe0202 · CC BY-SA 4.0 · Wikimedia Commons',
+      },
+      { src: '/photos/liban-c.jpg', credit: 'Fot. Zala · CC BY-SA 4.0 · Wikimedia Commons' },
+      {
+        src: '/photos/poi-liban-macewy.jpg',
+        credit: 'Fot. Mateusz Giełczyński · CC BY-SA 4.0 · Wikimedia Commons',
+      },
+    ],
+    description: [
+      'Dawny kamieniołom wapienia pod Kopcem Krakusa, prawie piętnaście hektarów dna i ścian w środku miasta, dwadzieścia minut od Rynku. Wchodzi się w to jak w dziurę w ziemi: nad Tobą jest Podgórze, a dookoła pionowe ściany i chaszcze.',
+      'Historia miejsca idzie warstwami. Najpierw fabryka wapna Bernarda Libana z 1872 roku, potem niemiecki obóz karny Służby Budowlanej od 1942 roku, potem plan zdjęciowy „Listy Schindlera" w 1993 roku, a na końcu przyroda, która wzięła wszystko z powrotem. Od sierpnia 2022 roku teren jest użytkiem ekologicznym.',
+      'Rzecz, która najbardziej zaskakuje: leżące na dnie macewy to scenografia filmowa, a nie prawdziwe nagrobki, choć ludzie do dziś zostawiają na nich kamyki. Prawdziwy obóz Płaszów jest siedemset metrów stąd. Wygodne buty obowiązkowe, teren jest dziki i nierówny.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak, to teren dziki i nieurządzony.' },
+      food: { has: false, note: 'Nic na miejscu. Najbliżej pod Kopcem Krakusa i przy Limanowskiego.' },
+      verified: false,
+    },
+  },
+  bonarka: {
+    photos: [
+      { src: '/photos/bonarka-a.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      {
+        src: '/photos/bonarka-b.jpg',
+        credit: 'Fot. Mateusz Giełczyński · CC BY-SA 4.0 · Wikimedia Commons',
+      },
+      {
+        src: '/photos/poi-bonarka-cement.jpg',
+        credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons',
+      },
+      {
+        src: '/photos/bonarka-c.jpg',
+        credit: 'Fot. Mateusz Giełczyński · CC BY-SA 4.0 · Wikimedia Commons',
+      },
+    ],
+    description: [
+      'Najmniejszy rezerwat w tej apce: niecałe dwa i pół hektara w Podgórzu, tuż przy ruchliwej drodze. Chroni się tu skały, nie las, więc to raczej krótkie wejście po drodze niż spacer na całe popołudnie. Ścieżka dydaktyczna ma trzysta metrów.',
+      'Pod nogami leży powierzchnia abrazyjna, czyli dno morza sprzed osiemdziesięciu kilku milionów lat, wyszlifowane przez fale na wapieniu starszym o kolejne kilkadziesiąt milionów. W ścianach widać progi uskokowe, w tym uskok nożycowy.',
+      'To wszystko odsłonił kamieniołom: w latach 1885 do 1929 wybierano tu margle na cement. Rezerwat utworzono w 1961 roku, na tym, co po nim zostało. Najlepiej łączyć z Kamieniołomem Libana, który jest kilometr stąd i opowiada podobną historię, tylko dużo mroczniejszą.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak, to mały rezerwat geologiczny.' },
+      food: { has: false, note: 'Nic w rezerwacie. Galeria Bonarka jest kilkaset metrów dalej.' },
+      verified: false,
+    },
+  },
+  mnikowska: {
+    photos: [
+      { src: '/photos/mnikowska-a.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons' },
+      {
+        src: '/photos/poi-mnikowska-matka-boska.jpg',
+        credit: 'Fot. Historia · CC BY 3.0 · Wikimedia Commons',
+      },
+      { src: '/photos/mnikowska-b.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/mnikowska-c.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+    ],
+    description: [
+      'Dwukilometrowy wąwóz wycięty w wapieniu przez strumień Sanka, siedemnaście kilometrów na zachód od Rynku, w Tenczyńskim Parku Krajobrazowym. Ściany mają w najwyższych miejscach około osiemdziesięciu metrów, są tu skalne bramy, iglice i kilkanaście jaskiń. Nazywają to małym Ojcowem i to nie jest przesada.',
+      'W miejscu, gdzie dolina rozstępuje się w półkole zwane Cyrkiem, na skale namalowano pięciometrowy wizerunek Matki Boskiej Skalskiej. Obraz powstał w 1863 roku, przed nim stoi ołtarz i droga krzyżowa, a msze odprawia się tu do dziś pod gołym niebem.',
+      'Rezerwat utworzono w 1963 roku na niecałych dwudziestu jeden hektarach. Rośnie tu siedemnaście gatunków chronionych roślin, między innymi obuwik, więc trzymaj się ścieżek. Najładniej jest wczesną wiosną, kiedy dno lasu kwitnie, zanim drzewa je zacienią.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak, to rezerwat przyrody.' },
+      food: { has: false, note: 'Nic w dolinie. Najbliżej we wsi Mników.' },
+      verified: false,
+    },
+  },
   miechow: {
     photos: [
       { src: '/photos/miechow-dworek-a.jpg', credit: 'Fot. Januszk57 · CC BY-SA 4.0 · Wikimedia Commons' },

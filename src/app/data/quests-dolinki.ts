@@ -828,4 +828,116 @@ export const DOLINKI_QUESTS: Quest[] = [
       },
     ],
   },
+  {
+    /* Mnikowska leży osobno od reszty Dolinek, 17 km na zachód od Rynku
+       i po drugiej stronie autostrady, w Tenczyńskim Parku Krajobrazowym.
+       Trafia tutaj, bo mechanizm ma ten sam: woda, wapień i czas. */
+    parkId: 'mnikowska',
+    stampAt: 3,
+    pois: [
+      {
+        id: 'matka-boska',
+        category: 'monument',
+        name: 'Matka Boska Skalska',
+        teaser: 'Pięciometrowy obraz namalowany wprost na skale, w roku powstania styczniowego.',
+        description: [
+          'W zakolu doliny, które nazywa się Cyrk, ściana cofa się i robi naturalną niszę. W tej niszy, prosto na wapieniu, namalowano pięciometrowy wizerunek Matki Boskiej. Miejscowi mówią na nią Matka Boska Skalska.',
+          'Obraz powstał w 1863 roku, czyli w roku wybuchu powstania styczniowego, kilkanaście kilometrów od granicy zaboru rosyjskiego. Przed niszą zbudowano ołtarz i do dziś odprawia się tu msze pod gołym niebem.',
+          'Malowidło na skale nie ma jak przetrwać samo. Deszcz i mróz zrobiły swoje: oryginał zniszczał, został odmalowany nieudolnie, potem odtworzony, a porządną renowację przeszedł dopiero w 2011 roku.',
+        ],
+        findHint:
+          'Środkowa część doliny, po południowej stronie. Szukaj miejsca, gdzie ściana się rozstępuje w półkole. Prowadzą tam schody, a przed niszą stoi ołtarz i stacje drogi krzyżowej.',
+        reveal:
+          'Prawie wszędzie przeczytasz, że obraz namalował Walery Eljasz Radzikowski, malarz i taternik. Nowsze ustalenia wskazują na kogo innego: Izydora Jabłońskiego. Podpisu na skale nie ma, więc autorstwo wędrowało z ust do ust przez sto sześćdziesiąt lat i po drodze przykleiło się do bardziej znanego nazwiska.',
+        dilemma: {
+          question:
+            'To rezerwat przyrody nieożywionej, a na jego głównej ścianie jest pięciometrowy obraz. Gdyby ktoś chciał namalować go dzisiaj, powinien dostać zgodę?',
+          options: [
+            'Nie, skała ma zostać skałą',
+            'Tak, to już tradycja tego miejsca',
+            'Nie dzisiaj, ale stary zostawić',
+          ],
+          counterpoint:
+            'Malowanie po skałach w rezerwacie to dokładnie to, przed czym rezerwat ma chronić, a zgoda dla jednego otwiera drzwi kolejnym. Ale to właśnie ten obraz sprawił, że ludzie tu przyjeżdżają, pilnują doliny i wiedzą, jak się nazywa. Bez niego byłby to kolejny ładny wąwóz bez nazwiska.',
+        },
+        sources: [
+          'https://pl.wikipedia.org/wiki/Dolina_Mnikowska',
+          'https://dziennikpolski24.pl/niewlasciwa-matka-boska/ar/3037830',
+        ],
+        photo: '/photos/poi-mnikowska-matka-boska.jpg',
+        photoCredit: 'Fot. Historia · CC BY 3.0 · Wikimedia Commons',
+        coords: [19.70765, 50.06521],
+        radius: 45,
+      },
+      {
+        id: 'jaskinia',
+        category: 'cave',
+        name: 'Jaskinia nad Matką Boską',
+        teaser: 'Osiemdziesiąt metrów korytarzy, a w środku znaleziono ludzkie kości.',
+        description: [
+          'Tuż nad niszą z obrazem jest otwór jaskini. Ma około osiemdziesięciu metrów korytarzy, co jak na Dolinki jest sporo, i drugie imię: Jaskinia doktora Mayera.',
+          'W 1881 roku zbadał ją Gotfryd Ossowski, jeden z pierwszych polskich archeologów zajmujących się jaskiniami. Znalazł w środku kości zwierząt i kości ludzkie.',
+          'W całej dolinie jest kilkanaście jaskiń i schronisk skalnych, a w części z nich są ślady obecności człowieka sprzed tysięcy lat. Wapień robi jamy, jamy robią dach nad głową.',
+        ],
+        findHint:
+          'Nad niszą z obrazem, po tej samej stronie doliny. Wejście jest wyżej niż ścieżka, więc łatwo je minąć, patrząc pod nogi.',
+        reveal:
+          'Kolejność zdarzeń w tym jednym miejscu jest nie do pobicia. Najpierw jaskinia była schronieniem, potem grobem, potem obiektem badań archeologa, a na końcu ktoś namalował pod nią ołtarz. Ludzie wracają tu od tysięcy lat, tylko za każdym razem po coś innego.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Mnikowska'],
+        coords: [19.70776, 50.06534],
+        radius: 40,
+      },
+      {
+        id: 'sciany',
+        category: 'view',
+        name: 'Ściany Cyrku',
+        teaser: 'Osiemdziesiąt metrów pionu, wycięte przez rzeczkę, którą przeskoczysz.',
+        description: [
+          'Ściany doliny mają w najwyższych miejscach około osiemdziesięciu metrów. To wapienie jurajskie, ta sama skała co w całej Jurze, licząca około stu pięćdziesięciu milionów lat.',
+          'Autorem wąwozu jest Sanka, czyli strumień, który płynie dnem i którego w wielu miejscach nie zauważysz, dopóki go nie usłyszysz. Woda przebiła się przez wapień i wynosiła go stąd ziarno po ziarnie.',
+          'Dolina bywa nazywana małym Ojcowem i to nie jest przesada marketingowa: skalne bramy, iglice i urwiska są tu na dwóch kilometrach.',
+        ],
+        findHint: 'Dno doliny, w połowie długości. Zadrzyj głowę.',
+        reveal:
+          'Ten wąwóz jest wynikiem prostego rachunku: mały strumień razy bardzo dużo czasu. Gdyby Sanka pogłębiała dolinę o jeden milimetr rocznie, osiemdziesiąt metrów zajęłoby jej osiemdziesiąt tysięcy lat, czyli chwilę jak na wiek tych skał. W praktyce szło jej wolniej, a i tak zdążyła.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Mnikowska'],
+        coords: [19.70630, 50.06673],
+        radius: 60,
+      },
+      {
+        id: 'zrodlo',
+        category: 'water',
+        name: 'Źródło w dolinie',
+        teaser: 'Woda wychodzi tu z wapienia po podróży, której nie widać z powierzchni.',
+        description: [
+          'W zachodniej części doliny bije źródło. Stoi przy nim tablica, więc trudno je przegapić.',
+          'W wapieniu woda nie płynie po powierzchni, tylko wsiąka i wędruje szczelinami pod ziemią, czasem kilometrami. Źródło to miejsce, w którym ta podziemna droga wychodzi z powrotem na światło.',
+        ],
+        findHint: 'Zachodnia część doliny, przy ścieżce. Obok stoi tablica informacyjna.',
+        reveal:
+          'To samo, co drąży jaskinie, robi też źródła. Woda z opadów rozpuszcza wapień, poszerza szczeliny w podziemne korytarze i tymi korytarzami płynie. Jaskinia nad obrazem i to źródło to dwa końce jednego procesu: jeden pusty, drugi z wodą.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Mnikowska'],
+        coords: [19.7051, 50.06737],
+        radius: 40,
+      },
+      {
+        id: 'rosliny',
+        category: 'meadow',
+        name: 'Siedemnaście gatunków pod ochroną',
+        teaser: 'Na tych zboczach rośnie obuwik, czyli największy dziki storczyk w Polsce.',
+        description: [
+          'Rezerwat utworzono w 1963 roku na niecałych dwudziestu jeden hektarach i chroni się tu nie tylko skały. Rośnie tutaj siedemnaście gatunków roślin objętych ochroną, między innymi obuwik pospolity, konwalia i naparstnica.',
+          'Obuwik to nasz największy dziki storczyk, z żółtym kwiatem w kształcie pantofelka. Kwitnie krótko, na przełomie maja i czerwca, i jest rzadki, bo potrzebuje dokładnie takich warunków jak tutaj: wapiennego podłoża i widnego lasu.',
+          'Najlepszy moment na dolinę to wczesna wiosna, kiedy dno lasu zakwita całe, zanim drzewa zdążą je zacienić.',
+        ],
+        findHint:
+          'Zbocza i widne fragmenty lasu wzdłuż doliny. Nic nie zrywaj i nie schodź ze ścieżki, tu prawie wszystko jest pod ochroną.',
+        reveal:
+          'Storczyki nie mają zapasów w nasionach i bez pomocy grzybów w glebie nie wykiełkują. Obuwik potrafi też pierwsze lata przesiedzieć całkowicie pod ziemią, żywiąc się przez grzyb, i dopiero potem wypuścić liście. Kwiatu doczekasz się po kilkunastu latach od nasiona, więc każdy okaz, który tu widzisz, jest starszy niż większość drzew dookoła.',
+        sources: ['https://pl.wikipedia.org/wiki/Dolina_Mnikowska'],
+        coords: [19.70892, 50.06557],
+        radius: 55,
+      },
+    ],
+  },
 ]

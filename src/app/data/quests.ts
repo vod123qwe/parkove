@@ -12,6 +12,7 @@
 import { DOLINKI_QUESTS } from './quests-dolinki'
 import { ODECEIXE_QUESTS } from './quests-odeceixe'
 import { MIECHOW_QUESTS } from './quests-miechow'
+import { KRZEMIONKI_QUESTS } from './quests-krzemionki'
 
 export type PoiDilemma = {
   question: string
@@ -2993,7 +2994,13 @@ const KRAKOW_QUESTS: Quest[] = [
 ]
 
 /** miasto plus wypady za miasto, w jednej liście, bo mechanika jest ta sama */
-export const QUESTS: Quest[] = [...KRAKOW_QUESTS, ...DOLINKI_QUESTS, ...MIECHOW_QUESTS, ...ODECEIXE_QUESTS]
+export const QUESTS: Quest[] = [
+  ...KRAKOW_QUESTS,
+  ...DOLINKI_QUESTS,
+  ...KRZEMIONKI_QUESTS,
+  ...MIECHOW_QUESTS,
+  ...ODECEIXE_QUESTS,
+]
 
 
 export const questForPark = (parkId: string) => QUESTS.find((q) => q.parkId === parkId)
