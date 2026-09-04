@@ -267,7 +267,7 @@ function backtrack(line) {
  * Metoda: siatka 30 m wewnatrz obrysu, komorka zaliczona, gdy trasa
  * przechodzi blizej niz 60 m (tyle widzisz w parku, nie wiecej).
  */
-function coverage(feature, line) {
+function coverage(feature, line, water = null) {
   const rs = feature.geometry.type === 'Polygon'
     ? feature.geometry.coordinates
     : feature.geometry.coordinates.flat()
@@ -284,6 +284,9 @@ function coverage(feature, line) {
   for (let y = minY; y <= maxY; y += stepY)
     for (let x = minX; x <= maxX; x += stepX) {
       if (!inPolygon([x, y], rs)) continue
+      /* woda nie jest terenem do chodzenia: liczona jako "nieodwiedzona"
+         zaniżała pokrycie wszędzie, gdzie w obrysie jest jezioro */
+      if (water && water.some((poly) => inPolygon([x, y], [poly]))) continue
       cells++
       for (const c of line)
         if (dist([x, y], c) < 60) { seen++; break }
@@ -739,11 +742,83 @@ const pointsOnly = argv.includes('--points')
  * dokładanie jednej trasy nie powinno w ogóle dotykać szlaków znakowanych.
  */
 const ringsOnly = argv.includes('--rings')
+/*
+ * Tryb --alleys: PETLA PO ALEJKACH dla miejsc, ktore nie maja questu.
+ *
+ * Generator liczy trasy PRZEZ PUNKTY wyprawy, wiec park bez punktow nie
+ * dostawal nic. Audyt (2026-08-29) pokazal trzynascie takich miejsc, a w nich
+ * od 2,5 do 6 km alejek: Park Tysiaclecia ma szesc kilometrow sciezek i ani
+ * jednej trasy w apce. Tutaj punkty bierzemy z samej sieci sciezek wewnatrz
+ * obrysu, wiec pętla powstaje bez questu.
+ */
+const alleysOnly = argv.includes('--alleys')
 const only = argv.filter((a) => !a.startsWith('--'))
 const parks =
-  pruneOnly || ringsOnly
+  pruneOnly || ringsOnly || alleysOnly
     ? []
     : Object.keys(quests).filter((p) => (only.length ? only.includes(p) : true))
+
+/**
+ * Punkty sieci sciezek WEWNATRZ obrysu miejsca.
+ *
+ * Bierzemy wierzcholki dróg pieszych z OSM i odrzucamy te poza granica, zeby
+ * petla nie wyszla na osiedle obok. Zwracamy tez wielokaty wody, bo pokrycie
+ * liczone razem z tafla jeziora zawsze wychodzi zle (Przylasek: czternascie
+ * zbiornikow w obrysie).
+ */
+async function parkWalkNetwork(feature) {
+  const rs =
+    feature.geometry.type === 'Polygon'
+      ? feature.geometry.coordinates
+      : feature.geometry.coordinates.flat()
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  for (const ring of rs)
+    for (const c of ring) {
+      minX = Math.min(minX, c[0]); maxX = Math.max(maxX, c[0])
+      minY = Math.min(minY, c[1]); maxY = Math.max(maxY, c[1])
+    }
+  const query = `[out:json][timeout:90];
+(
+  way(${minY},${minX},${maxY},${maxX})["highway"~"path|footway|track|cycleway|pedestrian|steps|living_street"];
+  way(${minY},${minX},${maxY},${maxX})["natural"="water"];
+  relation(${minY},${minX},${maxY},${maxX})["natural"="water"];
+);
+out geom;`
+  const data = await overpass(query)
+  if (!data) return null
+  const nodes = []
+  const water = []
+  for (const el of data.elements) {
+    const tags = el.tags ?? {}
+    if (tags.natural === 'water') {
+      const parts = el.geometry ? [el.geometry] : (el.members ?? []).map((m) => m.geometry).filter(Boolean)
+      for (const g of parts) if (g.length > 3) water.push(g.map((p) => [p.lon, p.lat]))
+      continue
+    }
+    for (const p of el.geometry ?? []) {
+      const c = [p.lon, p.lat]
+      if (inPolygon(c, rs)) nodes.push(c)
+    }
+  }
+  return { nodes, water }
+}
+
+/** k punktow maksymalnie rozrzuconych po sieci: prosty farthest-point sampling */
+function spread(points, k) {
+  if (points.length <= k) return points
+  const out = [points[0]]
+  while (out.length < k) {
+    let best = null
+    for (const p of points) {
+      let near = Infinity
+      for (const q of out) near = Math.min(near, dist(p, q))
+      if (!best || near > best.d) best = { p, d: near }
+    }
+    if (!best || best.d < 40) break
+    out.push(best.p)
+  }
+  return out
+}
 
 /* najdalsza para punktów: końce przejścia przez cały park */
 function farthestPair(pois) {
@@ -1132,6 +1207,78 @@ for (const [park, trails] of Object.entries(result)) {
   else delete result[park]
 }
 writeFileSync(CACHE, JSON.stringify(result), 'utf8')
+
+/* ---------- petle po alejkach (--alleys) ---------- */
+
+if (alleysOnly) {
+  const targets = (only.length ? only : parksData.features.map((f) => f.id)).filter(
+    (id) => only.length || !(result[id]?.length),
+  )
+  console.log(`petle po alejkach: ${targets.length} miejsc do sprawdzenia`)
+  for (const parkId of targets) {
+    const feature = parksData.features.find((f) => f.id === parkId)
+    if (!feature) continue
+    const net = await parkWalkNetwork(feature)
+    if (!net) {
+      console.log(`${parkId.padEnd(24)} Overpass nie odpowiada, zostawiam bez zmian`)
+      continue
+    }
+    if (net.nodes.length < 8) {
+      console.log(`${parkId.padEnd(24)} za malo sciezek w obrysie (${net.nodes.length} punktow)`)
+      continue
+    }
+    /* piec punktow wystarcza: wiecej i router zaczyna kluczyc po kazdym zaulku */
+    const via = spread(net.nodes, 5)
+    if (via.length < 3) {
+      console.log(`${parkId.padEnd(24)} sciezki zbyt skupione, petla nie ma sensu`)
+      continue
+    }
+    const r = await osrm('trip', via, '&roundtrip=true&source=first')
+    if (!r) {
+      console.log(`${parkId.padEnd(24)} router nie odpowiada`)
+      continue
+    }
+    const line = thin(r.trip.geometry.coordinates)
+    const m = Math.round(r.trip.distance)
+    const cov = Math.round(coverage(feature, line, net.water) * 100)
+    const back = Math.round(backtrack(line) * 100)
+    const insideOk = Math.round(insideShare(parkId, line) * 100)
+    /*
+     * Progi. Petla ma pokazac park, nie obejsc go dokola bloku, wiec trasa
+     * biegnaca w wiekszosci poza obrysem odpada zawsze.
+     *
+     * Dwa ustepstwa, oba wymuszone przez pierwszy bieg. Male miejsce ma
+     * krotka petle z natury: Kopiec Wandy zmiescil 443 m i to jest cala
+     * dostepna trasa, wiec prog dlugosci schodzi tam do 300 m. A zawracanie
+     * przestaje byc wada, gdy trasa pokazuje prawie caly obrys i z niego nie
+     * wychodzi: na kopiec prowadzi jedna droga i wraca sie nia sama, co jest
+     * charakterem miejsca, nie bledem generatora.
+     */
+    const small = (feature.properties?.areaHa ?? 0) < 5
+    const showsAlmostAll = cov >= 80 && insideOk >= 90
+    const ok = m >= (small ? 300 : 500) && insideOk >= 60 && back < (showsAlmostAll ? 75 : 60)
+    console.log(
+      `${parkId.padEnd(24)} ${ok ? 'WZIETE ' : 'odrzuc.'} ${String(m).padStart(5)} m  pokrycie ${String(cov).padStart(3)}%  w obrysie ${String(insideOk).padStart(3)}%  zawracanie ${String(back).padStart(3)}%`,
+    )
+    if (!ok) continue
+    const water = feature.properties?.kind === 'water'
+    result[parkId] = [
+      {
+        id: 'alejkami',
+        name: water ? 'Pętla brzegiem' : 'Pętla po alejkach',
+        kind: 'points',
+        m,
+        min: Math.max(1, Math.round(r.trip.duration / 60)),
+        cov,
+        role: 'petla',
+        note: 'Ułożona z alejek parku, bez punktów wyprawy.',
+        line,
+      },
+      ...(result[parkId] ?? []),
+    ]
+    writeFileSync(CACHE, JSON.stringify(result), 'utf8')
+  }
+}
 
 /* ---------- zapis ---------- */
 

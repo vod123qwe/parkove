@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.122.0'
+export const VERSION = '0.123.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,19 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.123.0',
+    date: '2026-08-29',
+    title: 'Parks without quest points get a loop of their own',
+    tldr:
+      'Trzynascie miejsc nie mialo zadnej trasy, choc maja od 2,5 do 6 km alejek: generator umial liczyc tylko trasy przez punkty wyprawy. Dwanascie z nich ma teraz petle ulozona z samych alejek.',
+    changes: [
+      ['added', 'A loop built from the park paths themselves, without needing quest points. Twelve places that had nothing now have one, among them Park Tysiaclecia with six kilometres of paths and no route at all until today'],
+      ['added', 'The new loops show a lot of their park: between 75 and 100 percent of it, against a median of 56 for routes that thread through quest points'],
+      ['changed', 'Coverage stops counting water as unvisited ground. A place whose outline holds fourteen reservoirs could never score well, however good the walk along the shore was'],
+      ['changed', 'Thresholds bend for small places: a mound has one way up and you come back down it, which is the character of the place rather than a fault in the route'],
+    ],
+  },
   {
     version: '0.122.0',
     date: '2026-08-29',
