@@ -23,23 +23,26 @@ mkdirSync(outDir, { recursive: true })
 
 /** szukanie po nazwie */
 const QUERIES = [
-  'Kamieniołom Libana',
-  'Liban quarry Krakow',
-  'Rezerwat Bonarka',
-  'Bonarka reserve Krakow geology',
-  'Dolina Mnikowska',
-  'Matka Boska Skalska Mników',
+  'Skała Kmity Zabierzów',
+  'Rezerwat Zimny Dół Czułów',
+  'Kajasówka rezerwat',
+  'Rezerwat Skołczanka Tyniec',
+  'Kamionna Beskid Wyspowy wieża',
+  'Kamionna Trzciana kościół',
 ]
 
 /** szukanie po wspolrzednych: [etykieta, lat, lng, promien w metrach] */
 const GEO = [
-  ['liban', 50.03649, 19.95681, 500],
-  ['bonarka', 50.02943, 19.95947, 400],
-  ['mnikowska', 50.06636, 19.70799, 900],
+  ['kmity', 50.09873, 19.81492, 500],
+  ['zimny-dol', 50.06699, 19.67537, 400],
+  ['kajasowka', 50.03047, 19.66643, 900],
+  ['skolczanka', 50.01378, 19.8296, 700],
+  ['kamionna-szczyt', 49.77867, 20.39628, 900],
+  ['kamionna-wies', 49.7994, 20.37521, 900],
 ]
 
 /** wybrane recznie po obejrzeniu: [nazwa pliku w apce, dokladny tytul z Commons] */
-const PICKS = [
+const PICKS_DONE = [
   ['liban-a', 'File:20200808 Kamieniołom Liban rano z Kopca Krakusa 0544 0788.jpg'],
   ['liban-b', "File:Liban's Quarry, former WWII German Nazi Labour Camp, Za Torem street, Krakow, Poland.jpg"],
   ['liban-c', 'File:Kraków Kamieniołom Libana 19.jpg'],
@@ -53,6 +56,25 @@ const PICKS = [
   ['mnikowska-b', 'File:20200612 Dolina Mnikowska 1503 0300.jpg'],
   ['mnikowska-c', 'File:Dolina Mnikowska DK7.jpg'],
   ['poi-mnikowska-matka-boska', 'File:W malowniczej Dolinie Mnikowskiej - panoramio.jpg'],
+]
+
+const PICKS = [
+  ['kmity-a', 'File:Skała Kmity - panoramio.jpg'],
+  ['kmity-b', 'File:Skała Kmity - panoramio (1).jpg'],
+  ['kmity-c', 'File:Skała Kmity - panoramio (2).jpg'],
+  ['zimny-dol-a', 'File:Rezerwat przyrody ZimnyDół DK37 (2).jpg'],
+  ['zimny-dol-b', 'File:Rezerwat przyrody ZimnyDół DK37 (4).jpg'],
+  ['zimny-dol-c', 'File:Rezerwat Zimny Dół a2.jpg'],
+  ['kajasowka-a', 'File:Rezerwat przyrody Kajasówka pod Krakowem, 20240317 0755 6729.jpg'],
+  ['kajasowka-b', 'File:Widok na Tatry ze wzgórza Kajasówka pod Krakowem, 20211204 0828 3913.jpg'],
+  ['kajasowka-c', 'File:Rezerwat przyrody Kajasówka, 20210117 1036 5372.jpg'],
+  ['poi-kajasowka-jaskinia', 'File:20200427 Wejście do Jaskini Przegińskiej 1451 9874 DxO.jpg'],
+  ['skolczanka-a', 'File:Rezerwat Skołczanka.JPG'],
+  ['skolczanka-b', 'File:Nature reserve Skołczanka 3.jpg'],
+  ['skolczanka-c', 'File:Nature reserve Skołczanka 10.jpg'],
+  ['kamionna-a', 'File:Kamionna i Pasierbiecka Góra.jpg'],
+  ['kamionna-b', 'File:Kamionna z Rozdziela.jpg'],
+  ['kamionna-c', 'File:Kamionna G44.jpg'],
 ]
 
 const strip = (html) => (html ?? '').replace(/<[^>]*>/g, '').trim()

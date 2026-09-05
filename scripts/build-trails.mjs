@@ -663,6 +663,50 @@ const MIN_M = 400
  * trails.ts po fakcie, zeby przezyly kazda regeneracje.
  */
 const ORDERED = {
+  /*
+   * Kamionna: trzy TRASY TEMATYCZNE zamiast jednej "przez wszystkie punkty".
+   * Pomysl Jarka (2026-09-05): miejsce ma trzy osobne watki, wiec zamiast
+   * kazac wybierac miedzy dlugoscia trasy, pozwalamy wybrac, o czym ma byc
+   * spacer. Punkty celowo powtarzaja sie miedzy trasami: kolumna
+   * Lubomirskiego jest i historia, i podaniem.
+   */
+  kamionna: [
+    {
+      id: 'temat-legendy',
+      name: 'Szlakiem legend',
+      role: 'przejscie',
+      note: 'Ze szczytu do wsi: jezioro, którego prawie nie ma, i kamień, który upuścił diabeł.',
+      via: [
+        [20.39553, 49.77843], // jeziorko pod szczytem, dawny Jeziernik
+        [20.39628, 49.77867], // wieza i szczyt Patria
+        [20.38868, 49.78398], // rezerwat, zejscie w buczyne
+        [20.36396, 49.80069], // kolumna Lubomirskiego we wsi
+      ],
+    },
+    {
+      id: 'temat-historia',
+      name: 'Historia wsi i góry',
+      role: 'petla',
+      note: 'Pętla po wsi: kościół z 1934 roku i kamienny słup po potopie szwedzkim.',
+      via: [
+        [20.37521, 49.7994], // kosciol NMP Krolowej Polski
+        [20.36396, 49.80069], // kolumna Lubomirskiego
+        [20.37521, 49.7994], // powrot pod kosciol
+      ],
+    },
+    {
+      id: 'temat-lasy',
+      name: 'Lasy i widoki',
+      role: 'petla',
+      note: 'Grzbietem przez buczynę: rezerwat, Pasierbiecka Góra i wieża widokowa.',
+      via: [
+        [20.39628, 49.77867], // wieza widokowa
+        [20.38868, 49.78398], // rezerwat buczyny karpackiej
+        [20.37796, 49.78138], // Pasierbiecka Gora
+        [20.39628, 49.77867], // powrot na szczyt
+      ],
+    },
+  ],
   'przylasek-rusiecki': [
     {
       id: 'wokol-jeziorek',
@@ -1183,6 +1227,8 @@ for (const parkId of pointsOnly ? Object.keys(quests).filter((p) => (only.length
       kind: 'points',
       m: Math.round(r.trip.distance),
       min: Math.max(1, Math.round(r.trip.duration / 60)),
+      ...(spec.role ? { role: spec.role } : {}),
+      ...(spec.note ? { note: spec.note } : {}),
       line: thin(r.trip.geometry.coordinates),
     })
     console.log(`  zamowiona ${spec.id}: ${(r.trip.distance / 1000).toFixed(1)} km`)

@@ -18,6 +18,107 @@ export type ParkInfo = {
 }
 
 export const PARK_INFO: Record<string, ParkInfo> = {
+  kmity: {
+    photos: [
+      {
+        src: '/photos/kmity-a.jpg',
+        credit: 'Fot. Arkadiusz Markiewicz · CC BY-SA 3.0 · Wikimedia Commons',
+      },
+      {
+        src: '/photos/kmity-b.jpg',
+        credit: 'Fot. Arkadiusz Markiewicz · CC BY-SA 3.0 · Wikimedia Commons',
+      },
+      {
+        src: '/photos/kmity-c.jpg',
+        credit: 'Fot. Arkadiusz Markiewicz · CC BY-SA 3.0 · Wikimedia Commons',
+      },
+    ],
+    description: [
+      'Wapienna skała nad Rudawą w Zabierzowie, jedenaście kilometrów od Krakowa, w miejscu gdzie rzeka przecina na wylot Garb Tenczyński. Ma około dwudziestu pięciu metrów prawie pionowej ściany. Rezerwat krajobrazowy od 1959 roku.',
+      'Nazwa pochodzi od legendy o rycerzu Stanisławie Kmicie, który miał skoczyć stąd z koniem z rozpaczy po tym, jak rodzina Olimpii Bonerówny nie zgodziła się na ich małżeństwo. Dwieście metrów dalej stoi skała nazwana jej imieniem.',
+      'Poza legendą jest tu osiemnaście gatunków roślin pod ochroną, w tym tojad i obuwik, oraz ścieżka dydaktyczna o długości dwóch i pół kilometra, prowadząca stąd w Dolinę Grzybowską. Wypad na dwie, trzy godziny.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak, to rezerwat nad rzeką.' },
+      food: { has: false, note: 'Nic na miejscu. Najbliżej w Zabierzowie.' },
+      verified: false,
+    },
+  },
+  'zimny-dol': {
+    photos: [
+      { src: '/photos/zimny-dol-a.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/zimny-dol-b.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/zimny-dol-c.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 3.0 · Wikimedia Commons' },
+    ],
+    description: [
+      'Najmniejszy rezerwat w tym zestawieniu: dwa hektary zbocza wąwozu w Czułowie, dziewiętnaście kilometrów na zachód od Krakowa. Cały spacer to kilkaset metrów, więc traktuj to jak przystanek, a nie osobną wyprawę.',
+      'Chroni się tu formy, jakie woda robi w wapieniu: bloki skalne, korytarze, okapy, schroniska podskalne i skalne grzyby, czyli skały z cienką nogą i szerokim kapeluszem. Jest też jaskinia, z której wypływa strumień, co w Jurze jest rzadkie: większość jaskiń dawno wyschła.',
+      'Rezerwat utworzono 8 lipca 1991 roku. Wąwóz uchodzi do doliny Sanki, tej samej, która wycięła Dolinę Mnikowską kwadrans stąd, więc te dwa miejsca dobrze się łączy w jeden wyjazd.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak, to mały rezerwat w wąwozie.' },
+      food: { has: false, note: 'Nic na miejscu ani w pobliżu.' },
+      verified: false,
+    },
+  },
+  kajasowka: {
+    photos: [
+      { src: '/photos/kajasowka-a.jpg', credit: 'Fot. Jakub Hałun · CC BY 4.0 · Wikimedia Commons' },
+      { src: '/photos/kajasowka-b.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons' },
+      {
+        src: '/photos/poi-kajasowka-jaskinia.jpg',
+        credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons',
+      },
+      { src: '/photos/kajasowka-c.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons' },
+    ],
+    description: [
+      'Wąski wapienny grzbiet w gminie Czernichów, dwadzieścia kilometrów od Krakowa: dwa i pół kilometra długości, najwyżej trzysta metrów szerokości. Rezerwat od 1962 roku.',
+      'To zrąb tektoniczny, czyli rzadka rzecz: blok skorupy ziemskiej ograniczony uskokami z obu stron. Nie został wypiętrzony, tylko został na miejscu, gdy sąsiednie bloki obniżyły się. W Polsce takich wyraźnych, dwustronnych zrębów jest niewiele.',
+      'Na słonecznych zboczach są murawy kserotermiczne z dziewięćsiłem, a w nich lata skalnik driada, motyl rzadki w skali kraju. W grzbiecie jest też Jaskinia Przegińska. Przy dobrej pogodzie widać stąd Babią Górę, a czasem i Tatry.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak, to rezerwat na grzbiecie.' },
+      food: { has: false, note: 'Nic na miejscu. Najbliżej w Czernichowie lub Rybnej.' },
+      verified: false,
+    },
+  },
+  skolczanka: {
+    photos: [
+      {
+        src: '/photos/skolczanka-a.jpg',
+        credit: 'Fot. Paweł Świegoda · CC BY-SA 2.5 · Wikimedia Commons',
+      },
+      { src: '/photos/skolczanka-b.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/skolczanka-c.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+    ],
+    description: [
+      'Trzydzieści siedem hektarów lasu i muraw na Wzgórzach Tynieckich, kilometr od opactwa w Tyńcu, jeszcze w granicach Krakowa. Rezerwat od 1957 roku.',
+      'Nietypowy, bo faunistyczny i owadzi: powstał po to, żeby chronić około pięciuset gatunków rzadkich motyli i błonkówek. Motyla nie da się ogrodzić, więc chroni się to, czego potrzebuje: las sosnowo-jodłowo-bukowy, ciepłolubne zarośla i murawy na polanach.',
+      'Najciekawiej jest nie w środku lasu, tylko na jego brzegach i polanach, gdzie jest słońce i kwiaty. Dobrze łączy się ze spacerem do Tyńca, bo klasztor stoi na tych samych wapieniach.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak, to rezerwat leśny.' },
+      food: { has: true, note: 'Nie w rezerwacie, ale w Tyńcu przy opactwie, kilometr stąd.' },
+      verified: false,
+    },
+  },
+  kamionna: {
+    photos: [
+      { src: '/photos/kamionna-a.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/kamionna-c.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+      { src: '/photos/kamionna-b.jpg', credit: 'Fot. Jerzy Opioła · CC BY-SA 4.0 · Wikimedia Commons' },
+    ],
+    description: [
+      'Góra o wysokości 801 metrów i wieś u jej podnóża, w gminie Trzciana pod Bochnią, około pięćdziesięciu kilometrów od Krakowa. Kamionna jest pierwszym szczytem Beskidu Wyspowego od północy, więc stoi się tu na granicy dwóch krain: z jednej strony łagodne Pogórze Wiśnickie, z drugiej kopulaste beskidzkie szczyty.',
+      'Od 2023 roku na wierzchołku stoi stalowa wieża widokowa o wysokości dwudziestu dziewięciu metrów, najwyższa w Beskidzie Wyspowym. Wcześniej stała tu wieża triangulacyjna i od niej wzięła się druga nazwa szczytu: Patria.',
+      'Miejsce ma trzy osobne wątki i trzy trasy do wyboru. Legendy: jeziorko pod szczytem, od którego góra nazywała się Jeziernik już w 1262 roku, oraz podanie o Diabelskim Kamieniu, który diabeł upuścił nad Trzcianą. Historia: kościół z 1934 roku i kamienna kolumna Lubomirskiego po potopie szwedzkim. Lasy: rezerwat buczyny karpackiej i sąsiednia Pasierbiecka Góra.',
+    ],
+    amenities: {
+      playground: { has: false, note: 'Brak. Na szczycie są za to miejsca piknikowe przy wieży.' },
+      food: { has: false, note: 'Nic na szlaku. Zapasy bierz ze sobą, sklepy są we wsiach niżej.' },
+      verified: false,
+    },
+  },
   liban: {
     photos: [
       { src: '/photos/liban-a.jpg', credit: 'Fot. Jakub Hałun · CC BY-SA 4.0 · Wikimedia Commons' },

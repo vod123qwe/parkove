@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.124.0'
+export const VERSION = '0.125.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,24 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.125.0',
+    date: '2026-09-05',
+    title: 'Five more places, and routes you pick by theme',
+    tldr: 'Nowe: Skala Kmity, Zimny Dol, Kajasowka, Skolczanka i Kamionna z trzema trasami tematycznymi.',
+    changes: [
+      ['added', 'Skala Kmity in Zabierzow: a 25 metre wall where the Rudawa cuts through the ridge, the legend of the knight who jumped, and the neighbouring rock named after the girl in that story.'],
+      ['added', 'Zimny Dol near Czulow: two hectares of stone mushrooms, overhangs and a cave with a stream still flowing out of it.'],
+      ['added', 'Kajasowka: a tectonic horst, a rare thing in Poland, plus the Przeginska cave and dry grassland with the driad butterfly.'],
+      ['added', 'Skolczanka above Tyniec: a reserve created in 1957 for insects, about 500 species of rare butterflies and bees.'],
+      ['added', 'Kamionna in gmina Trzciana: the first peak of Beskid Wyspowy from the north, a 29 metre tower from 2023, a summit lake that named the mountain Jeziernik in 1262, and the column Lubomirski raised after a skirmish with the Swedes.'],
+      ['added', 'Themed routes: Kamionna offers three walks to choose from, by legends, by history, or by forest and views. The picker already showed a name and a note, so the routes just fill them in.'],
+      ['added', 'A mountain place type, so a peak no longer shows up labelled as a valley.'],
+      ['added', '16 credited photos from Wikimedia Commons.'],
+      ['changed', 'add-places.mjs now takes an OSM id or a circle, so a place can be a reserve outline or a whole hill with a village under it.'],
+      ['changed', 'Ordered routes carry their role and note through to the app.'],
+    ],
+  },
   {
     version: '0.124.0',
     date: '2026-09-05',

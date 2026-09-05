@@ -12,6 +12,15 @@ const PLACES = [
   /* dwa obiekty o tej nazwie: stare wyrobisko (landuse=quarry) i uzytek
      ekologiczny z 2022. Bierzemy uzytek, bo obejmuje tez tablice i pomnik. */
   { id: 'liban', name: 'Kamieniołom Libana', kind: 'nature', osmId: 1460147273 },
+  { id: 'kmity', name: 'Skała Kmity', kind: 'nature', osmId: 2119192, osmType: 'relation' },
+  { id: 'zimny-dol', name: 'Zimny Dół', kind: 'valley', osmId: 158245131 },
+  { id: 'kajasowka', name: 'Kajasówka', kind: 'nature', osmId: 158245105 },
+  { id: 'skolczanka', name: 'Skołczanka', kind: 'nature', osmId: 158245125 },
+  /* Kamionna: obszar celowo duzy, bo wyprawa ma trzy watki rozrzucone po
+     calej gorze i wsi. Szczyt z wieza lezy ZA granica rezerwatu, kosciol i
+     kolumna Lubomirskiego sa we wsi poltora kilometra nizej. Kolo obejmuje
+     wszystko: ten sam trik co przy kopcach i Odeceixe. */
+  { id: 'kamionna', name: 'Kamionna', kind: 'mountain', circle: { center: [20.3825, 49.79], radiusM: 1950 } },
   /* nazwa w OSM ma cudzyslowy w srodku, ktore psuja skladnie zapytania,
      a dopasowanie po fragmencie lapie galerie handlowa. Bierzemy wiec way po id. */
   { id: 'bonarka', name: 'Rezerwat Bonarka', kind: 'nature', osmId: 136788901 },
@@ -45,10 +54,40 @@ const path = 'src/app/data/parks.json'
 const parks = JSON.parse(readFileSync(path, 'utf8'))
 const before = parks.features.length
 
+/** kolo jako wielokat: 32 wierzcholki wystarcza, zeby granica nie byla kanciasta */
+function circleRing(center, radiusM, steps = 32) {
+  const ring = []
+  const latM = 111320
+  const lonM = 111320 * Math.cos((center[1] * Math.PI) / 180)
+  for (let i = 0; i <= steps; i++) {
+    const a = (i / steps) * Math.PI * 2
+    ring.push([
+      Number((center[0] + (radiusM * Math.cos(a)) / lonM).toFixed(6)),
+      Number((center[1] + (radiusM * Math.sin(a)) / latM).toFixed(6)),
+    ])
+  }
+  return ring
+}
+
 for (const place of PLACES) {
+  if (place.circle) {
+    const { center, radiusM } = place.circle
+    const ring = circleRing(center, radiusM)
+    const areaHa = Number(((Math.PI * radiusM * radiusM) / 10000).toFixed(1))
+    parks.features = parks.features.filter((f) => f.id !== place.id)
+    parks.features.push({
+      type: 'Feature',
+      id: place.id,
+      properties: { id: place.id, name: place.name, kind: place.kind, areaHa, center },
+      geometry: { type: 'Polygon', coordinates: [ring] },
+    })
+    console.log(`${place.id.padEnd(14)} kolo ${radiusM} m, ${areaHa} ha, srodek ${center.join(', ')}`)
+    continue
+  }
   let q
   if (place.osmId) {
-    q = `[out:json][timeout:90];way(${place.osmId});out geom;`
+    const type = place.osmType ?? 'way'
+    q = `[out:json][timeout:90];${type}(${place.osmId});out geom;`
   } else {
     const [s, w, n, e] = place.bbox
     const sel = place.match ? `["name"~"${place.match}"]` : `["name"="${place.osm}"]`

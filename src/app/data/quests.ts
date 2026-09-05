@@ -13,6 +13,8 @@ import { DOLINKI_QUESTS } from './quests-dolinki'
 import { ODECEIXE_QUESTS } from './quests-odeceixe'
 import { MIECHOW_QUESTS } from './quests-miechow'
 import { KRZEMIONKI_QUESTS } from './quests-krzemionki'
+import { REZERWATY_QUESTS } from './quests-rezerwaty'
+import { KAMIONNA_QUESTS } from './quests-kamionna'
 
 export type PoiDilemma = {
   question: string
@@ -2998,6 +3000,8 @@ export const QUESTS: Quest[] = [
   ...KRAKOW_QUESTS,
   ...DOLINKI_QUESTS,
   ...KRZEMIONKI_QUESTS,
+  ...REZERWATY_QUESTS,
+  ...KAMIONNA_QUESTS,
   ...MIECHOW_QUESTS,
   ...ODECEIXE_QUESTS,
 ]

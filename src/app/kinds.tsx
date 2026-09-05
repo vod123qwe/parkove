@@ -10,6 +10,7 @@ export const KIND_META: Record<string, { label: string; icon: ReactNode }> = {
   water: { label: 'Woda', icon: <Waves /> },
   garden: { label: 'Ogród', icon: <Sprout /> },
   valley: { label: 'Dolina', icon: <MountainSnow /> },
+  mountain: { label: 'Góra', icon: <MountainSnow /> },
   village: { label: 'Wieś', icon: <Home /> },
 }
 
