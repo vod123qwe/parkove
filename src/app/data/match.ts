@@ -1,5 +1,5 @@
 /**
- * Podpowiadacz wypraw: dziewięć pytań, na końcu najwyżej trzy miejsca.
+ * Podpowiadacz wypraw: dwanaście kart w dwóch fazach, na końcu najwyżej trzy miejsca.
  *
  * Pomysł Jarka (2026-09-05): lista urosła do kilkudziesięciu miejsc i wybór
  * przestał być łatwy, a przewijanie kafelków nie pomaga, bo kafelek nie wie,
@@ -21,6 +21,7 @@ import { QUESTS } from './quests'
 import { PARK_INFO } from './parkinfo'
 import { visitEstimate } from './visit'
 import { countsForKrakow } from './trip'
+import { TRANSIT } from './transit'
 
 /** Rynek Główny: od niego liczymy „blisko czy daleko" */
 const CENTRE: [number, number] = [19.9366, 50.0619]
@@ -29,77 +30,145 @@ export type Feature =
   | 'blisko'
   | 'dlugie'
   | 'dziecko'
-  | 'widok'
-  | 'woda'
-  | 'historia'
-  | 'las'
-  | 'skaly'
+  | 'tramwaj'
   | 'nowe'
+  | 'widok'
+  | 'las'
+  | 'woda'
+  | 'skaly'
+  | 'historia'
+  | 'kwiaty'
+  | 'kameralnie'
+
+/**
+ * Dwie fazy pytań. „Dziś" to rzeczy, które zmieniają się z dnia na dzień
+ * (czas, towarzystwo, dojazd), „ochota" to gusty, które zmieniają się rzadko.
+ * Podział jest po to, żeby kiedyś dało się zapamiętać drugą fazę i przy
+ * kolejnym wejściu pytać tylko o pierwszą.
+ */
+export type Phase = 'dzis' | 'ochota'
+
+export const PHASE_LABEL: Record<Phase, string> = {
+  dzis: 'Dziś',
+  ochota: 'Na co masz ochotę',
+}
 
 export type Question = {
   id: Feature
+  phase: Phase
   /** treść karty, w pierwszej osobie: przesuwasz ją albo nie */
   text: string
   /** doprecyzowanie pod spodem, jedno zdanie */
   hint: string
   /** ikona z lucide, nazwa rozwiązywana w komponencie */
   icon: string
+  /**
+   * Zdjęcie na całą kartę, z public/photos. Świadomie prawdziwe miejsce
+   * z Krakowa i okolic, nie ilustracja: karta „chcę być nad wodą" ze zdjęciem
+   * Zakrzówka mówi więcej niż piktogram fali i przy okazji obiecuje coś, co
+   * naprawdę jest w apce.
+   */
+  photo: string
 }
 
 export const QUESTIONS: Question[] = [
+  /* ---- faza 1: dziś ---- */
   {
     id: 'blisko',
+    phase: 'dzis',
     text: 'Blisko, bez wyjeżdżania z miasta',
-    hint: 'W prawo, jeśli chcesz dojść albo dojechać w kwadrans.',
+    hint: 'W prawo, jeśli chcesz być na miejscu w kwadrans.',
     icon: 'pin',
+    photo: '/photos/park-planty-zzm-1.jpg',
   },
   {
     id: 'dlugie',
+    phase: 'dzis',
     text: 'Mam pół dnia albo więcej',
     hint: 'W prawo, jeśli nie spieszysz się do domu.',
     icon: 'clock',
+    photo: '/photos/dolina-bedkowska.jpg',
   },
   {
     id: 'dziecko',
+    phase: 'dzis',
     text: 'Idziemy z dzieckiem',
     hint: 'Plac zabaw, krótsza trasa i coś do jedzenia w pobliżu.',
     icon: 'child',
+    photo: '/photos/park-park-jordana-zzm-1.jpg',
   },
   {
+    id: 'tramwaj',
+    phase: 'dzis',
+    text: 'Bez auta, tramwajem albo autobusem',
+    hint: 'W lewo, jeśli jedziesz samochodem i parking nie jest problemem.',
+    icon: 'tram',
+    photo: '/photos/park-planty-bienczyckie-zzm-1.jpg',
+  },
+  /* ---- faza 2: na co masz ochotę ---- */
+  {
     id: 'nowe',
+    phase: 'ochota',
     text: 'Coś, gdzie jeszcze nie byłem',
     hint: 'W lewo, jeśli wolisz wrócić w znane miejsce.',
     icon: 'sparkles',
+    photo: '/photos/kamionna-b.jpg',
   },
   {
     id: 'widok',
+    phase: 'ochota',
     text: 'Chcę widok z góry',
     hint: 'Kopce, wieże, krawędzie dolin.',
     icon: 'mountain',
+    photo: '/photos/krakus-szczyt.jpg',
   },
   {
     id: 'las',
+    phase: 'ochota',
     text: 'Las i cisza',
     hint: 'Bez asfaltu i bez tłumu.',
     icon: 'tree',
+    photo: '/photos/park-las-wolski-2.jpg',
   },
   {
     id: 'woda',
+    phase: 'ochota',
     text: 'Chcę być nad wodą',
     hint: 'Zalew, staw, rzeka albo źródło.',
     icon: 'waves',
+    photo: '/photos/zakrzowek-kapielisko.jpg',
   },
   {
     id: 'skaly',
+    phase: 'ochota',
     text: 'Skały i jaskinie',
     hint: 'Wapień, ściany, dziury w ziemi.',
     icon: 'rock',
+    photo: '/photos/skalki-grota.jpg',
   },
   {
     id: 'historia',
+    phase: 'ochota',
     text: 'Chcę usłyszeć jakąś historię',
     hint: 'Miejsca, w których coś się wydarzyło.',
     icon: 'book',
+    photo: '/photos/poi-kopiec-kosciuszki-fort-2.jpg',
+  },
+  {
+    id: 'kwiaty',
+    phase: 'ochota',
+    text: 'Łąki i kwiaty',
+    hint: 'Otwarta przestrzeń, trawa po kolana, motyle.',
+    icon: 'flower',
+    photo: '/photos/park-laki-nowohuckie-zzm-1.jpg',
+  },
+  {
+    id: 'kameralnie',
+    phase: 'ochota',
+    text: 'Kameralnie, bez tłumu',
+    hint: 'Miejsce, o którym mało kto wie.',
+    icon: 'leaf',
+    photo: '/photos/zimny-dol-a.jpg',
   },
 ]
 
@@ -142,6 +211,7 @@ function buildPlaces(): Place[] {
     const cat = (name: string) => pois.filter((x) => x.category === name).length
     const est = visitEstimate(p.id)
     const info = PARK_INFO[p.id]
+    const transit = TRANSIT[p.id]
     const km = distanceKm(p.center, CENTRE)
     const minutes = est?.min ?? 45
     const areaHa = p.areaHa ?? 5
@@ -185,6 +255,29 @@ function buildPlaces(): Place[] {
           clamp(areaHa / 200) * 0.25,
       ),
       skaly: clamp(share(cat('cave')) + share(cat('climb')) * 0.8),
+      /*
+       * Dojazd komunikacją: TRANSIT ma sprawdzone wpisy tylko dla sześciu
+       * miejsc, a dolinki nie mają żadnego, bo nikt nie sprawdził numerów
+       * linii. Dlatego wpis daje pełne dopasowanie, a samo położenie
+       * w mieście (do 9 km od Rynku) daje częściowe: w Krakowie prawie
+       * wszędzie dojedziesz, tylko nie wiemy jeszcze czym.
+       */
+      tramwaj: transit ? (transit.mode === 'bus' ? 0.85 : 1) : km <= 9 ? 0.6 : 0,
+      kwiaty: clamp(
+        (p.kind === 'meadow' ? 0.7 : 0) +
+          (p.kind === 'garden' ? 0.5 : 0) +
+          (p.kind === 'nature' ? 0.3 : 0) +
+          share(cat('meadow')) * 0.8,
+      ),
+      /*
+       * Kameralność nie jest w danych wprost, więc liczymy ją z tego, co
+       * zwykle ściąga tłum: bliskość centrum i duży, znany park. Daleko
+       * i mało znaczy spokojnie. To przybliżenie, więc w powodach nazywamy
+       * je ostrożnie.
+       */
+      kameralnie: clamp(
+        (1 - clamp((25 - km) / 21)) * 0.55 + (WILD.has(p.kind) ? 0.3 : 0) + (areaHa < 30 ? 0.15 : 0),
+      ),
       /* wypełniane przy liczeniu wyniku, bo zależy od stanu gry */
       nowe: 0,
     }
@@ -226,6 +319,9 @@ const REASON: Record<Feature, string> = {
   las: 'las i cisza',
   skaly: 'skały',
   nowe: 'jeszcze tam nie byłeś',
+  tramwaj: 'dojedziesz komunikacją',
+  kwiaty: 'łąki',
+  kameralnie: 'kameralnie',
 }
 
 /** powód odwrotny: „nie" też coś znaczy i warto to pokazać */
@@ -233,6 +329,7 @@ const REASON_NO: Partial<Record<Feature, string>> = {
   blisko: 'wyjazd za miasto',
   dlugie: 'krótko',
   nowe: 'znane miejsce',
+  kameralnie: 'popularne',
 }
 
 /**

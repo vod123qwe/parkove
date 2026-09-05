@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.126.0'
+export const VERSION = '0.127.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.127.0',
+    date: '2026-09-05',
+    title: 'Where to today: photo cards, a third gesture, twelve questions',
+    tldr: 'Dokad dzis: karty ze zdjeciami, gest w dol to wszystko jedno, dwanascie pytan w dwu fazach.',
+    changes: [
+      ['changed', 'Cards are now full photos of real places from the app, with the question over the picture, instead of an icon on a blurred panel.'],
+      ['added', 'Third gesture: drag down for I do not care. Right is yes, left is no. Arrow keys and three buttons do the same.'],
+      ['added', 'Twelve questions in two phases: Today (near, half a day, with a child, without a car) and What you feel like (new, views, forest, water, rocks, history, meadows, quiet). The phase is shown above the deck.'],
+      ['added', 'Three new matching features: reachable by public transport (from the transit data, with a partial score for anything inside the city), meadows and flowers, and quiet places away from the crowd.'],
+      ['fixed', 'Releasing a card read the drag position from React state, which could be one frame stale, so a fast swipe down sometimes did nothing. Position lives in a ref now and the drag listens on the window.'],
+      ['added', 'The next two card photos preload, so the deck never shows a loading photo.'],
+    ],
+  },
   {
     version: '0.126.0',
     date: '2026-09-05',

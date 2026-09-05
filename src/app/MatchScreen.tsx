@@ -1,22 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
+  ArrowDown,
   Baby,
   BookOpen,
   Check,
   Clock,
+  Flower2,
   Gem,
+  Leaf,
   MapPin,
   MountainSnow,
   RotateCcw,
   Sparkles,
+  TramFront,
   TreePine,
   Waves,
   X,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Button, NavBar } from '../ds'
-import { QUESTIONS, match } from './data/match'
+import { PHASE_LABEL, QUESTIONS, match } from './data/match'
 import type { Answer, Feature, Match } from './data/match'
 import { PARK_INFO } from './data/parkinfo'
 import { fmtKm, fmtVisitMin } from './data/visit'
@@ -27,12 +31,16 @@ import type { MatchBg } from './matchbg'
 import { useGameState } from './state'
 
 /**
- * Dokąd dziś: dziewięć kart do przesunięcia, na końcu najwyżej trzy miejsca.
+ * Dokąd dziś: dwanaście kart do przesunięcia, na końcu najwyżej trzy miejsca.
  *
- * Gest jest tu treścią, a nie ozdobą. Lista z filtrami wymaga, żebyś wiedział,
- * czego szukasz; przesuwanie kart pozwala odpowiadać na to, na co masz ochotę,
- * i dopiero z tych odpowiedzi robi się wybór. Dlatego karta zawsze ma też dwa
- * przyciski: gest jest szybszy, ale nie może być jedyną drogą.
+ * Trzy gesty, nie dwa (Jarek 2026-09-05): w prawo „tak", w lewo „nie",
+ * w dół „wszystko jedno". Dół jest osobnym gestem, a nie przyciskiem, bo
+ * przy dwunastu kartach przełączanie się między kciukiem na karcie i palcem
+ * na przycisku psuje rytm. Przyciski zostają jako druga droga, dla
+ * dostępności i dla tych, którzy wolą klikać.
+ *
+ * Karta to zdjęcie prawdziwego miejsca z apki, nie ikona. Ikona zostaje jako
+ * mały znaczek, żeby karty w tej samej fazie dało się rozróżnić kątem oka.
  *
  * Logika dopasowania siedzi w data/match.ts, a tło w matchbg.ts. Tutaj jest
  * tylko ekran.
@@ -42,16 +50,22 @@ const ICONS: Record<string, ReactNode> = {
   pin: <MapPin />,
   clock: <Clock />,
   child: <Baby />,
+  tram: <TramFront />,
   sparkles: <Sparkles />,
   mountain: <MountainSnow />,
   tree: <TreePine />,
   waves: <Waves />,
   rock: <Gem />,
   book: <BookOpen />,
+  flower: <Flower2 />,
+  leaf: <Leaf />,
 }
 
 /** po tylu pikselach puszczenie karty liczy się jako odpowiedź */
-const THRESHOLD = 92
+const THRESHOLD_X = 92
+const THRESHOLD_Y = 110
+
+type Leaving = 'yes' | 'no' | 'skip' | null
 
 export function MatchScreen({
   onClose,
@@ -67,11 +81,18 @@ export function MatchScreen({
   const [answers, setAnswers] = useState<Partial<Record<Feature, Answer>>>({})
   const [results, setResults] = useState<Match[] | null>(null)
 
-  /* przeciąganie: dx w pikselach, `leaving` to kierunek odlatującej karty */
-  const [dx, setDx] = useState(0)
-  const [leaving, setLeaving] = useState<-1 | 1 | 0>(0)
+  /* przeciąganie w dwu osiach; `leaving` to kierunek odlatującej karty */
+  const [drag, setDrag] = useState({ x: 0, y: 0 })
+  const [leaving, setLeaving] = useState<Leaving>(null)
   const dragging = useRef(false)
-  const startX = useRef(0)
+  const start = useRef({ x: 0, y: 0 })
+  /*
+   * Ta sama pozycja co w stanie, ale w refie: pointerup potrafi przyjść w tej
+   * samej klatce co ostatni pointermove, zanim React zdąży przerenderować,
+   * i wtedy stan w domknięciu jest jeszcze stary. Szybki ruch kciukiem
+   * w dół kończył się „nic się nie stało". Ref jest zawsze aktualny.
+   */
+  const pos = useRef({ x: 0, y: 0 })
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const bg = useRef<MatchBg | null>(null)
@@ -86,11 +107,25 @@ export function MatchScreen({
   }, [])
 
   useEffect(() => {
-    bg.current?.setTilt(Math.max(-1, Math.min(1, dx / 150)))
-  }, [dx])
+    bg.current?.setTilt(Math.max(-1, Math.min(1, drag.x / 150)))
+  }, [drag.x])
+
+  /*
+   * Zdjęcia następnych kart ładujemy z wyprzedzeniem: karta wjeżdża spod
+   * spodu i ma być gotowa, a nie doładowywać się na oczach.
+   */
+  useEffect(() => {
+    for (const q of QUESTIONS.slice(step + 1, step + 3)) {
+      const img = new Image()
+      img.src = asset(q.photo)
+    }
+  }, [step])
 
   const question = QUESTIONS[step]
+  const nextQuestion = QUESTIONS[step + 1]
   const done = step >= QUESTIONS.length
+  /* pierwsza karta nowej fazy dostaje nagłówek, żeby zmiana tonu była widoczna */
+  const phaseStarts = !done && (step === 0 || QUESTIONS[step - 1].phase !== question.phase)
 
   const answer = useCallback(
     (value: Answer) => {
@@ -98,14 +133,14 @@ export function MatchScreen({
       if (!q) return
       const next = { ...answers, [q.id]: value }
       setAnswers(next)
-      setLeaving(value === 'yes' ? 1 : -1)
+      setLeaving(value)
       /* karta odlatuje, dopiero potem podmieniamy treść: inaczej tekst mruga */
       window.setTimeout(() => {
-        setLeaving(0)
-        setDx(0)
+        setLeaving(null)
+        setDrag({ x: 0, y: 0 })
         if (step + 1 >= QUESTIONS.length) setResults(match(next, visited, 3))
         setStep(step + 1)
-      }, 220)
+      }, 240)
     },
     [answers, step, visited],
   )
@@ -116,41 +151,65 @@ export function MatchScreen({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') answer('yes')
       if (e.key === 'ArrowLeft') answer('no')
+      if (e.key === 'ArrowDown') answer('skip')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [answer, done])
 
+  /*
+   * Ruch i puszczenie słuchamy na OKNIE, nie na karcie. Przechwycenie
+   * wskaźnika przez kartę (setPointerCapture) gubiło pointerup przy szybkim
+   * ruchu w dół i karta zostawała w połowie drogi. Okno dostaje wszystko,
+   * niezależnie od tego, gdzie palec skończy.
+   */
   const onDown = (e: React.PointerEvent) => {
     if (leaving) return
     dragging.current = true
-    startX.current = e.clientX
-    ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
-  }
-  const onMove = (e: React.PointerEvent) => {
-    if (!dragging.current) return
-    setDx(e.clientX - startX.current)
-  }
-  const onUp = () => {
-    if (!dragging.current) return
-    dragging.current = false
-    if (dx > THRESHOLD) answer('yes')
-    else if (dx < -THRESHOLD) answer('no')
-    else setDx(0)
+    start.current = { x: e.clientX, y: e.clientY }
+    pos.current = { x: 0, y: 0 }
+    const move = (ev: PointerEvent) => {
+      if (!dragging.current) return
+      /* w górę karta nie idzie: to nie jest odpowiedź, więc trzymamy ją przy zerze */
+      const next = { x: ev.clientX - start.current.x, y: Math.max(-24, ev.clientY - start.current.y) }
+      pos.current = next
+      setDrag(next)
+    }
+    const up = () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+      if (!dragging.current) return
+      dragging.current = false
+      const { x, y } = pos.current
+      pos.current = { x: 0, y: 0 }
+      /* dominująca oś decyduje: przekątna w prawo i w dół to nadal „tak" */
+      if (y > THRESHOLD_Y && y > Math.abs(x)) answer('skip')
+      else if (x > THRESHOLD_X) answer('yes')
+      else if (x < -THRESHOLD_X) answer('no')
+      else setDrag({ x: 0, y: 0 })
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
   }
 
   const restart = () => {
     setAnswers({})
     setResults(null)
     setStep(0)
-    setDx(0)
+    setDrag({ x: 0, y: 0 })
     bg.current?.setTilt(0)
   }
 
-  const offset = leaving ? leaving * window.innerWidth * 1.2 : dx
-  const tilt = offset / 26
-  const yes = dx > 40
-  const no = dx < -40
+  /* pozycja karty: w trakcie przeciągania za palcem, przy odlocie poza ekran */
+  const fly = leaving === 'yes' ? { x: window.innerWidth * 1.2, y: drag.y }
+    : leaving === 'no' ? { x: -window.innerWidth * 1.2, y: drag.y }
+    : leaving === 'skip' ? { x: drag.x, y: window.innerHeight }
+    : drag
+  const rotate = fly.x / 26
+  const verdict: Leaving = leaving
+    ?? (drag.y > 60 && drag.y > Math.abs(drag.x) ? 'skip' : drag.x > 40 ? 'yes' : drag.x < -40 ? 'no' : null)
 
   return createPortal(
     <div className="mtch">
@@ -159,29 +218,40 @@ export function MatchScreen({
 
       {!done ? (
         <div className="mtch__stage">
-          <p className="t-caption mtch__count">
-            Pytanie {step + 1} z {QUESTIONS.length}
-          </p>
+          <div className="mtch__head">
+            <p className={`t-label mtch__phase${phaseStarts ? ' -fresh' : ''}`}>{PHASE_LABEL[question.phase]}</p>
+            <p className="t-caption mtch__count">
+              {step + 1} z {QUESTIONS.length}
+            </p>
+          </div>
           <div className="mtch__progress" aria-hidden="true">
             <span style={{ width: `${(step / QUESTIONS.length) * 100}%` }} />
           </div>
 
           <div className="mtch__deck">
-            {/* karta pod spodem: widać, że to talia, a nie jedna plansza */}
-            <div className="mtch-card -under" aria-hidden="true" />
+            {/* następna karta czeka pod spodem: widać, że to talia */}
+            {nextQuestion && (
+              <div className="mtch-card -under" aria-hidden="true">
+                <img className="mtch-card__photo" src={asset(nextQuestion.photo)} alt="" />
+              </div>
+            )}
             <div
               className={`mtch-card${leaving ? ' -leaving' : ''}`}
-              style={{ transform: `translateX(${offset}px) rotate(${tilt}deg)` }}
+              style={{ transform: `translate(${fly.x}px, ${fly.y}px) rotate(${rotate}deg)` }}
               onPointerDown={onDown}
-              onPointerMove={onMove}
-              onPointerUp={onUp}
-              onPointerCancel={onUp}
             >
-              <span className={`mtch-card__verdict -yes${yes ? ' -on' : ''}`}>tak</span>
-              <span className={`mtch-card__verdict -no${no ? ' -on' : ''}`}>nie</span>
+              <img className="mtch-card__photo" src={asset(question.photo)} alt="" draggable={false} />
+              <span className="mtch-card__shade" aria-hidden="true" />
+
+              <span className={`mtch-card__verdict -yes${verdict === 'yes' ? ' -on' : ''}`}>tak</span>
+              <span className={`mtch-card__verdict -no${verdict === 'no' ? ' -on' : ''}`}>nie</span>
+              <span className={`mtch-card__verdict -skip${verdict === 'skip' ? ' -on' : ''}`}>wszystko jedno</span>
+
               <span className="mtch-card__icon">{ICONS[question.icon] ?? <Sparkles />}</span>
-              <h2 className="t-headline mtch-card__text">{question.text}</h2>
-              <p className="t-body-sm mtch-card__hint">{question.hint}</p>
+              <div className="mtch-card__body">
+                <h2 className="t-headline mtch-card__text">{question.text}</h2>
+                <p className="t-body-sm mtch-card__hint">{question.hint}</p>
+              </div>
             </div>
           </div>
 
@@ -189,14 +259,14 @@ export function MatchScreen({
             <button className="mtch__vote -no" onClick={() => answer('no')} aria-label="Nie dziś">
               <X size={26} />
             </button>
-            <button className="mtch__skip" onClick={() => answer('skip')}>
-              Wszystko jedno
+            <button className="mtch__vote -skip" onClick={() => answer('skip')} aria-label="Wszystko jedno">
+              <ArrowDown size={20} />
             </button>
             <button className="mtch__vote -yes" onClick={() => answer('yes')} aria-label="Tak, chcę">
               <Check size={26} />
             </button>
           </div>
-          <p className="t-caption mtch__tip">Przesuń kartę w prawo albo w lewo.</p>
+          <p className="t-caption mtch__tip">W prawo tak, w lewo nie, w dół wszystko jedno.</p>
         </div>
       ) : (
         <div className="mtch__results">
