@@ -6670,3 +6670,343 @@
   gap: var(--sp-3);
   margin-top: var(--sp-6);
 }
+
+/* ==========================================================================
+   Dokąd dziś: podpowiadacz wypraw (MatchScreen)
+
+   Ekran otwiera się z profilu, czyli z modala (z-index 200), więc siada nad
+   nim na 210, tak samo jak pamiętnik. Tło rysuje WebGL (matchbg.ts), a pod
+   spodem leży gradient z tokenów: gdy shader nie wystartuje, ekran nadal
+   wygląda jak trzeba, tylko bez ruchu.
+   ========================================================================== */
+
+.mtch {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--bg-primary) 0%, #0e2109 60%, var(--bg-primary) 100%);
+  color: #fff;
+}
+
+/* canvas jest elementem zastępowanym: bez jawnych 100% nie rozciąga się na inset */
+.mtch__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mtch__nav,
+.mtch__stage,
+.mtch__results {
+  position: relative;
+  z-index: 1;
+}
+
+.mtch__nav {
+  color: #fff;
+}
+
+.mtch__stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sp-2) var(--sp-5) calc(var(--sa-gap, 0px) + var(--sp-5));
+  min-height: 0;
+}
+
+.mtch__count {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: var(--sp-2);
+}
+
+.mtch__progress {
+  width: min(240px, 70%);
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.mtch__progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--bg-lime);
+  transition: width 0.28s ease;
+}
+
+/* ---- talia ---- */
+
+.mtch__deck {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  margin: var(--sp-4) 0;
+}
+
+.mtch-card {
+  position: absolute;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-8) var(--sp-6);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+
+.mtch-card.-under {
+  transform: translateY(14px) scale(0.94);
+  opacity: 0.45;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.mtch-card.-leaving {
+  transition:
+    transform 0.22s ease-in,
+    opacity 0.22s ease-in;
+  opacity: 0;
+}
+
+.mtch-card__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--bg-lime);
+}
+
+.mtch-card__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.mtch-card__text {
+  color: #fff;
+  margin: 0;
+}
+
+.mtch-card__hint {
+  color: rgba(255, 255, 255, 0.74);
+  margin: 0;
+}
+
+/* stemple TAK/NIE, widoczne dopiero gdy karta odjedzie na tyle, żeby to coś znaczyło */
+.mtch-card__verdict {
+  position: absolute;
+  top: var(--sp-6);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  border: 2px solid currentColor;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.mtch-card__verdict.-on {
+  opacity: 1;
+}
+
+.mtch-card__verdict.-yes {
+  left: var(--sp-6);
+  color: var(--bg-lime);
+  transform: rotate(-9deg);
+}
+
+.mtch-card__verdict.-no {
+  right: var(--sp-6);
+  color: #ff9a8b;
+  transform: rotate(9deg);
+}
+
+/* ---- przyciski pod talią ---- */
+
+.mtch__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.mtch__vote {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+
+.mtch__vote.-yes {
+  background: var(--bg-lime);
+  border-color: transparent;
+  color: var(--content-on-lime);
+}
+
+.mtch__skip {
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+}
+
+.mtch__tip {
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: var(--sp-3);
+}
+
+/* ---- wyniki ---- */
+
+.mtch__results {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-4) var(--sp-5) calc(var(--sa-gap, 0px) + var(--sp-8));
+}
+
+.mtch__resultsTitle {
+  color: #fff;
+  margin: 0 0 var(--sp-2);
+}
+
+.mtch__resultsLead {
+  color: rgba(255, 255, 255, 0.74);
+  margin: 0 0 var(--sp-6);
+}
+
+.mtch__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.mtch-hit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mtch-hit__rank {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  background: var(--bg-lime);
+  color: var(--content-on-lime);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.mtch-hit__photo {
+  flex: none;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+  display: grid;
+  place-items: center;
+}
+
+.mtch-hit__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mtch-hit__ph svg {
+  width: 26px;
+  height: 26px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mtch-hit__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.mtch-hit__name {
+  color: #fff;
+}
+
+.mtch-hit__meta {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.mtch-hit__why {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.mtch-hit__tag {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(195, 236, 71, 0.18);
+  color: var(--bg-lime);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.mtch__again {
+  margin-top: var(--sp-8);
+}
+
+.mtch__again .pk-btn {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mtch-card.-leaving {
+    transition-duration: 0.01ms;
+  }
+}

@@ -2,6 +2,7 @@ import {
   Award,
   BookOpen,
   ChevronRight,
+  Compass,
   Footprints,
   Info,
   List as ListIcon,
@@ -36,6 +37,7 @@ export function ProfileScreen({
   onAchievements,
   onJournal,
   onAllParks,
+  onMatch,
   onLooks,
   onAbout,
 }: {
@@ -46,6 +48,7 @@ export function ProfileScreen({
   onAchievements: () => void
   onJournal: () => void
   onAllParks: () => void
+  onMatch: () => void
   onLooks: () => void
   onAbout: () => void
 }) {
@@ -119,6 +122,17 @@ export function ProfileScreen({
 
       <ListHead>Odkrywaj</ListHead>
       <List divided={false} className="prof-cells">
+        <ListItem
+          className="prof-cell"
+          icon={<Compass />}
+          leadTone="accent"
+          leadShape="squircle"
+          leadSurface="paper"
+          title="Dokąd dziś?"
+          meta="Kilka pytań, trzy propozycje na dzisiaj"
+          trailing={<ChevronRight size={18} />}
+          onClick={onMatch}
+        />
         <ListItem
           className="prof-cell"
           icon={<ListIcon />}

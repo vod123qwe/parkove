@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.125.0'
+export const VERSION = '0.126.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.126.0',
+    date: '2026-09-05',
+    title: 'Where to today: nine cards, three suggestions',
+    tldr: 'Nowy ekran Dokad dzis: przesuwasz karty z pytaniami, dostajesz trzy propozycje.',
+    changes: [
+      ['added', 'Where to today, a new screen in the menu: nine cards you swipe right or left, then at most three places that fit the answers. Three, because a longer list brings back the problem it is meant to solve.'],
+      ['added', 'Each suggestion says why it came up: near, forest and quiet, water, views, history, or that you have not been there yet.'],
+      ['added', 'Matching is computed from data the app already has, so a newly added place gets a profile the moment it lands in parks.json. Nothing is hand tagged per place.'],
+      ['added', 'A live WebGL background under the cards that follows the drag and warms up as you pull right. Written as one shader rather than pulled from a 3D library, because the page needs one quad and the app has to stay small and work offline.'],
+      ['added', 'Cards answer to arrow keys and to two buttons, so the gesture is the fast path and never the only one.'],
+      ['changed', 'Half a day means two to four hours: a nine hour route no longer wins the question about having time.'],
+    ],
+  },
   {
     version: '0.125.0',
     date: '2026-09-05',

@@ -16,6 +16,7 @@ import { TrailPicker } from './TrailPicker'
 import { LooksModal } from './LooksModal'
 import { JournalScreen } from './JournalScreen'
 import { ProfileScreen } from './ProfileScreen'
+import { MatchScreen } from './MatchScreen'
 import { StatsModal } from './StatsModal'
 import { AboutModal } from './AboutModal'
 import { MapFilters } from './MapFilters'
@@ -211,6 +212,8 @@ export function App() {
   /** wybrana konkretna kawiarnia albo plac zabaw: pin rośnie, mapa centruje */
   const [amenitySpotId, setAmenitySpotId] = useState<string | null>(null)
   const [trailsOpen, setTrailsOpen] = useState(false)
+  /* podpowiadacz wypraw: pelnoekranowy, otwierany z profilu */
+  const [matchOpen, setMatchOpen] = useState(false)
   /*
    * Wybieranie szlaku na mapie w trakcie wyprawy: numer podgladanej trasy.
    * null = nie wybieramy. Podglad rysuje sie na mapie, a moduly na dole
@@ -1708,9 +1711,21 @@ export function App() {
           setMenuOpen(false)
           setListWide(true)
         }}
+        onMatch={() => setMatchOpen(true)}
         onLooks={() => setLooksModalOpen(true)}
         onAbout={() => setAboutOpen(true)}
       />
+
+      {matchOpen && (
+        <MatchScreen
+          onClose={() => setMatchOpen(false)}
+          onPick={(id) => {
+            setMatchOpen(false)
+            setMenuOpen(false)
+            showOnMap(id)
+          }}
+        />
+      )}
 
       <StatsModal
         open={statsOpen}
