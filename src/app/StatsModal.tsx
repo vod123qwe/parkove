@@ -19,6 +19,7 @@ import { CATEGORY_LABEL, QUESTS, questForPark } from './data/quests'
 import type { PoiCategory } from './data/quests'
 import { stampNeed } from './progress'
 import parksData from './data/parks.json'
+import { countsForKrakow } from './data/trip'
 
 /**
  * Moje liczby.
@@ -34,9 +35,10 @@ import parksData from './data/parks.json'
  * innych ludzi i nie będzie mieć.
  */
 
+/* tylko kolekcja Krakowa: bez wyprawy tymczasowej, poligonu i placow zabaw */
 const FEATURES = (parksData as {
-  features: Array<{ id: string; properties: { name: string } }>
-}).features
+  features: Array<{ id: string; properties: { name: string; trip?: string; test?: boolean; kind?: string } }>
+}).features.filter(countsForKrakow)
 
 const parkName = (id: string) => FEATURES.find((f) => f.id === id)?.properties.name ?? id
 

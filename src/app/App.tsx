@@ -40,7 +40,7 @@ import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { hasPack, verifyPack } from './offline'
 import { fmtKm, fmtVisitMin, visitEstimate } from './data/visit'
-import { hasBigPlayground, hasPlayground } from './data/playgrounds'
+import { hasBigPlayground, hasPlayground, plAry } from './data/playgrounds'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
 import { useWakeLock } from './wakelock'
@@ -55,7 +55,7 @@ import { isParkComplete } from './progress'
 import { useUpdateAvailable } from './update'
 import { MAP_STYLES, getMapStyle, resolveMapStyle, setMapStyle } from './data/mapstyles'
 import { DownloadStatus } from './DownloadStatus'
-import { KIND_META } from './kinds'
+import { KIND_META, kindIcon } from './kinds'
 import { challengeStates } from './data/challenges'
 import type { MapStyleId } from './data/mapstyles'
 import { PARKING } from './data/parking'
@@ -93,11 +93,18 @@ const DOCK_PEEK = 290
  * Progi wzięte z rozkładu danych: połowa miejsc mieści się w pół godziny,
  * dolinki jurajskie zaczynają się od godziny i 4 km w górę.
  */
-type ParkTab = 'all' | 'parki' | 'dolinki'
+/*
+ * Place zabaw (kind playground, group 'place') maja wlasna zakladke i NIE
+ * wchodza do „Wszystkie": to lista miejsc z historiami, a 62 place by ja
+ * zalaly. Place pokazuja sie w swojej zakladce, przez filtr placu w kazdej
+ * zakladce i przez szukanie.
+ */
+type ParkTab = 'all' | 'parki' | 'dolinki' | 'place'
 const TAB_DEFS: Array<[ParkTab, string]> = [
   ['all', 'Wszystkie'],
   ['parki', 'Parki'],
   ['dolinki', 'Dolinki'],
+  ['place', 'Place zabaw'],
 ]
 const TIME_OPTS = [
   { v: 0, label: 'Czas: dowolny' },
@@ -858,16 +865,22 @@ export function App() {
           plain(KIND_META[f.properties.kind]?.label ?? '').includes(needle),
       )
     }
-    if (!listNarrowed) return sortedParks
+    if (!listNarrowed) return sortedParks.filter((f) => groupOf(f) !== 'place')
     return sortedParks.filter((f) => {
       if (tab !== 'all' && groupOf(f) !== tab) return false
+      /* place tylko w swojej zakladce albo gdy ktos prosi o plac zabaw */
+      if (tab === 'all' && groupOf(f) === 'place' && playBand === '') return false
       const est = visitEstimate(f.id)
-      if (timeMax > 0 && !(est && est.min <= timeMax)) return false
-      if (distBand === '2' && !(est && est.km <= 2)) return false
-      if (distBand === '5' && !(est && est.km <= 5)) return false
-      if (distBand === '5plus' && !(est && est.km >= 5)) return false
-      if (playBand === 'any' && !hasPlayground(f.id)) return false
-      if (playBand === 'big' && !hasBigPlayground(f.id)) return false
+      const isPlace = groupOf(f) === 'place'
+      if (!isPlace) {
+        if (timeMax > 0 && !(est && est.min <= timeMax)) return false
+        if (distBand === '2' && !(est && est.km <= 2)) return false
+        if (distBand === '5' && !(est && est.km <= 5)) return false
+        if (distBand === '5plus' && !(est && est.km >= 5)) return false
+      }
+      /* plac jako miejsce JEST placem; z definicji duzym (generator bierze od 1500 m2) */
+      if (playBand === 'any' && !isPlace && !hasPlayground(f.id)) return false
+      if (playBand === 'big' && !isPlace && !hasBigPlayground(f.id)) return false
       return true
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -880,11 +893,14 @@ export function App() {
    * z siebie nie chowa pinow, bo „Dolinki" to porzadek listy, a nie pytanie.
    */
   const narrowedPins = filtersOn || needle.length > 0
+  const showPlacePins = tab === 'place' || playBand !== ''
   const visiblePins = useMemo(() => {
-    if (!narrowedPins) return parkPins
+    /* 62 piny placow na mapie miasta to tlok: pokazujemy je, gdy o nie pytasz */
+    const base = showPlacePins ? parkPins : parkPins.filter((p) => p.kind !== 'playground')
+    if (!narrowedPins) return base
     const keep = new Set(shownParks.map((f) => f.id))
-    return parkPins.filter((p) => keep.has(p.id))
-  }, [parkPins, shownParks, narrowedPins])
+    return base.filter((p) => keep.has(p.id))
+  }, [parkPins, shownParks, narrowedPins, showPlacePins])
 
   /*
    * Mapa dojezdza do tego, co zostalo. Tylko dla filtrow, nie dla szukania:
@@ -1417,21 +1433,33 @@ export function App() {
                 {rows.map(({ f, earned, total, done, visited, hasPlay, hasFood }) => (
                   <ListItem
                     key={f.id}
-                    photo={{ src: asset(heroPhoto(f.id) ?? photosForPark(f.id)[0]?.src ?? ''), alt: '' }}
+                    {...(() => {
+                      const src = heroPhoto(f.id) ?? photosForPark(f.id)[0]?.src
+                      /* plac zabaw bez zdjecia: ikona rodzaju zamiast pustego kadru */
+                      return src
+                        ? { photo: { src: asset(src), alt: '' } }
+                        : { icon: kindIcon(f.properties.kind), leadTone: 'accent' as const, leadShape: 'squircle' as const }
+                    })()}
                     title={f.properties.name}
                     meta={
-                      done
-                        ? 'zdobyte'
-                        : questForPark(f.id)
-                          ? visited
-                            ? `${earned} z ${total} punktów`
-                            : `${total} ${plPunkty(total)} do odkrycia`
-                          : visited
-                            ? 'odwiedzone'
-                            : 'jeszcze nieodkryte'
+                      groupOf(f) === 'place'
+                        ? (() => {
+                            const ary = Math.round(((f.properties as { playground?: { m2: number } }).playground?.m2 ?? 0) / 100)
+                            return `${ary} ${plAry(ary)}${visited ? ' · odwiedzony' : ''}`
+                          })()
+                        : done
+                          ? 'zdobyte'
+                          : questForPark(f.id)
+                            ? visited
+                              ? `${earned} z ${total} punktów`
+                              : `${total} ${plPunkty(total)} do odkrycia`
+                            : visited
+                              ? 'odwiedzone'
+                              : 'jeszcze nieodkryte'
                     }
                     metaExtra={(() => {
-                      const est = visitEstimate(f.id)
+                      /* plac zabaw nie ma trasy: estymata z powierzchni nic by nie znaczyla */
+                      const est = groupOf(f) === 'place' ? null : visitEstimate(f.id)
                       if (!est && !hasPlay && !hasFood) return undefined
                       return (
                         <>

@@ -20,7 +20,14 @@ export const TRIP_NAME = 'Costa Vicentina'
 /** przybliżony środek wyprawy: po nim apka poznaje, że jesteś na miejscu */
 export const TRIP_CENTER: [number, number] = [-8.785, 37.437]
 
-type ParkLike = { id: string; properties?: { trip?: string; test?: boolean } }
+type ParkLike = { id: string; properties?: { trip?: string; test?: boolean; kind?: string } }
+
+/**
+ * Duże place zabaw są w bazie jako osobne miejsca (kind 'playground'), ale
+ * gra jest o parkach: plac nie ma pieczątki, punktów ani udziału w procencie
+ * Krakowa. Listy, mapa, filtry i podpowiadacz widzą je normalnie.
+ */
+export const isPlayground = (f: ParkLike) => f.properties?.kind === 'playground'
 
 /** czy to miejsce z wyprawy (a nie z kolekcji krakowskiej) */
 export const isTripPark = (f: ParkLike) => f.properties?.trip != null
@@ -34,7 +41,8 @@ export const isTestPark = (f: ParkLike) => f.id.startsWith('test-') || f.propert
  * prefiks, a nie konkretne id, bo poprzednie („test-piltza") zdążyło już
  * zniknąć, a filtr z jego nazwą został i nic nie robił.
  */
-export const countsForKrakow = (f: ParkLike) => !isTestPark(f) && f.properties?.trip == null
+export const countsForKrakow = (f: ParkLike) =>
+  !isTestPark(f) && f.properties?.trip == null && !isPlayground(f)
 
 const HOME_KEY = 'pk-trip-home'
 

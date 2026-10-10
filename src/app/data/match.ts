@@ -20,7 +20,7 @@ import parksData from './parks.json'
 import { QUESTS } from './quests'
 import { PARK_INFO } from './parkinfo'
 import { visitEstimate } from './visit'
-import { countsForKrakow } from './trip'
+import { isPlayground, isTestPark } from './trip'
 import { TRANSIT } from './transit'
 import { playgroundScore } from './playgrounds'
 
@@ -214,8 +214,21 @@ const TAME = new Set(['park', 'garden', 'meadow'])
 function buildPlaces(): Place[] {
   const out: Place[] = []
   for (const f of parksData.features) {
-    if (!countsForKrakow(f as { id: string; properties?: { trip?: string; test?: boolean } })) continue
-    const p = f.properties as { id: string; name: string; kind: string; areaHa?: number; center: [number, number] }
+    /*
+     * Pula to Krakow i okolice bez wyprawy tymczasowej i poligonu. Place zabaw
+     * ZOSTAJA w puli (Jarek 2026-10-10): nie licza sie do kolekcji, ale na
+     * pytanie o duzy plac maja prawo byc odpowiedzia.
+     */
+    const like = f as { id: string; properties?: { trip?: string; test?: boolean; kind?: string } }
+    if (isTestPark(like) || like.properties?.trip != null) continue
+    const p = f.properties as {
+      id: string
+      name: string
+      kind: string
+      areaHa?: number
+      center: [number, number]
+      playground?: { m2: number }
+    }
     const quest = QUESTS.find((q) => q.parkId === p.id)
     const pois = quest?.pois ?? []
     const cat = (name: string) => pois.filter((x) => x.category === name).length
@@ -232,6 +245,39 @@ function buildPlaces(): Place[] {
      * z miejscem, które ma trzy punkty, ale wszystkie o wodzie.
      */
     const share = (n: number) => (pois.length ? clamp(n / Math.max(3, pois.length)) : 0)
+
+    if (isPlayground(like)) {
+      const m2 = p.playground?.m2 ?? 0
+      const placScore = m2 >= 3000 ? 1 : 0.7 + (0.3 * (m2 - 1500)) / 1500
+      out.push({
+        id: p.id,
+        name: p.name,
+        kind: p.kind,
+        areaHa,
+        center: p.center,
+        km: Math.round(km * 10) / 10,
+        /* kwadrans na placu to minimum, godzina to norma; estymata jest umowna */
+        minutes: 45,
+        points: 0,
+        profile: {
+          blisko: clamp((25 - km) / 21),
+          dlugie: 0,
+          dziecko: 0.85,
+          plac: clamp(placScore),
+          /* plac w miescie: dojazd komunikacja prawie zawsze, ale niesprawdzony */
+          tramwaj: km <= 9 ? 0.6 : 0,
+          nowe: 0,
+          widok: 0,
+          las: 0,
+          woda: 0,
+          skaly: 0,
+          historia: 0,
+          kwiaty: 0,
+          kameralnie: 0.2,
+        },
+      })
+      continue
+    }
 
     const profile: Profile = {
       /* pełne dopasowanie do 4 km, zero powyżej 25 */

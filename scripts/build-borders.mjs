@@ -86,7 +86,9 @@ function bbox(f) {
 const near = (a, b, pad = 0.004) =>
   a[0] - pad <= b[2] && b[0] - pad <= a[2] && a[1] - pad <= b[3] && b[1] - pad <= a[3]
 
-const features = parks.features
+/* place zabaw (kind playground) nie potrzebuja granic: to pojedyncze obrysy,
+   a wspolny ciag z parkiem i tak nie niesie informacji */
+const features = parks.features.filter((f) => f.properties?.kind !== 'playground')
 const boxes = new Map(features.map((f) => [f.id, bbox(f)]))
 
 /** wszystkie odcinki wszystkich obrysów, z flagą wspólności */

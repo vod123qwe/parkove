@@ -7,10 +7,12 @@ import { isParkComplete } from './progress'
 import { GROUP_LABEL, challengeStates } from './data/challenges'
 import type { ChallengeGroup, ChallengeState } from './data/challenges'
 import parksData from './data/parks.json'
+import { countsForKrakow } from './data/trip'
 import type { ParkFeature } from './ParkSheet'
 import { kindIcon } from './kinds'
 
-const FEATURES = parksData.features as unknown as ParkFeature[]
+/* pieczatki sa tylko dla kolekcji Krakowa: place zabaw i wyprawy tymczasowe odpadaja */
+const FEATURES = (parksData.features as unknown as ParkFeature[]).filter(countsForKrakow)
 
 const ORDER: ChallengeGroup[] = ['places', 'points', 'walks', 'marks']
 

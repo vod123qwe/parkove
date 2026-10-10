@@ -1,0 +1,843 @@
+{
+  "plac-w233073118": {
+    "description": [
+      "Plac zabaw o powierzchni około 70 arów w rejonie Mistrzejowice, przy ul. Srebrnych Orłów, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "70 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w991923949": {
+    "description": [
+      "Plac zabaw o powierzchni około 65 arów w rejonie Cegielniana, przy ul. Do Wilgi, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "65 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-r2264310": {
+    "description": [
+      "Plac zabaw o powierzchni około 63 ary w rejonie Habina, przy ul. Niepokalanej Marii Panny, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "63 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w366273074": {
+    "description": [
+      "Plac zabaw o powierzchni około 61 arów na os. 2 Pułku Lotniczego, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "61 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w293416629": {
+    "description": [
+      "Plac zabaw o powierzchni około 57 arów na os. Ruczaj-Zaborze, przy ul. Stefana Grota-Roweckiego, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "57 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w297072159": {
+    "description": [
+      "Plac zabaw o powierzchni około 56 arów w rejonie Kobierzyn, przy ul. Lubostroń, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "56 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w434737213": {
+    "description": [
+      "Plac zabaw o powierzchni około 47 arów na os. Złotego Wieku, przy ul. Wawelska, jeden z największych w Krakowie.",
+      "Teren ogrodzony. Czynny: 24/7. Prowadzi: Urząd Miasta Krakowa - Zarząd Zieleni Miejskiej.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "47 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w401907762": {
+    "description": [
+      "Plac zabaw o powierzchni około 44 ary w rejonie Bieżanów, przy ul. Księdza Jerzego Popiełuszki, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "44 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w239043483": {
+    "description": [
+      "Plac zabaw o powierzchni około 44 ary na os. Dywizjonu 303, przy ul. Franciszka Hynka, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "44 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w228454315": {
+    "description": [
+      "Plac zabaw o powierzchni około 43 ary na os. Słoneczne, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "43 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w278866418": {
+    "description": [
+      "Plac zabaw o powierzchni około 43 ary w rejonie Przegorzały, przy ul. Skibowa, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "43 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w742433908": {
+    "description": [
+      "Plac zabaw o powierzchni około 40 arów na os. Niepodległości, przy ul. Batalionu „Zośka”, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "40 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w704454450": {
+    "description": [
+      "Plac zabaw o powierzchni około 40 arów w rejonie Lekarka, przy ul. Jana Kochanowskiego, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "40 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w532074913": {
+    "description": [
+      "Plac zabaw o powierzchni około 38 arów w rejonie Nowa Huta, przy ul. Edwarda Rydza-Śmigłego, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "38 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w344755860": {
+    "description": [
+      "Plac zabaw o powierzchni około 36 arów w rejonie Kozłówka, przy ul. Facimiech, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "36 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w246205222": {
+    "description": [
+      "Plac zabaw o powierzchni około 35 arów w rejonie Wzgórza Krzesławickie, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "35 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w200660027": {
+    "description": [
+      "Plac zabaw o powierzchni około 32 ary przy ul. Cicha, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "32 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w611058056": {
+    "description": [
+      "Plac zabaw o powierzchni około 32 ary w rejonie Grzegórzki, przy ul. Profesora Marka Stachowskiego, jeden z największych w Krakowie.",
+      "Pod stopami trawa.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "32 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w204040902": {
+    "description": [
+      "Plac zabaw o powierzchni około 32 ary w rejonie Kazimierz, przy ul. Bulwar Inflancki, jeden z największych w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "32 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w233409876": {
+    "description": [
+      "Plac zabaw o powierzchni około 31 arów na os. Złotego Wieku, przy ul. Czarnolaska, jeden z największych w Krakowie.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "31 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w162131834": {
+    "description": [
+      "Plac zabaw o powierzchni około 30 arów w rejonie Prądnik Czerwony, jeden z największych w Krakowie.",
+      "Na placu: kosz do koszykówki, drabinka linowa, drabinki, domek, piaskownica, huśtawka wagowa, zjeżdżalnia, bujaki. Teren ogrodzony. Wstęp bezpłatny.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "30 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w612992989": {
+    "description": [
+      "Plac zabaw o powierzchni około 30 arów w rejonie Bugaj, przy ul. Karola Darwina.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "30 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w301226123": {
+    "description": [
+      "Plac zabaw o powierzchni około 30 arów w rejonie Kliny Zacisze, przy ul. Michała Korpala.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "30 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w287018490": {
+    "description": [
+      "Plac zabaw o powierzchni około 28 arów na os. Wojskowe, przy ul. Orla.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "28 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w233182864": {
+    "description": [
+      "Plac zabaw o powierzchni około 26 arów w rejonie Bieńczyce, przy ul. Samorządowa.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "26 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w338753455": {
+    "description": [
+      "Plac zabaw o powierzchni około 25 arów w rejonie Rakowice, przy ul. Śliczna.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "25 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w454894086": {
+    "description": [
+      "Plac zabaw o powierzchni około 25 arów w rejonie Czyżyny, przy ul. Franciszka Hynka.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "25 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w258243410": {
+    "description": [
+      "Plac zabaw o powierzchni około 24 ary na os. Ruczaj-Zaborze.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "24 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w114092878": {
+    "description": [
+      "Plac zabaw o powierzchni około 24 ary na os. Oficerskie, przy ul. Farmaceutów.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "24 ary"
+      },
+      "verified": false
+    },
+    "photos": [
+      {
+        "src": "/photos/plac-w114092878.jpg",
+        "credit": "Fot. Mateusz Giełczyński · CC BY-SA 3.0 · Wikimedia Commons"
+      }
+    ]
+  },
+  "plac-w553986106": {
+    "description": [
+      "Plac zabaw o powierzchni około 24 ary w rejonie Nowa Huta.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "24 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w480488169": {
+    "description": [
+      "Plac zabaw o powierzchni około 22 ary przy ul. Polna.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "22 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w291013701": {
+    "description": [
+      "Plac zabaw o powierzchni około 22 ary w rejonie Prądnik Czerwony, przy ul. Jakuba Majora.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "22 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1492010462": {
+    "description": [
+      "Plac zabaw o powierzchni około 22 ary w rejonie Łagiewniki, przy ul. Aleksandra Fredry.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "22 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w607465374": {
+    "description": [
+      "Plac zabaw o powierzchni około 22 ary w rejonie Bieżanów, przy ul. Wiesława Zarzyckiego.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "22 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w544237180": {
+    "description": [
+      "Plac zabaw o powierzchni około 22 ary na os. Sportowe.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "22 ary"
+      },
+      "verified": false
+    }
+  },
+  "plac-w445446246": {
+    "description": [
+      "Plac zabaw o powierzchni około 21 arów na os. Teatralne.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "21 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w273770775": {
+    "description": [
+      "Plac zabaw o powierzchni około 21 arów na os. Szuwarowa.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "21 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1291121500": {
+    "description": [
+      "Plac zabaw o powierzchni około 21 arów w rejonie Węgrzynowice, przy ul. Węgrzynowicka.",
+      "Prowadzi: Zarząd Zieleni Miejskiej w Krakowie.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "21 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w742436662": {
+    "description": [
+      "Plac zabaw o powierzchni około 21 arów na os. Wandy.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "21 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w227351076": {
+    "description": [
+      "Plac zabaw o powierzchni około 21 arów na os. Dywizjonu 303, przy ul. Majora Pilota Mariana Pisarka.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "21 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1272218436": {
+    "description": [
+      "Plac zabaw o powierzchni około 20 arów w rejonie Nowa Huta, przy ul. Ignacego Mościckiego.",
+      "Pod stopami trawa.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "20 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w218840621": {
+    "description": [
+      "Plac zabaw o powierzchni około 20 arów w rejonie Stare Wiślisko, przy ul. Stare Wiślisko.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "20 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w430885835": {
+    "description": [
+      "Plac zabaw o powierzchni około 20 arów przy ul. Sadowa.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "20 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w961112096": {
+    "description": [
+      "Plac zabaw o powierzchni około 20 arów na os. Centrum C.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "20 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1137090024": {
+    "description": [
+      "Plac zabaw o powierzchni około 20 arów na os. Willowe.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "20 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w34373328": {
+    "description": [
+      "Plac zabaw o powierzchni około 19 arów w rejonie Zawodzie, przy ul. Siewna.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "19 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w165756300": {
+    "description": [
+      "Plac zabaw o powierzchni około 18 arów w rejonie Brzyzek, przy ul. Kozienicka.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "18 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1305458348": {
+    "description": [
+      "Plac zabaw o powierzchni około 18 arów w rejonie Bularnia, przy ul. Białoprądnicka.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "18 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w936131406": {
+    "description": [
+      "Plac zabaw o powierzchni około 18 arów na os. Piastów.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "18 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w450444357": {
+    "description": [
+      "Plac zabaw o powierzchni około 18 arów w rejonie Wola Duchacka.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "18 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w318000066": {
+    "description": [
+      "Plac zabaw o powierzchni około 17 arów w rejonie Zasady, przy ul. Krowoderskich Zuchów.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "17 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w428895999": {
+    "description": [
+      "Plac zabaw o powierzchni około 17 arów w rejonie Ugorek, przy ul. Seniorów Lotnictwa.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "17 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w307483724": {
+    "description": [
+      "Plac zabaw o powierzchni około 17 arów w rejonie Krzesławice, przy ul. Melchiora Wańkowicza.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "17 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w199839955": {
+    "description": [
+      "Plac zabaw o powierzchni około 17 arów w rejonie Prądnik Czerwony.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "17 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w361291040": {
+    "description": [
+      "Plac zabaw o powierzchni około 17 arów w rejonie Prądnik Czerwony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "17 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w742442167": {
+    "description": [
+      "Plac zabaw o powierzchni około 17 arów na os. Tysiąclecia, przy ul. Cedyńska.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "17 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1347545982": {
+    "description": [
+      "Plac zabaw o powierzchni około 16 arów w rejonie Kościelniki, przy ul. Pysocice.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "16 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w398613186": {
+    "description": [
+      "Plac zabaw o powierzchni około 16 arów na os. Centrum D.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "16 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w350833071": {
+    "description": [
+      "Plac zabaw o powierzchni około 15 arów w rejonie Ugorek, przy ul. Ugorek.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "15 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1475398549": {
+    "description": [
+      "Plac zabaw o powierzchni około 15 arów w rejonie Uzdrowisko Swoszowice, przy ul. Lusińska.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "15 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w445023329": {
+    "description": [
+      "Plac zabaw o powierzchni około 15 arów w rejonie Rakowice, przy ul. Śliczna.",
+      "Teren ogrodzony.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "15 arów"
+      },
+      "verified": false
+    }
+  },
+  "plac-w1182302827": {
+    "description": [
+      "Plac zabaw o powierzchni około 15 arów na os. Słoneczne.",
+      "Rozmiar policzony z obrysu w OpenStreetMap. Opis to tylko to, co mapa wie na pewno; zdjęcie i resztę dopisze pierwsza wizyta."
+    ],
+    "amenities": {
+      "playground": {
+        "has": true,
+        "note": "15 arów"
+      },
+      "verified": false
+    }
+  }
+}

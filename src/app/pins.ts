@@ -254,12 +254,20 @@ const PARK_KIND_ICON: Record<string, keyof typeof ICONS> = {
   park: 'park',
   forest: 'forest',
   mound: 'mound',
+  /*
+   * Rodzaj dodany dla Kamionnej (0.125.0) bez wpisu tutaj: pin dostawal id
+   * obrazka, ktorego nie bylo w atlasie, i gora nie miala pinu na mapie.
+   * Zmierzone 2026-10-10: hasImage('ppin-mountain-fresh') === false.
+   */
+  mountain: 'mound',
   valley: 'valley',
   meadow: 'meadow',
   water: 'water',
   garden: 'garden',
   nature: 'nature',
   village: 'village',
+  /* duze place zabaw jako osobne miejsca (docs: scripts/build-playground-places.mjs) */
+  playground: 'playground',
 }
 
 const PARK_W = 96

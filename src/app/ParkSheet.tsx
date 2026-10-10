@@ -27,7 +27,8 @@ import { WeatherStrip } from './WeatherStrip'
 import { OfflineRow } from './OfflineRow'
 import { PARK_INFO } from './data/parkinfo'
 import { amenitiesFor, isFood, topChips } from './data/amenities'
-import { playgroundLine } from './data/playgrounds'
+import { plAry, playgroundLine } from './data/playgrounds'
+import { isPlayground } from './data/trip'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
 import { asset } from './assets'
 import { checkIn, collectPoint, stopExpedition, useGameState } from './state'
@@ -50,7 +51,8 @@ export type ParkFeature = {
     areaHa: number
     center: [number, number]
     /** which collection a place belongs to; missing means a Kraków park */
-    group?: 'dolinki'
+    /* 'place' = duzy plac zabaw jako osobne miejsce (bez pieczatki) */
+    group?: 'dolinki' | 'place'
     /** wyprawa tymczasowa (np. wyjazd): miejsce spoza kolekcji miasta */
     trip?: string
     /** poligon testowy, nigdy nie liczony do kolekcji */
@@ -176,7 +178,17 @@ export function ParkSheet({
   const playCount = spots.length - foodCount
   const hasFood = foodCount > 0
   const hasPlay = playCount > 0
-  const heroMeta = `${kind.label} · ${ha} ha${quest ? ` · ${quest.pois.length} ${plPunkty(quest.pois.length)}` : ''}`
+  /*
+   * Plac zabaw jako miejsce (docs: scripts/build-playground-places.mjs): bez
+   * pieczatki, bez punktow, bez wyprawy. Karta mowi o arach i osiedlu, a nie
+   * o hektarach i questach, i nie proponuje startu wyprawy po placu.
+   */
+  const playground = isPlayground(park)
+  const pg = (park.properties as { playground?: { m2: number; hood?: string } }).playground
+  const pgAry = Math.round((pg?.m2 ?? 0) / 100)
+  const heroMeta = playground
+    ? `${kind.label} · ${pgAry} ${plAry(pgAry)}${pg?.hood ? ` · ${pg.hood}` : ''}`
+    : `${kind.label} · ${ha} ha${quest ? ` · ${quest.pois.length} ${plPunkty(quest.pois.length)}` : ''}`
 
   /*
    * Ile trzeba na pieczątkę (reguła mieszka w progress.ts) i jak to powiedzieć.
@@ -211,6 +223,7 @@ export function ParkSheet({
       */}
       <p className="t-body-sm park-herometa">{heroMeta}</p>
       {(() => {
+        if (playground) return null
         const est = visitEstimate(park.id)
         if (!est) return null
         return (
@@ -233,6 +246,7 @@ export function ParkSheet({
         to samo dwa razy: wyszarzona, dopóki nie zdobyta, w kolorze i z liczbą
         punktów w narożniku, kiedy już jest.
       */}
+      {!playground && (
       <div className="park-progress">
         <div className="park-progress__stamp">
           <Stamp
@@ -280,6 +294,7 @@ export function ParkSheet({
           )}
         </div>
       </div>
+      )}
 
       {info?.description && (
         <Collapsible className="park-about" lines={4}>
@@ -481,6 +496,7 @@ export function ParkSheet({
       )}
 
       {/* jedna decyzja, przyklejona do dołu: reszta karty przewija się pod nią */}
+      {!playground && (
       <ActionBar>
         {onExpeditionHere ? (
           <Button full size="lg" icon={<Square size={18} />} /* jawna strzalka: inaczej React podal by event jako opcje zakonczenia */
@@ -501,6 +517,7 @@ export function ParkSheet({
           </Button>
         )}
       </ActionBar>
+      )}
     </BottomSheet>
   )
 }

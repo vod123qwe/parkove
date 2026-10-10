@@ -58,7 +58,7 @@ export const hasBigPlayground = (parkId: string) => (file.parks[parkId]?.big ?? 
 const plPlace = (n: number) =>
   n === 1 ? 'plac' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'place' : 'placów'
 
-const plAry = (n: number) =>
+export const plAry = (n: number) =>
   n === 1 ? 'ar' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'ary' : 'arów'
 
 export function playgroundLine(parkId: string): string | null {

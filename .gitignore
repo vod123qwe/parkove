@@ -19,3 +19,5 @@ scripts/.trails-cache.json
 
 # katalog roboczy wranglera: build Workera powstaje na miejscu przy kazdym deployu
 .wrangler/
+# adresy placow zabaw z Nominatim: pamiec podreczna generatora, nie dane
+.cache-playground-addr.json

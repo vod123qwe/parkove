@@ -1257,7 +1257,9 @@ writeFileSync(CACHE, JSON.stringify(result), 'utf8')
 /* ---------- petle po alejkach (--alleys) ---------- */
 
 if (alleysOnly) {
-  const targets = (only.length ? only : parksData.features.map((f) => f.id)).filter(
+  /* place zabaw (kind playground) nie maja tras: to miejsce, nie spacer */
+  const walkable = parksData.features.filter((f) => f.properties?.kind !== 'playground')
+  const targets = (only.length ? only : walkable.map((f) => f.id)).filter(
     (id) => only.length || !(result[id]?.length),
   )
   console.log(`petle po alejkach: ${targets.length} miejsc do sprawdzenia`)

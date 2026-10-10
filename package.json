@@ -1,7 +1,7 @@
 {
   "name": "parkove",
   "private": true,
-  "version": "0.130.0",
+  "version": "0.131.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,7 +28,8 @@
     "proxy:check": "node scripts/proxy-check.mjs",
     "proxy:secrets": "wrangler secret list -c workers/plant-proxy/wrangler.toml",
     "proxy:who": "wrangler whoami",
-    "playgrounds": "node scripts/build-playgrounds.mjs"
+    "playgrounds": "node scripts/build-playgrounds.mjs",
+    "playgrounds:places": "node scripts/build-playground-places.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.33.0",

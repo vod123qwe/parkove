@@ -2,6 +2,8 @@
 // family Saturday (playground, coffee/food). Curated per park, pilots first.
 // `verified: false` means the amenity is inferred from OSM and needs a real visit.
 
+import playgroundInfo from './playground-info.json'
+
 export type ParkInfo = {
   /** hero photo, then the gallery */
   photos?: Array<{ src: string; credit?: string }>
@@ -1121,4 +1123,14 @@ export const PARK_INFO: Record<string, ParkInfo> = {
 }
 
 /** pierwsze zdjęcie miejsca, do miniatury na liście */
+/*
+ * Opisy placów zabaw są GENEROWANE (scripts/build-playground-places.mjs) z
+ * faktów w OSM i dokładane tutaj, żeby karta miejsca miała jedną ścieżkę.
+ * Ręczny wpis w PARK_INFO wygrywa z generowanym, gdyby kiedyś któryś plac
+ * dostał własną historię.
+ */
+for (const [id, info] of Object.entries(playgroundInfo as Record<string, ParkInfo>)) {
+  if (!PARK_INFO[id]) PARK_INFO[id] = info
+}
+
 export const heroPhoto = (parkId: string) => PARK_INFO[parkId]?.photos?.[0]?.src

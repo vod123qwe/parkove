@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.130.0'
+export const VERSION = '0.131.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,21 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.131.0',
+    date: '2026-10-10',
+    title: '62 big playgrounds as places of their own',
+    tldr: 'Place zabaw od 1500 m2 sa teraz osobnymi miejscami: zakladka Place zabaw, karta z metrazem i osiedlem, bez pieczatki.',
+    changes: [
+      ['added', 'Every public playground in Krakow of at least 1500 square metres that is not already inside one of our parks is now a place: 62 of them, with the outline from OpenStreetMap, the size in ares and the neighbourhood and street from reverse geocoding.'],
+      ['added', 'A Playgrounds tab on the list. They stay out of All, so the places with stories keep their list; the playground filter and search reach them from any tab, and their pins appear on the map only when you ask for them.'],
+      ['added', 'A place card for a playground: ares and neighbourhood instead of hectares and points, a description made only of facts (size, location, equipment, surface, fence, hours, fee where OSM has them), check-in and your own photo. No stamp, no expedition start, no visiting estimate.'],
+      ['added', 'Playgrounds do not count toward the Krakow collection: progress, achievements and stats keep counting parks only. The matcher still sees them as candidates for Big playground.'],
+      ['changed', 'Photos from Commons only when they surely show the playground. Of 93 checked, one qualified; the rest wait for the first visit, through the camera button on the card.'],
+      ['fixed', 'Kamionna had no pin on the map since 0.125.0: the mountain kind had no pin artwork. It does now.'],
+      ['added', 'scripts/build-playground-places.mjs and npm run playgrounds:places; descriptions in src/app/data/playground-info.json.'],
+    ],
+  },
   {
     version: '0.130.0',
     date: '2026-10-10',
