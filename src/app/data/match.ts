@@ -1,5 +1,5 @@
 /**
- * Podpowiadacz wypraw: dwanaście kart w dwóch fazach, na końcu najwyżej trzy miejsca.
+ * Podpowiadacz wypraw: trzynaście kart w dwóch fazach, na końcu najwyżej trzy miejsca.
  *
  * Pomysł Jarka (2026-09-05): lista urosła do kilkudziesięciu miejsc i wybór
  * przestał być łatwy, a przewijanie kafelków nie pomaga, bo kafelek nie wie,
@@ -22,6 +22,7 @@ import { PARK_INFO } from './parkinfo'
 import { visitEstimate } from './visit'
 import { countsForKrakow } from './trip'
 import { TRANSIT } from './transit'
+import { playgroundScore } from './playgrounds'
 
 /** Rynek Główny: od niego liczymy „blisko czy daleko" */
 const CENTRE: [number, number] = [19.9366, 50.0619]
@@ -30,6 +31,7 @@ export type Feature =
   | 'blisko'
   | 'dlugie'
   | 'dziecko'
+  | 'plac'
   | 'tramwaj'
   | 'nowe'
   | 'widok'
@@ -96,6 +98,14 @@ export const QUESTIONS: Question[] = [
     hint: 'Plac zabaw, krótsza trasa i coś do jedzenia w pobliżu.',
     icon: 'child',
     photo: '/photos/park-park-jordana-zzm-1.jpg',
+  },
+  {
+    id: 'plac',
+    phase: 'dzis',
+    text: 'Duży plac zabaw',
+    hint: 'Taki, na którym dziecko zostanie godzinę, nie pięć minut.',
+    icon: 'play',
+    photo: '/photos/poi-kurdwanow-plac-zabaw.jpg',
   },
   {
     id: 'tramwaj',
@@ -238,11 +248,17 @@ function buildPlaces(): Place[] {
           : minutes <= 240
             ? clamp((minutes - 35) / 120)
             : clamp(1 - (minutes - 240) / 260),
+      /*
+       * Plac zabaw z obrysu w OSM (scripts/build-playgrounds.mjs): 1500 m²
+       * daje 0,7, 3000 m² i więcej daje 1, plac bez obrysu 0,35. Kuracja
+       * w parkinfo zostaje jako potwierdzenie, nie jako jedyne źródło.
+       */
+      plac: playgroundScore(p.id),
       dziecko: clamp(
-        (info?.amenities?.playground?.has ? 0.55 : 0) +
+        Math.max(playgroundScore(p.id) * 0.6, info?.amenities?.playground?.has ? 0.5 : 0) +
           (info?.amenities?.food?.has ? 0.15 : 0) +
           (minutes <= 60 ? 0.2 : 0) +
-          share(cat('play')) * 0.4 +
+          share(cat('play')) * 0.3 +
           (TAME.has(p.kind) ? 0.1 : 0),
       ),
       widok: clamp(share(cat('view')) + (HIGH.has(p.kind) ? 0.5 : 0)),
@@ -313,6 +329,7 @@ const REASON: Record<Feature, string> = {
   blisko: 'blisko',
   dlugie: 'na dłużej',
   dziecko: 'z dzieckiem',
+  plac: 'duży plac zabaw',
   widok: 'widoki',
   woda: 'woda',
   historia: 'historia',

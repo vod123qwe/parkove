@@ -13,6 +13,7 @@ import {
   MountainSnow,
   RotateCcw,
   Sparkles,
+  ToyBrick,
   TramFront,
   TreePine,
   Waves,
@@ -31,7 +32,7 @@ import type { MatchBg } from './matchbg'
 import { useGameState } from './state'
 
 /**
- * Dokąd dziś: dwanaście kart do przesunięcia, na końcu najwyżej trzy miejsca.
+ * Dokąd dziś: trzynaście kart do przesunięcia, na końcu najwyżej trzy miejsca.
  *
  * Trzy gesty, nie dwa (Jarek 2026-09-05): w prawo „tak", w lewo „nie",
  * w dół „wszystko jedno". Dół jest osobnym gestem, a nie przyciskiem, bo
@@ -50,6 +51,7 @@ const ICONS: Record<string, ReactNode> = {
   pin: <MapPin />,
   clock: <Clock />,
   child: <Baby />,
+  play: <ToyBrick />,
   tram: <TramFront />,
   sparkles: <Sparkles />,
   mountain: <MountainSnow />,

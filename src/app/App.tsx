@@ -40,6 +40,7 @@ import { distanceM, distanceToParkM, formatDistance } from './geo'
 import type { Pt } from './geo'
 import { hasPack, verifyPack } from './offline'
 import { fmtKm, fmtVisitMin, visitEstimate } from './data/visit'
+import { hasBigPlayground, hasPlayground } from './data/playgrounds'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
 import { useWakeLock } from './wakelock'
@@ -111,6 +112,18 @@ const DIST_OPTS = [
   { v: '5plus', label: '5 km i więcej' },
 ] as const
 type DistBand = (typeof DIST_OPTS)[number]['v']
+/*
+ * Plac zabaw jako filtr listy (Jarek 2026-10-10: „żeby z perspektywy dzieci
+ * można było filtrować"). „Duży" to co najmniej 1500 m² wg obrysu w OSM, próg
+ * siedzi w scripts/build-playgrounds.mjs. Plac bez obrysu liczy się do
+ * „z placem", nie do „dużego": nie zgadujemy rozmiaru.
+ */
+const PLAY_OPTS = [
+  { v: '', label: 'Plac zabaw: dowolnie' },
+  { v: 'any', label: 'Z placem zabaw' },
+  { v: 'big', label: 'Duży plac zabaw' },
+] as const
+type PlayBand = (typeof PLAY_OPTS)[number]['v']
 type PeekPage =
   | { t: 'park' }
   | { t: 'poi'; poi: QuestPoi }
@@ -144,6 +157,7 @@ export function App() {
   const [timeMax, setTimeMax] = useState(0)
   /** przedział kilometrów: '' = dowolny, '2'/'5' = najwyżej, '5plus' = od 5 */
   const [distBand, setDistBand] = useState<DistBand>('')
+  const [playBand, setPlayBand] = useState<PlayBand>('')
   /** arkusz z progami; taby zostają na wierzchu, progi chowają się tu */
   const [filtersOpen, setFiltersOpen] = useState(false)
 
@@ -314,12 +328,13 @@ export function App() {
    * zakladki jest zwyklym przelaczeniem widoku, a liczby stoja w naglowkach
    * grup. Predykat listy musi jednak widziec oba, stad dwie zmienne.
    */
-  const filtersOn = timeMax > 0 || distBand !== ''
+  const filtersOn = timeMax > 0 || distBand !== '' || playBand !== ''
   const listNarrowed = tab !== 'all' || filtersOn
   /* czysci progi, nie zakladke: zakladka nie jest filtrem */
   const clearFilters = () => {
     setTimeMax(0)
     setDistBand('')
+    setPlayBand('')
   }
 
   /*
@@ -851,10 +866,12 @@ export function App() {
       if (distBand === '2' && !(est && est.km <= 2)) return false
       if (distBand === '5' && !(est && est.km <= 5)) return false
       if (distBand === '5plus' && !(est && est.km >= 5)) return false
+      if (playBand === 'any' && !hasPlayground(f.id)) return false
+      if (playBand === 'big' && !hasBigPlayground(f.id)) return false
       return true
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortedParks, needle, listNarrowed, tab, timeMax, distBand])
+  }, [sortedParks, needle, listNarrowed, tab, timeMax, distBand, playBand])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -1226,7 +1243,7 @@ export function App() {
             okragly przycisk swieci, gdy ktorys prog jest zalozony */}
         <button
           className={`app-fbtn pk-press${timeMax > 0 || distBand !== '' ? ' -on' : ''}`}
-          aria-label="Filtry czasu i dystansu"
+          aria-label="Filtry czasu, dystansu i placu zabaw"
           onClick={() => setFiltersOpen(true)}
         >
           <SlidersHorizontal size={17} />
@@ -1261,7 +1278,7 @@ export function App() {
           </p>
         )}
         {!needle && filtersOn && shownParks.length === 0 && (
-          <p className="t-caption app-fzero">Poluzuj czas albo dystans, najlepiej ostatni.</p>
+          <p className="t-caption app-fzero">Poluzuj czas, dystans albo plac zabaw, najlepiej ostatni.</p>
         )}
         {needle && (
           <p className="t-caption app-search__count">
@@ -1671,9 +1688,27 @@ export function App() {
               ))}
             </select>
           </label>
+          <label className={`app-fselect${playBand !== '' ? ' -on' : ''}`}>
+            <ToyBrick size={15} aria-hidden="true" />
+            <span className="app-fselect__label">
+              {PLAY_OPTS.find((o) => o.v === playBand)!.label}
+            </span>
+            <ChevronDown size={14} aria-hidden="true" />
+            <select
+              value={playBand}
+              aria-label="Plac zabaw"
+              onChange={(e) => setPlayBand(e.target.value as PlayBand)}
+            >
+              {PLAY_OPTS.map((o) => (
+                <option key={o.v} value={o.v}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         {filtersOn && shownParks.length === 0 && (
-          <p className="t-caption app-fzero">Poluzuj czas albo dystans, najlepiej ostatni.</p>
+          <p className="t-caption app-fzero">Poluzuj czas, dystans albo plac zabaw, najlepiej ostatni.</p>
         )}
         <div className="app-fsheet__foot">
           <Button
@@ -1681,6 +1716,7 @@ export function App() {
             onClick={() => {
               setTimeMax(0)
               setDistBand('')
+              setPlayBand('')
             }}
           >
             Wyczyść

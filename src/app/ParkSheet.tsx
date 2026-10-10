@@ -27,6 +27,7 @@ import { WeatherStrip } from './WeatherStrip'
 import { OfflineRow } from './OfflineRow'
 import { PARK_INFO } from './data/parkinfo'
 import { amenitiesFor, isFood, topChips } from './data/amenities'
+import { playgroundLine } from './data/playgrounds'
 import { MODE_LABEL, TRANSIT, transitDirectionsUrl } from './data/transit'
 import { asset } from './assets'
 import { checkIn, collectPoint, stopExpedition, useGameState } from './state'
@@ -348,7 +349,8 @@ export function ParkSheet({
               <ToyBrick size={20} />
               <span className="t-body-strong park-amenity__title">Plac zabaw</span>
               <span className="t-caption park-amenity__status">
-                {playCount > 1 ? `${playCount} w okolicy` : 'jest na miejscu'}
+                {/* rozmiar z obrysu OSM, gdy jest; inaczej stara linia z kuracji */}
+                {playgroundLine(park.id) ?? (playCount > 1 ? `${playCount} w okolicy` : 'jest na miejscu')}
               </span>
               {playChips.length > 0 && (
                 <span className="t-caption park-amenity__chips">{playChips.join(' · ')}</span>

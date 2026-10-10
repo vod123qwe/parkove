@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.127.0'
+export const VERSION = '0.128.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.128.0',
+    date: '2026-10-10',
+    title: 'Playgrounds with a size',
+    tldr: 'Place zabaw z rozmiarem: filtr Duzy plac zabaw na liscie, karta w Dokad dzis, metraz w karcie parku.',
+    changes: [
+      ['added', 'Playground size per place, computed from the playground outline in OpenStreetMap. 48 of 65 places have a playground within 120 m of their edge, 28 have a big one of at least 1500 square metres. A playground mapped as a point counts as present, not as big: we do not guess a size.'],
+      ['added', 'List filter: any playground or a big playground, next to time and distance.'],
+      ['added', 'Where to today gets a thirteenth card, Big playground, in the Today phase, with a photo of the pirate ship in Park Kurdwanow.'],
+      ['changed', 'The park card now says how many playgrounds there are and how big the largest is, in ares, instead of just that one exists.'],
+      ['changed', 'With a child in the matcher now reads the same measured data instead of relying only on the hand curated flag.'],
+      ['added', 'scripts/build-playgrounds.mjs and npm run playgrounds; the result lives in src/app/data/playgrounds.json.'],
+    ],
+  },
   {
     version: '0.127.0',
     date: '2026-09-05',
