@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.132.0'
+export const VERSION = '0.133.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,15 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.133.0',
+    date: '2026-10-10',
+    title: 'Tabs instead of a pill on the web',
+    tldr: 'Na webie zakladki listy to tekstowe karty z podkresleniem zamiast pigulki; telefon bez zmian.',
+    changes: [
+      ['added', 'Segmented has a second outfit, tabs: text labels on a hairline with a 2 px underline that glides like the pill thumb did. Same component, same model, used by the list on the web where four pill segments in a 440 px panel looked wrong. The catalog shows both.'],
+    ],
+  },
   {
     version: '0.132.0',
     date: '2026-10-10',

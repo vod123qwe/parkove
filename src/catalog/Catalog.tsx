@@ -1138,7 +1138,7 @@ export function Catalog() {
         <Section
           id="segmented"
           title="Segmented"
-          lead="A small radio group for exclusive choices: theme switch, expedition modes. The active segment is raised."
+          lead="A small radio group for exclusive choices: theme switch, expedition modes. Two outfits, one model: the pill with a raised thumb for a thumb on a phone, and tabs with an underline for the web panel, where four pill segments in 440 px looked wrong."
         >
           <div className="cat-spec">
             <Segmented
@@ -1147,6 +1147,20 @@ export function Catalog() {
                 { value: 'auto', label: 'Auto' },
                 { value: 'light', label: 'Jasny' },
                 { value: 'dark', label: 'Ciemny' },
+              ]}
+              value={segDemo}
+              onChange={setSegDemo}
+              className="cat-segdemo"
+            />
+          </div>
+          <div className="cat-spec">
+            <Segmented
+              variant="tabs"
+              aria-label="Demo segmented tabs"
+              options={[
+                { value: 'auto', label: 'Wszystkie' },
+                { value: 'light', label: 'Parki' },
+                { value: 'dark', label: 'Dolinki' },
               ]}
               value={segDemo}
               onChange={setSegDemo}

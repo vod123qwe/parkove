@@ -44,3 +44,40 @@
   color: var(--content-primary);
   font-weight: 700;
 }
+
+/* ---- wariant 'tabs': zakładki z podkreśleniem, dla układu webowego ----
+   Bez zatopionego tła i bez pigułki: przyciski stoją na linii, a wskaźnik
+   jest kreską 2 px pod aktywną, przesuwaną tym samym mechanizmem co kciuk. */
+.pk-segmented.-tabs {
+  padding: 0;
+  gap: var(--sp-5);
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.pk-segmented.-tabs .pk-segmented__btn {
+  flex: 0 0 auto;
+  padding: var(--sp-2) 0 calc(var(--sp-2) + 2px);
+  border-radius: 0;
+  font-size: 14px;
+  color: var(--content-tertiary);
+}
+
+.pk-segmented.-tabs .pk-segmented__btn:hover {
+  color: var(--content-primary);
+}
+
+.pk-segmented.-tabs .pk-segmented__btn.-active {
+  color: var(--content-primary);
+}
+
+.pk-segmented.-tabs .pk-segmented__thumb {
+  top: auto;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--content-accent);
+  box-shadow: none;
+}
+

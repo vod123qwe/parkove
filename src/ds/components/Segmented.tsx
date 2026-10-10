@@ -10,6 +10,14 @@ export type SegmentedProps<T extends string> = {
   onChange: (value: T) => void
   'aria-label'?: string
   className?: string
+  /**
+   * 'pill' (domyślnie): zatopiona pigułka z wypukłym kciukiem, dobra pod
+   * palec na telefonie. 'tabs': tekstowe zakładki z podkreśleniem, dla
+   * układu webowego (Jarek 2026-10-10: pigułka z czterema opcjami w panelu
+   * 440 px „źle wygląda na web"). Ten sam model, ten sam przesuwany
+   * wskaźnik, inny strój: w zakładkach wskaźnik jest kreską pod aktywną.
+   */
+  variant?: 'pill' | 'tabs'
 }
 
 export function Segmented<T extends string>({
@@ -17,6 +25,7 @@ export function Segmented<T extends string>({
   value,
   onChange,
   className,
+  variant = 'pill',
   ...rest
 }: SegmentedProps<T>) {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -37,7 +46,7 @@ export function Segmented<T extends string>({
   }, [value, options.length])
 
   return (
-    <div ref={rootRef} className={cx('pk-segmented', className)} role="radiogroup" {...rest}>
+    <div ref={rootRef} className={cx('pk-segmented', variant === 'tabs' && '-tabs', className)} role="radiogroup" {...rest}>
       {thumb && (
         <span
           className="pk-segmented__thumb"

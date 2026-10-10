@@ -1370,6 +1370,7 @@ export function App() {
         {!needle && (
           <Segmented
             className="app-ftabs"
+            variant={wide ? 'tabs' : 'pill'}
             aria-label="Rodzaj miejsc"
             options={TAB_DEFS.map(([value, label]) => ({ value, label }))}
             value={tab}
