@@ -7120,3 +7120,50 @@
 .app-fcount .app-fclear {
   margin-left: auto;
 }
+
+/* ==========================================================================
+   Układ webowy (docs/web-layout.md): html[data-pk-wide='on']
+
+   Powłoka zostaje fixed; nie przechodzimy na grid, bo wszystkie dzieci są
+   pozycjonowane absolutnie i grid by ich nie dotknął. Mapa zostaje przy
+   lewej krawędzi, a każda rzecz nad nią dostaje PRAWY brzeg odsunięty o
+   szerokość panelu. Panel (arkusze i ekrany) stoi w prawej kolumnie przez
+   swoje własne style w DS. Strona: decyzja Jarka 2026-10-10, „mapa po lewej,
+   cały sidebar po prawej".
+   ========================================================================== */
+
+html[data-pk-wide='on'] {
+  --pk-panel-w: 440px;
+}
+
+/* prawa kolumna pod panelem: gdy nic nie jest otwarte, nie ma tam dziury na mapę */
+html[data-pk-wide='on'] .app-shell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--pk-panel-w);
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  z-index: 1;
+}
+
+html[data-pk-wide='on'] .app-map {
+  right: var(--pk-panel-w);
+}
+
+html[data-pk-wide='on'] .app-hud {
+  right: calc(var(--pk-panel-w) + var(--sp-4));
+}
+
+/* karta podglądu: na razie w kolumnie mapy, u dołu; okienko przy pinie to krok 2 */
+html[data-pk-wide='on'] .pk-peek {
+  left: calc((100% - var(--pk-panel-w)) / 2);
+}
+
+/*
+ * Kontrolek MapLibre NIE odsuwamy: siedzą wewnątrz .app-map, który już kończy
+ * się na krawędzi panelu, więc własne „right" odsuwało je podwójnie
+ * (atrybucja wylądowała na x=307 zamiast przy 990). Zmierzone 2026-10-10.
+ */

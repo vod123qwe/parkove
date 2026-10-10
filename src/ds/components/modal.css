@@ -99,3 +99,23 @@
     transform: translateX(100%);
   }
 }
+
+/* ==========================================================================
+   Układ webowy (docs/web-layout.md): ekran pełny staje się zawartością prawej
+   kolumny. Zostaje stosem nawigacji (profil, a nad nim statystyki), tylko w
+   440 px zamiast na całym ekranie. Mapa po prawej zostaje żywa.
+   ========================================================================== */
+
+html[data-pk-wide='on'] .pk-modal {
+  inset: 0 0 0 auto;
+  width: 440px;
+  box-shadow: var(--elevation-3);
+}
+
+html[data-pk-wide='on'] .pk-modal__panel {
+  border-left: 1px solid var(--border-subtle);
+}
+
+html[data-pk-wide='on'] .pk-modal__inner {
+  max-width: none;
+}

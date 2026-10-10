@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { cx } from '../cx'
 import { useOverlay } from '../useOverlay'
 import { useLightChrome } from '../useLightChrome'
+import { useWide } from '../useWide'
 import './bottomsheet.css'
 
 export type BottomSheetProps = {
@@ -108,6 +109,17 @@ export function BottomSheet({
     toldDetent.current = detent
     onDetent?.(detent)
   }, [detent, onDetent])
+  /*
+   * Układ webowy (docs/web-layout.md): arkusz NIE-modalny nie stoi na dole,
+   * tylko jest zawartością lewej kolumny, na całą jej wysokość. Zatrzaski
+   * nie mają wtedy sensu, więc od razu zgłaszamy „pełny": lista miejsc na
+   * tej podstawie pokazuje nagłówek i zakładki, które przy wystawaniu chowa.
+   */
+  const wide = useWide()
+  const panelMode = wide && !modal
+  useEffect(() => {
+    if (panelMode) setDetent('full')
+  }, [panelMode])
   const [heights, setHeights] = useState<{ full: number; auto: number } | null>(null)
   const drag = useRef<{
     startY: number
@@ -316,6 +328,29 @@ export function BottomSheet({
   }
 
   const gap = heights ? heights.full - heights.auto : 0
+
+  /*
+   * Tryb panelu: ta sama treść, ten sam nagłówek, zero mechaniki arkusza.
+   * Bez chwytu, bez przeciągania, bez przycisku „wróć do mapy", bez mierzenia
+   * wysokości: kolumna ma stałą wysokość ekranu i własne przewijanie.
+   * Hooki powyżej wykonują się jak zwykle (kolejność hooków musi być stała),
+   * tylko ich wynik nie jest tu używany.
+   */
+  if (panelMode) {
+    return (
+      <div className={cx('pk-sheet', '-nonmodal', '-panel', closing && '-closing', className)}>
+        <div className="pk-sheet__panel" role="dialog" aria-label={title}>
+          <div className={cx('pk-sheet__head', hero != null && '-overlay')}>
+            {hero == null && title != null && <h2 className="pk-sheet__title t-headline">{title}</h2>}
+          </div>
+          <div className={cx('pk-sheet__content', hero != null && '-hero')}>
+            {hero}
+            <div className="pk-sheet__inner">{children}</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={cx('pk-sheet', closing && '-closing', !modal && '-nonmodal', className)}>

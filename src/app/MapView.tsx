@@ -1244,7 +1244,8 @@ export function MapView({
           top: 120,
           left: 48,
           right: 48,
-          bottom: (focus.bottomPadding ?? 0) + 48,
+          /* uklad webowy: pod mapa nic nie lezy, dolny margines zostaje zwykly */
+          bottom: (document.documentElement.dataset.pkWide === 'on' ? 0 : (focus.bottomPadding ?? 0)) + 48,
         },
       })
       return
@@ -1253,7 +1254,13 @@ export function MapView({
       center: focus.center,
       zoom: focus.zoom ?? zoomForArea(focus.areaHa ?? 20),
       duration: 1200,
-      padding: { top: 0, left: 0, right: 0, bottom: focus.bottomPadding ?? 0 },
+      padding: {
+        top: 0,
+        left: 0,
+        right: 0,
+        /* uklad webowy: pod mapa nic nie lezy, wiec nie odsuwamy celu w gore */
+        bottom: document.documentElement.dataset.pkWide === 'on' ? 0 : (focus.bottomPadding ?? 0),
+      },
     })
   }, [focus])
 

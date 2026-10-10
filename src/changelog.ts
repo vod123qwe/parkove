@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.129.0'
+export const VERSION = '0.130.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,21 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.130.0',
+    date: '2026-10-10',
+    title: 'Web layout, step one: map on the left, panel on the right',
+    tldr: 'Na szerokim ekranie (od 900 px) mapa jest po lewej, a lista, karta miejsca i ekrany menu w panelu 440 px po prawej.',
+    changes: [
+      ['added', 'A wide layout from 900 px: the map keeps the left side of the window and a 440 px panel takes the right. Phones and portrait tablets are untouched; every wide rule starts from one flag on the document.'],
+      ['added', 'Non-modal sheets (the place list, the place card, expedition points) render as the panel instead of a bottom sheet: full height, own scrolling, no grabber, no detents.'],
+      ['added', 'Pushed screens (You, My numbers, Looks, About, Parking, Directions, Achievements, a point, a stamp) open inside the same right column, stacked like navigation, while the map stays live.'],
+      ['added', 'Modal sheets (Filters, Reveal, end of walk, far from the park) stay dialogs, centred on screen instead of stuck to the bottom.'],
+      ['changed', 'Map framing ignores the bottom padding in the wide layout, because nothing covers the map any more.'],
+      ['added', 'Forcing the layout for tests: ?wide=on, ?wide=off, ?wide=auto, kept for the tab session.'],
+      ['added', 'docs/web-layout.md: the decisions, the mechanism and the order of the next steps (pin popover, own screens, polish).'],
+    ],
+  },
   {
     version: '0.129.0',
     date: '2026-10-10',

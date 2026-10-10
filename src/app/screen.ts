@@ -81,6 +81,36 @@ export const GROUND_KEY = 'pk-ground-debug'
 export const SIM_KEY = 'pk-sim-phone'
 
 /**
+ * Układ webowy: panel 440 px po lewej, mapa na reszcie (docs/web-layout.md).
+ *
+ * Jedna flaga na dokumencie, `data-pk-wide="on"`, z progu 900 px. Ta sama
+ * zasada co przy symulacji telefonu: CSS i React czytają jedno miejsce, więc
+ * próg jest jeden, a `?wide=on` / `?wide=off` wymusza go do testów na
+ * telefonie i w podglądzie, gdzie szerokość okna nie jest tą, którą chcemy
+ * sprawdzić. Wymuszenie trzyma się do końca sesji karty.
+ */
+export const WIDE_KEY = 'pk-wide-force'
+const WIDE_QUERY = '(min-width: 900px)'
+
+export function trackWide() {
+  const root = document.documentElement
+  const param = new URLSearchParams(location.search).get('wide')
+  if (param === 'on' || param === 'off') sessionStorage.setItem(WIDE_KEY, param)
+  if (param === 'auto') sessionStorage.removeItem(WIDE_KEY)
+  const mql = window.matchMedia(WIDE_QUERY)
+  const apply = () => {
+    const forced = sessionStorage.getItem(WIDE_KEY)
+    const on = forced ? forced === 'on' : mql.matches
+    const was = root.dataset.pkWide === 'on'
+    if (on) root.dataset.pkWide = 'on'
+    else delete root.dataset.pkWide
+    if (was !== on) window.dispatchEvent(new Event('pk-wide'))
+  }
+  apply()
+  mql.addEventListener('change', apply)
+}
+
+/**
  * Symulacja bezpiecznych obszarów telefonu na dowolnym ekranie.
  *
  * Jarek: „dalej na dole jest przerwa na telefonie, jak możemy to rozwiązać?

@@ -10,9 +10,12 @@ Decyzje z tego samego dnia (cztery pytania, cztery odpowiedzi):
 - **Czym to jest na dużym ekranie**: narzędzie do planowania w domu. Nagrywanie
   wyprawy zostaje na telefonie, układ webowy nie musi go obsługiwać dobrze,
   tylko nie może go zepsuć.
-- **Proporcje**: panel 440 px po lewej, mapa na całej reszcie. Nie pół na pół:
+- **Proporcje**: panel 440 px, mapa na całej reszcie. Nie pół na pół:
   mapa jest kluczowa, a 440 px to szerokość, przy której tekst karty czyta się
   jak na telefonie, bez rozciągania wierszy.
+- **Strona**: mapa po lewej, panel po prawej (Jarek, po obejrzeniu pierwszej
+  wersji z panelem po lewej: „mapa powinna być po lewej, a cały sidebar po
+  prawej"). Mapa zaczyna się od krawędzi okna, panel domyka ekran z prawej.
 - **Klik w pin**: małe okienko przy pinie (zdjęcie, nazwa, czas, dystans,
   przyciski). Szczegóły dopiero po kliknięciu w okienko, w panelu.
 - **Próg**: od 900 px szerokości. Laptopy i tablety w poziomie dostają panel,
@@ -55,25 +58,26 @@ inaczej niż przez błąd w selektorze.
 ## Układ
 
 ```
-+------------------+----------------------------------------------+
-| panel 440 px     | mapa (reszta)                                |
-|                  |  [filtry]                           [menu]   |
-| lista miejsc     |                                              |
-|  albo            |          (pin) -> małe okienko               |
-| karta miejsca    |                                              |
-|  albo            |                                              |
-| Dokąd dziś       |                                              |
-|  albo            |                                              |
-| Pamiętnik, Ty... |                                              |
-+------------------+----------------------------------------------+
++----------------------------------------------+------------------+
+| mapa (reszta)                                | panel 440 px     |
+|  [filtry]                           [menu]   |                  |
+|                                              | lista miejsc     |
+|          (pin) -> małe okienko               |  albo            |
+|                                              | karta miejsca    |
+|                                              |  albo            |
+|                                              | Dokąd dziś       |
+|                                              |  albo            |
+|                                              | Pamiętnik, Ty... |
++----------------------------------------------+------------------+
 ```
 
-- **Powłoka**: `.app-shell` zostaje `fixed; inset: 0`, w trybie wide dostaje
-  `display: grid; grid-template-columns: 440px 1fr`. Mapa siedzi w drugiej
-  kolumnie, HUD (filtry, menu, pobieranie) nad nią.
+- **Powłoka**: `.app-shell` zostaje `fixed; inset: 0`. Bez grida: wszystkie
+  dzieci są pozycjonowane absolutnie, więc mapa dostaje `right: 440px`, a HUD
+  (filtry, menu, pobieranie) i kontrolki mapy odsuwają się od prawej o
+  szerokość panelu.
 - **Panel** to nie nowy komponent, tylko **drugi tryb istniejących nakładek**.
   Arkusz nie-modalny i ekran push w trybie wide renderują się jako zawartość
-  lewej kolumny: `fixed; left: 0; top: 0; bottom: 0; width: 440px`, bez
+  prawej kolumny: `fixed; right: 0; top: 0; bottom: 0; width: 440px`, bez
   zaokrągleń od góry, bez chwytu, bez zatrzasków, z własnym przewijaniem.
   Logika „jedna powierzchnia na raz" zostaje: gdy wybrane jest miejsce, lista
   znika i panel pokazuje kartę; gdy otwiera się profil, staje nad listą jak
