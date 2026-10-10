@@ -872,6 +872,67 @@ export function App() {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedParks, needle, listNarrowed, tab, timeMax, distBand, playBand])
+
+  /*
+   * Filtry i szukanie ograniczaja tez PINY na mapie, nie tylko liste (Jarek
+   * 2026-10-10: „gdy dodam jakies filtry, powinny one ograniczyc wyniki na
+   * mapie"). Bez zawezenia mapa pokazuje wszystko jak dotad; zakladka sama
+   * z siebie nie chowa pinow, bo „Dolinki" to porzadek listy, a nie pytanie.
+   */
+  const narrowedPins = filtersOn || needle.length > 0
+  const visiblePins = useMemo(() => {
+    if (!narrowedPins) return parkPins
+    const keep = new Set(shownParks.map((f) => f.id))
+    return parkPins.filter((p) => keep.has(p.id))
+  }, [parkPins, shownParks, narrowedPins])
+
+  /*
+   * Mapa dojezdza do tego, co zostalo. Tylko dla filtrow, nie dla szukania:
+   * przy wpisywaniu kazda litera przesuwalaby mape, a filtr zmienia sie raz.
+   * Kadr liczony z pinow, nie z obrysow, bo pin to to, co widac. Dol zostaje
+   * dla wystajacej listy (DOCK_PEEK), MapView doklada swoj margines.
+   */
+  useEffect(() => {
+    if (!filtersOn || needle.length > 0 || visiblePins.length === 0) return
+    /*
+     * Kadr na WIEKSZOSC wynikow, nie na wszystkie. Miechow i Kamionna sa
+     * w bazie, wiec prawie kazdy filtr zostawia jeden pin 30 albo 50 km od
+     * reszty, a prostokat na wszystko pokazywal pol wojewodztwa zamiast
+     * przyblizyc. Piny dalej niz 25 km od srodka ciezkosci wypadaja z kadru
+     * (zostaja na mapie), chyba ze zostalyby mniej niz dwa.
+     */
+    const cx = visiblePins.reduce((a, p) => a + p.coords[0], 0) / visiblePins.length
+    const cy = visiblePins.reduce((a, p) => a + p.coords[1], 0) / visiblePins.length
+    const kmFrom = (p: { coords: [number, number] }) =>
+      Math.hypot((p.coords[0] - cx) * 111.32 * Math.cos((cy * Math.PI) / 180), (p.coords[1] - cy) * 111.32)
+    const near = visiblePins.filter((p) => kmFrom(p) <= 25)
+    const pins = near.length >= 2 ? near : visiblePins
+    let w = 180
+    let s = 90
+    let e = -180
+    let n = -90
+    for (const p of pins) {
+      w = Math.min(w, p.coords[0])
+      e = Math.max(e, p.coords[0])
+      s = Math.min(s, p.coords[1])
+      n = Math.max(n, p.coords[1])
+    }
+    /* jeden pin: nie fitBounds na punkt, tylko dolot ze stalym zoomem */
+    if (pins.length === 1) {
+      setFocus({ center: [w, s], zoom: 13.5, ts: Date.now(), bottomPadding: DOCK_PEEK })
+      return
+    }
+    setFocus({
+      center: [(w + e) / 2, (s + n) / 2],
+      bounds: [
+        [w, s],
+        [e, n],
+      ],
+      ts: Date.now(),
+      bottomPadding: DOCK_PEEK,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtersOn, timeMax, distBand, playBand, tab])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -938,7 +999,7 @@ export function App() {
         parking={parkingPins}
         onSelectParking={onSelectParking}
         onClearSelection={clearSelection}
-        parkPins={parkPins}
+        parkPins={visiblePins}
         hideParkPinId={selected?.id ?? null}
         showParkPins={!onWalk}
         focus={focus}
@@ -1266,16 +1327,67 @@ export function App() {
           />
         )}
         {!needle && filtersOn && (
-          <p className="t-caption app-fcount">
-            {shownParks.length === 0
-              ? 'Nic nie pasuje.'
-              : `${shownParks.length} ${
-                  shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
-                } pasuje`}
+          /*
+           * Licznik plus AKTYWNE filtry jako chipy, kazdy z wlasnym selectem
+           * (Jarek 2026-10-10: „obok powinny byc wybrane filtry z mozliwoscia
+           * ich edycji juz z tego miejsca"). Ten sam wzorzec co w arkuszu,
+           * tylko mniejszy; nieaktywne progi zostaja w arkuszu, zeby wiersz
+           * mowil o tym, co dziala, a nie o wszystkim, co mogloby.
+           */
+          <div className="app-fcount">
+            <span className="t-caption app-fcount__n">
+              {shownParks.length === 0
+                ? 'Nic nie pasuje.'
+                : `${shownParks.length} ${
+                    shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
+                  } pasuje`}
+            </span>
+            {timeMax > 0 && (
+              <label className="app-fselect -chip -on">
+                <Clock size={13} aria-hidden="true" />
+                <span className="app-fselect__label">{TIME_OPTS.find((o) => o.v === timeMax)!.label}</span>
+                <ChevronDown size={12} aria-hidden="true" />
+                <select value={timeMax} aria-label="Czas zwiedzania" onChange={(e) => setTimeMax(Number(e.target.value))}>
+                  {TIME_OPTS.map((o) => (
+                    <option key={o.v} value={o.v}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {distBand !== '' && (
+              <label className="app-fselect -chip -on">
+                <Footprints size={13} aria-hidden="true" />
+                <span className="app-fselect__label">{DIST_OPTS.find((o) => o.v === distBand)!.label}</span>
+                <ChevronDown size={12} aria-hidden="true" />
+                <select value={distBand} aria-label="Dystans do przejścia" onChange={(e) => setDistBand(e.target.value as DistBand)}>
+                  {DIST_OPTS.map((o) => (
+                    <option key={o.v} value={o.v}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {playBand !== '' && (
+              <label className="app-fselect -chip -on">
+                <ToyBrick size={13} aria-hidden="true" />
+                <span className="app-fselect__label">{PLAY_OPTS.find((o) => o.v === playBand)!.label}</span>
+                <ChevronDown size={12} aria-hidden="true" />
+                <select value={playBand} aria-label="Plac zabaw" onChange={(e) => setPlayBand(e.target.value as PlayBand)}>
+                  {PLAY_OPTS.map((o) => (
+                    <option key={o.v} value={o.v}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <button className="app-fclear" onClick={clearFilters}>
               Wyczyść
             </button>
-          </p>
+          </div>
         )}
         {!needle && filtersOn && shownParks.length === 0 && (
           <p className="t-caption app-fzero">Poluzuj czas, dystans albo plac zabaw, najlepiej ostatni.</p>

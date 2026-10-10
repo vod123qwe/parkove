@@ -7089,3 +7089,34 @@
     transition-duration: 0.01ms;
   }
 }
+
+/*
+ * Wiersz pod zakladkami po zawezeniu listy: licznik, AKTYWNE filtry jako chipy
+ * do edycji w miejscu i „Wyczysc". Chip to ten sam .app-fselect co w arkuszu,
+ * tylko mniejszy i bez rozciagania na szerokosc, zeby trzy zmiescily sie
+ * w jednym, najwyzej dwoch wierszach na telefonie.
+ */
+.app-fcount {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+}
+
+.app-fcount__n {
+  color: var(--content-secondary);
+  margin-right: var(--sp-1);
+}
+
+.app-fselect.-chip {
+  flex: none;
+  padding: 5px 10px;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.app-fcount .app-fclear {
+  margin-left: auto;
+}

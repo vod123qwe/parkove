@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.128.0'
+export const VERSION = '0.129.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,17 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.129.0',
+    date: '2026-10-10',
+    title: 'Filters reach the map',
+    tldr: 'Filtry ograniczaja piny na mapie i przyblizaja do wynikow; aktywne filtry sa chipami do edycji przy liczniku.',
+    changes: [
+      ['changed', 'Filters and search now narrow the pins on the map, not only the list. Without narrowing the map shows everything as before.'],
+      ['added', 'After a filter changes the map fits the remaining places. Outliers farther than 25 km from the centre of the results stay on the map but out of the frame, so one place in Miechow does not zoom the whole province out.'],
+      ['added', 'Active filters appear as chips next to the match count, each with its own dropdown, so time, distance and playground can be changed right there without reopening the sheet.'],
+    ],
+  },
   {
     version: '0.128.0',
     date: '2026-10-10',
