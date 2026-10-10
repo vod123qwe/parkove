@@ -1,7 +1,7 @@
 // Parkove version history. Newest first.
 // Every update session: add an entry here and bump VERSION (+ package.json).
 
-export const VERSION = '0.131.0'
+export const VERSION = '0.132.0'
 
 export type ChangeType = 'added' | 'changed' | 'fixed'
 
@@ -40,6 +40,20 @@ export function changesSince(from: string) {
 }
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '0.132.0',
+    date: '2026-10-10',
+    title: 'The map answers every choice; filters live in the web panel',
+    tldr: 'Mapa reaguje na kazda zakladke, filtr, szukanie i Wyczysc; na webie filtry stoja w panelu na stale.',
+    changes: [
+      ['changed', 'Tabs narrow the pins on the map too. Clicking Dolinki now shows the valleys and frames them; before, a tab only reordered the list and the map did not move, which read as broken filtering.'],
+      ['changed', 'The frame follows every choice: tabs and filters at once, search after a short pause so the map does not jump under each letter, and Clear returns to the whole collection.'],
+      ['fixed', 'Framing the whole collection used the mean of all pins, which the three Portuguese places dragged 90 km west, so nothing counted as near and the frame covered half of Europe. The centre is the median now and outliers beyond 25 km stay on the map but out of the frame.'],
+      ['added', 'Web layout: the three filters (time, distance, playground) sit in the panel under the tabs, always visible, no sheet and no scrim, so each change is visible on the map next to it. The round filter button is phone only.'],
+      ['changed', 'Web layout: denser list rows with a hover state, a lower search field, and the active-filter chips give way to the filter bar.'],
+      ['fixed', 'The filter button on the phone did not light up for the playground filter.'],
+    ],
+  },
   {
     version: '0.131.0',
     date: '2026-10-10',

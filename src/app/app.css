@@ -7167,3 +7167,72 @@ html[data-pk-wide='on'] .pk-peek {
  * się na krawędzi panelu, więc własne „right" odsuwało je podwójnie
  * (atrybucja wylądowała na x=307 zamiast przy 990). Zmierzone 2026-10-10.
  */
+
+/* ==========================================================================
+   Układ webowy: panel listy jako narzędzie (Jarek 2026-10-10: „zrób tę wersję
+   znacznie bardziej webową, tak samo filtrowanie").
+
+   Filtry stoją w panelu na stałe, w jednym pasku pod zakładkami, zamiast
+   w arkuszu za przyciskiem. Wiersze listy są gęstsze i reagują na kursor,
+   bo na webie przegląda się wzrokiem, nie kciukiem. Mapa jest obok, więc
+   każda zmiana filtra ma widoczny skutek natychmiast.
+   ========================================================================== */
+
+html[data-pk-wide='on'] .pk-sheet.-panel .pk-sheet__inner {
+  padding-top: var(--sp-2);
+}
+
+/* pasek filtrów: trzy progi w jednym rzędzie, zawijane dopiero poniżej 400 px panelu */
+html[data-pk-wide='on'] .app-fselects.-web {
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+}
+
+html[data-pk-wide='on'] .app-fselects.-web .app-fselect {
+  flex: 1 1 120px;
+  padding: 7px 10px 7px 12px;
+}
+
+html[data-pk-wide='on'] .app-fselects.-web .app-fselect__label {
+  font-size: 12.5px;
+}
+
+html[data-pk-wide='on'] .app-fselects.-web .app-fselect:hover {
+  border-color: var(--border-focus);
+  cursor: pointer;
+}
+
+html[data-pk-wide='on'] .app-fselects.-web .app-fselect select {
+  cursor: pointer;
+}
+
+/* licznik wyników: jedna linia z „Wyczyść" po prawej, bez chipów (są w pasku) */
+html[data-pk-wide='on'] .app-fcount {
+  margin: calc(-1 * var(--sp-1)) 0 var(--sp-3);
+}
+
+/* wyszukiwarka: niższa, z większym oddechem pod spodem */
+html[data-pk-wide='on'] .pk-sheet.-panel .app-search {
+  height: 40px;
+  margin: 0 0 var(--sp-3);
+}
+
+html[data-pk-wide='on'] .pk-sheet.-panel .app-ftabs {
+  margin: 0 0 var(--sp-3);
+}
+
+/* wiersze listy: gęściej i z reakcją na kursor */
+html[data-pk-wide='on'] .pk-sheet.-panel .app-parklist > * {
+  border-radius: var(--radius-md);
+  transition: background-color 120ms ease;
+}
+
+html[data-pk-wide='on'] .pk-sheet.-panel .app-parklist > *:hover {
+  background: var(--bg-surface-sunken);
+  cursor: pointer;
+}
+
+html[data-pk-wide='on'] .pk-sheet.-panel .app-listgroup__head {
+  margin-top: var(--sp-2);
+}

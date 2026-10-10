@@ -41,6 +41,7 @@ import type { Pt } from './geo'
 import { hasPack, verifyPack } from './offline'
 import { fmtKm, fmtVisitMin, visitEstimate } from './data/visit'
 import { hasBigPlayground, hasPlayground, plAry } from './data/playgrounds'
+import { useWide } from '../ds/useWide'
 import { beginWalk } from './walk'
 import { askHeading, useHeading } from './heading'
 import { useWakeLock } from './wakelock'
@@ -167,6 +168,13 @@ export function App() {
   const [playBand, setPlayBand] = useState<PlayBand>('')
   /** arkusz z progami; taby zostają na wierzchu, progi chowają się tu */
   const [filtersOpen, setFiltersOpen] = useState(false)
+  /* uklad webowy: filtry stoja w panelu na stale, zamiast w arkuszu */
+  const wide = useWide()
+  /*
+   * Szukanie tez kadruje mape, ale z opoznieniem: kazda litera przesuwalaby
+   * mape pod palcem. Filtry i zakladki reaguja od razu, szukanie po chwili.
+   */
+  const [needleSlow, setNeedleSlow] = useState('')
 
   /*
    * Pogoda dla calej listy: jedno zapytanie na wszystkie miejsca, wiec placimy
@@ -855,6 +863,10 @@ export function App() {
       .replace(/ł/g, 'l')
       .toLowerCase()
   const needle = plain(query.trim())
+  useEffect(() => {
+    const t = window.setTimeout(() => setNeedleSlow(needle), 450)
+    return () => window.clearTimeout(t)
+  }, [needle])
 
   const shownParks = useMemo(() => {
     if (needle.length > 0) {
@@ -892,7 +904,13 @@ export function App() {
    * mapie"). Bez zawezenia mapa pokazuje wszystko jak dotad; zakladka sama
    * z siebie nie chowa pinow, bo „Dolinki" to porzadek listy, a nie pytanie.
    */
-  const narrowedPins = filtersOn || needle.length > 0
+  /*
+   * Zakladka TEZ zaweza piny. Wczesniej nie: „Dolinki" mialy byc porzadkiem
+   * listy, a nie pytaniem do mapy. Ale dla czlowieka klikniecie zakladki jest
+   * filtrem i brak reakcji mapy wygladal jak zepsute filtrowanie (Jarek
+   * 2026-10-10). Teraz kazdy wybor w panelu zmienia to, co widac na mapie.
+   */
+  const narrowedPins = filtersOn || needle.length > 0 || tab !== 'all'
   const showPlacePins = tab === 'place' || playBand !== ''
   const visiblePins = useMemo(() => {
     /* 62 piny placow na mapie miasta to tlok: pokazujemy je, gdy o nie pytasz */
@@ -909,7 +927,9 @@ export function App() {
    * dla wystajacej listy (DOCK_PEEK), MapView doklada swoj margines.
    */
   useEffect(() => {
-    if (!filtersOn || needle.length > 0 || visiblePins.length === 0) return
+    if (visiblePins.length === 0) return
+    /* w trakcie wpisywania czekamy na needleSlow; po nim kadrujemy jak przy filtrze */
+    if (needle.length > 0 && needle !== needleSlow) return
     /*
      * Kadr na WIEKSZOSC wynikow, nie na wszystkie. Miechow i Kamionna sa
      * w bazie, wiec prawie kazdy filtr zostawia jeden pin 30 albo 50 km od
@@ -917,8 +937,20 @@ export function App() {
      * przyblizyc. Piny dalej niz 25 km od srodka ciezkosci wypadaja z kadru
      * (zostaja na mapie), chyba ze zostalyby mniej niz dwa.
      */
-    const cx = visiblePins.reduce((a, p) => a + p.coords[0], 0) / visiblePins.length
-    const cy = visiblePins.reduce((a, p) => a + p.coords[1], 0) / visiblePins.length
+    /*
+     * MEDIANA, nie srednia. Przy „Wszystkie" w zbiorze sa trzy miejsca
+     * z wyprawy w Portugalii i srednia dlugosci geograficznej ucieka 90 km na
+     * zachod od Krakowa, wiec w 25 km od niej nie bylo zadnego pinu i kadr
+     * obejmowal pol Europy (zmierzone 2026-10-10: zoom 2,4). Mediana zostaje
+     * w Krakowie niezaleznie od tego, ile pinow stoi za granica.
+     */
+    const median = (xs: number[]) => {
+      const s = [...xs].sort((a, b) => a - b)
+      const m = s.length >> 1
+      return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2
+    }
+    const cx = median(visiblePins.map((p) => p.coords[0]))
+    const cy = median(visiblePins.map((p) => p.coords[1]))
     const kmFrom = (p: { coords: [number, number] }) =>
       Math.hypot((p.coords[0] - cx) * 111.32 * Math.cos((cy * Math.PI) / 180), (p.coords[1] - cy) * 111.32)
     const near = visiblePins.filter((p) => kmFrom(p) <= 25)
@@ -948,7 +980,7 @@ export function App() {
       bottomPadding: DOCK_PEEK,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtersOn, timeMax, distBand, playBand, tab])
+  }, [filtersOn, timeMax, distBand, playBand, tab, needleSlow])
   const grouped = useMemo(() => {
     const rows = shownParks.map((f) => {
       const p = progress[f.id]
@@ -1318,13 +1350,15 @@ export function App() {
         </label>
         {/* progi czasu i dystansu mieszkaja pod ta ikona (uwaga Jarka):
             okragly przycisk swieci, gdy ktorys prog jest zalozony */}
-        <button
-          className={`app-fbtn pk-press${timeMax > 0 || distBand !== '' ? ' -on' : ''}`}
-          aria-label="Filtry czasu, dystansu i placu zabaw"
-          onClick={() => setFiltersOpen(true)}
-        >
-          <SlidersHorizontal size={17} />
-        </button>
+        {!wide && (
+          <button
+            className={`app-fbtn pk-press${filtersOn ? ' -on' : ''}`}
+            aria-label="Filtry czasu, dystansu i placu zabaw"
+            onClick={() => setFiltersOpen(true)}
+          >
+            <SlidersHorizontal size={17} />
+          </button>
+        )}
         </div>
         {/* filtry nie maja sensu przy szukaniu: wynik idzie po wszystkim */}
         {/*
@@ -1342,6 +1376,52 @@ export function App() {
             onChange={setTab}
           />
         )}
+        {wide && !needle && (
+          /*
+           * Uklad webowy: trzy progi stoja w panelu na stale, nie w arkuszu
+           * (Jarek 2026-10-10: „jezeli klikam filtrowanie, to mapa na kazdy
+           * wybor powinna reagowac"). Mapa jest obok, wiec kazda zmiana selecta
+           * jest widoczna od razu, bez scrimu i bez zamykania dialogu.
+           */
+          <div className="app-fselects -web" role="group" aria-label="Filtry">
+            <label className={`app-fselect${timeMax > 0 ? ' -on' : ''}`}>
+              <Clock size={14} aria-hidden="true" />
+              <span className="app-fselect__label">{TIME_OPTS.find((o) => o.v === timeMax)!.label}</span>
+              <ChevronDown size={13} aria-hidden="true" />
+              <select value={timeMax} aria-label="Czas zwiedzania" onChange={(e) => setTimeMax(Number(e.target.value))}>
+                {TIME_OPTS.map((o) => (
+                  <option key={o.v} value={o.v}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={`app-fselect${distBand !== '' ? ' -on' : ''}`}>
+              <Footprints size={14} aria-hidden="true" />
+              <span className="app-fselect__label">{DIST_OPTS.find((o) => o.v === distBand)!.label}</span>
+              <ChevronDown size={13} aria-hidden="true" />
+              <select value={distBand} aria-label="Dystans do przejścia" onChange={(e) => setDistBand(e.target.value as DistBand)}>
+                {DIST_OPTS.map((o) => (
+                  <option key={o.v} value={o.v}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={`app-fselect${playBand !== '' ? ' -on' : ''}`}>
+              <ToyBrick size={14} aria-hidden="true" />
+              <span className="app-fselect__label">{PLAY_OPTS.find((o) => o.v === playBand)!.label}</span>
+              <ChevronDown size={13} aria-hidden="true" />
+              <select value={playBand} aria-label="Plac zabaw" onChange={(e) => setPlayBand(e.target.value as PlayBand)}>
+                {PLAY_OPTS.map((o) => (
+                  <option key={o.v} value={o.v}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
         {!needle && filtersOn && (
           /*
            * Licznik plus AKTYWNE filtry jako chipy, kazdy z wlasnym selectem
@@ -1358,7 +1438,7 @@ export function App() {
                     shownParks.length === 1 ? 'miejsce' : shownParks.length < 5 ? 'miejsca' : 'miejsc'
                   } pasuje`}
             </span>
-            {timeMax > 0 && (
+            {!wide && timeMax > 0 && (
               <label className="app-fselect -chip -on">
                 <Clock size={13} aria-hidden="true" />
                 <span className="app-fselect__label">{TIME_OPTS.find((o) => o.v === timeMax)!.label}</span>
@@ -1372,7 +1452,7 @@ export function App() {
                 </select>
               </label>
             )}
-            {distBand !== '' && (
+            {!wide && distBand !== '' && (
               <label className="app-fselect -chip -on">
                 <Footprints size={13} aria-hidden="true" />
                 <span className="app-fselect__label">{DIST_OPTS.find((o) => o.v === distBand)!.label}</span>
@@ -1386,7 +1466,7 @@ export function App() {
                 </select>
               </label>
             )}
-            {playBand !== '' && (
+            {!wide && playBand !== '' && (
               <label className="app-fselect -chip -on">
                 <ToyBrick size={13} aria-hidden="true" />
                 <span className="app-fselect__label">{PLAY_OPTS.find((o) => o.v === playBand)!.label}</span>
